@@ -21,14 +21,14 @@ Inductive operator : list nat -> Type :=
 | oper_lam         : operator [1]
 | oper_app         : operator [0; 0]
 
-| comp: operator [0]
-| ret_m: operator [0]
-| bind_m : operator [0; 1] (*bind x = e1 in e2*)
+| oper_comp: operator [0]
+| oper_ret_m: operator [0]
+| oper_bind_m : operator [0; 1] (*bind x = e1 in e2*)
 
-| reftp: operator [0]
-| ref: operator [0]
-| deref: operator [0]
-| assign: operator [0; 0] (*R := v*)
+| oper_reftp: operator [0]
+| oper_ref: operator [0]
+| oper_deref: operator [0]
+| oper_assign: operator [0; 0] (*R := v*)
 
 | oper_triv        : operator nil
 | oper_unittp      : operator nil
@@ -331,210 +331,33 @@ Qed.
 
 End object.
 
-Arguments var {object}.
+(*Arguments var {object}.
 Arguments oper {object}.
 Arguments rw_nil {object}.
 Arguments rw_cons {object}.
 
 Arguments hyp {object}.
 Arguments context {object}.
-Arguments judgement {object}.
+Arguments judgement {object}.*)
 
-Definition nattp_m : @term obj := oper _ (oper_nat _) rw_nil.
-Definition z_m : @term obj := oper _ (oper_z _) rw_nil.
-Definition succ_m M: @term obj := oper _ (oper_succ _) (rw_cons _ _ M rw_nil).
+Definition nattp_m : @term := oper _ oper_nat rw_nil.
+Definition z_m : @term := oper _ oper_z rw_nil.
+Definition succ_m M: @term := oper _ oper_succ (rw_cons _ _ M rw_nil).
 
-Definition arrow {obj} m1 m2       : @term obj := oper _ (oper_arrow _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition pi {obj} m1 m2          : @term obj := oper _ (oper_pi _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition clam {obj} m1 m2        : @term obj := oper _ (oper_clam _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition capp {obj} m1 m2        : @term obj := oper _ (oper_capp _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition ctlam {obj} m1 m2 m3  : @term obj := oper _ (oper_ctlam _) (rw_cons _ _ m1 (rw_cons _ _ m2 (rw_cons _ _ m3 rw_nil))).
-Definition ctapp {obj} m1 m2       : @term obj := oper _ (oper_ctapp _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition lam {obj} m             : @term obj := oper _ (oper_lam _) (rw_cons _ _ m rw_nil).
-Definition app {obj} m1 m2         : @term obj := oper _ (oper_app _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition fut {obj} m             : @term obj := oper _ (oper_fut _) (rw_cons _ _ m rw_nil).
-Definition cnext {obj} m           : @term obj := oper _ (oper_cnext _) (rw_cons _ _ m rw_nil).
-Definition cprev {obj} m           : @term obj := oper _ (oper_cprev _) (rw_cons _ _ m rw_nil).
-Definition next {obj} m            : @term obj := oper _ (oper_next _) (rw_cons _ _ m rw_nil).
-Definition prev {obj} m            : @term obj := oper _ (oper_prev _) (rw_cons _ _ m rw_nil).
-Definition rec {obj} m             : @term obj := oper _ (oper_rec _) (rw_cons _ _ m rw_nil).
-Definition equal {obj} m1 m2 m3    : @term obj := oper _ (oper_equal _) (rw_cons _ _ m1 (rw_cons _ _ m2 (rw_cons _ _ m3 rw_nil))).
-Definition triv {obj}              : @term obj := oper _ (oper_triv _) rw_nil.
-Definition eqtype {obj} m1 m2      : @term obj := oper _ (oper_eqtype _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition subtype {obj} m1 m2     : @term obj := oper _ (oper_subtype _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition kuniv {obj} m           : @term obj := oper _ (oper_kuniv _) (rw_cons _ _ m rw_nil).
-Definition all {obj} m1 m2 m3      : @term obj := oper _ (oper_all _) (rw_cons _ _ m1 (rw_cons _ _ m2 (rw_cons _ _ m3 rw_nil))).
-Definition exist {obj} m1 m2 m3    : @term obj := oper _ (oper_exist _) (rw_cons _ _ m1 (rw_cons _ _ m2 (rw_cons _ _ m3 rw_nil))).
-Definition voidtp {obj}            : @term obj := oper _ (oper_voidtp _) rw_nil.
-Definition unittp {obj}            : @term obj := oper _ (oper_unittp _) rw_nil.
-Definition cunit {obj}             : @term obj := oper _ (oper_cunit _) rw_nil.
-Definition booltp {obj}            : @term obj := oper _ (oper_booltp _) rw_nil.
-Definition btrue {obj}             : @term obj := oper _ (oper_btrue _) rw_nil.
-Definition bfalse {obj}            : @term obj := oper _ (oper_bfalse _) rw_nil.
-Definition bite {obj} m1 m2 m3     : @term obj := oper _ (oper_bite _) (rw_cons _ _ m1 (rw_cons _ _ m2 (rw_cons _ _ m3 rw_nil))).
-Definition prod {obj} m1 m2        : @term obj := oper _ (oper_prod _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition sigma {obj} m1 m2       : @term obj := oper _ (oper_sigma _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition cpair {obj} m1 m2       : @term obj := oper _ (oper_cpair _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition cpi1 {obj} m            : @term obj := oper _ (oper_cpi1 _) (rw_cons _ _ m rw_nil).
-Definition cpi2 {obj} m            : @term obj := oper _ (oper_cpi2 _) (rw_cons _ _ m rw_nil).
-Definition ppair {obj} m1 m2       : @term obj := oper _ (oper_ppair _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition ppi1 {obj} m            : @term obj := oper _ (oper_ppi1 _) (rw_cons _ _ m rw_nil).
-Definition ppi2 {obj} m            : @term obj := oper _ (oper_ppi2 _) (rw_cons _ _ m rw_nil).
-Definition set {obj} m1 m2         : @term obj := oper _ (oper_set _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition quotient {obj} m1 m2    : @term obj := oper _ (oper_quotient _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition guard {obj} m1 m2       : @term obj := oper _ (oper_guard _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition wt {obj} m1 m2          : @term obj := oper _ (oper_wt _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition ext {obj} x             : @term obj := oper _ (oper_ext _ x) rw_nil.
+Definition arrow m1 m2 : @term := oper _ oper_arrow (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition lam m             : @term := oper _ oper_lam (rw_cons _ _ m rw_nil).
+Definition app m1 m2         : @term := oper _ oper_app (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+
+Definition comp T : @term := oper _ oper_comp (rw_cons _ _ T rw_nil).
+Definition ret_m M : @term := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
+Definition bind_m M : @term := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
+
+Definition reftp T : @term := oper _ oper_comp (rw_cons _ _ T rw_nil).
+Definition ref_m M : @term := oper _ oper_ref (rw_cons _ _ M rw_nil).
+Definition deref_m M : @term := oper _ oper_deref (rw_cons _ _ M rw_nil).
+Definition assign_m m1 m2 : @term := oper _ oper_assign (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+
+Definition unittp_m       : @term := oper _ oper_unittp rw_nil.
+Definition triv_m       : @term := oper _ oper_triv rw_nil.
 
 
-Arguments hyp_tpl  {object}.
-Arguments hyp_tp {object}.
-Arguments hyp_tml {object}.
-Arguments hyp_tm {object}.
-Arguments hyp_emp {object}.
-Arguments deq {object}.
-
-
-(* The choice here is arbitrary.  Any value would do. *)
-Definition arb {object} := @triv object.
-
-
-Inductive same_operator {A B : Type} : forall a b, operator A a -> operator B b -> Prop :=
-| same_univ :
-    same_operator [0] [0] (oper_univ A) (oper_univ B)
-
-| same_cty :
-    same_operator [0] [0] (oper_cty A) (oper_cty B)
-
-| same_con :
-    same_operator [0; 0] [0; 0] (oper_con A) (oper_con B)
-
-| same_karrow :
-    same_operator [0; 0] [0; 0] (oper_karrow A) (oper_karrow B)
-
-| same_arrow :
-    same_operator [0; 0] [0; 0] (oper_arrow A) (oper_arrow B)
-
-| same_pi :
-    same_operator [0; 1] [0; 1] (oper_pi A) (oper_pi B)
-
-| same_clam :
-    same_operator [0; 1] [0; 1] (oper_clam A) (oper_clam B)
-
-| same_capp :
-    same_operator [0; 0] [0; 0] (oper_capp A) (oper_capp B)
-
-| same_ctlam :
-    same_operator [0; 1; 0] [0; 1; 0] (oper_ctlam A) (oper_ctlam B)
-
-| same_ctapp :
-    same_operator [0; 0] [0; 0] (oper_ctapp A) (oper_ctapp B)
-
-| same_lam :
-    same_operator [1] [1] (oper_lam A) (oper_lam B)
-
-| same_app :
-    same_operator [0; 0] [0; 0] (oper_app A) (oper_app B)
-
-| same_fut :
-    same_operator [0] [0] (oper_fut A) (oper_fut B)
-
-| same_cnext :
-    same_operator [0] [0] (oper_cnext A) (oper_cnext B)
-
-| same_cprev :
-    same_operator [0] [0] (oper_cprev A) (oper_cprev B)
-
-| same_next :
-    same_operator [0] [0] (oper_next A) (oper_next B)
-
-| same_prev :
-    same_operator [0] [0] (oper_prev A) (oper_prev B)
-
-| same_rec :
-    same_operator [1] [1] (oper_rec A) (oper_rec B)
-
-| same_equal :
-    same_operator [0; 0; 0] [0; 0; 0] (oper_equal A) (oper_equal B)
-
-| same_triv :
-    same_operator nil nil (oper_triv A) (oper_triv B)
-
-| same_eqtype :
-    same_operator [0; 0] [0; 0] (oper_eqtype A) (oper_eqtype B)
-
-| same_subtype :
-    same_operator [0; 0] [0; 0] (oper_subtype A) (oper_subtype B)
-
-| same_kuniv :
-    same_operator [0] [0] (oper_kuniv A) (oper_kuniv B)
-
-| same_all :
-    same_operator [0; 0; 1] [0; 0; 1] (oper_all A) (oper_all B)
-
-| same_exist :
-    same_operator [0; 0; 1] [0; 0; 1] (oper_exist A) (oper_exist B)
-
-| same_voidtp :
-    same_operator nil nil (oper_voidtp A) (oper_voidtp B)
-
-| same_unittp :
-    same_operator nil nil (oper_unittp A) (oper_unittp B)
-
-| same_cunit :
-    same_operator nil nil (oper_cunit A) (oper_cunit B)
-
-| same_booltp :
-    same_operator nil nil (oper_booltp A) (oper_booltp B)
-
-| same_btrue :
-    same_operator nil nil (oper_btrue A) (oper_btrue B)
-
-| same_bfalse :
-    same_operator nil nil (oper_bfalse A) (oper_bfalse B)
-
-| same_bite :
-    same_operator [0; 0; 0] [0; 0; 0] (oper_bite A) (oper_bite B)
-
-| same_prod :
-    same_operator [0; 0] [0; 0] (oper_prod A) (oper_prod B)
-
-| same_sigma :
-    same_operator [0; 1] [0; 1] (oper_sigma A) (oper_sigma B)
-
-| same_cpair :
-    same_operator [0; 0] [0; 0] (oper_cpair A) (oper_cpair B)
-
-| same_cpi1 :
-    same_operator [0] [0] (oper_cpi1 A) (oper_cpi1 B)
-
-| same_cpi2 :
-    same_operator [0] [0] (oper_cpi2 A) (oper_cpi2 B)
-
-| same_ppair :
-    same_operator [0; 0] [0; 0] (oper_ppair A) (oper_ppair B)
-
-| same_ppi1 :
-    same_operator [0] [0] (oper_ppi1 A) (oper_ppi1 B)
-
-| same_ppi2 :
-    same_operator [0] [0] (oper_ppi2 A) (oper_ppi2 B)
-
-| same_set :
-    same_operator [0; 1] [0; 1] (oper_set A) (oper_set B)
-
-| same_quotient :
-    same_operator [0; 2] [0; 2] (oper_quotient A) (oper_quotient B)
-
-| same_guard :
-    same_operator [0; 0] [0; 0] (oper_guard A) (oper_guard B)
-
-| same_wt :
-    same_operator [0; 1] [0; 1] (oper_wt A) (oper_wt B)
-
-| same_ext {x y} :
-    same_operator nil nil (oper_ext A x) (oper_ext B y)
-.
-
-
-Hint Constructors same_operator : same_operator.
