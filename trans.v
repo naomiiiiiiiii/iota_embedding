@@ -12,12 +12,6 @@ Definition inr R: term False := ppair bfalse R.
 Definition opt w: term False := sigma booltp (bite (var 0) w unittp).
 
 (*recursion*)
-Definition theta : (term False) :=
-  lam(
-      lam (
- app (var 0) (app (app (var 1) (var 1)) (var 0))
-        )
-    ).
 
 Definition combt A: (term False) := rec (
                                     pi (fut (var 0)) (subst (sh 1) A)).
@@ -90,7 +84,7 @@ bite (if_cons L1) (cons (hd L1) (app (app f (tl L1)) L2 )) L2
 )
 ).
 
- Definition pend: (term False) := app (app theta theta) app_bc.
+ Definition pend: (term False) := app theta app_bc.
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun w1 => fun w2 => exist one world (equal w2 (app (app pend (var 0)) w1)
@@ -115,7 +109,7 @@ bite (if_cons w) (cons (app (hd w) (next v)) (app (app f (tl w)) v)) unittp
                                       ).
  (** getstore w v ~:= * (w/v) *)
 
- Definition getstore: (term False) := app (app theta theta) getstorebc.
+ Definition getstore: (term False) := app theta getstorebc.
 
  Definition store: (term False) -> (term False) := fun w => all one world ( (*u := var 0*)
                                                   pi 
@@ -125,15 +119,60 @@ bite (if_cons w) (cons (app (hd w) (next v)) (app (app f (tl w)) v)) unittp
 ).
 
  (*nats*)
- Definition minusbc: (term False) := lam 
+(*mysterious error Definition if_z (n: term False) := ppi1 n. *)
+Definition if_z (n: term False): (term False) := ppi1 n. 
+
+Definition minusbc: (term False) := lam
                          (
                            (*f := 0*)
                            lam ( (*f:= 1, n := 0*)
-                                       lam ((*f := 2, n:= 1, m := 0*)
+                               lam ((*f := 2, n:= 1, m := 0*)
+                                   let f := (var 2) in
+                                   let n := (var 1) in
+                                   let m := (var 0) in
                                                   bite (if_z n)
                                                   (nzero)
                                                   (bite (if_z m)
                                                      (n)
                                                     (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
                                                   ))).
- Definition minus: (term False) := app (app theta theta) minusbc.
+ Definition minus: (term False) := app theta minusbc.
+
+
+ Definition lengthbc: (term False) := lam 
+                                ( (*f:= 0*)
+                                  lam ((*f:= 1, L := 0*)
+                                      let f:= var 1 in
+                                      let L := var 0 in
+                                                bite (if_cons L) (nsucc (app f (tl L))) (nzero)
+                                                )).
+
+ Definition length: (term False) := app theta lengthbc.
+
+ Definition nth_normalbc: (term False) := lam 
+                              ( (*f : = 0*)
+                                 lam ((*f:= 1, L := 0*)
+                                     lam ( (*f:= 2, L:= 1, n:= 0*)
+                                           let f := (var 2) in
+                                           let L := (var 1) in
+                                           let n := (var 0) in
+                                                         bite (if_cons L)
+                                                         ( bite (if_z n) (hd L)
+                                                            (app (app f (app (ppi2 n) triv)) (app (ppi2 L) triv))
+                                                            )
+                                                         (lam voidtp)
+
+
+))).
+
+ Definition nth_normal: (term False) := app theta nth_normalbc.
+
+ (*gets you the nth thing from the back
+  all the ref indexes are wrt this*)
+ Definition nth := lam 
+                ((*L := 0*)
+                  lam ((*L = 1, n= 0*)
+                                           let L := (var 1) in
+                                           let n := (var 0) in
+                              app (app nth_normal L) (app (app minus (app length L)) n)
+                              )).
