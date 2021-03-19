@@ -137,11 +137,8 @@ Qed.
 
 
 Inductive hyp : Type :=
-| hyp_tpl : hyp
-| hyp_tp  : hyp
-| hyp_tml : term -> hyp
+(*| hyp_tpl : hyp x: _type_*)
 | hyp_tm  : term -> hyp
-| hyp_emp : hyp
 .
 
 
@@ -277,36 +274,6 @@ intros; simpl; f_equal; eauto.
 Qed.
 
 
-(* Obsolete *)
-Ltac invert_row_cons r :=
-match type of r with
-| row ?a =>
-    let i := fresh "i"
-    in let x := fresh "a"
-    in let m := fresh "m"
-    in let Heq := fresh "Heq"
-    in
-      remember a as x eqn:Heq in r;
-      revert Heq;
-      cases r; [intro Heq; discriminate Heq |];
-      intros i' x m r Heq;
-      injection Heq;
-      clear Heq;
-      intros -> ->;
-      revert m r
-end.
-
-
-(* Obsolete *)
-Ltac invert_row_nil r :=
-let x := fresh "a"
-in let Heq := fresh "Heq"
-in
-  remember (@nil nat) as x eqn:Heq in r;
-  revert Heq;
-  cases r; [| intros ? ? ? ? Heq; discriminate Heq];
-  intros _.
-
 
 Inductive Forallr (P : term -> Type) : forall a, row a -> Type :=
 | Forallr_nil
@@ -361,67 +328,8 @@ substrefl h.
 cbn in Heq''.
 auto.
 Qed.
-    
-
-(* obsolete *)
-Lemma invertrow :
-  forall l (r : row l),
-    (fix P (l : list nat) : (row l -> Type) -> Type :=
-       match l
-         as l
-         return (row l -> Type) -> Type
-       with
-       | nil => fun Q => Q rw_nil
-
-       | cons a l' =>
-           fun Q =>
-             existsT x,
-               P l' (fun r => Q (rw_cons _ _ x r))
-       end)
-    l (fun r' => r = r').
-Proof.
-intros l.
-induct l.
-
-(* nil *)
-{
-intro r.
-cases r.
-reflexivity.
-}
-
-(* cons *)
-{
-intros n a IH r.
-cases r.
-intros n' a' t r Heq.
-injection Heq.
-intros -> ->.
-substrefl Heq.
-exists t.
-so (IH r) as H.
-replace (fun r' => rw_cons n a t r = rw_cons n a t r') with (fun r' => r = r').
-2:{
-  fextensionality 1.
-  intro r''.
-  pextensionality.
-  - intro.
-    subst r''.
-    reflexivity.
-  
-  - intro Heq.
-    injectionc Heq.
-    intro Heq.
-    eapply inj_pair2_UIP; eauto.
-    intros; apply proof_irrelevance; done.
-  }
-exact H.
-}
-Qed.
-
 
 End object.
-
 
 Arguments var {object}.
 Arguments oper {object}.
@@ -432,10 +340,10 @@ Arguments hyp {object}.
 Arguments context {object}.
 Arguments judgement {object}.
 
-Definition univ {obj} m            : @term obj := oper _ (oper_univ _) (rw_cons _ _ m rw_nil).
-Definition cty {obj} m             : @term obj := oper _ (oper_cty _) (rw_cons _ _ m rw_nil).
-Definition con {obj} m1 m2         : @term obj := oper _ (oper_con _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition karrow {obj} m1 m2       : @term obj := oper _ (oper_karrow _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition nattp_m : @term obj := oper _ (oper_nat _) rw_nil.
+Definition z_m : @term obj := oper _ (oper_z _) rw_nil.
+Definition succ_m M: @term obj := oper _ (oper_succ _) (rw_cons _ _ M rw_nil).
+
 Definition arrow {obj} m1 m2       : @term obj := oper _ (oper_arrow _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 Definition pi {obj} m1 m2          : @term obj := oper _ (oper_pi _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 Definition clam {obj} m1 m2        : @term obj := oper _ (oper_clam _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
