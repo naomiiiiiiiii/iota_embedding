@@ -2,14 +2,10 @@ Require Import Coq.Arith.Arith.
 
 Require Import Axioms.
 
-From istari Require Import Sigma Tactics Equality Ordinal Page.
+From istari Require Import Sigma Tactics Equality Ordinal Page
+Subst SimpSub Sequence.
 
 Import List.ListNotations.
-
-Section object.
-
-
-Variable object : Type.
 
 
 Inductive operator : list nat -> Type :=
@@ -329,8 +325,6 @@ cbn in Heq''.
 auto.
 Qed.
 
-End object.
-
 (*Arguments var {object}.
 Arguments oper {object}.
 Arguments rw_nil {object}.
@@ -361,3 +355,18 @@ Definition unittp_m       : @term := oper _ oper_unittp rw_nil.
 Definition triv_m       : @term := oper _ oper_triv rw_nil.
 
 
+(*rules*)
+
+Inductive tr : context -> judgement -> Type :=
+
+(* Hypotheses *)
+
+| tr_hyp_tm :
+    forall G i a,
+      index i G (hyp_tm a)
+      -> tr G (deq (var i) (var i) (subst (sh (S i)) a))
+  
+| tr_hyp_tp :
+    forall G i,
+      index i G hyp_tp
+      -> tr G (deqtype (var i) (var i)).
