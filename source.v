@@ -3,10 +3,15 @@ Require Import Coq.Arith.Arith.
 Require Import Axioms.
 
 From istari Require Import Sigma Tactics Equality Ordinal Page
-Subst SimpSub Sequence.
+subst_src Sequence.
 
 Import List.ListNotations.
 
+
+Section Object.
+
+
+  Variable object : Type.
 
 Inductive operator : list nat -> Type :=
 | oper_nat: operator nil
@@ -28,6 +33,7 @@ Inductive operator : list nat -> Type :=
 
 | oper_triv        : operator nil
 | oper_unittp      : operator nil
+| oper_obj: object -> operator nil
 .
 
 
@@ -134,7 +140,7 @@ Qed.
 
 Inductive hyp : Type :=
 (*| hyp_tpl : hyp x: _type_*)
-| hyp_tm  : term -> hyp
+hyp_tm  : term -> hyp
 .
 
 
@@ -324,49 +330,54 @@ substrefl h.
 cbn in Heq''.
 auto.
 Qed.
+End Object.
 
-(*Arguments var {object}.
+Arguments var {object}.
 Arguments oper {object}.
 Arguments rw_nil {object}.
 Arguments rw_cons {object}.
 
 Arguments hyp {object}.
 Arguments context {object}.
-Arguments judgement {object}.*)
+Arguments judgement {object}.
 
-Definition nattp_m : @term := oper _ oper_nat rw_nil.
-Definition z_m : @term := oper _ oper_z rw_nil.
-Definition succ_m M: @term := oper _ oper_succ (rw_cons _ _ M rw_nil).
+Definition nattp_m {obj}: @term obj := oper _ (oper_nat _) rw_nil.
+Definition z_m {obj}: @term obj := oper _ (oper_z _) rw_nil.
+Definition succ_m {obj} M: @term obj := oper _ (oper_succ _) (rw_cons _ _ M rw_nil).
+(*
+Definition arrow {obj} m1 m2 : @term obj := oper _ (oper_arrow _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition lam {obj} m             : @term obj := oper _ oper_lam (rw_cons _ _ m rw_nil).
+Definition app {obj} m1 m2         : @term obj := oper _ oper_app (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 
-Definition arrow m1 m2 : @term := oper _ oper_arrow (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition lam m             : @term := oper _ oper_lam (rw_cons _ _ m rw_nil).
-Definition app m1 m2         : @term := oper _ oper_app (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition comp {obj} T : @term obj := oper _ oper_comp (rw_cons _ _ T rw_nil).
+Definition ret_m {obj} M : @term obj := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
+Definition bind_m {obj} M : @term obj := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
 
-Definition comp T : @term := oper _ oper_comp (rw_cons _ _ T rw_nil).
-Definition ret_m M : @term := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
-Definition bind_m M : @term := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
+Definition reftp {obj} T : @term obj := oper _ oper_comp (rw_cons _ _ T rw_nil).
+Definition ref_m {obj} M : @term obj := oper _ oper_ref (rw_cons _ _ M rw_nil).
+Definition deref_m {obj} M : @term obj := oper _ oper_deref (rw_cons _ _ M rw_nil).
+Definition assign_m {obj} m1 m2 : @term obj := oper _ oper_assign (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 
-Definition reftp T : @term := oper _ oper_comp (rw_cons _ _ T rw_nil).
-Definition ref_m M : @term := oper _ oper_ref (rw_cons _ _ M rw_nil).
-Definition deref_m M : @term := oper _ oper_deref (rw_cons _ _ M rw_nil).
-Definition assign_m m1 m2 : @term := oper _ oper_assign (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition unittp_m  {obj}     : @term obj := oper _ oper_unittp rw_nil.
+Definition triv_m   {obj}    : @term obj := oper _ oper_triv rw_nil.*)
 
-Definition unittp_m       : @term := oper _ oper_unittp rw_nil.
-Definition triv_m       : @term := oper _ oper_triv rw_nil.
-
+Arguments hyp_tm {object}.
+Arguments deq {object}.
 
 (*rules*)
 
-Inductive tr : context -> judgement -> Type :=
+Inductive tr : @context False -> @judgement False -> Type :=
 
 (* Hypotheses *)
 
 | tr_hyp_tm :
     forall G i a,
       index i G (hyp_tm a)
-      -> tr G (deq (var i) (var i) (subst (sh (S i)) a))
+      -> tr G (deq (var i) (var i) (subst_src.subst (subst_src.sh (S i)) a)).
   
 | tr_hyp_tp :
     forall G i,
       index i G hyp_tp
       -> tr G (deqtype (var i) (var i)).
+(*subst wants the syntax term
+ not the target term*)
