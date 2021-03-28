@@ -1,10 +1,15 @@
-(*replaced all object with false watch out for this*)
+
 Require Import Tactics.
-Require Import Syntax.
+Require Import source.
 
 
-Definition termx := @term False.
-Definition varx := @var False.
+Section object.
+
+Variable object : Type.
+
+
+Definition termx := @term object.
+Definition varx := @var object.
 
 
 Inductive sub : Type :=
@@ -31,7 +36,7 @@ Definition project (s : sub) (i : nat) : termx :=
 
 
 Definition shift (n : nat) (t : termx) : termx :=
-  traverse False
+  traverse object
     (fun i j =>
        if lt_dec j i then 
          varx j
@@ -41,7 +46,7 @@ Definition shift (n : nat) (t : termx) : termx :=
 
 
 Definition subst (s : sub) (t : termx) : termx :=
-  traverse False
+  traverse object
     (fun i j =>
       if lt_dec j i then
         varx j
@@ -74,7 +79,7 @@ Fixpoint under (n : nat) (s : sub) {struct n} : sub :=
 Lemma traverse_resp :
   forall resolve resolve',
     (forall i j, resolve i j = resolve' i j)
-    -> forall i t, traverse False resolve i t = traverse False resolve' i t.
+    -> forall i t, traverse object resolve i t = traverse object resolve' i t.
 Proof.
 intros resolve resolve' Hres i t.
 apply (traverse_parametric _ (fun i i' => i = i')); eauto; [].
@@ -84,8 +89,8 @@ Qed.
 
 Lemma traverse_delta :
   forall n resolve i t,
-    traverse False resolve (i+n) t
-    = traverse False (fun i' j => resolve (i'+n) j) i t.
+    traverse object resolve (i+n) t
+    = traverse object (fun i' j => resolve (i'+n) j) i t.
 Proof.
 intros n resolve i t.
 apply (traverse_parametric _ (fun i1 i2 => i1 = i2 + n)); auto; [].
@@ -95,9 +100,9 @@ Qed.
 
 Lemma traverse_compose_delta :
   forall n resolve resolve' i t,
-    traverse False resolve (i+n) (traverse False resolve' i t)
-    = traverse False
-      (fun i' j => traverse False resolve (i'+n) (resolve' i' j))
+    traverse object resolve (i+n) (traverse object resolve' i t)
+    = traverse object
+      (fun i' j => traverse object resolve (i'+n) (resolve' i' j))
       i t.
 Proof.
 intros n resolve resolve' i t.
@@ -535,7 +540,7 @@ Qed.
 
 Lemma traverse_under :
   forall i s t,
-    traverse False
+    traverse object
       (fun i j =>
         if lt_dec j i then
           varx j
@@ -546,7 +551,7 @@ Lemma traverse_under :
     subst (under i s) t.
 Proof.
 intros i s t.
-apply (traverse_parametric False (fun i1 i2 => i1 = i + i2)); try (intros; omega); [].
+apply (traverse_parametric object (fun i1 i2 => i1 = i + i2)); try (intros; omega); [].
 intros ? j k ->.
 forget (lt_dec k (i+j)) as b.
 destruct b as [Hlt | Hnlt].
@@ -643,7 +648,7 @@ etransitivity.
     clear s j Hnlt.
     rewrite -> subst_sh_shift; [].
     rewrite -> shift_sum; [].
-    change (traverse False
+    change (traverse object
               (fun i' j =>
                  if lt_dec j i' then varx j else shift i' (project (sh n) (j - i')))
               (0+i) (shift i t)
@@ -1077,21 +1082,22 @@ erewrite -> subst_eqsub; eauto.
 Qed.
 
 
+End object.
 
 
-(*Arguments sub {False}.
-Arguments dot {False}.
-Arguments sh {False}.
-Arguments trunc {False}.
-Arguments project {False}.
-Arguments shift {False}.
-Arguments subst {False}.
-Arguments id {False}.
-Arguments sh1 {False}.
-Arguments subst1 {False}.
-Arguments compose {False}.
-Arguments under {False}.
-Arguments eqsub {False}.*)
+Arguments sub {object}.
+Arguments dot {object}.
+Arguments sh {object}.
+Arguments trunc {object}.
+Arguments project {object}.
+Arguments shift {object}.
+Arguments subst {object}.
+Arguments id {object}.
+Arguments sh1 {object}.
+Arguments subst1 {object}.
+Arguments compose {object}.
+Arguments under {object}.
+Arguments eqsub {object}.
 
 
 (* Least priority first. *)
