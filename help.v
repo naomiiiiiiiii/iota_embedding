@@ -1,9 +1,10 @@
-From istari Require Import Sigma Tactics
+From istari Require Import Tactics Sequence source subst_src rules_src
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
+Definition oof M A: (@Syntax.judgement False) := deq M M A.
+
 (*he has arrow, you could be using arrow instead of pi if it makes it easier*)
-Definition oof (M: term False) := deq M M.
 
 Definition plus L R : (term False) := sigma booltp (bite (var 0) (subst (sh 1) L)
                                            (subst (sh 1) R) ).
