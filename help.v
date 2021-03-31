@@ -133,7 +133,7 @@ Definition minusbc: (term False) := lam
                                    let n := (var 1) in
                                    let m := (var 0) in
                                                   bite (if_z n)
-                                                  (nzero)
+                                                  (m)
                                                   (bite (if_z m)
                                                      (n)
                                                     (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
@@ -178,3 +178,8 @@ Definition minusbc: (term False) := lam
                                            let n := (var 0) in
                               app (app nth_normal L) (app (app minus (app length L)) n)
                               )).
+(*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
+ Definition make_ref: ((term False) -> (term False)) -> ((term False) -> (term False)) := [As]
+                                                       ([w] sigma nattp ([i] all world ([u]
+          equal (app (app (app nth w) i) (next u))
+   (later (As u)) typ))).
