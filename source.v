@@ -15,23 +15,23 @@ Section Object.
 Inductive operator : list nat -> Type :=
 | oper_nat: operator nil
 | oper_z: operator nil
-|oper_succ: operator [0]
+|oper_succ_m: operator [0]
 
-| oper_arrow       : operator [0; 0]
-| oper_lam         : operator [1]
-| oper_app         : operator [0; 0]
+| oper_arrow_m       : operator [0; 0]
+| oper_lam_m         : operator [1]
+| oper_app_m         : operator [0; 0]
 
-| oper_comp: operator [0]
+| oper_comp_m: operator [0]
 | oper_ret_m: operator [0]
 | oper_bind_m : operator [0; 1] (*bind x = e1 in e2*)
 
-| oper_reftp: operator [0]
-| oper_ref: operator [0]
-| oper_deref: operator [0]
-| oper_assign: operator [0; 0] (*R := v*)
+| oper_reftp_m: operator [0]
+| oper_ref_m: operator [0]
+| oper_deref_m: operator [0]
+| oper_assign_m: operator [0; 0] (*R := v*)
 
-| oper_triv        : operator nil
-| oper_unittp      : operator nil
+| oper_triv_m        : operator nil
+| oper_unittp_m      : operator nil
 | oper_obj: object -> operator nil
 .
 
@@ -148,7 +148,9 @@ Definition context := list hyp.
 
 Inductive judgement : Type :=
 | deq : (* tm *) term -> term -> (* cn *) term -> judgement
+| typ: term -> judgement
 .
+
 
 
 Fixpoint traverse (resolve : nat -> nat -> term) (i : nat) (m : term) {struct m} : term
@@ -342,24 +344,22 @@ Arguments judgement {object}.
 
 Definition nattp_m {obj}: @term obj := oper _ (oper_nat _) rw_nil.
 Definition z_m {obj}: @term obj := oper _ (oper_z _) rw_nil.
-Definition succ_m {obj} M: @term obj := oper _ (oper_succ _) (rw_cons _ _ M rw_nil).
-(*
-Definition arrow {obj} m1 m2 : @term obj := oper _ (oper_arrow _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-Definition lam {obj} m             : @term obj := oper _ oper_lam (rw_cons _ _ m rw_nil).
-Definition app {obj} m1 m2         : @term obj := oper _ oper_app (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition succ_m {obj} M: @term obj := oper _ (oper_succ_m _) (rw_cons _ _ M rw_nil).
+Definition arrow_m {obj} m1 m2 : @term obj := oper _ (oper_arrow_m _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition lam_m {obj} m             : @term obj := oper _ (oper_lam_m _) (rw_cons _ _ m rw_nil).
+Definition app_m {obj} m1 m2         : @term obj := oper _ (oper_app_m _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 
-Definition comp {obj} T : @term obj := oper _ oper_comp (rw_cons _ _ T rw_nil).
-Definition ret_m {obj} M : @term obj := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
-Definition bind_m {obj} M : @term obj := oper _ oper_ret_m (rw_cons _ _ M rw_nil).
+Definition comp_m {obj} T : @term obj := oper _ (oper_comp_m _) (rw_cons _ _ T rw_nil).
+Definition ret_m {obj} M : @term obj := oper _ (oper_ret_m _) (rw_cons _ _ M rw_nil).
+Definition bind_m {obj} m1 m2 : @term obj := oper _ (oper_bind_m _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
+Definition reftp_m {obj} T : @term obj := oper _ (oper_reftp_m _) (rw_cons _ _ T rw_nil).
+Definition ref_m {obj} M : @term obj := oper _ (oper_ref_m _) (rw_cons _ _ M rw_nil).
+Definition deref_m {obj} M : @term obj := oper _ (oper_deref_m _) (rw_cons _ _ M rw_nil).
+Definition asgn_m {obj} m1 m2 : @term obj := oper _ (oper_assign_m _) (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
 
-Definition reftp {obj} T : @term obj := oper _ oper_comp (rw_cons _ _ T rw_nil).
-Definition ref_m {obj} M : @term obj := oper _ oper_ref (rw_cons _ _ M rw_nil).
-Definition deref_m {obj} M : @term obj := oper _ oper_deref (rw_cons _ _ M rw_nil).
-Definition assign_m {obj} m1 m2 : @term obj := oper _ oper_assign (rw_cons _ _ m1 (rw_cons _ _ m2 rw_nil)).
-
-Definition unittp_m  {obj}     : @term obj := oper _ oper_unittp rw_nil.
-Definition triv_m   {obj}    : @term obj := oper _ oper_triv rw_nil.*)
+Definition unittp_m  {obj}     : @term obj := oper _ (oper_unittp_m _) rw_nil.
+Definition triv_m   {obj}    : @term obj := oper _ (oper_triv_m _) rw_nil.
 
 Arguments hyp_tm {object}.
 Arguments deq {object}.
-
+Arguments typ {object}.
