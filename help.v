@@ -57,58 +57,48 @@ Definition bind : term False := app Yc
         ))).
 (*worlds*)
 
- Definition list: (term False) -> (term False) := fun A => wt (opt A) (bite (ppi1 (var 0)) unittp voidtp).
-
- Definition cons: (term False) -> (term False) -> (term False) := fun x => fun L => ppair (ppair btrue x)
-                                                                      (lam L).
-
- Definition hd: (term False) -> (term False) := fun L => ppi2 (ppi1 L).
-
- Definition tl: (term False) -> (term False) := fun L => (app (ppi2 L) triv).
-
- Definition if_cons: (term False) -> (term False) := fun L => ppi1 (ppi1 L).
-
  Definition one: (term False) := nsucc nzero.
 
- Definition world: (term False) := rec (list (karrow (fut (var 0)) (univ (one)))).
+Definition world: (term False) := rec (prod
+                                     (karrow nattp (karrow (fut (var 0)) (univ (one))))
+                                     nattp).
 
- Definition tlist: (term False) := list (univ one).
+Definition len w: (term False) := ppi2 w.
 
- Definition app_bc: (term False) := lam 
-                      ( (*f:= 0*)
-                         lam ( (*f:= 1; L1 := 0*)
-                               lam ( (*f := 2; L1 := 1; L2 := 0*)
-                                     let f := (var 2) in
-                                     let L1 := (var 1) in
-                                     let L2 := (var 0) in
-bite (if_cons L1) (cons (hd L1) (app (app f (tl L1)) L2 )) L2
-)
-)
-).
+Definition default_w: (term False) := ppair (lam (*n := 0*) (lam (*n:= 1, |> w := 0*) unittp)) nzero.
+                                                      
 
- Definition pend: (term False) := app theta app_bc.
+Definition U1 := univ one.
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
-   fun w1 => fun w2 => exist one world (equal w2 (app (app pend (var 0)) w1)
-                                                              world).
+   fun w1 => fun w2 => prod (pi nattp (* 0 : = i
+                           *)
+                    (pi (ltpagetp (var 0) (len w1))
+                        ( (*1:= i, 0 := H*)
+                          equal (app (ppi1 w1) (var 1)) (app (ppi1 w2) (var 1)) (karrow
+                                                                                (fut world) U1)
+                        )
+                    )) (leqpagetp (len w1) (len w2)).
 
- Lemma osub : forall (M M' U1 U2 U3: term False) (G: context),
+ Lemma compose_sub : forall (M M' U1 U2 U3: term False) (G: context),
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
                          ->tr G (oof triv (subseq U1 U3)).
  Admitted.
 
- Definition getstorebc: (term False) := lam
+ Definition getstorebc: (term False) := unittp (*lam
                                       ( (*f := var 0*)
                          lam  ((*f := 1, w := 0*)
                              lam ( (*f:= 2, w:= 1, v:= 0*)
                                  let f := var 2 in
                                  let w := var 1 in
                                  let v := var 0 in
+                                 unittp
+
 bite (if_cons w) (cons (app (hd w) (next v)) (app (app f (tl w)) v)) unittp
 )
 )
-                                      ).
+                                      ))) *).
  (** getstore w v ~:= * (w/v) *)
 
  Definition getstore: (term False) := app theta getstorebc.
@@ -141,17 +131,17 @@ Definition minusbc: (term False) := lam
  Definition minus: (term False) := app theta minusbc.
 
 
- Definition lengthbc: (term False) := lam 
+ Definition lengthbc: (term False) := unittp (*lam 
                                 ( (*f:= 0*)
                                   lam ((*f:= 1, L := 0*)
                                       let f:= var 1 in
                                       let L := var 0 in
                                                 bite (if_cons L) (nsucc (app f (tl L))) (nzero)
-                                                )).
+                                                )).*).
 
  Definition length: (term False) := app theta lengthbc.
 
- Definition nth_normalbc: (term False) := lam 
+(* Definition nth_normalbc: (term False) := lam 
                               ( (*f : = 0*)
                                  lam ((*f:= 1, L := 0*)
                                      lam ( (*f:= 2, L:= 1, n:= 0*)
@@ -177,9 +167,50 @@ Definition minusbc: (term False) := lam
                                            let L := (var 1) in
                                            let n := (var 0) in
                               app (app nth_normal L) (app (app minus (app length L)) n)
-                              )).
+                )).*)
+
+ Definition nth w n: term False := app (ppi1 w) n.
 (*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
- Definition make_ref: ((term False) -> (term False)) -> ((term False) -> (term False)) := [As]
-                                                       ([w] sigma nattp ([i] all world ([u]
-          equal (app (app (app nth w) i) (next u))
-   (later (As u)) typ))).
+ Definition make_ref: term False -> term False := fun As =>
+ (lam (*w := 0*)
+    (sigma nattp ( (*w:= 1, i := 0*)
+      all world one (*w:= 2, i := 1, u := 0*)
+          ( let w := (var 2) in
+            let i := (var 1) in
+            let u := (var 0) in
+            prod (leqpagetp i (len w))
+          (equal (app (nth w i) (next u))
+                 (fut (app As u)) U1))))).
+
+Check nattp_m.
+
+ Definition move (A: source.term False) (m: term False): term False :=
+   match A with
+     source.oper L operator R =>
+     match operator with
+       oper_nat _ => lam (var 0)
+     | oper_arrow_m =>
+lam ( (*f:= 0*)
+       lam ( (*f := 1 m:= 0*)
+                          lam (*f:= 2 m := 1, x:= 0*)
+                            app f ()
+                        ))
+| _ => lam (var 0)
+     end
+   | source.var _ => lam (var 0) end.
+
+
+
+
+ Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False)
+          (n: nat) (*counter*) :=
+   match G with
+     [ ] => e
+   | x :: xs =>
+     match x with
+       hyp_tm A => move_gamma xs m (subst (dot (move A m (var n)) id) e)
+     end
+   end.
+
+
+
