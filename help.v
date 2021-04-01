@@ -1,3 +1,5 @@
+
+From Coq Require Import Lists.List.
 From istari Require Import Tactics Sequence source subst_src rules_src
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -65,21 +67,57 @@ Definition world: (term False) := rec (prod
 
 Definition len w: (term False) := ppi2 w.
 
-Definition default_w: (term False) := ppair (lam (*n := 0*) (lam (*n:= 1, |> w := 0*) unittp)) nzero.
+Definition default_f: (term False) := (lam (*n:= 1, |> w := 0*) unittp).
+(*dfault: world -> U1*)
                                                       
 
 Definition U1 := univ one.
 
- Definition subseq: (term False) -> (term False) -> (term False) :=
-   fun w1 => fun w2 => prod (pi nattp (* 0 : = i
-                           *)
-                    (pi (ltpagetp (var 0) (len w1))
-                        ( (*1:= i, 0 := H*)
-                          equal (app (ppi1 w1) (var 1)) (app (ppi1 w2) (var 1)) (karrow
-                                                                                (fut world) U1)
-                        )
-                    )) (leqpagetp (len w1) (len w2)).
+Definition if_z (n: term False): (term False) := ppi1 n.
 
+Definition minusbc: (term False) := lam
+                         (
+                           (*f := 0*)
+                           lam ( (*f:= 1, n := 0*)
+                               lam ((*f := 2, n:= 1, m := 0*)
+                                   let f := (var 2) in
+                                   let n := (var 1) in
+                                   let m := (var 0) in
+                                                  bite (if_z n)
+                                                  (m)
+                                                  (bite (if_z m)
+                                                     (n)
+                                                    (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
+                                                  ))).
+ Definition minus: (term False) := app theta minusbc.
+
+ Definition plusbc: (term False) := lam
+                         (
+                           (*f := 0*)
+                           lam ( (*f:= 1, n := 0*)
+                               lam ((*f := 2, n:= 1, m := 0*)
+                                   let f := (var 2) in
+                                   let n := (var 1) in
+                                   let m := (var 0) in
+                                                  bite (if_z m)
+                                                     (n)
+                                                    (app (app f n) (app (ppi2 m) triv))
+                                                  ))).
+ Definition plus_n: (term False) := app theta plusbc.
+
+Definition pend w1 w2 :=
+  ppair (lam ( (*n := 0*)
+             let n := var 0 in
+             bite (if_z (app (app minus (len w1)) n)) (app (ppi1 w2)
+                                                           (app (app minus (len w1)) n)) (app (ppi1 w1) n)
+        )) (plus (len w1) (len w2)).
+
+Definition cons w1 x :=
+  pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).
+
+ Definition subseq: (term False) -> (term False) -> (term False) :=
+   fun w1 => fun w2 => exist one world (equal w2 (pend w1 (var 0))
+                                        world).
  Lemma compose_sub : forall (M M' U1 U2 U3: term False) (G: context),
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
@@ -112,23 +150,6 @@ bite (if_cons w) (cons (app (hd w) (next v)) (app (app f (tl w)) v)) unittp
 
  (*nats*)
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
-Definition if_z (n: term False): (term False) := ppi1 n. 
-
-Definition minusbc: (term False) := lam
-                         (
-                           (*f := 0*)
-                           lam ( (*f:= 1, n := 0*)
-                               lam ((*f := 2, n:= 1, m := 0*)
-                                   let f := (var 2) in
-                                   let n := (var 1) in
-                                   let m := (var 0) in
-                                                  bite (if_z n)
-                                                  (m)
-                                                  (bite (if_z m)
-                                                     (n)
-                                                    (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
-                                                  ))).
- Definition minus: (term False) := app theta minusbc.
 
 
  Definition lengthbc: (term False) := unittp (*lam 
@@ -184,31 +205,53 @@ Definition minusbc: (term False) := lam
 
 Check nattp_m.
 
- Definition move (A: source.term False) (m: term False): term False :=
+
+ Definition move (A: source.term False): term False :=
    match A with
-     source.oper L operator R =>
+     source.oper _ operator _ =>
      match operator with
-       oper_nat _ => lam (var 0)
-     | oper_arrow_m =>
-lam ( (*f:= 0*)
-       lam ( (*f := 1 m:= 0*)
-                          lam (*f:= 2 m := 1, x:= 0*)
-                            app f ()
+       oper_nat _ => lam (lam (var 1))
+     | oper_arrow_m _ =>
+lam ( (*m := 0*)
+lam ( (* m:= 1, f:= 0*)
+       lam ( (*f := 1 m':= 0*)
+           lam (*f:= 2 m' := 1, x:= 0*)
+             (let f := var 2 in
+             let x := var 0 in
+                            app (app f (triv)) x
+  ))))
+     | oper_comp_m _ => lam (lam (* c:= 0,*) (
+                           lam (*c:= 1, m := 0*)
+                             (lam (*c:= 2, m:= 1, s := 0*)
+                                (let c:= var 2 in
+                                let s := var 0 in
+                                app (app c triv) s)
+                             )
+                         ))
+     | oper_reftp_m _ => lam (lam (*R := 0*)
+                        (let i := ppi1 (var 0) in
+                         ppair i (ppair triv triv)
                         ))
-| _ => lam (var 0)
+     | oper_unittp_m _ => lam (lam (var 0))
+     | _ => triv (*not a type operator, error case*)
      end
-   | source.var _ => lam (var 0) end.
+   | source.var _ => triv end.
 
 
+Check move.
 
-
- Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False)
-          (n: nat) (*counter*) :=
+ Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) :=
    match G with
-     [ ] => e
-   | x :: xs =>
+     nil => e
+   | x::xs =>
      match x with
-       hyp_tm A => move_gamma xs m (subst (dot (move A m (var n)) id) e)
+       source.hyp_tm A => move_gamma xs m (subst (
+                                              dot (app (app (move A) m) (var 0))
+                                                  id) e)
+
+     (*assuming variables are stored in context with 0 first
+      DONT need the counter cuz all the other variables get moved down a slot with the
+      cons subtitution*)
      end
    end.
 
