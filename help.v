@@ -116,27 +116,32 @@ Definition cons w1 x :=
   pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
-   fun w1 => fun w2 => exist one world (equal w2 (pend w1 (var 0))
-                                        world).
+   fun w1 => fun w2 => prod (exist one world (equal w2 (pend w1 (var 0))
+                                              world))
+                      (sigma nattp (*j = var 0*) (equal (len w2) (var 0) nattp)).
+
+ Definition getlen_subseq m : term False :=
+   ppi1 (ppi2 m).
+
  Lemma compose_sub : forall (M M' U1 U2 U3: term False) (G: context),
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof triv (subseq U1 U3)).
+                         ->tr G (oof (ppair triv (ppair (getlen_subseq M) triv))
+                                    (subseq U1 U3)).
  Admitted.
 
- Definition getstorebc: (term False) := unittp (*lam
+ Definition getstorebc: (term False) := unittp lam
                                       ( (*f := var 0*)
                          lam  ((*f := 1, w := 0*)
                              lam ( (*f:= 2, w:= 1, v:= 0*)
                                  let f := var 2 in
                                  let w := var 1 in
                                  let v := var 0 in
-                                 unittp
-
-bite (if_cons w) (cons (app (hd w) (next v)) (app (app f (tl w)) v)) unittp
+       bite (if_z (len w)) unittp
+                          (ppair (app (app f (tl w)) v) (app (hd w) (next v)))
 )
 )
-                                      ))) *).
+                                      ).
  (** getstore w v ~:= * (w/v) *)
 
  Definition getstore: (term False) := app theta getstorebc.
