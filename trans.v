@@ -20,48 +20,47 @@ Inductive trans_type: (source.term False) -> (Syntax.term False) -> Type :=
                        ))
                                                 ))
                                                 ).
+(*probably want to make the above a function also so that
+ Gamma @ w can be calculated*)
 
-Inductive trans source.context -> (source.term False) -> (Syntax.term False) -> Type :=
-  t_ref: trans E Es ->
+Inductive trans: source.context -> (source.term False) -> (Syntax.term False) -> Type :=
+  t_ref: forall G E Es T Ts, trans G E Es ->
          trans_type T Ts ->
-         tr G (oof_m E T) ->
-         trans (ref E)
-               (*unresolved question: need i ever use x?
-                yes but move Es straight to u4 m ' o m o m0*)
-lam ( (*u1  = 0*)
-               ( lam (*u1 = 1 m = 0*)
-                       (  lam (*u1 = 2 m = 1, s= 0*)
-                            (let m := var 1 in
-                             let s := var 0 in
-                             let x := app (app (move_context G) triv) Es in
-                             ret (ppair (ppair triv (*u2 <= u3*)
-                                               (lam (*store*)
+         rules_src.tr G (oof_m E T) ->
+         trans G (ref_m E)
+(lam ( (*u1  = 0*)
+               ( lam (*u1 = 1 m0 = 0*)
+                       (  lam (*u1 = 2 m0 = 1, s= 0*)
+                            ( let u1 := var 2 in
+                              let m1 := var 1 in
+                             let x := app Es u1 in (*all of Es is @ u1 including vars in Gamma*)
+                             let i := getlen_subseq m1 in
+                             let m2 := make_subseq (nsucc i) (*u2 <= u3*) in
+                             let p1 := ppair m2 (*u2 <= u3*)
+                                               (lam (*store u3*)
  (*
 u1 = 3
-m: u1 <= u2 = 2
+m1: u1 <= u2 = 2
 s= 1
-m': u3 <= u4 = 0*)
-    (ppair (app s triv) (*store u2*)
-    (next (app (move_app T) (app Es u1)))(*|> tau @ u3*) )
+m3: u3 <= u4 = 0*)                                                
+                                                  (
+                             let u1 := var 3 in
+                             let m1 := var 2 in
+                             let s := var 1 in
+                             let m3 := var 0 in
+                             let x := app Es u1 in (*all of Es is @ u1 including vars in Gamma*)
+                             let i := getlen_subseq m1 in
+                             let m2 := make_subseq (nsucc i) (*u2 <= u3*) in
+                             let m14 := compose_sub m3 (compose_sub m2 m1) in
+                             ppair
+                               (app s (compose_sub m3 m2)) (*store u2*)
+                               (next (move_app T m14 x)) (*|> tau @ u3*) 
                                                )
-
-                                 ) )
-                             (exist world
-        ([u']
-         prod (prod (subseq u2 u')
-         (store u')) ((make_ref Ts) u'))))   type
-(ppair (ppair
-       triv   u2 <:= x::u2
-        (all world ([uf] lam (subseq (cons (lam (later world)
-                                                 ([u] letnext world u ([u'] later(Ts u')))) u2)
-                                  uf)
-([m'] (ppair (app s triv))
-         (ES uf)))
-)
-                      )   store
-(ppair (app length u2) (all world ([_] triv)))
-)
-)))
-                        <- of E T
-                        <- trans_type T Ts
-                        <- trans E ES.
+                                               )
+                                         
+                                    in
+                             ret_t (ppair p1
+                                          (ppair i (ppair triv triv)) (*ref*)
+                                        )
+                            )
+)))).

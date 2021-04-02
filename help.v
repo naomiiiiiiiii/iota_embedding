@@ -44,6 +44,8 @@ Definition laters A : term False := rec (plus A (fut (var 0))).
 
 Definition ret: term False := lam (inl (var 0)).
 
+Definition ret_t x := app ret x.
+
 Definition bind : term False := app Yc
    (lam   ( (*f := 0*)
       lam ( (*f:= 1, x := 0*)
@@ -123,14 +125,23 @@ Definition cons w1 x :=
  Definition getlen_subseq m : term False :=
    ppi1 (ppi2 m).
 
- Lemma compose_sub : forall (M M' U1 U2 U3: term False) (G: context),
+ Definition make_subseq n: term False := ppair triv (ppair n triv).
+
+ (*M o M'*)
+ Definition compose_sub M (M': term False) := make_subseq (getlen_subseq M).
+
+ Lemma compose_sub_works : forall (M M' U1 U2 U3: term False) (G: context),
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof (ppair triv (ppair (getlen_subseq M) triv))
+                         ->tr G (oof (compose_sub M M') 
                                     (subseq U1 U3)).
  Admitted.
 
- Definition getstorebc: (term False) := unittp lam
+
+
+ (*start here*)
+
+ Definition getstorebc: (term False) := unittp (*lam
                                       ( (*f := var 0*)
                          lam  ((*f := 1, w := 0*)
                              lam ( (*f:= 2, w:= 1, v:= 0*)
@@ -141,7 +152,7 @@ Definition cons w1 x :=
                           (ppair (app (app f (tl w)) v) (app (hd w) (next v)))
 )
 )
-                                      ).
+                                      )*).
  (** getstore w v ~:= * (w/v) *)
 
  Definition getstore: (term False) := app theta getstorebc.
@@ -219,20 +230,24 @@ Check nattp_m.
      | oper_arrow_m _ =>
 lam ( (*m := 0*)
 lam ( (* m:= 1, f:= 0*)
-       lam ( (*f := 1 m':= 0*)
-           lam (*f:= 2 m' := 1, x:= 0*)
-             (let f := var 2 in
+       lam ( (*m:= 2 f := 1 m':= 0*)
+           lam (*m := 3 f:= 2 m' := 1, x:= 0*)
+             ( let m := var 3 in
+               let f := var 2 in
+               let m' := var 1 in
              let x := var 0 in
-                            app (app f (triv)) x
+                            app (app f (compose_sub m' m)) x
   ))))
-     | oper_comp_m _ => lam (lam (* c:= 0,*) (
-                           lam (*c:= 1, m := 0*)
-                             (lam (*c:= 2, m:= 1, s := 0*)
-                                (let c:= var 2 in
+     | oper_comp_m _ => lam (lam (* m= 1, c:= 0,*) (
+                           lam (*m = 2, c:= 1, m' := 0*)
+                             (lam (*m = 3, c:= 2, m' := 1, s := 0*)
+                                (let m := var 3 in
+                                 let c:= var 2 in
+                                 let m' := var 1 in
                                 let s := var 0 in
-                                app (app c triv) s)
+                                app (app c (compose_sub m' m)) s
                              )
-                         ))
+                         )))
      | oper_reftp_m _ => lam (lam (*R := 0*)
                         (let i := ppi1 (var 0) in
                          ppair i (ppair triv triv)
@@ -242,8 +257,8 @@ lam ( (* m:= 1, f:= 0*)
      end
    | source.var _ => triv end.
 
-
-Check move.
+ Definition move_app A m x :=
+   app (app (move A) m) x.
 
  Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) :=
    match G with
@@ -260,8 +275,6 @@ Check move.
      end
    end.
 
- Definition move_app A : term False :=
-   app (move A) triv.
 
 
 
