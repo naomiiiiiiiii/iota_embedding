@@ -255,5 +255,8 @@ Check move.
      end
    end.
 
+ Definition move_app A : term False :=
+   app (move A) triv.
+
 
 

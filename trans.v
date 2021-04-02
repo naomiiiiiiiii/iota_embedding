@@ -30,14 +30,21 @@ Inductive trans source.context -> (source.term False) -> (Syntax.term False) -> 
                 yes but move Es straight to u4 m ' o m o m0*)
 lam ( (*u1  = 0*)
                ( lam (*u1 = 1 m = 0*)
-                       (  lam (*u1 = 2m = 1, s= 0*)
+                       (  lam (*u1 = 2 m = 1, s= 0*)
                             (let m := var 1 in
                              let s := var 0 in
                              let x := app (app (move_context G) triv) Es in
-                             ret (ppair (ppair triv (lam
-                                                       (*u1 = 3 m = 2 s  = 1 m' = 0*)
-(ppair (app s triv) (next (app (move_app T) (app Es u1))))
-                                                    )
+                             ret (ppair (ppair triv (*u2 <= u3*)
+                                               (lam (*store*)
+ (*
+u1 = 3
+m: u1 <= u2 = 2
+s= 1
+m': u3 <= u4 = 0*)
+    (ppair (app s triv) (*store u2*)
+    (next (app (move_app T) (app Es u1)))(*|> tau @ u3*) )
+                                               )
+
                                  ) )
                              (exist world
         ([u']
