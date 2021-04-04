@@ -107,15 +107,25 @@ Definition minusbc: (term False) := lam
                                                   ))).
  Definition plus_n: (term False) := app theta plusbc.
 
+Definition leq_bool m n := if_z (app (app minus m) n).
+
+(*uses default value of w2*)
 Definition pend w1 w2 :=
   ppair (lam ( (*n := 0*)
              let n := var 0 in
-             bite (if_z (app (app minus (len w1)) n)) (app (ppi1 w2)
-                                                           (app (app minus (len w1)) n)) (app (ppi1 w1) n)
-        )) (plus (len w1) (len w2)).
+             bite (leq_bool (len w1) n)
+                  (app (ppi1 w2) (app (app minus (len w1)) n))
+                  (app (ppi1 w1) n)
+        ))
+        (plus (len w1) (len w2)).
+
+(*Definition cons w1 x :=
+  pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).*)
 
 Definition cons w1 x :=
-  pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).
+  pend w1 (ppair (lam x) one).
+(*default value after s(len w1) is x*
+ie uses default value of w2*)
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun w1 => fun w2 => prod (exist one world (equal w2 (pend w1 (var 0))
