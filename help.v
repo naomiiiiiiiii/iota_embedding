@@ -63,17 +63,11 @@ Definition bind : term False := app Yc
 
  Definition one: (term False) := nsucc nzero.
 
-Definition world: (term False) := rec (prod
-                                     (karrow nattp (karrow (fut (var 0)) (univ (one))))
-                                     nattp).
+Definition preworld: (term False) := rec 
+                                   (arrow nattp (karrow (fut (var 0)) (univ (nzero)))).
+Definition world: (term False) := prod world nattp.
 
 Definition len w: (term False) := ppi2 w.
-
-Definition default_f: (term False) := (lam (*n:= 1, |> w := 0*) unittp).
-(*dfault: world -> U1*)
-                                                      
-
-Definition U1 := univ one.
 
 Definition if_z (n: term False): (term False) := ppi1 n.
 
@@ -107,23 +101,21 @@ Definition minusbc: (term False) := lam
                                                   ))).
  Definition plus_n: (term False) := app theta plusbc.
 
-Definition leq_bool m n := if_z (app (app minus m) n).
+Definition lt_bool m n := if_z (app (app minus m) (nsucc n)).
 
 (*uses default value of w2*)
-Definition pend w1 w2 :=
-  ppair (lam ( (*n := 0*)
-             let n := var 0 in
-             bite (leq_bool (len w1) n)
-                  (app (ppi1 w2) (app (app minus (len w1)) n))
-                  (app (ppi1 w1) n)
-        ))
-        (plus (len w1) (len w2)).
 
 (*Definition cons w1 x :=
   pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).*)
 
 Definition cons w1 x :=
-  pend w1 (ppair (lam x) one).
+  ppair (lam ( (*n := 0*)
+             let n := var 0 in
+             bite (lt_bool n (len w1))
+                  (app (ppi1 w1) n)
+                  x
+        ))
+        (nsucc (len w1)).
 (*default value after s(len w1) is x*
 ie uses default value of w2*)
 
