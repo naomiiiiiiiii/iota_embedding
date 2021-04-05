@@ -65,7 +65,7 @@ Definition bind : term False := app Yc
 
 Definition preworld: (term False) := rec 
                                    (arrow nattp (karrow (fut (var 0)) (univ (nzero)))).
-Definition world: (term False) := prod world nattp.
+Definition world: (term False) := prod preworld nattp.
 
 Definition len w: (term False) := ppi2 w.
 
@@ -119,57 +119,59 @@ Definition cons w1 x :=
 (*default value after s(len w1) is x*
 ie uses default value of w2*)
 
+(*start here*)
+
+Definition leq_t n m : term False :=
+  app (app leqtp n) m.
+
  Definition subseq: (term False) -> (term False) -> (term False) :=
-   fun w1 => fun w2 => prod (exist one world (equal w2 (pend w1 (var 0))
-                                              world))
-                      (sigma nattp (*j = var 0*) (equal (len w2) (var 0) nattp)).
+   fun W1 => fun W2 =>
+            let w1 := ppi1 W1 in
+            let w2 := ppi1 W2 in
+            let n1 := ppi2 W1 in
+            let n2 := ppi2 W2 in
+            prod (leq_t n1 n2)
+                 (pi nattp 
+                     (*i = var 0*)
+                     (all (*i = 1, h = 0*)
+                     nzero (leq_t (var 1) n1)
+                     (all nzero (fut preworld) (*i = 2, h = 1, u= 0*)
+                          (eqtype (app (app w1 (var 2)) (var 0))
+                          (app (app w2 (var 2)) (var 0)))
+                     ))
+                 ).
 
- Definition getlen_subseq m : term False :=
-   ppi1 (ppi2 m).
 
- Definition make_subseq n: term False := ppair triv (ppair n triv).
+ Definition make_subseq: term False := ppair triv (lam triv).
 
  (*M o M'*)
- Definition compose_sub M (M': term False) := make_subseq (getlen_subseq M).
 
  Lemma compose_sub_works : forall (M M' U1 U2 U3: term False) (G: context),
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof (compose_sub M M') 
+                         ->tr G (oof make_subseq 
                                     (subseq U1 U3)).
  Admitted.
 
+ (*getstore w v = *(w/v)*)
+ Definition getstore w v: (term False) := pi nattp ((*i = 0*)
+                                           let i := var 0 in
+                                           (app (app w i) (next v))
+                                         ).
 
-
- (*start here*)
-
- Definition getstorebc: (term False) := unittp (*lam
-                                      ( (*f := var 0*)
-                         lam  ((*f := 1, w := 0*)
-                             lam ( (*f:= 2, w:= 1, v:= 0*)
-                                 let f := var 2 in
-                                 let w := var 1 in
-                                 let v := var 0 in
-       bite (if_z (len w)) unittp
-                          (ppair (app (app f (tl w)) v) (app (hd w) (next v)))
-)
-)
-                                      )*).
- (** getstore w v ~:= * (w/v) *)
-
- Definition getstore: (term False) := app theta getstorebc.
-
- Definition store: (term False) -> (term False) := fun w => all one world ( (*u := var 0*)
+ Definition store: (term False) -> (term False) := fun wn =>
+                                            let w := ppi1 wn in
+                                            let n := ppi2 wn in
+                                            all one preworld ( (*u := var 0*)
                                                   pi 
-                                                    (subseq w (var 0))
+                                                    (subseq wn (ppair (var 0) n) )
                                                     (*u :=  var 1, m := var 0*)
-                                                     (app (app getstore w) (var 1))
-).
+                                                     (getstore w (var 1))).
 
  (*nats*)
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
 
-
+(*start here*)
  Definition lengthbc: (term False) := unittp (*lam 
                                 ( (*f:= 0*)
                                   lam ((*f:= 1, L := 0*)
