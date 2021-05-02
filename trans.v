@@ -1,3 +1,4 @@
+From Coq.Lists Require Import List.
 From istari Require Import source subst_src rules_src help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -5,7 +6,7 @@ From istari Require Import Sigma Tactics
 
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
-Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (Syntax.term False)
+Fixpoint  trans_type (W: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)
   :=  match tau with
         nattp_m => nattp
       | unittp_m => unittp
@@ -13,7 +14,7 @@ Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (S
                                         (let u := var 1 in
                                         let l := var 0 in
                                         let U := ppair u l in
-                                        arrow (subseq W U) (arrow (trans_type A U) (trans_type B U))
+                                        arrow (subseq W U) (arrow (trans_type U A) (trans_type U B))
                                     ))
        | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
@@ -27,7 +28,7 @@ Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (S
             let v := (var 1) in
             let lv := (var 0) in
           eqtype (app (app (nth W i) (next v)) (next lv))
-                 (fut (trans_type tau' (ppair v lv) ))
+                 (fut (trans_type (ppair v lv) tau' ))
                       )
                  ))
             )
@@ -47,11 +48,15 @@ Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (S
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                                     prod (prod (subseq U V) (store V))
-                                                    (trans_type tau' V)))
+                                                    (trans_type V tau')))
                                     )
                        ))
                       ))
-        | _ => nattp end.
+      | _ => nattp end.
+
+Fixpoint gamma_at (gamma: source.context) (W: Syntax.term False) :=
+  map (trans_type W) gamma.
+
 (*make trans_type a meta function
 %% can return whatever for terms that aren't types cuz induction on the derivation will
  take care of it
