@@ -61,10 +61,9 @@ Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (S
 (*probably want to make the above a function also so that
  Gamma @ w can be calculated*)
 
-Inductive trans: source.context -> (source.term False) -> (Syntax.term False) -> Type :=
-  t_ref: forall G E Es T Ts, trans G E Es ->
-         trans_type T Ts ->
-         rules_src.tr G (oof_m E T) ->
+Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
+  t_ref: forall G E Es T, trans G E Es ->
+         of_m G E T ->
          trans G (ref_m E)
                (lam ( (*l1  = 0*) lam (*l1 = 1, l = 0*)
                     ( lam (*l1 = 2, l = 1, m = 0*)
