@@ -179,13 +179,11 @@ Admitted.
  Definition nth w n: term False := app (ppi1 w) n.
 
 
-
- Definition move (A: source.term False): term False :=
+(*start here get rid of vacuous cases w program module*)
+ Definition move (A: source.term): term False :=
    match A with
-     source.oper _ operator _ =>
-     match operator with
-       oper_nat _ => lam (lam (var 1))
-     | oper_arrow_m _ =>
+     nattp_m => lam (lam (var 1))
+   | arrow_m _ _ =>
 lam ( (*m := 0*)
 lam ( (* m:= 1, f:= 0*)
        lam ( (*m:= 2 f := 1 m':= 0*)
@@ -196,7 +194,7 @@ lam ( (* m:= 1, f:= 0*)
              let x := var 0 in
                             app (app f make_subseq) x (*compose_sub m' m*)
   ))))
-     | oper_comp_m _ => lam (lam (* m= 1, c:= 0,*) (
+     | comp_m _ => lam (lam (* m= 1, c:= 0,*) (
                            lam (*m = 2, c:= 1, m' := 0*)
                              (lam (*m = 3, c:= 2, m' := 1, s := 0*)
                                 ( (*let m := var 3 in*)
@@ -206,32 +204,26 @@ lam ( (* m:= 1, f:= 0*)
                                 app (app c make_subseq) s (*compose_sub m' m*)
                              )
                          )))
-     | oper_reftp_m _ => lam (lam (*R := 0*)
+     | reftp_m _ => lam (lam (*R := 0*)
                         (let i := ppi1 (var 0) in
                          ppair i (ppair triv triv)
                         ))
-     | oper_unittp_m _ => lam (lam (var 0))
+     | unittp_m  => lam (lam (var 0))
      | _ => triv (*not a type operator, error case*)
-     end
-   | source.var _ => triv end.
-
+end.
  Definition move_app A m x :=
    app (app (move A) m) x.
 
  Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) :=
    match G with
      nil => e
-   | x::xs =>
-     match x with
-       source.hyp_tm A => move_gamma xs m (subst (
-                                              dot (app (app (move A) m) (var 0))
-                                                  id) e)
+   | b::bs => move_gamma bs m (subst ( dot (move_app b m (var 0)) 
+                                                 id) e)
 
      (*assuming variables are stored in context with 0 first
       DONT need the counter cuz all the other variables get moved down a slot with the
       cons subtitution*)
-     end
-   end.
+     end.
 
 
 
