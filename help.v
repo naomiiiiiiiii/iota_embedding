@@ -102,7 +102,7 @@ Definition minusbc: (term False) := lam
                                                   ))).
  Definition plus_n: (term False) := app theta plusbc.
 
-Definition lt_bool m n := if_z (app (app minus m) (nsucc n)).
+Definition lt_b m n := if_z (app (app minus m) (nsucc n)).
 
 (*uses default value of w2*)
 
@@ -112,7 +112,7 @@ Definition lt_bool m n := if_z (app (app minus m) (nsucc n)).
 Definition cons w1 x :=
   ppair (lam ( (*n := 0*)
              let n := var 0 in
-             bite (lt_bool n (len w1))
+             bite (lt_b n (len w1))
                   (app (ppi1 w1) n)
                   x
         ))
