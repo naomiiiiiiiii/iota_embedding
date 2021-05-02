@@ -5,7 +5,7 @@ From istari Require Import Sigma Tactics
 
 (*functions which take in the world and give you the type*)
 (*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
- Definition make_ref (tau : term False) (W: term False): (Syntax.term False) :=
+Fixpoint make_ref (tau : term False) (W: term False): (Syntax.term False) :=
 sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
             prod (ltpagetp i l1)
@@ -18,14 +18,13 @@ sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
             let v := (var 1) in
             let lv := (var 0) in
           eqtype (app (app (nth W i) (next v)) (next lv))
-                 (fut (app As (ppair v lv)))
+                 (fut (app tau (ppair v lv)))
                       )
                  ))
-             ).
-
+             )
 with trans_type (tau : source.term False) (W: Syntax.term False): (Syntax.term False)
   :=  match tau with
-        reftp_m tau' => (make_ref tau' W)
+        oper (oper_reftp_m tau' => (make_ref tau' W)
       | _ => nattp end.
 
       | comp_m tau' => 
