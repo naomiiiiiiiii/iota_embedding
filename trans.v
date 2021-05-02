@@ -4,9 +4,18 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 
 (*functions which take in the world and give you the type*)
-(*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
-Fixpoint make_ref (tau : term False) (W: term False): (Syntax.term False) :=
-sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
+(*make_ref: tau in source -> (translation of ref tau into target)*)
+Fixpoint  trans_type (tau : source.term) (W: Syntax.term False) {struct tau}: (Syntax.term False)
+  :=  match tau with
+        nattp_m => nattp
+      | unittp_m => unittp
+      | arrow_m A B => all preworld nzero (pi nattp (*u = 1, l = 0*)
+                                        (let u := var 1 in
+                                        let l := var 0 in
+                                        let U := ppair u l in
+                                        arrow (subseq W U) (arrow (trans_type A U) (trans_type B U))
+                                    ))
+       | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
             prod (ltpagetp i l1)
                  (all preworld nzero (*wl1:= 2, i := 1, v := 0*)
@@ -18,30 +27,31 @@ sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
             let v := (var 1) in
             let lv := (var 0) in
           eqtype (app (app (nth W i) (next v)) (next lv))
-                 (fut (app tau (ppair v lv)))
+                 (fut (trans_type tau' (ppair v lv) ))
                       )
                  ))
-             )
-with trans_type (tau : source.term False) (W: Syntax.term False): (Syntax.term False)
-  :=  match tau with
-        oper (oper_reftp_m tau' => (make_ref tau' W)
-      | _ => nattp end.
+            )
 
-      | comp_m tau' => 
-                                                (lam (*w:= var 0*)
-                                                (all world nzero ((*w = 1, u := var 0*)
-                                                       let w := Syntax.var 1 in
-                                                       let u := Syntax.var 0 in
-    arrow (subseq w u) (arrow (store u)
-                         (laters (exist world nzero ((*w:= 2, u:= 1, u':= 0*)
-                                              let u := Syntax.var 1 in
-                                              let u' := Syntax.var 0 in
-                                                    prod (prod (subseq u u') (store u'))
-                                                    (app Ts u'))
+      | comp_m tau' => all preworld nzero ((* u := var 0*)
+                      pi nattp  (*u := 1, l := 0*)   (                         
+                                                       let u := Syntax.var 1 in
+                                                       let l := Syntax.var 0 in
+                                                       let U := (ppair u l) in
+    arrow (subseq W U) (arrow (store U)
+                         (laters (exist world nzero ((*u:= 2, l:= 1, v:= 0*)
+                                          sigma nattp (*u = 3, l = 2, v= 1, lv = 0*)
+                                          (let u := Syntax.var 3 in
+                                              let l := Syntax.var 2 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                                    prod (prod (subseq U V) (store V))
+                                                    (trans_type tau' V)))
                                     )
                        ))
-                                                ))
-                                                ).
+                      ))
+        | _ => nattp end.
 (*make trans_type a meta function
 %% can return whatever for terms that aren't types cuz induction on the derivation will
  take care of it
