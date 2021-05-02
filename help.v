@@ -184,31 +184,32 @@ Admitted.
    match A with
      nattp_m => lam (lam (var 1))
    | arrow_m _ _ =>
-lam ( (*m := 0*)
-lam ( (* m:= 1, f:= 0*)
-       lam ( (*m:= 2 f := 1 m':= 0*)
-           lam (*m := 3 f:= 2 m' := 1, x:= 0*)
+lam ( (*m0 := 0*)
+lam ( lam (
+       lam ( (*m0:= 3, f := 2, l := 1, m:= 0*)
+           lam (*m0:= 4, f := 3, l := 2 m:= 1 x := 0*)
              ( (*let m := var 3 in*)
-               let f := var 2 in
-              (* let m' := var 1 in*)
+               let f := var 3 in
+               let l := var 2 in
              let x := var 0 in
-                            app (app f make_subseq) x (*compose_sub m' m*)
-  ))))
-     | comp_m _ => lam (lam (* m= 1, c:= 0,*) (
-                           lam (*m = 2, c:= 1, m' := 0*)
-                             (lam (*m = 3, c:= 2, m' := 1, s := 0*)
-                                ( (*let m := var 3 in*)
-                                 let c:= var 2 in
-                                 (*let m' := var 1 in*)
+                           app (app (app f l) make_subseq) x (*compose_sub m m0*)
+  )))))
+     | comp_m _ => lam (lam (* m0= 1, c:= 0,*) ( lam (
+                           lam (*m0 = 3, c:= 2, l = 1, m := 0*)
+                             (lam (*m0 = 4, c:= 3, l = 2, m := 1, s := 0*)
+                                ( 
+                                  let c:= var 3 in
+                                  let l:= var 2 in
                                 let s := var 0 in
-                                app (app c make_subseq) s (*compose_sub m' m*)
+                                app (app (app c l) make_subseq) s
+                                (*compose_sub m m0*)
                              )
-                         )))
+                         ))))
      | reftp_m _ => lam (lam (*R := 0*)
-                        (let i := ppi1 (var 0) in
-                         ppair i (ppair triv triv)
-                        ))
-     | unittp_m  => lam (lam (var 0))
+                          (let i := ppi1 (var 0) in
+                           ppair i (ppair triv (lam triv))
+                          ))
+     | unittp_m  => lam (lam (var 1))
      | _ => triv (*not a type operator, error case*)
 end.
  Definition move_app A m x :=
