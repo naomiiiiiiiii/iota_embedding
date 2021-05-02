@@ -46,5 +46,3 @@ Inductive tr : @context False -> @judgement False -> Type :=
 | tr_asgn: forall G R V T, tr G (oof_m V T) ->
                       tr G (oof_m R (comp_m (reftp_m T))) ->
                       tr G (oof_m (asgn_m R V) (comp_m unittp_m)).
-(*subst wants the syntax term
- not the target term*)

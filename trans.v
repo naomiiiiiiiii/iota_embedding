@@ -3,6 +3,7 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
+(*functions which take in the world and give you the type*)
 Inductive trans_type: (source.term False) -> (Syntax.term False) -> Type :=
   tt_ref: forall A As, trans_type A As -> trans_type (reftp_m A) (make_ref As)
 | tt_comp: forall T Ts, trans_type T Ts -> trans_type (comp_m T)

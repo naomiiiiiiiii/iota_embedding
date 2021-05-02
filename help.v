@@ -61,10 +61,11 @@ Definition bind : term False := app Yc
         ))).
 (*worlds*)
 
- Definition one: (term False) := nsucc nzero.
+Definition U0 : (term False) := univ nzero.
 
 Definition preworld: (term False) := rec 
-                                   (arrow nattp (karrow (fut (var 0)) (univ (nzero)))).
+                                   (arrow nattp (karrow (fut (var 0)) U0)).
+
 Definition world: (term False) := prod preworld nattp.
 
 Definition len w: (term False) := ppi2 w.
@@ -124,6 +125,9 @@ ie uses default value of w2*)
 Definition leq_t n m : term False :=
   app (app leqtp n) m.
 
+Definition app3 w i u l : term False :=
+ app (app (app w i) u) l.
+
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun W1 => fun W2 =>
             let w1 := ppi1 W1 in
@@ -133,16 +137,17 @@ Definition leq_t n m : term False :=
             prod (leq_t n1 n2)
                  (pi nattp 
                      (*i = var 0*)
-                     (all (*i = 1, h = 0*)
-                     nzero (leq_t (var 1) n1)
-                     (all nzero (fut preworld) (*i = 2, h = 1, u= 0*)
-                          (eqtype (app (app w1 (var 2)) (var 0))
-                          (app (app w2 (var 2)) (var 0)))
+                     ( pi nattp (*i = 1, l = 0*)
+                       (all (*i = 2, l = 1, h = 0*)
+                     nzero (leq_t (var 2) n1)
+                     (all nzero (fut preworld) (*i = 3, l = 2, h = 1, u= 0*)
+                          (eqtype (app3 w1 (var 3) (var 0) (var 2))
+                          (app3 w2 (var 3) (var 0) (var 2)))
                      ))
-                 ).
+                 )).
 
 
- Definition make_subseq: term False := ppair triv (lam triv).
+ Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
 
  (*M o M'*)
 
@@ -151,7 +156,7 @@ Definition leq_t n m : term False :=
                          -> tr G (oof M' (subseq U1 U2))
                          ->tr G (oof make_subseq 
                                     (subseq U1 U3)).
- Admitted.
+Admitted.
 
  (*getstore w v = *(w/v)*)
  Definition getstore w v: (term False) := pi nattp ((*i = 0*)
@@ -162,7 +167,7 @@ Definition leq_t n m : term False :=
  Definition store: (term False) -> (term False) := fun wn =>
                                             let w := ppi1 wn in
                                             let n := ppi2 wn in
-                                            all one preworld ( (*u := var 0*)
+                                            all nzero preworld ( (*u := var 0*)
                                                   pi 
                                                     (subseq wn (ppair (var 0) n) )
                                                     (*u :=  var 1, m := var 0*)
@@ -171,59 +176,29 @@ Definition leq_t n m : term False :=
  (*nats*)
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
 
-(*start here*)
- Definition lengthbc: (term False) := unittp (*lam 
-                                ( (*f:= 0*)
-                                  lam ((*f:= 1, L := 0*)
-                                      let f:= var 1 in
-                                      let L := var 0 in
-                                                bite (if_cons L) (nsucc (app f (tl L))) (nzero)
-                                                )).*).
-
- Definition length: (term False) := app theta lengthbc.
-
-(* Definition nth_normalbc: (term False) := lam 
-                              ( (*f : = 0*)
-                                 lam ((*f:= 1, L := 0*)
-                                     lam ( (*f:= 2, L:= 1, n:= 0*)
-                                           let f := (var 2) in
-                                           let L := (var 1) in
-                                           let n := (var 0) in
-                                                         bite (if_cons L)
-                                                         ( bite (if_z n) (hd L)
-                                                            (app (app f (app (ppi2 n) triv)) (app (ppi2 L) triv))
-                                                            )
-                                                         (lam voidtp)
-
-
-))).
-
- Definition nth_normal: (term False) := app theta nth_normalbc.
-
- (*gets you the nth thing from the back
-  all the ref indexes are wrt this*)
- Definition nth := lam 
-                ((*L := 0*)
-                  lam ((*L = 1, n= 0*)
-                                           let L := (var 1) in
-                                           let n := (var 0) in
-                              app (app nth_normal L) (app (app minus (app length L)) n)
-                )).*)
-
  Definition nth w n: term False := app (ppi1 w) n.
 (*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
  Definition make_ref: term False -> term False := fun As =>
- (lam (*w := 0*)
-    (sigma nattp ( (*w:= 1, i := 0*)
-      all world one (*w:= 2, i := 1, u := 0*)
-          ( let w := (var 2) in
-            let i := (var 1) in
-            let u := (var 0) in
-            prod (leqpagetp i (len w))
-          (equal (app (nth w i) (next u))
-                 (fut (app As u)) U1))))).
+lam
+  (sigma nattp ( (*wl1:= 1, i := 0*)
+           let l1 := ppi2 (var 1) in
+           let i := (var 0) in
+            prod (ltpagetp i l1)
+                 (all preworld nzero (*wl1:= 2, i := 1, v := 0*)
+                      (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
+                      (
+            let W := (var 3) in
+            let w := ppi1 W in
+            let l1 := ppi2 W in
+            let i := (var 2) in
+            let v := (var 1) in
+            let lv := (var 0) in
+          eqtype (app (app (nth W i) (next v)) (next lv))
+                 (fut (app As (ppair v lv)))
+                      )
+         )))
+   ).
 
-Check nattp_m.
 
 
  Definition move (A: source.term False): term False :=
@@ -236,20 +211,20 @@ lam ( (*m := 0*)
 lam ( (* m:= 1, f:= 0*)
        lam ( (*m:= 2 f := 1 m':= 0*)
            lam (*m := 3 f:= 2 m' := 1, x:= 0*)
-             ( let m := var 3 in
+             ( (*let m := var 3 in*)
                let f := var 2 in
-               let m' := var 1 in
+              (* let m' := var 1 in*)
              let x := var 0 in
-                            app (app f (compose_sub m' m)) x
+                            app (app f make_subseq) x (*compose_sub m' m*)
   ))))
      | oper_comp_m _ => lam (lam (* m= 1, c:= 0,*) (
                            lam (*m = 2, c:= 1, m' := 0*)
                              (lam (*m = 3, c:= 2, m' := 1, s := 0*)
-                                (let m := var 3 in
+                                ( (*let m := var 3 in*)
                                  let c:= var 2 in
-                                 let m' := var 1 in
+                                 (*let m' := var 1 in*)
                                 let s := var 0 in
-                                app (app c (compose_sub m' m)) s
+                                app (app c make_subseq) s (*compose_sub m' m*)
                              )
                          )))
      | oper_reftp_m _ => lam (lam (*R := 0*)

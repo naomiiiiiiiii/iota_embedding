@@ -37,7 +37,7 @@ Inductive operator : list nat -> Type :=
 
 
 Inductive term : Type :=
-| var : nat -> term
+| var : nat -> term (*cant have type variables in this language*)
 | oper : forall a, operator a -> row a -> term
 
 with row : list nat -> Type :=
