@@ -177,27 +177,6 @@ Admitted.
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
 
  Definition nth w n: term False := app (ppi1 w) n.
-(*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
- Definition make_ref: term False -> term False := fun As =>
-lam
-  (sigma nattp ( (*wl1:= 1, i := 0*)
-           let l1 := ppi2 (var 1) in
-           let i := (var 0) in
-            prod (ltpagetp i l1)
-                 (all preworld nzero (*wl1:= 2, i := 1, v := 0*)
-                      (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
-                      (
-            let W := (var 3) in
-            let w := ppi1 W in
-            let l1 := ppi2 W in
-            let i := (var 2) in
-            let v := (var 1) in
-            let lv := (var 0) in
-          eqtype (app (app (nth W i) (next v)) (next lv))
-                 (fut (app As (ppair v lv)))
-                      )
-         )))
-   ).
 
 
 

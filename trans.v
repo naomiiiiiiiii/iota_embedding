@@ -4,9 +4,31 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 
 (*functions which take in the world and give you the type*)
-Inductive trans_type: (source.term False) -> (Syntax.term False) -> Type :=
-  tt_ref: forall A As, trans_type A As -> trans_type (reftp_m A) (make_ref As)
-| tt_comp: forall T Ts, trans_type T Ts -> trans_type (comp_m T)
+(*make_ref: (translation of tau into target) -> (translation of ref tau into target)*)
+ Definition make_ref (tau : term False) (W: term False): (Syntax.term False) :=
+sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
+           let i := (var 0) in
+            prod (ltpagetp i l1)
+                 (all preworld nzero (*wl1:= 2, i := 1, v := 0*)
+                      (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
+                      (
+            let w := ppi1 W in
+            let l1 := ppi2 W in
+            let i := (var 2) in
+            let v := (var 1) in
+            let lv := (var 0) in
+          eqtype (app (app (nth W i) (next v)) (next lv))
+                 (fut (app As (ppair v lv)))
+                      )
+                 ))
+             ).
+
+with trans_type (tau : source.term False) (W: Syntax.term False): (Syntax.term False)
+  :=  match tau with
+        reftp_m tau' => (make_ref tau' W)
+      | _ => nattp end.
+
+      | comp_m tau' => 
                                                 (lam (*w:= var 0*)
                                                 (all world nzero ((*w = 1, u := var 0*)
                                                        let w := Syntax.var 1 in
@@ -21,6 +43,12 @@ Inductive trans_type: (source.term False) -> (Syntax.term False) -> Type :=
                        ))
                                                 ))
                                                 ).
+(*make trans_type a meta function
+%% can return whatever for terms that aren't types cuz induction on the derivation will
+ take care of it
+ write up the rest of the translations*)
+
+
 (*probably want to make the above a function also so that
  Gamma @ w can be calculated*)
 

@@ -18,8 +18,6 @@ Inductive tr : @context False -> @judgement False -> Type :=
     tr G (oof_m M nattp_m) ->
     tr G (oof_m (succ_m M) nattp_m)
 | tr_natform: forall G, tr G (typ nattp_m)
-| tr_triv: forall G, tr G (oof_m triv_m unittp_m)
-| tr_null: forall G, tr G (typ unittp_m)
 | tr_arrow_m_formation :
     forall G a b,
       tr G (typ a)
@@ -45,4 +43,6 @@ Inductive tr : @context False -> @judgement False -> Type :=
 | tr_ref: forall G E A, tr G (oof_m E A) -> tr G (oof_m (ref_m E) (comp_m (reftp_m A)))
 | tr_asgn: forall G R V T, tr G (oof_m V T) ->
                       tr G (oof_m R (comp_m (reftp_m T))) ->
-                      tr G (oof_m (asgn_m R V) (comp_m unittp_m)).
+                      tr G (oof_m (asgn_m R V) (comp_m unittp_m))
+| tr_triv: forall G, tr G (oof_m triv_m unittp_m)
+| tr_null: forall G, tr G (typ unittp_m).
