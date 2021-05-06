@@ -113,6 +113,7 @@ Definition subst : sub -> term -> term :=
 
 Definition id : sub := sh 0.
 Definition sh1 : sub := sh 1.
+Definition sh5 : sub := sh 5.
 Definition subst1 (t : term) : term -> term := subst (dot t id).
 Definition shift1 : term -> term := subst sh1.
 

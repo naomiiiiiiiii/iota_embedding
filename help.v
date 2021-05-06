@@ -109,7 +109,7 @@ Definition lt_b m n := if_z (app (app minus m) (nsucc n)).
 (*Definition cons w1 x :=
   pend w1 (ppair (lam (let n := var 0 in bite (if_z n) x default_f)) one).*)
 
-Definition cons w1 x :=
+Definition cons_w w1 x :=
   ppair (lam ( (*n := 0*)
              let n := var 0 in
              bite (lt_b n (len w1))
