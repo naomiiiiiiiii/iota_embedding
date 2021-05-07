@@ -130,6 +130,7 @@ Definition app3 w i u l : term False :=
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun W1 => fun W2 =>
+            (*lam (lam *)
             let w1 := ppi1 W1 in
             let w2 := ppi1 W2 in
             let n1 := ppi2 W1 in
@@ -138,23 +139,30 @@ Definition app3 w i u l : term False :=
                  (pi nattp 
                      (*i = var 0*)
                      ( pi nattp (*i = 1, l = 0*)
-                       (all (*i = 2, l = 1, h = 0*)
-                     nzero (leq_t (var 2) (subst (sh 3) n1))
-                     (all nzero (fut preworld) (*i = 3, l = 2, h = 1, u= 0*)
-                          (eqtype (app3 (subst (sh 3) w1)
+                       (all 
+                     nzero (leq_t (var 1) (subst (sh 3) n1))
+                     (all nzero (fut preworld) (*i = 2, l = 1, h = 0*)
+                          (eqtype (app3 (subst (sh 4) w1) (*i = 3, l = 2, h = 1, u= 0*)
                                         (var 3) (var 0) (var 2))
-                          (app3 (subst (sh 3) w2) (var 3) (var 0) (var 2)))
+                          (app3 (subst (sh 4) w2) (var 3) (var 0) (var 2)))
                      ))
                  )).
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
- Lemma subseq_subst: forall s W1 W2, 
-       (subst s 
-              (subseq W1 W2)) = (subseq (subst s W1) (subst s W2)).
+ Lemma subseq_subst: forall W1 W2, 
+       (subst (sh 3)
+              (subseq W1 W2)) = (subseq (subst (sh 3) W1) (subst (sh 3) W2)).
    intros. unfold subseq. simpsub1. unfold wind. simpl. simpsub1.
-   repeat rewrite <- compose_dot.
+   auto. unfold theta. simpsub. simpl.
+   reflexivity.
+repeat rewrite project_dot_succ.
+repeat rewrite project_dot_zero.
+auto.  repeat rewrite subst_compose_sh_right.
+simpsub. auto.
+reflexivity.
+          <- compose_dot.
    simpl.
    (*weird dots stacked on top of compose
     but s is in the middle
