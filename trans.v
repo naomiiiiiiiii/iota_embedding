@@ -39,7 +39,7 @@ Fixpoint  trans_type (W: Syntax.term False) (tau : source.term) {struct tau}: (S
                  ))
             )
 
-      | comp_m tau' => all preworld nzero ((* u := var 0*)
+      | comp_m tau' => all nzero preworld((* u := var 0*)
                       pi nattp  (*u := 1, l := 0*)   (                         
                                                        let u := Syntax.var 1 in
                                                        let l := Syntax.var 0 in

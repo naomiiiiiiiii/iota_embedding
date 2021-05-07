@@ -139,13 +139,32 @@ Definition app3 w i u l : term False :=
                      (*i = var 0*)
                      ( pi nattp (*i = 1, l = 0*)
                        (all (*i = 2, l = 1, h = 0*)
-                     nzero (leq_t (var 2) n1)
+                     nzero (leq_t (var 2) (subst (sh 3) n1))
                      (all nzero (fut preworld) (*i = 3, l = 2, h = 1, u= 0*)
-                          (eqtype (app3 w1 (var 3) (var 0) (var 2))
-                          (app3 w2 (var 3) (var 0) (var 2)))
+                          (eqtype (app3 (subst (sh 3) w1)
+                                        (var 3) (var 0) (var 2))
+                          (app3 (subst (sh 3) w2) (var 3) (var 0) (var 2)))
                      ))
                  )).
 
+Ltac simpsub1 :=
+  unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
+
+ Lemma subseq_subst: forall s W1 W2, 
+       (subst s 
+              (subseq W1 W2)) = (subseq (subst s W1) (subst s W2)).
+   intros. unfold subseq. simpsub1. unfold wind. simpl. simpsub1.
+   repeat rewrite <- compose_dot.
+   simpl.
+   (*weird dots stacked on top of compose
+    but s is in the middle
+    solution to all of this is make subseq a function :/*)
+   reflexivity.
+
+
+
+ Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
+                             (subseq (var 0) (ppair (var 1) (var 0)))).
 
  Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
 
