@@ -1,5 +1,5 @@
-From Coq.Lists Require Import List.
 Require Import ssreflect.
+From mathcomp Require Import ssreflect.seq.
 From istari Require Import source subst_src rules_src help trans.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -25,6 +25,19 @@ Lemma subseq_type: forall G w1 w2,
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
+Lemma tr_weakening_append: forall G1 G2 J,
+      tr G1 J ->
+      tr (G2 ++ G1) (substj (sh (length G2)) J).
+  intros. induction G2.
+  simpl. simpsub. assumption.
+  rewrite - app_comm_cons.
+  rewrite - (app_nil_l (a:: G2 ++ G1)).
+  suffices: (substctx sh1 nil = nil).
+  move => Heq.
+  rewrite - (Heq False).
+  
+  apply (tr_weakening (G2 ++ G1)).
+
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 
@@ -46,9 +59,13 @@ Theorem one: forall G D e T ebar w1 l1,
     unfold nattp. simpsub. apply nat_type.
     eapply tr_eqtype_convert.
     eapply tr_eqtype_symmetry.
-    eapply tr_arrow_pi_equal. unfold subseq. simpsub1.
-    simpl. unfold wind. simpsub. simpl.
-    eapply tr_formation_weaken. apply subseq_type.
+    eapply tr_arrow_pi_equal. rewrite subseq_subst.
+    eapply tr_formation_weaken.
+    apply subseq_type.
+    simpsub.
+    induction G. simpsub.
+    repeat rewrite compose_sh_dot.
+    apply (tr_weakening D).
     apply tr_hyp_tm.
     try prove_subst.
     repeat simpl.

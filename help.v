@@ -140,7 +140,7 @@ Definition app3 w i u l : term False :=
                      (*i = var 0*)
                      ( pi nattp (*i = 1, l = 0*)
                        (all 
-                     nzero (leq_t (var 1) (subst (sh 3) n1))
+                     nzero (leq_t (var 1) (subst (sh 2) n1))
                      (all nzero (fut preworld) (*i = 2, l = 1, h = 0*)
                           (eqtype (app3 (subst (sh 4) w1) (*i = 3, l = 2, h = 1, u= 0*)
                                         (var 3) (var 0) (var 2))
@@ -151,25 +151,14 @@ Definition app3 w i u l : term False :=
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
- Lemma subseq_subst: forall W1 W2 s, 
-       (subst s
-              (subseq W1 W2)) = (subseq (subst s W1) (subst s W2)).
+Lemma subseq_subst: forall W1 W2, 
+       (subst (dot (var 0) (dot (var 1) (sh 3)))
+              (subseq W1 W2)) = (subseq (subst (dot (var 0) (dot (var 1) (sh 3))) W1)
+                                        (subst (dot (var 0) (dot (var 1) (sh 3))) W2)).
    intros. unfold subseq. simpsub1. unfold wind. simpl. simpsub1.
    auto.
-   reflexivity.
-   unfold theta. simpsub. simpl.
-   reflexivity.
-repeat rewrite project_dot_succ.
-repeat rewrite project_dot_zero.
-auto.  repeat rewrite subst_compose_sh_right.
-simpsub. auto.
-reflexivity.
-          <- compose_dot.
-   simpl.
-   (*weird dots stacked on top of compose
-    but s is in the middle
-    solution to all of this is make subseq a function :/*)
-   reflexivity.
+   (*udner is only for putting substitutions under binders*)
+   Qed.
 
 
 
