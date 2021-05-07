@@ -3,7 +3,7 @@ Require Import Tactics Sequence source subst_src (*SimpSub*).
 
 Require Import Defined.
 
-Inductive of_m : context -> term -> term -> Prop :=
+Inductive of_m : context -> term -> term -> Type :=
 
 (* Hypotheses *)
 

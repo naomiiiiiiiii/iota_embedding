@@ -66,7 +66,7 @@ Definition picomp3 (M: term False) := ppi2 (ppi1 (ppi2 M)).
 Definition picomp4 (M: term False) := ppi2 (ppi2 M). 
 
 Fixpoint gamma_at (gamma: source.context) (W: Syntax.term False) :=
-  map (trans_type W) gamma.
+  map (fun t => hyp_tm (trans_type W t)) gamma.
 
 (*make trans_type a meta function
 %% can return whatever for terms that aren't types cuz induction on the derivation will
