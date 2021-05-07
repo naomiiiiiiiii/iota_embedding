@@ -151,11 +151,13 @@ Definition app3 w i u l : term False :=
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
- Lemma subseq_subst: forall W1 W2, 
-       (subst (sh 3)
-              (subseq W1 W2)) = (subseq (subst (sh 3) W1) (subst (sh 3) W2)).
+ Lemma subseq_subst: forall W1 W2 s, 
+       (subst s
+              (subseq W1 W2)) = (subseq (subst s W1) (subst s W2)).
    intros. unfold subseq. simpsub1. unfold wind. simpl. simpsub1.
-   auto. unfold theta. simpsub. simpl.
+   auto.
+   reflexivity.
+   unfold theta. simpsub. simpl.
    reflexivity.
 repeat rewrite project_dot_succ.
 repeat rewrite project_dot_zero.
