@@ -12,15 +12,25 @@ From istari Require Import Sigma Tactics
 
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
-Fixpoint  trans_type (W: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)
-  :=  match tau with
+
+
+Definition test : term False := subst1 unittp (var 0).
+Compute test. (*sends var 0 to unittp*)
+
+Definition test1 : term False := subst1 unittp (ppair (var 0) (var 1)).
+Compute test1. (*sends var 0 to unittp and var 1 to var 0*)
+
+Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)                                                                          
+  :=
+    let W := (ppair w1 l1) in
+    match tau with
         nattp_m => nattp
       | unittp_m => unittp
       | arrow_m A B => all preworld nzero (pi nattp (*u := 1, l := 0*)
                                         (let u := var 1 in
                                         let l := var 0 in
                                         let U := ppair u l in
-                                        arrow (subseq W U) (arrow (trans_type U A) (trans_type U B))
+                                        arrow (subseq W U) (arrow (trans_type u l A) (trans_type u l B))
                                     ))
        | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
@@ -34,30 +44,30 @@ Fixpoint  trans_type (W: Syntax.term False) (tau : source.term) {struct tau}: (S
             let v := (var 1) in
             let lv := (var 0) in
           eqtype (app (app (nth W i) (next v)) (next lv))
-                 (fut (trans_type (ppair v lv) tau' ))
+                 (fut (trans_type v lv tau' ))
                       )
                  ))
             )
 
-      | comp_m tau' => all nzero preworld((* u := var 0*)
-                      pi nattp  (*u := 1, l := 0*)   (                         
-                                                       let u := Syntax.var 1 in
-                                                       let l := Syntax.var 0 in
+      | comp_m tau' => subst1 l1 (all nzero preworld((* u := var 1*)
+                      pi nattp  (*u := 2, l := 1*)   (                         
+                                                       let u := Syntax.var 2 in
+                                                       let l := Syntax.var 1 in
                                                        let U := (ppair u l) in
-    arrow (subseq W U) (arrow (store U)
-                         (laters (exist world nzero ((*u:= 2, l:= 1, v:= 0*)
-                                          sigma nattp (*u := 3, l := 2, v= 1, lv := 0*)
-                                          (let u := Syntax.var 3 in
-                                              let l := Syntax.var 2 in
-                                              let v := Syntax.var 1 in
-                                              let lv := Syntax.var 0 in
+    arrow (subseq (ppair w1 (var 0)) U) (arrow (store U)
+                         (laters (exist world nzero ((*u:= 3, l:= 2, v:= 1*)
+                                          sigma nattp (*u := 4, l := 3, v= 2, lv := 1*)
+                                          (let u := Syntax.var 4 in
+                                              let l := Syntax.var 3 in
+                                              let v := Syntax.var 2 in
+                                              let lv := Syntax.var 1 in
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                                     prod (prod (subseq U V) (store V))
-                                                    (trans_type V tau')))
+                                                    (trans_type v lv tau')))
                                     )
                        ))
-                      ))
+                      )))
       | _ => nattp end.
 
 Definition picomp1 (M: term False) := ppi1 M. 
@@ -65,8 +75,8 @@ Definition picomp2 (M: term False) := ppi1 (ppi1 (ppi2 M) ).
 Definition picomp3 (M: term False) := ppi2 (ppi1 (ppi2 M)). 
 Definition picomp4 (M: term False) := ppi2 (ppi2 M). 
 
-Fixpoint gamma_at (gamma: source.context) (W: Syntax.term False) :=
-  map (fun t => hyp_tm (trans_type W t)) gamma.
+Fixpoint gamma_at (gamma: source.context) (w l: Syntax.term False) :=
+  map (fun t => hyp_tm (trans_type w l t)) gamma.
 
 (*make trans_type a meta function
 %% can return whatever for terms that aren't types cuz induction on the derivation will
