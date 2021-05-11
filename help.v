@@ -165,6 +165,10 @@ Lemma subst_pw: forall s,
 intros. unfold preworld. unfold nattp. auto. Qed.
 
 
+Lemma subst_nat: forall s,
+    @subst False s nattp = nattp.
+intros. unfold nattp. auto. Qed.
+
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
                              (subseq (var 0) (ppair (var 1) (var 0)))).
 

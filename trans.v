@@ -49,18 +49,19 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                  ))
             )
 
-      | comp_m tau' => subst1 l1 (all nzero preworld((* u  := var 1. this substitution must go under.*)
-                      pi nattp  (*u := 2, l := 1*)   (                         
-                                                       let u := Syntax.var 2 in
-                                                       let l := Syntax.var 1 in
+      | comp_m tau' => subst1 l1 (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*)
+                      pi nattp  (*l1 := 2, u = 1, l := 0*)   (                         
+                                                       let l1 := Syntax.var 2 in
+                                                       let u := Syntax.var 1 in
+                                                       let l := Syntax.var 0 in
                                                        let U := (ppair u l) in
-    arrow (subseq (ppair (shift 3 w1) (var 0)) U) (arrow (store U)
-                         (laters (exist world nzero ((*u:= 3, l:= 2, v:= 1*)
-                                          sigma nattp (*u := 4, l := 3, v= 2, lv := 1*)
-                                          (let u := Syntax.var 4 in
-                                              let l := Syntax.var 3 in
-                                              let v := Syntax.var 2 in
-                                              let lv := Syntax.var 1 in
+    arrow (subseq (ppair (shift 3 w1) l1) U) (arrow (store U)
+                         (laters (exist world nzero ((* u := 2, l:= 1, v = 0*)
+                                          sigma nattp (*u := 3, l := 2, v= 1, lv := 0*)
+                                          (let u := Syntax.var 3 in
+                                              let l := Syntax.var 2 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                                     prod (prod (subseq U V) (store V))

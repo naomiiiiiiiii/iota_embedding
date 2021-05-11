@@ -110,9 +110,14 @@ Lemma size_gamma_at: forall G w l,
     apply tr_weakening_append. eapply split_world. apply Dtrans.
     subst. repeat rewrite size_cons. rewrite addnA.
     rewrite size_gamma_at. auto.
-    (*w1 l1 have gone under inders, need to shift them
-     should do w1 as a variable beign subbed in like l1 cuz then
-     the subs get taken care of*)
+    - simpsub.
+      suffices: (tr
+    [:: hyp_tm nattp, hyp_tm preworld,
+        hyp_tm nattp
+      & gamma_at G w1 l1 ++ D]
+    (deq (var 2) (var 2) (subst (sh 3) nattp)
+)). move => Hdone. rewrite subst_nat in Hdone. apply Hdone. 
+      apply tr_hyp_tm. 
     rewrite subseq_subst.
     simpsub.
     induction G. simpsub.
