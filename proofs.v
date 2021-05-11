@@ -49,15 +49,26 @@ Lemma tr_weakening_append: forall (G1: context) G2 J,
  auto.
 Qed.
 
-Theorem one: forall G D e T ebar w1 l1,
+Lemma split_world: forall w1 l1 G,
+tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
+                                                          conjunction here*)
+Admitted.
+
+Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
+    size (a:: L) = 1 + (size L). Admitted.
+ 
+Lemma size_gamma_at: forall G w l,
+    size (gamma_at G w l) = size G. Admitted.
+
+  Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 
-         tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (subst (sh (length G)) l1))
+         tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
                                                    (trans_type
-                                                      (subst (sh (length G))
-                                                             w1) (subst (sh (length G))
+                                                      (shift (size G)
+                                                             w1) (shift (size G)
                                                              l1)
-                                                    T )) .
+                                                    T )).
   move => G D e T ebar w1 l1 Ds Dtrans.
   move : w1 l1 Dtrans. induction Ds; intros.
   10 : {
@@ -65,8 +76,7 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply (tr_pi_elim _ nattp).
     inversion H; subst.
     eapply tr_pi_intro. eapply nat_type.
-    unfold subst1; rewrite subst_all.
-    apply tr_all_intro. unfold preworld; simpl.
+    apply tr_all_intro.
     apply pw_kind.
     rewrite subst_lam.
     simpsub. simpl.
@@ -74,7 +84,7 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply tr_eqtype_convert.
     eapply tr_eqtype_symmetry.
     eapply tr_arrow_pi_equal.
-    eapply tr_formation_weaken. simpsub.
+    eapply tr_formation_weaken.
     apply subseq_type.
     unfold world.
     eapply tr_eqtype_convert.
@@ -83,7 +93,23 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply tr_formation_weaken; eapply tr_kuniv_weaken.
     eapply pw_kind. eapply nat_type.
     eapply tr_sigma_intro.
-    simpl.
+    simpl. rewrite shift_sum.
+    remember (size ([:: hyp_tm nattp,
+        hyp_tm preworld,
+        hyp_tm nattp
+      & gamma_at G w1 l1])) as sizel.
+    suffices: sizel = (3 + size G)%coq_nat.
+    move => Heq. repeat rewrite - Heq.
+    suffices: 
+  (tr
+    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
+      & gamma_at G w1 l1 ++ D]
+    (substj (sh sizel) (deq w1 w1 preworld)) ).
+    move => Hdone. unfold substj in Hdone. simpl in Hdone. repeat rewrite subst_pw subst_sh_shift in Hdone.  assumption.
+    repeat rewrite - cat_cons. subst.
+    apply tr_weakening_append. eapply split_world. apply Dtrans.
+    subst. repeat rewrite size_cons. rewrite addnA.
+    rewrite size_gamma_at. auto.
     (*w1 l1 have gone under inders, need to shift them
      should do w1 as a variable beign subbed in like l1 cuz then
      the subs get taken care of*)

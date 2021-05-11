@@ -160,6 +160,9 @@ Lemma subseq_subst: forall W1 W2,
    (*udner is only for putting substitutions under binders*)
    Qed.
 
+Lemma subst_pw: forall s,
+    subst s preworld = preworld.
+intros. unfold preworld. unfold nattp. auto. Qed.
 
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
