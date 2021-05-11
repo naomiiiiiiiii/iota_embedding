@@ -65,7 +65,8 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply (tr_pi_elim _ nattp).
     inversion H; subst.
     eapply tr_pi_intro. eapply nat_type.
-    apply tr_all_intro.
+    unfold subst1; rewrite subst_all.
+    apply tr_all_intro. unfold preworld; simpl.
     apply pw_kind.
     rewrite subst_lam.
     simpsub. simpl.
@@ -83,6 +84,9 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply pw_kind. eapply nat_type.
     eapply tr_sigma_intro.
     simpl.
+    (*w1 l1 have gone under inders, need to shift them
+     should do w1 as a variable beign subbed in like l1 cuz then
+     the subs get taken care of*)
     rewrite subseq_subst.
     simpsub.
     induction G. simpsub.
