@@ -74,7 +74,7 @@ Theorem one: forall G D e T ebar w1 l1,
     eapply tr_eqtype_convert.
     eapply tr_eqtype_symmetry.
     eapply tr_arrow_pi_equal.
-    eapply tr_formation_weaken.
+    eapply tr_formation_weaken. simpsub.
     apply subseq_type.
     unfold world.
     eapply tr_eqtype_convert.
