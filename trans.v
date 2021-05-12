@@ -55,7 +55,8 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                                        let u := Syntax.var 1 in
                                                        let l := Syntax.var 0 in
                                                        let U := (ppair u l) in
-    arrow (subseq (ppair (shift 3 w1) l1) U) (arrow (store U)
+                                                       arrow (subseq (ppair (shift 3 w1) l1) U)
+ (*compm1_Type starts here*)                        (arrow (store U)
                          (laters (exist nzero preworld ((* u := 2, l:= 1, v = 0*)
                                           sigma nattp (*l1 = 4 u := 3, l := 2, v= 1, lv := 0*)
                                           (let u := Syntax.var 3 in
@@ -65,10 +66,10 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                                     prod (prod (subseq U V) (store V))
-                                                    (shift 5 (trans_type v lv tau'))))
+                                                     (trans_type v lv tau'))))
                                     )
                        ))
-                      )))
+                      ))
       | _ => nattp end.
 
 (*proves the second part of the compm1 to be a type*)

@@ -82,7 +82,7 @@ intros.
     apply nat_type. Qed.
 
   Lemma compm1_type : forall U A G,
-    (tr G (oof U world)) -> (tr G (oof A U0)) ->
+    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
     tr G (oof (arrow (store U)
                          (laters (exist nzero preworld (
                                           sigma nattp 
@@ -90,7 +90,7 @@ intros.
                                               let lv := Syntax.var 0 in
                                               let V := ppair v lv in
                                               prod (prod (subseq (subst (sh 2) U) V) (store V))
-                                                   (shift 2 A)
+                                                   A
                                                     ))
                                     )
          )) U0). (*A should be substed by 2 here start here fix this in trans also*)
@@ -120,16 +120,10 @@ rewrite - (subst_pw (sh 2)).
     apply subseq_type.
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
-apply tr_weakening_append. assumption.
+apply tr_weakening_append. assumption. assumption.
     auto. unfold nzero. simpsub. apply store_type. auto.
-    simpsub. simpl.
-    repeat rewrite - subst_sh_shift.
-    rewrite - (subst_univ False (sh 2) ).
-    rewrite - Hsize. rewrite -Hseq.
-    repeat rewrite subst_sh_shift.
-    eapply tr_weakening_append.
-    apply A_t. auto.
-    apply leq_refl. auto.
+    rewrite subst_nzero. apply A_t.
+    auto. apply leq_refl. auto.
     Qed.
 
     
@@ -228,7 +222,14 @@ suffices:
 simpsub. move => Hdone. rewrite shift_sum in Hdone. simpl in Hdone.
 eapply tr_formation_weaken. apply Hdone.
         apply compm1_type.
+        assumption.
+        (*when forming the type A -> B, the x: A doesnt bind
+         when you're writing B
+         but when forming an element of A -> B, the x: A does bind
 
+         when forming the type A \times B, the x: A doesnt bind
+         when forming a value of type A \times B, the x: A does bind*)
+        simpsub.
       eapply tr_hyp_tm. constructor.
       repeat rewrite subst_nat. apply nat_type.
       (*start here*)
