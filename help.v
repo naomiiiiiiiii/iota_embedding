@@ -1,12 +1,9 @@
 
 From Coq Require Import Lists.List.
-From istari Require Import Tactics Sequence source subst_src rules_src
+From istari Require Import Tactics Sequence source subst_src rules_src basic_types
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
-Definition oof M A: (@Syntax.judgement False) := deq M M A.
-
-Definition oof_t M: (@Syntax.judgement False) := deqtype M M.
 
 (*he has arrow, you could be using arrow instead of pi if it makes it easier*)
 
