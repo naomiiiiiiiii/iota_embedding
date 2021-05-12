@@ -6,6 +6,8 @@ From istari Require Import Tactics Sequence source subst_src rules_src
 
 Definition oof M A: (@Syntax.judgement False) := deq M M A.
 
+Definition oof_t M: (@Syntax.judgement False) := deqtype M M.
+
 (*he has arrow, you could be using arrow instead of pi if it makes it easier*)
 
 Definition plus L R : (term False) := sigma booltp (bite (var 0) (subst (sh 1) L)
@@ -164,6 +166,9 @@ Lemma subst_pw: forall s,
     subst s preworld = preworld.
 intros. unfold preworld. unfold nattp. auto. Qed.
 
+Lemma subst_world: forall s,
+    subst s world = world.
+intros. unfold world. unfold preworld. unfold nattp. auto. Qed.  
 
 Lemma subst_nat: forall s,
     @subst False s nattp = nattp.

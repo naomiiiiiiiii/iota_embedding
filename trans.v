@@ -56,7 +56,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                                        let l := Syntax.var 0 in
                                                        let U := (ppair u l) in
     arrow (subseq (ppair (shift 3 w1) l1) U) (arrow (store U)
-                         (laters (exist world nzero ((* u := 2, l:= 1, v = 0*)
+                         (laters (exist nzero preworld ((* u := 2, l:= 1, v = 0*)
                                           sigma nattp (*u := 3, l := 2, v= 1, lv := 0*)
                                           (let u := Syntax.var 3 in
                                               let l := Syntax.var 2 in
@@ -70,6 +70,12 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                        ))
                       )))
       | _ => nattp end.
+
+(*proves the second part of the compm1 to be a type*)
+
+
+  (*after this return to bind proof, use above for next goal,
+   probably should save as hypothesis that W and U are worlds*)
 
 Definition picomp1 (M: term False) := ppi1 M. 
 Definition picomp2 (M: term False) := ppi1 (ppi1 (ppi2 M) ). 
