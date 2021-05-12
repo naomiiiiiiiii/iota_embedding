@@ -212,7 +212,7 @@ eapply split_world. apply Dw.
       apply tr_hyp_tm; repeat constructor.
       + assumption. 
         (*do a suffices somehow*)
-        suffices:
+suffices:
           tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & gamma_at G w1 l1 ++ D]
     (oof
        (arrow (store (ppair (var 1) (var 0)))
@@ -225,8 +225,8 @@ eapply split_world. apply Dw.
                     prod (prod (subseq (subst (sh 2) (ppair (var 1) (var 0))) V) (store V))
                          (shift 2
                                 (shift 3 (trans_type (var 1) (var 0) B)))))))) U0).
-        simpsub. move => Hdone. simpl in Hdone.
-        apply Hdone.
+simpsub. move => Hdone. rewrite shift_sum in Hdone. simpl in Hdone.
+eapply tr_formation_weaken. apply Hdone.
         apply compm1_type.
 
       eapply tr_hyp_tm. constructor.
