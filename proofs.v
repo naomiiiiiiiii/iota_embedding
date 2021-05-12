@@ -153,12 +153,39 @@ Lemma size_gamma_at: forall G w l,
                                                              w1) (shift (size G)
                                                              l1)
                                                     T )).
-  move => G D e T ebar w1 l1 Ds Dtrans.
-  move : w1 l1 Dtrans. induction Ds; intros.
+  move => G D e T ebar w1 l1 De Dw Dtrans.
+  move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
+(*Useful facts that will help us later*)
+    remember (size ([:: hyp_tm nattp,
+        hyp_tm preworld,
+        hyp_tm nattp
+        & gamma_at G w1 l1])) as sizel.
+    assert (sizel = (3 + size G)%coq_nat) as Hsizel. subst.
+    repeat rewrite size_cons. repeat rewrite addnA.
+    rewrite size_gamma_at. auto.
+
+    assert ([:: hyp_tm nattp; hyp_tm preworld; hyp_tm nattp] ++ (gamma_at G w1 l1) =
+  [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & (gamma_at G w1 l1) ]) as Hseq.
+  rewrite - cat1s. rewrite - catA.
+  repeat rewrite cat1s. reflexivity.
+   assert (tr
+    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
+      & gamma_at G w1 l1 ++ D]
+    (oof (ppair (var 1) (var 0)) world) ) as Hu.
+   apply world_pair.
+        rewrite - (subst_pw (sh 2)).
+      apply tr_hyp_tm; repeat constructor.
+        rewrite - (subst_nat (sh 1)).
+        apply tr_hyp_tm; repeat constructor.
+    (*actual proof*)
     simpl.
     eapply (tr_pi_elim _ nattp).
-    inversion H; subst.
+    inversion Dtrans; subst.
+    remember (size ([:: hyp_tm nattp,
+        hyp_tm preworld,
+        hyp_tm nattp
+        & gamma_at G w1 l1])) as sizel.
     eapply tr_pi_intro. eapply nat_type.
     apply tr_all_intro.
     apply pw_kind.
@@ -172,36 +199,36 @@ Lemma size_gamma_at: forall G w l,
     apply subseq_type. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-   +      simpl. rewrite shift_sum.
-    remember (size ([:: hyp_tm nattp,
-        hyp_tm preworld,
-        hyp_tm nattp
-      & gamma_at G w1 l1])) as sizel.
-    suffices: sizel = (3 + size G)%coq_nat.
-    move => Heq. repeat rewrite - Heq.
+
+   +     rewrite shift_sum.
     apply world_pair. 
     repeat rewrite - cat_cons. rewrite - (subst_pw (sh sizel)).
-    rewrite - subst_sh_shift. subst. apply tr_weakening_append; auto.
-eapply split_world. apply Dtrans.
-    -
+    repeat rewrite - Hsizel.
+    rewrite subst_sh_shift. subst.
+    repeat rewrite - Hseq.
+    apply tr_weakening_append; auto.
+eapply split_world. apply Dw.
       rewrite - (subst_nat (sh 3)).
-      apply tr_hyp_tm.
-      apply Sequence.index_S.
-      apply Sequence.index_S. constructor.
-      subst. repeat rewrite size_cons. rewrite addnA.
-    rewrite size_gamma_at. auto.
-    + unfold world.
-    eapply tr_eqtype_convert.
-    eapply tr_eqtype_symmetry.
-      eapply tr_prod_sigma_equal.
-    eapply tr_formation_weaken; eapply tr_kuniv_weaken.
-    eapply pw_kind. eapply nat_type.
-    eapply tr_sigma_intro.
-    rewrite - (subst_pw (sh 2)).
-    eapply tr_hyp_tm.
-      apply Sequence.index_S. constructor.
-      unfold subst1. repeat rewrite subst_nat.
-      rewrite - (subst_nat (sh 1)).
+      apply tr_hyp_tm; repeat constructor.
+      + assumption. 
+        (*do a suffices somehow*)
+        suffices:
+          tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & gamma_at G w1 l1 ++ D]
+    (oof
+       (arrow (store (ppair (var 1) (var 0)))
+          (laters
+             (exist nzero preworld
+                (sigma nattp
+                   (let v := var 1 in
+                    let lv := var 0 in
+                    let V := ppair v lv in
+                    prod (prod (subseq (subst (sh 2) (ppair (var 1) (var 0))) V) (store V))
+                         (shift 2
+                                (shift 3 (trans_type (var 1) (var 0) B)))))))) U0).
+        simpsub. move => Hdone. simpl in Hdone.
+        apply Hdone.
+        apply compm1_type.
+
       eapply tr_hyp_tm. constructor.
       repeat rewrite subst_nat. apply nat_type.
       (*start here*)
