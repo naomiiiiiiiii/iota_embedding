@@ -26,11 +26,11 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
     match tau with
         nattp_m => nattp
       | unittp_m => unittp
-      | arrow_m A B => all preworld nzero (pi nattp (*u := 1, l := 0*)
+      | arrow_m A B => all nzero preworld (pi nattp (*u := 1, l := 0*)
                                         (let u := var 1 in
                                         let l := var 0 in
                                         let U := ppair u l in
-                                        arrow (subseq W U) (arrow (trans_type u l A) (trans_type u l B))
+                                        arrow (subseq (shift 2 W) U) (arrow (trans_type u l A) (trans_type u l B))
                                     ))
        | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in

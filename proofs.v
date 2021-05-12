@@ -126,6 +126,59 @@ apply tr_weakening_append. assumption. assumption.
     auto. apply leq_refl. auto.
     Qed.
 
+  Lemma trans_type_works : forall w l A G,
+      (tr G (oof (ppair w l) world)) ->
+      tr G (oof (trans_type w l A) U0).
+    move => w l A G Du. move : w l G Du.
+    induction A; intros; simpl; try apply nat_U0.
+    +
+  assert ([:: hyp_tm nattp; hyp_tm preworld] ++ G=
+  [:: hyp_tm nattp, hyp_tm preworld & G]) as Hseq.
+  rewrite - cat1s. rewrite - catA.
+  repeat rewrite cat1s. reflexivity.
+ assert (tr [:: hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 1) (var 0)) world)) as Hu.
+     apply world_pair. 
+        rewrite - (subst_pw (sh 2)).
+      apply tr_hyp_tm; repeat constructor.
+        rewrite - (subst_nat (sh 1)).
+        apply tr_hyp_tm; repeat constructor.
+
+        apply tr_all_formation_univ.
+      apply pw_kind.
+      apply tr_pi_formation_univ.
+      rewrite subst_nzero. apply nat_U0.
+      apply tr_arrow_formation_univ.
+      repeat rewrite subst_nzero.
+      apply subseq_type.
+    - (*showing w, l world*)
+      rewrite - (subst_world (sh 2)).
+      rewrite subst_sh_shift. rewrite - Hseq.
+      apply tr_weakening_append. assumption. assumption.
+        apply tr_arrow_formation_univ.
+        repeat rewrite subst_nzero.
+        eapply IHA1; try assumption.
+        eapply IHA2; try assumption.
+        auto. apply leq_refl. auto.
+      + simpsub. simpl. apply tr_all_formation_univ.
+        unfold subst1. rewrite subst_pw.
+        rewrite subst_nzero. apply pw_kind.
+        apply tr_pi_formation_univ.
+        repeat rewrite subst_nat.
+        rewrite subst_nzero. apply nat_U0.
+        apply tr_arrow_formation_univ.
+        simpsub. simpl. unfold subseq. simpl.
+        rewrite subst_prod.
+        eapply tr_prod_formation_univ.
+        (*need a lemma about leq start here*)
+        rewrite
+      apply world+
+rewrite - (subst_pw (sh 2)).
+    apply tr_hyp_tm. repeat constructor.
+    rewrite - (subst_nat (sh 1)). 
+    apply tr_hyp_tm.
+    rewrite subst_nat.
+    repeat constructor.
     
 Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
@@ -217,9 +270,8 @@ suffices:
                     let lv := var 0 in
                     let V := ppair v lv in
                     prod (prod (subseq (subst (sh 2) (ppair (var 1) (var 0))) V) (store V))
-                         (shift 2
-                                (shift 3 (trans_type (var 1) (var 0) B)))))))) U0).
-simpsub. move => Hdone. rewrite shift_sum in Hdone. simpl in Hdone.
+                          (trans_type (var 1) (var 0) B)))))) U0).
+simpsub. move => Hdone. 
 eapply tr_formation_weaken. apply Hdone.
         apply compm1_type.
         assumption.
