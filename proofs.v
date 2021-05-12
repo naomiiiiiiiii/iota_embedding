@@ -1,6 +1,6 @@
 Require Import ssreflect.
 From mathcomp Require Import ssreflect seq ssrnat.
-From istari Require Import source subst_src rules_src help trans.
+From istari Require Import source subst_src rules_src help trans basic_types.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -128,7 +128,9 @@ apply tr_weakening_append. assumption.
     rewrite - Hsize. rewrite -Hseq.
     repeat rewrite subst_sh_shift.
     eapply tr_weakening_append.
-     apply A_t.
+    apply A_t. auto.
+    apply leq_refl. auto.
+    Qed.
 
     
 Lemma split_world: forall w1 l1 G,
