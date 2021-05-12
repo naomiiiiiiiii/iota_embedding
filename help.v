@@ -165,14 +165,23 @@ Lemma subseq_subst: forall W1 W2,
 Lemma subst_pw: forall s,
     subst s preworld = preworld.
 intros. unfold preworld. unfold nattp. auto. Qed.
+Hint Rewrite subst_pw.
 
 Lemma subst_world: forall s,
     subst s world = world.
 intros. unfold world. unfold preworld. unfold nattp. auto. Qed.  
+Hint Rewrite subst_world.
 
 Lemma subst_nat: forall s,
     @subst False s nattp = nattp.
-intros. unfold nattp. auto. Qed.
+  intros. unfold nattp. auto. Qed.
+
+Hint Rewrite subst_nat.
+
+Lemma subst_nzero: forall s,
+    @subst False s nzero = nzero.
+  intros. unfold nzero. auto. Qed.
+Hint Rewrite subst_nzero.
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
                              (subseq (var 0) (ppair (var 1) (var 0)))).

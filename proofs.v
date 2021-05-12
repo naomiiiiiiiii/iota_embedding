@@ -17,6 +17,7 @@ Lemma nat_U0: forall G,
 
 Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
+Hint Resolve nat_type. 
 
 Lemma pw_kind: forall G,
       tr G (deq preworld preworld (kuniv nzero)). Admitted.
@@ -30,9 +31,12 @@ Ltac simpsub1 :=
 
 Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
       tr G1 (deq J1 J2 t) ->
-      tr (G2 ++ G1) (substj (sh (size G2)) (deq J1 J2 t)).
+      tr (G2 ++ G1) (
+                       (deq (shift (size G2) J1)
+                            (shift (size G2) J2)
+                            (shift (size G2) t))).
  intros. induction G2.
- -  simpl. simpsub. assumption.
+ -  simpl. repeat rewrite - subst_sh_shift. simpsub. assumption.
  -
   suffices: (tr (substctx sh1 [::] ++ cons a (G2 ++ G1))
                 (substj (under (length [::]) sh1)
@@ -41,7 +45,6 @@ Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
   simpl in Hdone.
   rewrite (size_ncons 1).
   rewrite - plusE. 
-  unfold substj.
   repeat rewrite subst_sh_shift.
   repeat rewrite - shift_sum.
   repeat rewrite subst_sh_shift in Hdone.
@@ -49,7 +52,7 @@ Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
  apply (Hdone False). 
  intros.
  eapply tr_weakening.
- auto.
+ simpl. repeat rewrite subst_sh_shift. assumption.
 Qed.
 
 Lemma store_type: forall W G,
@@ -79,18 +82,33 @@ intros.
     apply nat_type. Qed.
 
   Lemma compm1_type : forall U A G,
-    (tr G (oof U world)) -> (tr G (deqtype A A)) ->
+    (tr G (oof U world)) -> (tr G (oof A U0)) ->
     tr G (oof (arrow (store U)
                          (laters (exist nzero preworld (
                                           sigma nattp 
                                           ( let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let V := ppair v lv in
-                                                    prod (prod (subseq (subst (sh 2) U) V) (store V)) A
+                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   (shift 2 A)
                                                     ))
                                     )
-         )) U0).
+         )) U0). (*A should be substed by 2 here start here fix this in trans also*)
   move => U A G U_t A_t.
+  assert ([:: hyp_tm nattp; hyp_tm preworld] ++ G=
+  [:: hyp_tm nattp, hyp_tm preworld & G]) as Hseq.
+  rewrite - cat1s. rewrite - catA.
+  repeat rewrite cat1s. reflexivity.
+assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
+  assert (tr [:: hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 1) (var 0)) world)) as Hworld.
+apply world_pair.
+rewrite - (subst_pw (sh 2)).
+    apply tr_hyp_tm. repeat constructor.
+    rewrite - (subst_nat (sh 1)). 
+    apply tr_hyp_tm.
+    rewrite subst_nat.
+    repeat constructor.
   eapply tr_arrow_formation_univ.
   apply store_type. assumption. apply bar_type.
   apply tr_exist_formation_univ.
@@ -100,18 +118,19 @@ intros.
     eapply tr_prod_formation_univ.
     eapply tr_prod_formation_univ. unfold nzero. simpl.
     apply subseq_type.
-    rewrite - cat1s.
-    rewrite - (cat1s (hyp_tm preworld) G). rewrite catA.
-    rewrite (cat1s (hyp_tm nattp)).
-    rewrite - (subst_world (sh (size
-[:: hyp_tm nattp; hyp_tm preworld]
-              ))).
-assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) by auto. rewrite - H.
+    rewrite - (subst_world (sh 2)).
+    rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption.
-    eapply tr_eqtype_convert.
-    eapply tr_eqtype_symmetry.
-      eapply tr_prod_sigma_equal. Admitted.
+    auto. unfold nzero. simpsub. apply store_type. auto.
+    simpsub. simpl.
+    repeat rewrite - subst_sh_shift.
+    rewrite - (subst_univ False (sh 2) ).
+    rewrite - Hsize. rewrite -Hseq.
+    repeat rewrite subst_sh_shift.
+    eapply tr_weakening_append.
+     apply A_t.
 
+    
 Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
                                                           conjunction here*)
@@ -158,29 +177,17 @@ Lemma size_gamma_at: forall G w l,
       & gamma_at G w1 l1])) as sizel.
     suffices: sizel = (3 + size G)%coq_nat.
     move => Heq. repeat rewrite - Heq.
-    suffices: 
-  (tr
-    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
-      & gamma_at G w1 l1 ++ D]
-    (substj (sh sizel) (deq w1 w1 preworld)) ).
-    move => Hdone. unfold substj in Hdone. simpl in Hdone. repeat rewrite subst_pw subst_sh_shift in Hdone.
     apply world_pair. 
     repeat rewrite - cat_cons. rewrite - (subst_pw (sh sizel)).
     rewrite - subst_sh_shift. subst. apply tr_weakening_append; auto.
 eapply split_world. apply Dtrans.
-    subst. repeat rewrite size_cons. rewrite addnA.
-    rewrite size_gamma_at. auto.
-    - simpsub.
-      suffices: (tr
-    [:: hyp_tm nattp, hyp_tm preworld,
-        hyp_tm nattp
-      & gamma_at G w1 l1 ++ D]
-    (deq (var 2) (var 2) (subst (sh 3) nattp)
-)). move => Hdone. rewrite subst_nat in Hdone. apply Hdone. 
+    -
+      rewrite - (subst_nat (sh 3)).
       apply tr_hyp_tm.
       apply Sequence.index_S.
       apply Sequence.index_S. constructor.
-      rewrite subst_nat. apply nat_type.
+      subst. repeat rewrite size_cons. rewrite addnA.
+    rewrite size_gamma_at. auto.
     + unfold world.
     eapply tr_eqtype_convert.
     eapply tr_eqtype_symmetry.
@@ -195,6 +202,7 @@ eapply split_world. apply Dtrans.
       rewrite - (subst_nat (sh 1)).
       eapply tr_hyp_tm. constructor.
       repeat rewrite subst_nat. apply nat_type.
+      (*start here*)
       apply arrow_kind_formation.
       rewrite subseq_subst.
     simpsub.
