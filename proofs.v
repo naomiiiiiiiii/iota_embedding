@@ -126,16 +126,20 @@ apply tr_weakening_append. assumption. assumption.
     auto. apply leq_refl. auto.
     Qed.
 
+  Lemma hseq2: forall (T: Type) (x y: T)
+                  (L: seq T), [:: x; y] ++ L=
+                 [:: x, y & L].
+intros.
+  rewrite - cat1s. rewrite - catA.
+  repeat rewrite cat1s. reflexivity. Qed.
+
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
-    move => w l A G Du. move : w l G Du.
+    move => w l A G Du.
+  move : w l G Du.
     induction A; intros; simpl; try apply nat_U0.
     +
-  assert ([:: hyp_tm nattp; hyp_tm preworld] ++ G=
-  [:: hyp_tm nattp, hyp_tm preworld & G]) as Hseq.
-  rewrite - cat1s. rewrite - catA.
-  repeat rewrite cat1s. reflexivity.
  assert (tr [:: hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 1) (var 0)) world)) as Hu.
      apply world_pair. 
@@ -153,7 +157,7 @@ apply tr_weakening_append. assumption. assumption.
       apply subseq_type.
     - (*showing w, l world*)
       rewrite - (subst_world (sh 2)).
-      rewrite subst_sh_shift. rewrite - Hseq.
+      rewrite subst_sh_shift. rewrite - hseq2.
       apply tr_weakening_append. assumption. assumption.
         apply tr_arrow_formation_univ.
         repeat rewrite subst_nzero.
@@ -175,15 +179,22 @@ apply tr_weakening_append. assumption. assumption.
         apply leq_type.
     - simpsub.
       rewrite - subst_sh_shift. simpsub.
-      rewrite - (subst_nat (sh 1)).
-      apply tr_sigma_elim2.
+      rewrite - (subst_nat (dot
+                              (ppi1
+          (ppair (subst (sh 2) w)
+             (subst (sh 2) l))) 
+                id )).
+      eapply (tr_sigma_elim2 _ preworld).
       apply world+
-rewrite - (subst_pw (sh 2)).
-    apply tr_hyp_tm. repeat constructor.
-    rewrite - (subst_nat (sh 1)). 
-    apply tr_hyp_tm.
-    rewrite subst_nat.
-    repeat constructor.
+      rewrite - (subst_pw (sh 2)).
+      simpsub.
+      rewrite - hseq2.
+      rewrite - (subst_nat (under 1 (sh 2) )).
+      rewrite - (subst_sigma False (sh 2) ).
+      repeat rewrite subst_nat. rewrite subst_pw.
+      rewrite - (subst_ppair).
+      repeat rewrite subst_sh_shift.
+      apply tr_weakening_append. apply Du. 
     
 Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
