@@ -60,7 +60,6 @@ Definition bind : term False := app Yc
         ))).
 (*worlds*)
 
-Definition U0 : (term False) := univ nzero.
 
 Definition preworld: (term False) := rec 
                                    (arrow nattp (karrow (fut (var 0)) U0)).
@@ -121,8 +120,6 @@ ie uses default value of w2*)
 
 (*start here*)
 
-Definition leq_t n m : term False :=
-  app (app leqtp n) m.
 
 Definition app3 w i u l : term False :=
  app (app (app w i) u) l.
@@ -179,6 +176,19 @@ Lemma subst_nzero: forall s,
     @subst False s nzero = nzero.
   intros. unfold nzero. auto. Qed.
 Hint Rewrite subst_nzero.
+
+Lemma subst_leqtp: forall s,
+    @subst False s (leqtp) = leqtp.
+  intros. unfold leqtp. unfold wind. unfold theta.
+  repeat rewrite subst_app.
+  repeat rewrite subst_lam. simpsub. simpl.
+  repeat rewrite project_dot_succ.
+  rewrite project_dot_zero. auto. Qed.
+
+Lemma subst_leq: forall s n1 n2,
+    @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
+  intros. unfold leq_t.  repeat rewrite subst_app. rewrite subst_leqtp. auto. 
+Qed.
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
                              (subseq (var 0) (ppair (var 1) (var 0)))).

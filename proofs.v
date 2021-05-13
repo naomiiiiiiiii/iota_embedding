@@ -171,7 +171,12 @@ apply tr_weakening_append. assumption. assumption.
         rewrite subst_prod.
         eapply tr_prod_formation_univ.
         (*need a lemma about leq start here*)
-        rewrite
+        rewrite subst_leq.
+        apply leq_type.
+    - simpsub.
+      rewrite - subst_sh_shift. simpsub.
+      rewrite - (subst_nat (sh 1)).
+      apply tr_sigma_elim2.
       apply world+
 rewrite - (subst_pw (sh 2)).
     apply tr_hyp_tm. repeat constructor.
