@@ -64,7 +64,7 @@ Definition bind : term False := app Yc
 Definition preworld: (term False) := rec 
                                    (arrow nattp (karrow (fut (var 0)) U0)).
 
-Definition world: (term False) := prod preworld nattp.
+Definition world: (term False) := sigma preworld nattp.
 
 Definition len w: (term False) := ppi2 w.
 

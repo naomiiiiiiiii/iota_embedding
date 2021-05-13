@@ -73,13 +73,12 @@ Lemma world_pair: forall w l G, tr G (oof w preworld) ->
                            tr G (oof l nattp) ->
     tr G (oof (ppair w l) world).
 intros.
-    eapply tr_eqtype_convert.
+   (* eapply tr_eqtype_convert.
     eapply tr_eqtype_symmetry.
-      eapply tr_prod_sigma_equal.
-    eapply tr_formation_weaken; eapply tr_kuniv_weaken.
-    eapply pw_kind. eapply nat_type.
-    eapply tr_sigma_intro; try assumption. rewrite subst_nat.
-    apply nat_type. Qed.
+      eapply tr_prod_sigma_equal.*)
+    (*eapply tr_formation_weaken; eapply tr_kuniv_weaken.
+    eapply pw_kind. eapply nat_type.*)
+    eapply tr_sigma_intro; try assumption.     apply nat_type. Qed.
 
   Lemma compm1_type : forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
@@ -194,7 +193,8 @@ intros.
       repeat rewrite subst_nat. rewrite subst_pw.
       rewrite - (subst_ppair).
       repeat rewrite subst_sh_shift.
-      apply tr_weakening_append. apply Du. 
+      apply tr_weakening_append. apply Du.
+      Admitted.
     
 Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
