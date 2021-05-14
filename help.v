@@ -138,7 +138,7 @@ Definition app3 w i u l : term False :=
                  (*u = 0*)
                  (pi (fut nattp) (*u = 1, l = 0*)
                      (pi (nattp) (*u = 2, l = 1, i = 0*)(
-                           pi (leq_t (var 0) (subst (sh 2) l1))
+                           pi (leq_t (var 0) (subst (sh 3) l1))
                               ( (*u = 3, l = 2, i = 1, m = 0*)
                           eqtype (app3 (subst (sh 4) w1)                                         (var 1) (var 3) (var 2))
                           (app3 (subst (sh 4) w2) (var 1) (var 3) (var 2))
@@ -186,13 +186,17 @@ Lemma subst_leq: forall s n1 n2,
   intros. unfold leq_t.  repeat rewrite subst_app. rewrite subst_leqtp. auto. 
 Qed.
 
-Opaque preworld.
-Lemma subseq_subst: forall W1 W2 s,
+Lemma subst_subseq: forall W1 W2 s,
        (subst s
               (subseq W1 W2)) = subseq (subst s W1)
                                        (subst s W2).
   intros. unfold subseq. repeat rewrite subst_app. auto.
-   Qed.
+Qed.
+
+Lemma subst_U0: forall s,
+    (@subst False s (univ nzero)) = univ nzero.
+auto. Qed.
+
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
                              (subseq (var 0) (ppair (var 1) (var 0)))).

@@ -10,10 +10,15 @@ Lemma tr_arrow_elim: forall G a b m n p q,
       tr G (deq m n (pi a (subst sh1 b)))
       -> tr G (deq p q a) 
       -> tr G (deq (app m p) (app n q) b).
-            Admitted.
+Admitted.
+
+Lemma kind_type: forall G K i,
+    tr G (oof K (kuniv i)) -> tr G (deqtype K K).
+  Admitted.
 
 Lemma nat_U0: forall G,
     tr G (oof nattp U0). Admitted.
+Hint Resolve nat_U0. 
 
 Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
@@ -23,8 +28,21 @@ Lemma world_type: forall G,
       tr G (deqtype world world). Admitted.
 Hint Resolve world_type. 
 
+Lemma pw_type2: forall G, tr G (deqtype (arrow (fut nattp) (univ nzero))
+       (arrow (fut nattp) (univ nzero))). Admitted.
+
+Lemma pw_kind1: forall G, tr G (deq
+       (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
+       (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
+       (kuniv nzero) ).
+Admitted.
+
+
 Lemma pw_kind: forall G,
       tr G (deq preworld preworld (kuniv nzero)). Admitted.
+
+Lemma pw_type: forall G,
+      tr G (deqtype preworld preworld ). Admitted.
 
 Lemma split_world_elim2: forall W G,
     tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
@@ -58,31 +76,79 @@ Lemma subseq_type: forall G w1 w2,
   eapply split_world_elim2.
   rewrite - (subst_world (sh 2)).
   eapply tr_hyp_tm. repeat constructor.
-  eapply tr_pi_formation_univ. apply nat_U0. 
-  eapply tr_pi_formation_univ. apply nat_U0.
-  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
-  apply leq_type.
-  rewrite - (subst_nat (sh 2)).
-  eapply tr_hyp_tm. repeat constructor.
-  rewrite subst_ppi2. simpsub. simpl.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 3)).
-  eapply tr_hyp_tm. repeat constructor.
   eapply tr_all_formation_univ.
   eapply tr_fut_kind_formation.
   apply pw_kind.
   apply zero_typed.
+  eapply tr_pi_formation_univ.
+  eapply tr_fut_formation_univ.
+  apply nat_U0.
+  repeat rewrite subst_nzero. apply zero_typed.
+  repeat rewrite subst_nzero.
+  eapply tr_pi_formation_univ. apply nat_U0.
+  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
+  apply leq_type.
+  rewrite - (subst_nat (sh 1)).
+  eapply tr_hyp_tm. repeat constructor.
+  rewrite subst_ppi2. simpsub. simpl.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 4)).
+  eapply tr_hyp_tm. repeat constructor.
   repeat rewrite subst_nzero.
   eapply tr_eqtype_formation_univ.
   rewrite - (subst_nzero (dot (var 2) id)).
   rewrite - subst_univ.
-  eapply (tr_pi_elim _ nattp).
+  eapply (tr_pi_elim _ (fut nattp) ).
   rewrite subst_ppi1. simpsub. simpl.
-  rewrite - (subst_nzero (under 1 (dot (var 0) id)) ).
-  rewrite - subst_univ.
-  rewrite - (subst_nat (dot (var 0) id)).
-  rewrite - subst_pi.
+  assert (forall s, pi (fut nattp) (univ nzero)
+                     =  @subst False s (pi (fut nattp) (univ nzero))
+         ) as sub1.
+  auto.
+  assert (forall s, @subst False s (pi (fut preworld) (pi (fut nattp) (univ nzero)))
+                     = (pi (fut preworld) (pi (fut nattp) (univ nzero)))
+         ) as sub2.
+  auto.
+  assert (forall s, arrow (fut nattp) (univ nzero)
+                     =  @subst False s (arrow (fut nattp) (univ nzero))
+         ) as sub3.
+  intros. auto.
+  eapply tr_eqtype_convert.
+  rewrite - (subst_U0 (sh 1)).
+  eapply tr_arrow_pi_equal.
+  eapply tr_fut_formation. eapply nat_type.
+  eapply tr_univ_formation.
+  apply zero_typed.
+  rewrite (sub3 (dot (var 3) id)).
   eapply (tr_pi_elim _ (fut preworld)).
+  eapply tr_eqtype_convert.
+  rewrite (sub3 sh1).
+  eapply tr_arrow_pi_equal.
+  eapply tr_fut_formation. eapply pw_type.
+  eapply pw_type2.
+  assert (forall s, (arrow (fut preworld)
+          (arrow (fut nattp) (univ nzero)))
+               =  @subst False s (arrow (fut nattp) (univ nzero) ))
+    as sub4.
+  auto.
+  assert (forall G, (tr G ()))
+  eapply tr_arrow_formation.
+  eapply tr_fut_formation. eapply nat_type.
+  eapply tr_univ_formation.
+  apply zero_typed.
+  eapply tr_eqtype_convert.
+  eapply tr_eqtype_symmetry.
+  eapply tr_arrow_karrow_equal.
+  eapply tr_fut_formation. eapply pw_type.
+  rewrite - (sub2 (dot (var 1) id)).
+  eapply (tr_pi_elim _ nattp).
+  eapply tr_eqtype_convert.
+  rewrite - (sub2 (sh1)).
+  apply nat_type.
+  eapply tr_formation_weaken.
+  eapply tr_kuniv_weaken.
+  eapply pw_kind1.
+
+
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
