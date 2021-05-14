@@ -44,6 +44,10 @@ Lemma pw_kind: forall G,
 Lemma pw_type: forall G,
       tr G (deqtype preworld preworld ). Admitted.
 
+Lemma unfold_pw: forall G,
+    tr G (deqtype preworld (arrow nattp
+          (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))). Admitted.
+
 Lemma split_world_elim2: forall W G,
     tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
 Admitted.
@@ -144,7 +148,29 @@ Lemma subseq_type: forall G w1 w2,
   eapply tr_arrow_pi_equal.
   apply nat_type.
   eapply (kind_type _ _ _ (pw_kind1 _) ).
-  eapply tr_sigma_elim1.
+  eapply tr_eqtype_convert.
+  apply unfold_pw.
+  eapply (tr_sigma_elim1 _ _ nattp).
+  (*assert (forall s, (arrow nattp
+             (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
+               =  @subst False s (arrow nattp
+             (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
+)
+    as sub5.
+  intros. auto.*)
+  assert (sigma preworld nattp = world) by auto. rewrite H.
+  rewrite - {3}(subst_world (sh 5)).
+  apply tr_hyp_tm. repeat constructor.
+  rewrite - {3}(subst_nat (sh 2)).
+  apply tr_hyp_tm. repeat constructor.
+  rewrite - {2}(subst_pw (sh 4)).
+  rewrite - subst_fut.
+  apply tr_hyp_tm. repeat constructor.
+  apply tr_hyp_tm. repeat constructor.
+  apply tr_arrow_formation. apply nat_type.
+  eapply (kind_type _ _ _ (pw_kind1 _) ).
+  apply nat_type.
+  eapply (kind_type _ _ _ (pw_kind _) ).
   repeat rewrite - (subst_world (sh 5)).
 
   eapply tr_eq
