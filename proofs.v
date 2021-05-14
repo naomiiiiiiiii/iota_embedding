@@ -48,13 +48,13 @@ Lemma pw_type: forall {G},
 
 Hint Resolve pw_type.
 
-Lemma pw_type2: forall G, tr G (deqtype (arrow (fut nattp) (univ nzero))
+Lemma pw_type2: forall {G}, tr G (deqtype (arrow (fut nattp) (univ nzero))
                                    (arrow (fut nattp) (univ nzero))).
   intros. apply tr_arrow_formation.
   apply tr_fut_formation. auto.
   apply tr_univ_formation. auto. Qed.
 
-Lemma pw_type1: forall G, tr G (deqtype
+Lemma pw_type1: forall {G}, tr G (deqtype
        (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
        (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
   ).
@@ -81,7 +81,7 @@ tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
     Admitted.
 
 
-Lemma subseq_type: forall G w1 w2,
+Lemma subseq_U0: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
     tr G (oof (subseq w1 w2) (univ nzero)).
   intros.
@@ -158,7 +158,7 @@ tr [:: hyp_tm
   rewrite - (sub2 (sh1)).
   eapply tr_arrow_pi_equal.
   apply nat_type.
-  eapply (kind_type _ _ _ (pw_type1 _) ).
+  eapply pw_type1.
   eapply tr_eqtype_convert.
   apply unfold_pw.
   eapply (tr_sigma_elim1 _ _ nattp).
@@ -326,7 +326,7 @@ rewrite - (subst_pw (sh 2)).
   simpl.
     eapply tr_prod_formation_univ.
     eapply tr_prod_formation_univ. unfold nzero. simpl.
-    apply subseq_type.
+    apply subseq_U0.
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption. assumption.
@@ -368,7 +368,7 @@ intros.
       rewrite subst_nzero. apply nat_U0.
       apply tr_arrow_formation_univ.
       repeat rewrite subst_nzero.
-      apply subseq_type.
+      apply subseq_U0.
     - (*showing w, l world*)
       rewrite - (subst_world (sh 2)).
       rewrite subst_sh_shift. rewrite - hseq2.
@@ -393,11 +393,23 @@ intros.
         (*showing the subseq part is a type,
          problematic coz of substitutions*)
         simpsub. simpl.
-        rewrite subseq_subst. simpsub.
+        rewrite subst_subseq.
+        apply subseq_U0.
+        simpsub.
         repeat rewrite subst_nat.
-        rewrite subst_nzero.
-
-
+        rewrite - subst_sh_shift.
+        simpsub.
+        rewrite - subst_ppair.
+        rewrite - (subst_world (sh 2)).
+        repeat rewrite subst_sh_shift.
+        rewrite - hseq2.
+        apply tr_weakening_append. assumption.
+        simpsub.
+        unfold subst1. repeat rewrite subst_nat subst_pw.
+        apply uworld.
+        simpsub. simpl.
+        (*need to get rid of the substs*)
+        repeat rewrite subst_store. simpsub.
 
         unfold subseq. simpl.
         rewrite subst_prod.
@@ -508,7 +520,7 @@ Lemma size_gamma_at: forall G w l,
     eapply tr_eqtype_symmetry.
     eapply tr_arrow_pi_equal.
     eapply tr_formation_weaken.
-    apply subseq_type. (*to show subseqs
+    apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
 

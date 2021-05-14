@@ -38,7 +38,7 @@ Definition Yc: (term False) := lam ((*f := 0*)
                 ))
 ).
 
-Definition laters A : term False := rec (plus A (fut (var 0))).
+Definition laters A : term False := rec (plus (shift 1 A)  (fut (var 0))).
   (*notice similarity w type of nat*)
 
 Definition ret: term False := lam (inl (var 0)).
@@ -180,6 +180,7 @@ Lemma subst_leqtp: forall s,
   repeat rewrite subst_lam. simpsub. simpl.
   repeat rewrite project_dot_succ.
   rewrite project_dot_zero. auto. Qed.
+Hint Rewrite subst_leqtp.
 
 Lemma subst_leq: forall s n1 n2,
     @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
@@ -193,9 +194,36 @@ Lemma subst_subseq: forall W1 W2 s,
   intros. unfold subseq. repeat rewrite subst_app. auto.
 Qed.
 
+
+
+ Definition getstore w v: (term False) := pi nattp ((*i = 0*)
+                                           let i := var 0 in
+                                           (app (app (shift 1 w) i) (next (shift 1 v)))
+                                         ).
+
+ Definition store: (term False) -> (term False) := fun W => app (lam (
+                                            let w := ppi1 (var 0) in
+                                            let n := ppi2 (var 0) in
+                                            all nzero preworld ( (*u := var 0*)
+                                                  pi 
+                                                    (subseq (var 1) (ppair (var 0) (shift 1 n) ))
+                                                    (*u :=  var 1, m := var 0*)
+                                                     (getstore (shift 2 w) (var 1))))) W.
 Lemma subst_U0: forall s,
     (@subst False s (univ nzero)) = univ nzero.
-auto. Qed.
+  auto. Qed.
+
+
+Lemma subst_store: forall W s, (subst s (store W)) = store (subst s W).
+  intros. unfold store. auto. Qed.
+
+Lemma subst_laters: forall s A, (subst s (laters A)) = (laters (subst s A)).
+  intros. unfold laters. unfold plus. rewrite subst_rec. rewrite subst_sigma.
+  rewrite subst_booltp. rewrite subst_bite. simpsub. simpl.
+  repeat rewrite <- subst_sh_shift. simpsub. auto. Qed.
+
+
+Hint Rewrite subst_U0 subst_subseq subst_leq subst_leqtp subst_nzero subst_nat subst_world subst_pw.
 
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
@@ -213,19 +241,6 @@ auto. Qed.
 Admitted.
 
  (*getstore w v = *(w/v)*)
- Definition getstore w v: (term False) := pi nattp ((*i = 0*)
-                                           let i := var 0 in
-                                           (app (app w i) (next v))
-                                         ).
-
- Definition store: (term False) -> (term False) := fun wn =>
-                                            let w := ppi1 wn in
-                                            let n := ppi2 wn in
-                                            all nzero preworld ( (*u := var 0*)
-                                                  pi 
-                                                    (subseq wn (ppair (var 0) n) )
-                                                    (*u :=  var 1, m := var 0*)
-                                                     (getstore w (var 1))).
 
  (*nats*)
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
