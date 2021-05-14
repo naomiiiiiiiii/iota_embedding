@@ -61,45 +61,7 @@ tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
 Lemma subseq_type: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
     tr G (oof (subseq w1 w2) (univ nzero)).
-  intros. unfold subseq.
-  rewrite - (subst_nzero (dot w2 id)).
-  rewrite - subst_univ.
-  eapply (tr_pi_elim _ world).
-  rewrite - (subst_nzero (under 1 (dot w1 id)) ).
-  rewrite - subst_univ.
-  rewrite - (subst_world (dot w1 id)).
-  rewrite - subst_pi.
-  eapply (tr_pi_elim _ world).
-  apply tr_pi_intro. apply world_type.
-  apply tr_pi_intro. apply world_type.
-  eapply tr_prod_formation_univ.
-  eapply leq_type.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 1)).
-  eapply tr_hyp_tm. constructor.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 2)).
-  eapply tr_hyp_tm. repeat constructor.
-  eapply tr_all_formation_univ.
-  eapply tr_fut_kind_formation.
-  apply pw_kind.
-  apply zero_typed.
-  eapply tr_pi_formation_univ.
-  eapply tr_fut_formation_univ.
-  apply nat_U0.
-  repeat rewrite subst_nzero. apply zero_typed.
-  repeat rewrite subst_nzero.
-  eapply tr_pi_formation_univ. apply nat_U0.
-  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
-  apply leq_type.
-  rewrite - (subst_nat (sh 1)).
-  eapply tr_hyp_tm. repeat constructor.
-  rewrite subst_ppi2. simpsub. simpl.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 4)).
-  eapply tr_hyp_tm. repeat constructor.
-  repeat rewrite subst_nzero.
-  eapply tr_eqtype_formation_univ.
+  intros.
   assert (forall V,
 tr [:: hyp_tm
           (leq_t (var 0)
@@ -197,11 +159,56 @@ tr [:: hyp_tm
   rewrite - subst_fut.
   apply tr_hyp_tm. repeat constructor.
   simpsub. simpl.
+
+
+unfold subseq.
+  rewrite - (subst_nzero (dot w2 id)).
+  rewrite - subst_univ.
+  eapply (tr_pi_elim _ world).
+  rewrite - (subst_nzero (under 1 (dot w1 id)) ).
+  rewrite - subst_univ.
+  rewrite - (subst_world (dot w1 id)).
+  rewrite - subst_pi.
+  eapply (tr_pi_elim _ world).
+  apply tr_pi_intro. apply world_type.
+  apply tr_pi_intro. apply world_type.
+  eapply tr_prod_formation_univ.
+  eapply leq_type.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 1)).
+  eapply tr_hyp_tm. constructor.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 2)).
+  eapply tr_hyp_tm. repeat constructor.
+  eapply tr_all_formation_univ.
+  eapply tr_fut_kind_formation.
+  apply pw_kind.
+  apply zero_typed.
+  eapply tr_pi_formation_univ.
+  eapply tr_fut_formation_univ.
+  apply nat_U0.
+  repeat rewrite subst_nzero. apply zero_typed.
+  repeat rewrite subst_nzero.
+  eapply tr_pi_formation_univ. apply nat_U0.
+  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
+  apply leq_type.
+  rewrite - (subst_nat (sh 1)).
+  eapply tr_hyp_tm. repeat constructor.
+  rewrite subst_ppi2. simpsub. simpl.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 4)).
+  eapply tr_hyp_tm. repeat constructor.
+  repeat rewrite subst_nzero.
+  eapply tr_eqtype_formation_univ.
 apply Hworldapp. 
   rewrite - {3}(subst_world (sh 5)).
   apply tr_hyp_tm. repeat constructor.
-
-
+simpsub. simpl. apply Hworldapp. 
+  rewrite - {3}(subst_world (sh 6)).
+  apply tr_hyp_tm. repeat constructor.
+  auto.
+  repeat rewrite subst_nzero. apply leq_refl. auto.
+assumption. assumption.
 
 
 
