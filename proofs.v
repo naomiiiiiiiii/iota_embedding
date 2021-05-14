@@ -100,7 +100,33 @@ Lemma subseq_type: forall G w1 w2,
   eapply tr_hyp_tm. repeat constructor.
   repeat rewrite subst_nzero.
   eapply tr_eqtype_formation_univ.
-  rewrite - (subst_nzero (dot (var 2) id)).
+  assert (forall V,
+tr [:: hyp_tm
+          (leq_t (var 0)
+             (subst (sh 3) (ppi2 (var 0)))),
+        hyp_tm nattp, hyp_tm (fut nattp),
+        hyp_tm (fut preworld), hyp_tm world,
+        hyp_tm world
+        & G] (oof V world) ->
+
+  tr
+    [:: hyp_tm
+          (leq_t (var 0)
+             (subst (sh 3) (ppi2 (var 0)))),
+        hyp_tm nattp, hyp_tm (fut nattp),
+        hyp_tm (fut preworld), hyp_tm world,
+        hyp_tm world
+      & G]
+    (oof
+       (app3 (ppi1 V) 
+          (var 1) (var 3) (var 2)) 
+     (univ nzero))
+         ) as Hworldapp.
+
+
+ - rewrite - (subst_nzero (dot (var 2) id)). (*start of the application proof,
+                                              make this general for any
+                                              (var 0) which gamma says is world*)
   rewrite - subst_univ.
   eapply (tr_pi_elim _ (fut nattp) ).
   rewrite subst_ppi1. simpsub. simpl.
@@ -166,6 +192,14 @@ Lemma subseq_type: forall G w1 w2,
   rewrite - {2}(subst_pw (sh 4)).
   rewrite - subst_fut.
   apply tr_hyp_tm. repeat constructor.
+  rewrite - {2}(subst_nat (sh 3)).
+  rewrite - subst_fut.
+  apply tr_hyp_tm. repeat constructor.
+(*make the result above*)
+
+
+
+
   apply tr_hyp_tm. repeat constructor.
   apply tr_arrow_formation. apply nat_type.
   eapply (kind_type _ _ _ (pw_kind1 _) ).
