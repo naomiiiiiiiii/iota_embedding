@@ -13,7 +13,7 @@ Lemma tr_arrow_elim: forall G a b m n p q,
 Admitted.
 
 Lemma kind_type: forall G K i,
-    tr G (oof K (kuniv i)) -> tr G (deqtype K K).
+    tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
   Admitted.
 
 Lemma nat_U0: forall G,
@@ -104,14 +104,14 @@ Lemma subseq_type: forall G w1 w2,
                      =  @subst False s (pi (fut nattp) (univ nzero))
          ) as sub1.
   auto.
-  assert (forall s, @subst False s (pi (fut preworld) (pi (fut nattp) (univ nzero)))
-                     = (pi (fut preworld) (pi (fut nattp) (univ nzero)))
+  assert (forall s, @subst False s (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
+                     = (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
          ) as sub2.
   auto.
   assert (forall s, arrow (fut nattp) (univ nzero)
                      =  @subst False s (arrow (fut nattp) (univ nzero))
          ) as sub3.
-  intros. auto.
+  auto.
   eapply tr_eqtype_convert.
   rewrite - (subst_U0 (sh 1)).
   eapply tr_arrow_pi_equal.
@@ -127,26 +127,35 @@ Lemma subseq_type: forall G w1 w2,
   eapply pw_type2.
   assert (forall s, (arrow (fut preworld)
           (arrow (fut nattp) (univ nzero)))
-               =  @subst False s (arrow (fut nattp) (univ nzero) ))
+               =  @subst False s (arrow (fut preworld)
+          (arrow (fut nattp) (univ nzero)))
+)
     as sub4.
   auto.
-  assert (forall G, (tr G ()))
-  eapply tr_arrow_formation.
-  eapply tr_fut_formation. eapply nat_type.
-  eapply tr_univ_formation.
-  apply zero_typed.
   eapply tr_eqtype_convert.
   eapply tr_eqtype_symmetry.
   eapply tr_arrow_karrow_equal.
   eapply tr_fut_formation. eapply pw_type.
+  eapply pw_type2.
   rewrite - (sub2 (dot (var 1) id)).
   eapply (tr_pi_elim _ nattp).
   eapply tr_eqtype_convert.
   rewrite - (sub2 (sh1)).
+  eapply tr_arrow_pi_equal.
   apply nat_type.
-  eapply tr_formation_weaken.
-  eapply tr_kuniv_weaken.
-  eapply pw_kind1.
+  eapply (kind_type _ _ _ (pw_kind1 _) ).
+  eapply tr_sigma_elim1.
+  repeat rewrite - (subst_world (sh 5)).
+
+  eapply tr_eq
+  rewrite (sub4 (dot (var 1) id)).
+  eapply (tr_arrow_elim _ nattp).
+  .
+  eapply tr_arrow_formation.
+  eapply tr_fut_formation. eapply nat_type.
+  eapply tr_univ_formation.
+  apply zero_typed.
+
 
 
 

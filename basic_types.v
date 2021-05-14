@@ -27,3 +27,4 @@ Lemma leq_type: forall G n1 n2,
 
 Hint Resolve zero_typed.
 Hint Resolve leq_refl.
+
