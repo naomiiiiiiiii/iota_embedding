@@ -172,10 +172,14 @@ intros.
         apply tr_all_formation_univ.
         rewrite subst_pw.
         rewrite subst_nzero. apply pw_kind.
+        rewrite subst_pi.
         apply tr_pi_formation_univ.
         repeat rewrite subst_nat.
         rewrite subst_nzero. apply nat_U0.
+        rewrite subst_arrow.
         apply tr_arrow_formation_univ.
+        (*showing the subseq part is a type,
+         problematic coz of substitutions*)
         simpsub. simpl. unfold subseq. simpl.
         rewrite subst_prod.
         eapply tr_prod_formation_univ.
