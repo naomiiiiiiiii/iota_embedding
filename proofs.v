@@ -122,14 +122,14 @@ tr [:: hyp_tm
           (var 1) (var 3) (var 2)) 
      (univ nzero))
          ) as Hworldapp.
+  intros V Hvw.
 
-
- - rewrite - (subst_nzero (dot (var 2) id)). (*start of the application proof,
+  rewrite - (subst_nzero (dot (var 2) id)). (*start of the application proof,
                                               make this general for any
                                               (var 0) which gamma says is world*)
   rewrite - subst_univ.
   eapply (tr_pi_elim _ (fut nattp) ).
-  rewrite subst_ppi1. simpsub. simpl.
+   simpsub. simpl.
   assert (forall s, pi (fut nattp) (univ nzero)
                      =  @subst False s (pi (fut nattp) (univ nzero))
          ) as sub1.
@@ -184,9 +184,10 @@ tr [:: hyp_tm
 )
     as sub5.
   intros. auto.*)
-  assert (sigma preworld nattp = world) by auto. rewrite H.
+  apply Hvw.
+  (*assert (sigma preworld nattp = world) by auto. rewrite H.
   rewrite - {3}(subst_world (sh 5)).
-  apply tr_hyp_tm. repeat constructor.
+  apply tr_hyp_tm. repeat constructor.*)
   rewrite - {3}(subst_nat (sh 2)).
   apply tr_hyp_tm. repeat constructor.
   rewrite - {2}(subst_pw (sh 4)).
@@ -195,7 +196,11 @@ tr [:: hyp_tm
   rewrite - {2}(subst_nat (sh 3)).
   rewrite - subst_fut.
   apply tr_hyp_tm. repeat constructor.
-(*make the result above*)
+  simpsub. simpl.
+apply Hworldapp. 
+  rewrite - {3}(subst_world (sh 5)).
+  apply tr_hyp_tm. repeat constructor.
+
 
 
 
