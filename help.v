@@ -136,7 +136,7 @@ Definition app3 w i u l : term False :=
                      (*i = var 0*)
                      ( pi nattp (*i = 1, l = 0*)
                        (pi 
-             (leq_t (var 1) (subst (sh 2) n1))
+                      (leq_t (var 1) (subst (sh 2) n1))
                      (all nzero (fut preworld) (*i = 2, l = 1, h = 0*)
                           (eqtype (app3 (subst (sh 4) w1) (*i = 3, l = 2, h = 1, u= 0*)
                                         (var 3) (var 0) (var 2))
@@ -147,14 +147,6 @@ Definition app3 w i u l : term False :=
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
-Lemma subseq_subst: forall W1 W2, 
-       (subst (dot (var 0) (dot (var 1) (sh 3)))
-              (subseq W1 W2)) = (subseq (subst (dot (var 0) (dot (var 1) (sh 3))) W1)
-                                        (subst (dot (var 0) (dot (var 1) (sh 3))) W2)).
-   intros. unfold subseq. simpsub1. unfold wind. simpl. simpsub1.
-   auto.
-   (*udner is only for putting substitutions under binders*)
-   Qed.
 
 Lemma subst_pw: forall s,
     subst s preworld = preworld.
@@ -189,6 +181,28 @@ Lemma subst_leq: forall s n1 n2,
     @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
   intros. unfold leq_t.  repeat rewrite subst_app. rewrite subst_leqtp. auto. 
 Qed.
+
+Opaque preworld.
+Lemma subseq_subst: forall W1 W2 s,
+       (subst s
+              (subseq W1 W2)) = subseq (subst s W1)
+                                       (subst s W2).
+  intros. unfold subseq.
+  rewrite subst_prod. rewrite subst_leq.
+  repeat rewrite subst_pi. repeat rewrite subst_nat.
+  repeat rewrite subst_leq.
+  repeat rewrite subst_ppi2.
+  rewrite <- subst_compose.
+  rewrite under_sum.
+  rewrite compose_sh_under_eq.
+  (*s o shift on left
+   shift o s on right*)
+  Opaque nzero nattp.
+  simpsub. simpl.
+  simpsub. simpl.
+   auto.
+   (*udner is only for putting substitutions under binders*)
+   Qed.
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
                              (subseq (var 0) (ppair (var 1) (var 0)))).
