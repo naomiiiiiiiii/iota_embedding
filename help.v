@@ -131,19 +131,21 @@ Definition app3 w i u l : term False :=
                    let W2 := var 1 in
             let w1 := ppi1  W1 in
             let w2 := ppi1 W2 in
-            let n1 := ppi2 W1 in
-            let n2 := ppi2 W2 in
-            prod (leq_t n1 n2)
-                 (pi nattp 
-                     (*i = var 0*)
-                     ( pi nattp (*i = 1, l = 0*)
-                       (pi 
-                      (leq_t (var 1) (subst (sh 2) n1))
-                     (all nzero (fut preworld) (*i = 2, l = 1, h = 0*)
-                          (eqtype (app3 (subst (sh 4) w1) (*i = 3, l = 2, h = 1, u= 0*)
-                                        (var 3) (var 0) (var 2))
-                          (app3 (subst (sh 4) w2) (var 3) (var 0) (var 2)))
-                     ))
+            let l1 := ppi2 W1 in
+            let l2 := ppi2 W2 in
+            prod (leq_t l1 l2)
+                 (all nzero (fut preworld)
+                 (*u = 0*)
+                 (pi (fut nattp) (*u = 1, l = 0*)
+                     (pi (nattp) (*u = 2, l = 1, i = 0*)(
+                           pi (leq_t (var 0) (subst (sh 2) l1))
+                              ( (*u = 3, l = 2, i = 1, m = 0*)
+                          eqtype (app3 (subst (sh 4) w1)                                         (var 1) (var 3) (var 2))
+                          (app3 (subst (sh 4) w2) (var 1) (var 3) (var 2))
+                              )
+                                                   )
+                                           )
+
                  ))))) W1) W2.
 
 Ltac simpsub1 :=

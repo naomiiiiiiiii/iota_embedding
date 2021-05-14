@@ -76,11 +76,13 @@ Lemma subseq_type: forall G w1 w2,
   eapply tr_eqtype_formation_univ.
   rewrite - (subst_nzero (dot (var 2) id)).
   rewrite - subst_univ.
-  eapply tr_pi_elim.
+  eapply (tr_pi_elim _ nattp).
   rewrite subst_ppi1. simpsub. simpl.
   rewrite - (subst_nzero (under 1 (dot (var 0) id)) ).
   rewrite - subst_univ.
-  rewrite - (subst_world (dot (var 0) id)).
+  rewrite - (subst_nat (dot (var 0) id)).
+  rewrite - subst_pi.
+  eapply (tr_pi_elim _ (fut preworld)).
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
