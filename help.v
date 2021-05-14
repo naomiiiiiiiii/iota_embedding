@@ -135,8 +135,8 @@ Definition app3 w i u l : term False :=
                  (pi nattp 
                      (*i = var 0*)
                      ( pi nattp (*i = 1, l = 0*)
-                       (all 
-                     nzero (leq_t (var 1) (subst (sh 2) n1))
+                       (pi 
+             (leq_t (var 1) (subst (sh 2) n1))
                      (all nzero (fut preworld) (*i = 2, l = 1, h = 0*)
                           (eqtype (app3 (subst (sh 4) w1) (*i = 3, l = 2, h = 1, u= 0*)
                                         (var 3) (var 0) (var 2))

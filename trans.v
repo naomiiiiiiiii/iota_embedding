@@ -35,7 +35,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
        | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
             prod (ltpagetp i l1)
-                 (all preworld nzero (*wl1:= 2, i := 1, v := 0*)
+                 (all nzero preworld (*wl1:= 2, i := 1, v := 0*)
                       (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
                       (
             let w := ppi1 W in

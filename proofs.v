@@ -132,21 +132,24 @@ intros.
   rewrite - cat1s. rewrite - catA.
   repeat rewrite cat1s. reflexivity. Qed.
 
+  Lemma uworld: forall G,
+      (tr [:: hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 1) (var 0)) world)). intros.
+     apply world_pair. 
+        rewrite - (subst_pw (sh 2)).
+      apply tr_hyp_tm; repeat constructor.
+        rewrite - (subst_nat (sh 1)).
+        apply tr_hyp_tm; repeat constructor. Admitted.
+
+  Hint Resolve uworld.
+
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
     move => w l A G Du.
   move : w l G Du.
     induction A; intros; simpl; try apply nat_U0.
-    +
- assert (tr [:: hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 1) (var 0)) world)) as Hu.
-     apply world_pair. 
-        rewrite - (subst_pw (sh 2)).
-      apply tr_hyp_tm; repeat constructor.
-        rewrite - (subst_nat (sh 1)).
-        apply tr_hyp_tm; repeat constructor.
-
+    + (*arrow*)
         apply tr_all_formation_univ.
       apply pw_kind.
       apply tr_pi_formation_univ.
@@ -157,14 +160,17 @@ intros.
     - (*showing w, l world*)
       rewrite - (subst_world (sh 2)).
       rewrite subst_sh_shift. rewrite - hseq2.
-      apply tr_weakening_append. assumption. assumption.
-        apply tr_arrow_formation_univ.
+      apply tr_weakening_append. assumption.
+      apply uworld.
+        apply tr_arrow_formation_univ; try auto.
         repeat rewrite subst_nzero.
-        eapply IHA1; try assumption.
-        eapply IHA2; try assumption.
+        eapply IHA1; try assumption; try auto. 
+        eapply IHA2; try assumption; try auto.
         auto. apply leq_refl. auto.
-      + simpsub. simpl. apply tr_all_formation_univ.
-        unfold subst1. rewrite subst_pw.
+        (*comp type*)
+      + unfold subst1. rewrite subst_all.
+        apply tr_all_formation_univ.
+        rewrite subst_pw.
         rewrite subst_nzero. apply pw_kind.
         apply tr_pi_formation_univ.
         repeat rewrite subst_nat.
@@ -184,7 +190,6 @@ intros.
              (subst (sh 2) l))) 
                 id )).
       eapply (tr_sigma_elim2 _ preworld).
-      apply world+
       rewrite - (subst_pw (sh 2)).
       simpsub.
       rewrite - hseq2.
@@ -194,8 +199,32 @@ intros.
       rewrite - (subst_ppair).
       repeat rewrite subst_sh_shift.
       apply tr_weakening_append. apply Du.
-      Admitted.
-    
+      simpsub. rewrite subst_nat.
+      unfold subst1. rewrite subst_pw.
+      rewrite - (subst_nat (dot
+                              (ppi1
+          (ppair (var 1)
+             (var 0))) 
+                id  )).
+      eapply (tr_sigma_elim2 _ preworld).
+      repeat rewrite subst_nat.
+      apply uworld.
+  + (*ref type*)
+    rewrite subst_pi.
+    apply tr_pi_formation_univ.
+    repeat rewrite subst_nat.
+    repeat rewrite subst_nzero.
+    apply nat_U0.
+    rewrite subst_pi. simpsub. simpl.
+    apply tr_pi_formation_univ.
+    repeat rewrite subst_nat.
+    repeat rewrite subst_nzero.
+    apply nat_U0.
+    repeat rewrite subst_nzero.
+    apply tr_all_formation_univ.
+    simpsub.
+    repeat rewrite subst_nat. unfold subst1. repeat rewrite subst_pw. rewrite subst_leq. simpsub.
+    rewrite - subst_sh_shift. simpsub. rewrite subst_nzero.
 Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
                                                           conjunction here*)
