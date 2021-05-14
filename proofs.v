@@ -64,6 +64,23 @@ Lemma subseq_type: forall G w1 w2,
   apply leq_type.
   rewrite - (subst_nat (sh 2)).
   eapply tr_hyp_tm. repeat constructor.
+  rewrite subst_ppi2. simpsub. simpl.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 3)).
+  eapply tr_hyp_tm. repeat constructor.
+  eapply tr_all_formation_univ.
+  eapply tr_fut_kind_formation.
+  apply pw_kind.
+  apply zero_typed.
+  repeat rewrite subst_nzero.
+  eapply tr_eqtype_formation_univ.
+  rewrite - (subst_nzero (dot (var 2) id)).
+  rewrite - subst_univ.
+  eapply tr_pi_elim.
+  rewrite subst_ppi1. simpsub. simpl.
+  rewrite - (subst_nzero (under 1 (dot (var 0) id)) ).
+  rewrite - subst_univ.
+  rewrite - (subst_world (dot (var 0) id)).
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
