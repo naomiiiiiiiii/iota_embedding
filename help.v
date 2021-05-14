@@ -126,8 +126,10 @@ Definition app3 w i u l : term False :=
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun W1 => fun W2 =>
-            (*lam (lam *)
-            let w1 := ppi1 W1 in
+       app  (app   (lam (lam
+                   (let W1 := var 0 in
+                   let W2 := var 1 in
+            let w1 := ppi1  W1 in
             let w2 := ppi1 W2 in
             let n1 := ppi2 W1 in
             let n2 := ppi2 W2 in
@@ -142,7 +144,7 @@ Definition app3 w i u l : term False :=
                                         (var 3) (var 0) (var 2))
                           (app3 (subst (sh 4) w2) (var 3) (var 0) (var 2)))
                      ))
-                 )).
+                 ))))) W1) W2.
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
@@ -187,21 +189,7 @@ Lemma subseq_subst: forall W1 W2 s,
        (subst s
               (subseq W1 W2)) = subseq (subst s W1)
                                        (subst s W2).
-  intros. unfold subseq.
-  rewrite subst_prod. rewrite subst_leq.
-  repeat rewrite subst_pi. repeat rewrite subst_nat.
-  repeat rewrite subst_leq.
-  repeat rewrite subst_ppi2.
-  rewrite <- subst_compose.
-  rewrite under_sum.
-  rewrite compose_sh_under_eq.
-  (*s o shift on left
-   shift o s on right*)
-  Opaque nzero nattp.
-  simpsub. simpl.
-  simpsub. simpl.
-   auto.
-   (*udner is only for putting substitutions under binders*)
+  intros. unfold subseq. repeat rewrite subst_app. auto.
    Qed.
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))

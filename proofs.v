@@ -19,12 +19,51 @@ Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
 Hint Resolve nat_type. 
 
+Lemma world_type: forall G,
+      tr G (deqtype world world). Admitted.
+Hint Resolve world_type. 
+
 Lemma pw_kind: forall G,
       tr G (deq preworld preworld (kuniv nzero)). Admitted.
 
+Lemma split_world_elim2: forall W G,
+    tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
+Admitted.
+
+    Lemma split_world: forall w1 l1 G,
+tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
+                                                          conjunction here*)
+    Admitted.
+
+
 Lemma subseq_type: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
-    tr G (oof (subseq w1 w2) (univ nzero)). Admitted.
+    tr G (oof (subseq w1 w2) (univ nzero)).
+  intros. unfold subseq.
+  rewrite - (subst_nzero (dot w2 id)).
+  rewrite - subst_univ.
+  eapply (tr_pi_elim _ world).
+  rewrite - (subst_nzero (under 1 (dot w1 id)) ).
+  rewrite - subst_univ.
+  rewrite - (subst_world (dot w1 id)).
+  rewrite - subst_pi.
+  eapply (tr_pi_elim _ world).
+  apply tr_pi_intro. apply world_type.
+  apply tr_pi_intro. apply world_type.
+  eapply tr_prod_formation_univ.
+  eapply leq_type.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 1)).
+  eapply tr_hyp_tm. constructor.
+  eapply split_world_elim2.
+  rewrite - (subst_world (sh 2)).
+  eapply tr_hyp_tm. repeat constructor.
+  eapply tr_pi_formation_univ. apply nat_U0. 
+  eapply tr_pi_formation_univ. apply nat_U0.
+  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
+  apply leq_type.
+  rewrite - (subst_nat (sh 2)).
+  eapply tr_hyp_tm. repeat constructor.
 
 Ltac simpsub1 :=
   unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
@@ -143,6 +182,8 @@ intros.
 
   Hint Resolve uworld.
 
+                        
+
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
@@ -180,7 +221,14 @@ intros.
         apply tr_arrow_formation_univ.
         (*showing the subseq part is a type,
          problematic coz of substitutions*)
-        simpsub. simpl. unfold subseq. simpl.
+        simpsub. simpl.
+        rewrite subseq_subst. simpsub.
+        repeat rewrite subst_nat.
+        rewrite subst_nzero.
+
+
+
+        unfold subseq. simpl.
         rewrite subst_prod.
         eapply tr_prod_formation_univ.
         (*need a lemma about leq start here*)
@@ -229,10 +277,7 @@ intros.
     simpsub.
     repeat rewrite subst_nat. unfold subst1. repeat rewrite subst_pw. rewrite subst_leq. simpsub.
     rewrite - subst_sh_shift. simpsub. rewrite subst_nzero.
-Lemma split_world: forall w1 l1 G,
-tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
-                                                          conjunction here*)
-Admitted.
+
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
