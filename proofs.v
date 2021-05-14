@@ -12,9 +12,10 @@ Lemma tr_arrow_elim: forall G a b m n p q,
       -> tr G (deq (app m p) (app n q) b).
 Admitted.
 
-Lemma kind_type: forall G K i,
+Lemma kind_type: forall {G K i},
     tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
-  Admitted.
+  intros. eapply tr_formation_weaken.
+  eapply tr_kuniv_weaken. apply X. Qed.
 
 Lemma nat_U0: forall G,
     tr G (oof nattp U0). Admitted.
@@ -24,25 +25,43 @@ Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
 Hint Resolve nat_type. 
 
-Lemma world_type: forall G,
-      tr G (deqtype world world). Admitted.
-Hint Resolve world_type. 
+
+
+
+Lemma pw_kind: forall {G},
+    tr G (deq preworld preworld (kuniv nzero)).
+  intros. apply tr_rec_kind_formation.
+  apply tr_arrow_kind_formation.
+  auto. apply tr_karrow_kind_formation.
+  apply tr_fut_kind_formation.
+  simpl. rewrite - subst_kuniv.
+  apply tr_hyp_tm. repeat constructor.
+  auto.
+  apply tr_arrow_kind_formation. apply tr_fut_formation_univ.
+  rewrite subst_nzero. apply nat_U0. auto.
+  apply tr_univ_kind_formation; auto. apply zero_typed. Qed.
+Hint Resolve pw_kind. 
+
+Lemma pw_type: forall {G},
+    tr G (deqtype preworld preworld ).
+  intros. apply (kind_type pw_kind). Qed.
+
+Hint Resolve pw_type.
 
 Lemma pw_type2: forall G, tr G (deqtype (arrow (fut nattp) (univ nzero))
-       (arrow (fut nattp) (univ nzero))). Admitted.
+                                   (arrow (fut nattp) (univ nzero))).
+  intros. apply tr_arrow_formation.
+  apply tr_fut_formation. auto.
+  apply tr_univ_formation. auto. Qed.
 
-Lemma pw_kind1: forall G, tr G (deq
+Lemma pw_type1: forall G, tr G (deqtype
        (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
        (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
-       (kuniv nzero) ).
-Admitted.
+  ).
+  intros. apply tr_karrow_formation.
+  apply tr_fut_formation. auto. apply pw_type2. Qed.
 
 
-Lemma pw_kind: forall G,
-      tr G (deq preworld preworld (kuniv nzero)). Admitted.
-
-Lemma pw_type: forall G,
-      tr G (deqtype preworld preworld ). Admitted.
 
 Lemma unfold_pw: forall G,
     tr G (deqtype preworld (arrow nattp
@@ -51,6 +70,10 @@ Lemma unfold_pw: forall G,
 Lemma split_world_elim2: forall W G,
     tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
 Admitted.
+
+Lemma world_type: forall G,
+      tr G (deqtype world world). Admitted.
+Hint Resolve world_type. 
 
     Lemma split_world: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
@@ -135,7 +158,7 @@ tr [:: hyp_tm
   rewrite - (sub2 (sh1)).
   eapply tr_arrow_pi_equal.
   apply nat_type.
-  eapply (kind_type _ _ _ (pw_kind1 _) ).
+  eapply (kind_type _ _ _ (pw_type1 _) ).
   eapply tr_eqtype_convert.
   apply unfold_pw.
   eapply (tr_sigma_elim1 _ _ nattp).
@@ -209,25 +232,7 @@ simpsub. simpl. apply Hworldapp.
   auto.
   repeat rewrite subst_nzero. apply leq_refl. auto.
 assumption. assumption.
-
-
-
-  apply tr_hyp_tm. repeat constructor.
-  apply tr_arrow_formation. apply nat_type.
-  eapply (kind_type _ _ _ (pw_kind1 _) ).
-  apply nat_type.
-  eapply (kind_type _ _ _ (pw_kind _) ).
-  repeat rewrite - (subst_world (sh 5)).
-
-  eapply tr_eq
-  rewrite (sub4 (dot (var 1) id)).
-  eapply (tr_arrow_elim _ nattp).
-  .
-  eapply tr_arrow_formation.
-  eapply tr_fut_formation. eapply nat_type.
-  eapply tr_univ_formation.
-  apply zero_typed.
-
+Qed.
 
 
 
