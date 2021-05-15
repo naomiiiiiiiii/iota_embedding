@@ -75,11 +75,15 @@ Lemma world_type: forall G,
       tr G (deqtype world world). Admitted.
 Hint Resolve world_type. 
 
-    Lemma split_world: forall w1 l1 G,
+    Lemma split_world1: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
                                                           conjunction here*)
     Admitted.
 
+    Lemma split_world2: forall w1 l1 G,
+tr G (oof (ppair w1 l1) world) -> tr G (oof l1 nattp). (*ask karl can't put a
+                                                          conjunction here*)
+    Admitted.
 
 Lemma subseq_U0: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
@@ -338,9 +342,12 @@ apply tr_weakening_append. assumption. assumption.
   Lemma hseq2: forall (T: Type) (x y: T)
                   (L: seq T), [:: x; y] ++ L=
                  [:: x, y & L].
-intros.
-  rewrite - cat1s. rewrite - catA.
-  repeat rewrite cat1s. reflexivity. Qed.
+intros. auto. Qed.
+
+  Lemma hseq3: forall (T: Type) (x y z: T)
+                  (L: seq T), [:: x; y; z] ++ L=
+                 [:: x, y, z & L].
+intros. auto. Qed.
 
   Lemma uworld: forall G,
       (tr [:: hyp_tm nattp, hyp_tm preworld & G]
@@ -380,25 +387,30 @@ intros.
         eapply IHA2; try assumption; try auto.
         auto. apply leq_refl. auto.
         (*comp type*)
-      + unfold subst1. rewrite subst_all.
+      + unfold U0. rewrite - (subst_U0 (dot l id)).
+        eapply tr_pi_elim.
+        eapply tr_pi_intro. apply nat_type.
         apply tr_all_formation_univ.
-        rewrite subst_pw.
-        rewrite subst_nzero. apply pw_kind.
-        rewrite subst_pi.
+         apply pw_kind.
         apply tr_pi_formation_univ.
-        repeat rewrite subst_nat.
         rewrite subst_nzero. apply nat_U0.
-        rewrite subst_arrow.
         apply tr_arrow_formation_univ.
-        (*showing the subseq part is a type,
-         problematic coz of substitutions*)
-        simpsub. simpl.
-        rewrite subst_subseq.
         apply subseq_U0.
-        simpsub.
-        repeat rewrite subst_nat.
-        rewrite - subst_sh_shift.
-        simpsub.
+        apply world_pair.
+        rewrite - (subst_pw (sh 3)).
+        rewrite - hseq3.
+        rewrite subst_sh_shift.
+        apply tr_weakening_append.
+        eapply split_world1. apply Du.
+        rewrite - (subst_nat (sh 3)).
+        apply tr_hyp_tm. repeat constructor.
+        apply uworld.
+        apply compm1_type.
+        apply uworld.
+        eapply IHA. apply uworld. auto.
+        apply leq_refl. auto.
+        eapply split_world2. apply Du.
+   - (*ref type*)
         rewrite - subst_ppair.
         rewrite - (subst_world (sh 2)).
         repeat rewrite subst_sh_shift.
