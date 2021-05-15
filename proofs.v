@@ -1,4 +1,4 @@
-Require Import ssreflect.
+Require Import Program.Equality.
 From mathcomp Require Import ssreflect seq ssrnat.
 From istari Require Import source subst_src rules_src help trans basic_types.
 From istari Require Import Sigma Tactics
@@ -411,155 +411,7 @@ intros. auto. Qed.
         apply leq_refl. auto.
         eapply split_world2. apply Du.
    - (*ref type*)
-        rewrite - subst_ppair.
-        rewrite - (subst_world (sh 2)).
-        repeat rewrite subst_sh_shift.
-        rewrite - hseq2.
-        apply tr_weakening_append. assumption.
-        simpsub.
-        unfold subst1. repeat rewrite subst_nat subst_pw.
-        apply uworld.
-        simpsub. simpl.
-        apply tr_arrow_formation_univ.
-        rewrite subst_store. simpsub.
-        apply store_type. apply uworld.
-        rewrite subst_laters. apply bar_type.
-        rewrite subst_exist.
-  apply tr_exist_formation_univ. auto.
-  rewrite subst_sigma; eapply tr_sigma_formation_univ.
-  auto.
-  repeat rewrite subst_prod.
-  repeat eapply tr_prod_formation_univ.
-  rewrite subst_subseq.
-  apply subseq_U0. simpsub. simpl. repeat rewrite subst_nat.
-  repeat rewrite subst_pw.
-  apply world_pair.
-  rewrite - (subst_pw (sh 4)).
-  apply tr_hyp_tm. repeat constructor.
-  rewrite - (subst_nat (sh 3)).
-  apply tr_hyp_tm. repeat constructor.
-  repeat rewrite subst_nat.
-  repeat rewrite subst_pw. simpsub. simpl.
-  apply uworld.
-  apply store_type. auto.
-  simpsub. simpl.
-  (*get a substitution over trans type if i leave l in there*)
-
-    rewrite subst_nzero. apply A_t.
-    auto. apply leq_refl. auto.
-
-
-
-
-
-
-
-
-
-
-
-        repeat rewrite subst_laters.
-simpsub. simpl. repeat rewrite subst_nzero. repeat rewrite subst_pw.
-        remember 
-             (dot (var 0)
-                (dot (var 1) (dot (subst (sh 2) l) (sh 2)))) as s.
-        assert (
-           (arrow
-          (subst
-             (dot (var 0)
-                (dot (var 1) (dot (subst (sh 2) l) (sh 2))))
-             (store (ppair (var 1) (var 0))))
-          (subst
-             (dot (var 0)
-                (dot (var 1) (dot (subst (sh 2) l) (sh 2))))
-             (laters
-                (exist nzero preworld
-                   (sigma nattp
-                      (prod
-                         (prod
-                            (subseq (ppair (var 3) (var 2))
-                               (ppair (var 1) (var 0)))
-                            (store (ppair (var 1) (var 0))))
-                         (trans_type (var 1) (var 0) A))))))) =
-           (arrow
-             (store (ppair (
-                         (subst s (var 1))) (subst
-                             s (var 0))))
-             (laters
-                (exist nzero preworld
-                   (sigma nattp
-                      (prod
-                         (prod
-                            (subseq (ppair
-                                       (subst (under 3 s)
-                                              (var 3))
-                                       (subst (under 3 s) (var 2)))
-                                    (ppair
-                                       (subst (under 3 s) (var 1))
-                                       (subst (under 3 s) (var 0))
-))
-                            (store (ppair 
-                                       (subst (under 3 s) (var 1))
-                                       (subst (under 3 s) (var 0))))
-                         )
-                         (trans_type (subst (under 2 s) (var 1))
-                                     (subst (under 2 s) (var 0)) A)
-                      )
-                   )
-           )))
-          ).
-        repeat rewrite subst_store. simpsub. simpl.
-        rewrite subst_later.
-        unfold subseq. simpl.
-        rewrite subst_prod.
-        eapply tr_prod_formation_univ.
-        (*need a lemma about leq start here*)
-        rewrite subst_leq.
-        apply leq_type.
-    - simpsub.
-      rewrite - subst_sh_shift. simpsub.
-      rewrite - (subst_nat (dot
-                              (ppi1
-          (ppair (subst (sh 2) w)
-             (subst (sh 2) l))) 
-                id )).
-      eapply (tr_sigma_elim2 _ preworld).
-      rewrite - (subst_pw (sh 2)).
-      simpsub.
-      rewrite - hseq2.
-      rewrite - (subst_nat (under 1 (sh 2) )).
-      rewrite - (subst_sigma False (sh 2) ).
-      repeat rewrite subst_nat. rewrite subst_pw.
-      rewrite - (subst_ppair).
-      repeat rewrite subst_sh_shift.
-      apply tr_weakening_append. apply Du.
-      simpsub. rewrite subst_nat.
-      unfold subst1. rewrite subst_pw.
-      rewrite - (subst_nat (dot
-                              (ppi1
-          (ppair (var 1)
-             (var 0))) 
-                id  )).
-      eapply (tr_sigma_elim2 _ preworld).
-      repeat rewrite subst_nat.
-      apply uworld.
-  + (*ref type*)
-    rewrite subst_pi.
-    apply tr_pi_formation_univ.
-    repeat rewrite subst_nat.
-    repeat rewrite subst_nzero.
-    apply nat_U0.
-    rewrite subst_pi. simpsub. simpl.
-    apply tr_pi_formation_univ.
-    repeat rewrite subst_nat.
-    repeat rewrite subst_nzero.
-    apply nat_U0.
-    repeat rewrite subst_nzero.
-    apply tr_all_formation_univ.
-    simpsub.
-    repeat rewrite subst_nat. unfold subst1. repeat rewrite subst_pw. rewrite subst_leq. simpsub.
-    rewrite - subst_sh_shift. simpsub. rewrite subst_nzero.
-
+Admitted.
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
@@ -567,7 +419,19 @@ Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
 Lemma size_gamma_at: forall G w l,
     size (gamma_at G w l) = size G. Admitted.
 
-  Theorem one: forall G D e T ebar w1 l1,
+Theorem typed_hygiene: forall G M M' A,
+    (tr G (deq M M' A)) -> (hygiene (ctxpred G) M).
+  intros. dependent induction X; auto; try repeat constructor.
+  - rewrite ctxpred_length. eapply Sequence.index_length. apply i0.
+  - suffices:  (fun j : nat =>
+     (j < 0)%coq_nat \/
+     (j >= 0)%coq_nat /\ ctxpred G (j - 0)%coq_nat) = (ctxpred G).
+    intros Heq. rewrite Heq. eapply IHX1; try reflexivity.
+    (*apply extensionality.*)
+    Admitted.
+
+
+Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 
          tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
@@ -580,19 +444,14 @@ Lemma size_gamma_at: forall G w l,
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
 (*Useful facts that will help us later*)
-    remember (size ([:: hyp_tm nattp,
+   remember (size ([:: hyp_tm nattp,
         hyp_tm preworld,
         hyp_tm nattp
         & gamma_at G w1 l1])) as sizel.
-    assert (sizel = (3 + size G)%coq_nat) as Hsizel. subst.
+    assert (sizel = (3 + size G)) as Hsizel. subst.
     repeat rewrite size_cons. repeat rewrite addnA.
     rewrite size_gamma_at. auto.
-
-    assert ([:: hyp_tm nattp; hyp_tm preworld; hyp_tm nattp] ++ (gamma_at G w1 l1) =
-  [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & (gamma_at G w1 l1) ]) as Hseq.
-  rewrite - cat1s. rewrite - catA.
-  repeat rewrite cat1s. reflexivity.
-   assert (tr
+   (*assert (tr
     [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
       & gamma_at G w1 l1 ++ D]
     (oof (ppair (var 1) (var 0)) world) ) as Hu.
@@ -600,15 +459,62 @@ Lemma size_gamma_at: forall G w l,
         rewrite - (subst_pw (sh 2)).
       apply tr_hyp_tm; repeat constructor.
         rewrite - (subst_nat (sh 1)).
-        apply tr_hyp_tm; repeat constructor.
+        apply tr_hyp_tm; repeat constructor.*)
     (*actual proof*)
     simpl.
-    eapply (tr_pi_elim _ nattp).
-    inversion Dtrans; subst.
-    remember (size ([:: hyp_tm nattp,
+    suffices:
+  tr (gamma_at G w1 l1 ++ D)
+(deqtype
+      (
+       subst1 (shift (size G) l1) 
+             (all nzero preworld
+                (pi nattp
+                   (arrow
+                      (subseq
+                         (ppair (shift 3 (shift (size G) w1))
+                            (var 2)) (ppair (var 1) (var 0)))
+                      (arrow (store (ppair (var 1) (var 0)))
+                         (laters
+                            (exist nzero preworld
+                               (sigma nattp
+                                  (prod
+                                     (prod
+                                        (subseq
+                                          (ppair (var 3) (var 2))
+                                          (ppair (var 1) (var 0)))
+                                        (store
+                                          (ppair (var 1) (var 0))))
+                                     (trans_type (var 1) (var 0) B)))))))))
+              )
+    (app
+          (lam
+             (all nzero preworld
+                (pi nattp
+                   (arrow
+                      (subseq
+                         (ppair (shift 3 (shift (size G) w1))
+                            (var 2)) (ppair (var 1) (var 0)))
+                      (arrow (store (ppair (var 1) (var 0)))
+                         (laters
+                            (exist nzero preworld
+                               (sigma nattp
+                                  (prod
+                                     (prod
+                                        (subseq
+                                          (ppair (var 3) (var 2))
+                                          (ppair (var 1) (var 0)))
+                                        (store
+                                          (ppair (var 1) (var 0))))
+                                     (trans_type (var 1) (var 0) B))))))))))
+          (shift (size G) l1))
+    ). move => Heq.
+eapply tr_eqtype_convert. apply Heq.
+    inversion Dtrans; subst. simpl.
+      eapply (tr_pi_elim _ nattp).
+    (*remember (size ([:: hyp_tm nattp,
         hyp_tm preworld,
         hyp_tm nattp
-        & gamma_at G w1 l1])) as sizel.
+        & gamma_at G w1 l1])) as sizel.*)
     eapply tr_pi_intro. eapply nat_type.
     apply tr_all_intro.
     apply pw_kind.
@@ -622,15 +528,16 @@ Lemma size_gamma_at: forall G w l,
     apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-
    +     rewrite shift_sum.
     apply world_pair. 
-    repeat rewrite - cat_cons. rewrite - (subst_pw (sh sizel)).
+    (*rewrite subst_sh_shift. subst.
+    repeat rewrite - Hseq.*)
+    rewrite - {2}(subst_pw (sh (3 + size G))).
+    rewrite subst_sh_shift. repeat rewrite plusE.
     repeat rewrite - Hsizel.
-    rewrite subst_sh_shift. subst.
-    repeat rewrite - Hseq.
+    repeat rewrite - cat_cons.
     apply tr_weakening_append; auto.
-eapply split_world. apply Dw.
+eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
       apply tr_hyp_tm; repeat constructor.
       + assumption. 
