@@ -408,9 +408,96 @@ intros.
         unfold subst1. repeat rewrite subst_nat subst_pw.
         apply uworld.
         simpsub. simpl.
-        (*need to get rid of the substs*)
-        repeat rewrite subst_store. simpsub.
+        apply tr_arrow_formation_univ.
+        rewrite subst_store. simpsub.
+        apply store_type. apply uworld.
+        rewrite subst_laters. apply bar_type.
+        rewrite subst_exist.
+  apply tr_exist_formation_univ. auto.
+  rewrite subst_sigma; eapply tr_sigma_formation_univ.
+  auto.
+  repeat rewrite subst_prod.
+  repeat eapply tr_prod_formation_univ.
+  rewrite subst_subseq.
+  apply subseq_U0. simpsub. simpl. repeat rewrite subst_nat.
+  repeat rewrite subst_pw.
+  apply world_pair.
+  rewrite - (subst_pw (sh 4)).
+  apply tr_hyp_tm. repeat constructor.
+  rewrite - (subst_nat (sh 3)).
+  apply tr_hyp_tm. repeat constructor.
+  repeat rewrite subst_nat.
+  repeat rewrite subst_pw. simpsub. simpl.
+  apply uworld.
+  apply store_type. auto.
+  simpsub. simpl.
+  (*get a substitution over trans type if i leave l in there*)
 
+    rewrite subst_nzero. apply A_t.
+    auto. apply leq_refl. auto.
+
+
+
+
+
+
+
+
+
+
+
+        repeat rewrite subst_laters.
+simpsub. simpl. repeat rewrite subst_nzero. repeat rewrite subst_pw.
+        remember 
+             (dot (var 0)
+                (dot (var 1) (dot (subst (sh 2) l) (sh 2)))) as s.
+        assert (
+           (arrow
+          (subst
+             (dot (var 0)
+                (dot (var 1) (dot (subst (sh 2) l) (sh 2))))
+             (store (ppair (var 1) (var 0))))
+          (subst
+             (dot (var 0)
+                (dot (var 1) (dot (subst (sh 2) l) (sh 2))))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair (var 3) (var 2))
+                               (ppair (var 1) (var 0)))
+                            (store (ppair (var 1) (var 0))))
+                         (trans_type (var 1) (var 0) A))))))) =
+           (arrow
+             (store (ppair (
+                         (subst s (var 1))) (subst
+                             s (var 0))))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair
+                                       (subst (under 3 s)
+                                              (var 3))
+                                       (subst (under 3 s) (var 2)))
+                                    (ppair
+                                       (subst (under 3 s) (var 1))
+                                       (subst (under 3 s) (var 0))
+))
+                            (store (ppair 
+                                       (subst (under 3 s) (var 1))
+                                       (subst (under 3 s) (var 0))))
+                         )
+                         (trans_type (subst (under 2 s) (var 1))
+                                     (subst (under 2 s) (var 0)) A)
+                      )
+                   )
+           )))
+          ).
+        repeat rewrite subst_store. simpsub. simpl.
+        rewrite subst_later.
         unfold subseq. simpl.
         rewrite subst_prod.
         eapply tr_prod_formation_univ.
