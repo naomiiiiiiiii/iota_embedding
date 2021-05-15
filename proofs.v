@@ -540,7 +540,20 @@ eapply tr_eqtype_convert. apply Heq.
 eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
       apply tr_hyp_tm; repeat constructor.
-      + assumption. 
+   + apply uworld.
+     (*back to main proof*)
+   + eapply tr_formation_weaken. apply compm1_type.
+     apply uworld.
+     apply trans_type_works. apply uworld.
+
+
+
+
+
+
+
+
+
         (*do a suffices somehow*)
 suffices:
           tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & gamma_at G w1 l1 ++ D]
