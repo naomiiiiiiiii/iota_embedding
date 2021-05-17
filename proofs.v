@@ -10,12 +10,16 @@ Ltac var_solv :=
   try (apply tr_hyp_tm; repeat constructor).
 
 Lemma tr_arrow_elim: forall G a b m n p q, 
-      tr G (deq m n (pi a (subst sh1 b)))
+    tr G (deqtype a a) ->
+    tr G (deqtype b b) ->
+      tr G (deq m n (arrow a b))
       -> tr G (deq p q a) 
       -> tr G (deq (app m p) (app n q) b).
 intros. 
 suffices: (subst1 p (subst sh1 b)) = b. move => Heq.
-rewrite - Heq. eapply tr_pi_elim; try apply X; try assumption.
+rewrite - Heq.
+eapply (tr_pi_elim _ a); try assumption.
+eapply tr_eqtype_convert; try apply tr_arrow_pi_equal; assumption.
 simpsub. auto. Qed.
 
 Lemma tr_arrow_intro: forall G a b m n,
@@ -439,7 +443,7 @@ intros. auto. Qed.
       apply tr_pi_formation_univ; auto.
       repeat rewrite subst_nzero. apply nat_U0.
       apply tr_eqtype_formation_univ.
-      eapply tr_arrow_elim.
+      eapply (tr_arrow_elim _ nattp).
       (*start here*)
 Admitted.
 
@@ -520,7 +524,7 @@ eapply IHA. simpsub. auto.
 Qed.
 
 Theorem test: forall s, (@subst False s nattp) = nattp.
-  intros. simpsub1.
+  intros. simpsub1. Admitted.
 
 
 Theorem one: forall G D e T ebar w1 l1,
