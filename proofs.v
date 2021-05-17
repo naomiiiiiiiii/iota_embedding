@@ -9,6 +9,8 @@ Check context.
 Ltac var_solv :=
   try (apply tr_hyp_tm; repeat constructor).
 
+
+
 Lemma tr_arrow_elim: forall G a b m n p q, 
     tr G (deqtype a a) ->
     tr G (deqtype b b) ->
@@ -30,6 +32,17 @@ Lemma tr_arrow_intro: forall G a b m n,
 intros. eapply tr_eqtype_convert.
 apply tr_eqtype_symmetry. apply tr_arrow_pi_equal; try assumption.
 eapply tr_pi_intro; try assumption. Qed.
+
+Lemma tr_karrow_elim: forall G a b m n p q,
+    tr G (deqtype a a) ->
+    tr G (deqtype b b) ->
+      tr G (deq m n (karrow a b))
+      -> tr G (deq p q a) 
+      -> tr G (deq (app m p) (app n q) b).
+  intros. apply (tr_arrow_elim _ a); try assumption.
+  eapply tr_eqtype_convert. apply tr_eqtype_symmetry.
+  apply tr_arrow_karrow_equal; assumption.
+  assumption. Qed.
 
 Lemma kind_type: forall {G K i},
     tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
@@ -90,6 +103,10 @@ Lemma split_world_elim2: forall W G,
     tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
 Admitted.
 
+Lemma split_world_elim1: forall W G,
+    tr G (oof W world) -> tr G (oof (ppi1 W) preworld).
+Admitted.
+
 Lemma world_type: forall G,
       tr G (deqtype world world). Admitted.
 Hint Resolve world_type. 
@@ -103,6 +120,18 @@ tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
 tr G (oof (ppair w1 l1) world) -> tr G (oof l1 nattp). (*ask karl can't put a
                                                           conjunction here*)
     Admitted.
+
+    Lemma nth_works: forall G w n,
+        tr G (oof w world) -> tr G (oof n nattp) -> tr G (oof (nth w n)
+                           (karrow (fut preworld) (arrow (fut nattp) U0))).
+      intros. unfold nth. apply (tr_arrow_elim _ nattp); auto.
+      do 2? constructor. auto.
+      constructor. auto.
+      apply tr_univ_formation. auto.
+      eapply tr_eqtype_convert. apply unfold_pw.
+      apply split_world_elim1. assumption.
+      Qed.
+
 
 Lemma subseq_U0: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
@@ -443,7 +472,13 @@ intros. auto. Qed.
       apply tr_pi_formation_univ; auto.
       repeat rewrite subst_nzero. apply nat_U0.
       apply tr_eqtype_formation_univ.
-      eapply (tr_arrow_elim _ nattp).
+      eapply (tr_arrow_elim _ nattp); auto.
+      apply tr_univ_formation. repeat rewrite subst_nzero. auto.
+      apply (tr_karrow_elim _ (fut preworld)).
+      eapply kind_type. apply tr_fut_kind_formation. apply pw_kind. auto.
+      apply tr_arrow_formation; auto.
+      apply tr_univ_formation. repeat rewrite subst_nzero. auto.
+      apply (tr_arrow_elim _ (fut nattp)).
       (*start here*)
 Admitted.
 
