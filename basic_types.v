@@ -25,6 +25,14 @@ Lemma leq_type: forall G n1 n2,
     tr G (oof (leq_t n1 n2) U0).
   Admitted.
 
+
+Lemma lt_type: forall G n1 n2,
+    tr G (oof n1 nattp) -> tr G (oof n2 nattp) ->
+    tr G (oof (ltpagetp n1 n2) U0).
+  Admitted.
+
 Hint Resolve zero_typed.
 Hint Resolve leq_refl.
+Hint Resolve leq_type.
+Hint Resolve lt_type.
 

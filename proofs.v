@@ -6,6 +6,9 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 Check context.
 
+Ltac var_solv :=
+  try (apply tr_hyp_tm; repeat constructor).
+
 Lemma tr_arrow_elim: forall G a b m n p q, 
       tr G (deq m n (pi a (subst sh1 b)))
       -> tr G (deq p q a) 
@@ -424,7 +427,20 @@ intros. auto. Qed.
         eapply IHA. apply uworld. auto.
         apply leq_refl. auto.
         eapply split_world2. apply Du.
-   - (*ref type*)
+    - (*ref type*)
+      eapply tr_sigma_formation_univ; auto.
+      eapply tr_prod_formation_univ. apply lt_type.
+      rewrite - (subst_nat sh1). var_solv.
+      rewrite subst_ppi2. apply split_world_elim2.
+      rewrite - (subst_world sh1).
+      rewrite - cat1s. repeat rewrite subst_sh_shift.
+      apply tr_weakening_append. assumption.
+      apply tr_all_formation_univ. apply pw_kind.
+      apply tr_pi_formation_univ; auto.
+      repeat rewrite subst_nzero. apply nat_U0.
+      apply tr_eqtype_formation_univ.
+      eapply tr_arrow_elim.
+      (*start here*)
 Admitted.
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
@@ -444,8 +460,6 @@ Theorem typed_hygiene: forall G M M' A,
     (*apply extensionality.*)
     Admitted.
 
-Ltac var_solv :=
-  try (apply tr_hyp_tm; repeat constructor).
 
 (*Opaque laters.
 Opaque preworld.
@@ -504,6 +518,10 @@ move => Heq. rewrite Heq. auto. eapply IHA. simpsub. auto.
     move => Heq. rewrite Heq. auto.
 eapply IHA. simpsub. auto.
 Qed.
+
+Theorem test: forall s, (@subst False s nattp) = nattp.
+  intros. simpsub1.
+
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
