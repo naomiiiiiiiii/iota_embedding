@@ -231,10 +231,18 @@ Opaque nattp.
 Opaque world.
 
 
-Hint Rewrite subst_U0 subst_subseq subst_leq subst_leqtp subst_nzero subst_nat subst_world subst_pw.
+Hint Rewrite subst_U0 : ssub1.
+Hint Rewrite subst_subseq: ssub1.
+Hint Rewrite subst_leq: ssub1.
+Hint Rewrite subst_leqtp: ssub1.
+Hint Rewrite subst_nzero: ssub1.
+Hint Rewrite subst_nat: ssub1.
+Hint Rewrite subst_world: ssub1.
+Hint Rewrite subst_pw: ssub1.
+Hint Rewrite subst_world: ssub1.
 
 Ltac simpsub1 :=
-  autorewrite with subst.
+  autorewrite with ssub1.
 
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))

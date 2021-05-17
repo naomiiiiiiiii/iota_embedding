@@ -450,7 +450,7 @@ Ltac var_solv :=
 Lemma trans_type_subst : forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros; simpl; auto; simpsub1; simpl.
+  move => w l A s H. move: w l s H. induction A; intros; simpl; auto; simpsub; simpl.
             repeat rewrite subst_nat; repeat rewrite subst_pw;
   repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
  try rewrite subst_compose; try rewrite H. 
@@ -465,8 +465,12 @@ eapply IHA2. simpsub. auto.
 eapply IHA1. simpsub. auto.
 rewrite subst_ppair in H. inversion H. rewrite H1.
 repeat rewrite subst_ppair.
-rewrite subst_laters. simpsub. 
-
+rewrite subst_laters. simpsub.  simpl.
+repeat rewrite subst_nat; repeat rewrite subst_pw;
+  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift. simpsub. simpl.
+repeat rewrite subst_compose.
+repeat rewrite H1 H2.
+(*suffices do the same as the above for trans_Type*)
 repeat rewrite - subst_sh_shift.
 simpsub.
 
