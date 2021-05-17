@@ -447,6 +447,29 @@ Theorem typed_hygiene: forall G M M' A,
 Ltac var_solv :=
   try (apply tr_hyp_tm; repeat constructor).
 
+Lemma trans_type_subst : forall w l A s,
+    (subst s (ppair w l)) = (ppair w l) ->
+    (subst s (trans_type w l A)) = (trans_type w l A).
+  move => w l A s H. move: w l s H. induction A; intros; simpl; auto; simpsub1; simpl.
+            repeat rewrite subst_nat; repeat rewrite subst_pw;
+  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
+ try rewrite subst_compose; try rewrite H. 
+  suffices:  (subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1). move => Heq1.
+  suffices:  (subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2). move => Heq2.
+  rewrite Heq1 Heq2. auto. 
+eapply IHA2. simpsub. auto. 
+eapply IHA1. simpsub. auto.
+rewrite subst_ppair in H. inversion H. rewrite H1.
+repeat rewrite subst_ppair.
+rewrite subst_laters. simpsub. 
+
+repeat rewrite - subst_sh_shift.
+simpsub.
+
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 

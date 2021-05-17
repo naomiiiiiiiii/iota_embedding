@@ -148,14 +148,13 @@ Definition app3 w i u l : term False :=
 
                  ))))) W1) W2.
 
-Ltac simpsub1 :=
-  unfold leq_t; unfold leqtp; unfold nattp; unfold preworld; unfold app3; unfold nzero; simpsub; simpl.
 
 
 Lemma subst_pw: forall s,
     subst s preworld = preworld.
 intros. unfold preworld. unfold nattp. auto. Qed.
 Hint Rewrite subst_pw.
+
 
 Lemma subst_world: forall s,
     subst s world = world.
@@ -216,14 +215,26 @@ Lemma subst_U0: forall s,
 
 Lemma subst_store: forall W s, (subst s (store W)) = store (subst s W).
   intros. unfold store. auto. Qed.
+Opaque store.
 
 Lemma subst_laters: forall s A, (subst s (laters A)) = (laters (subst s A)).
   intros. unfold laters. unfold plus. rewrite subst_rec. rewrite subst_sigma.
   rewrite subst_booltp. rewrite subst_bite. simpsub. simpl.
   repeat rewrite <- subst_sh_shift. simpsub. auto. Qed.
+Opaque laters.
+Opaque preworld.
+Opaque U0.
+Opaque subseq.
+Opaque leqtp.
+Opaque nzero.
+Opaque nattp.
+Opaque world.
 
 
 Hint Rewrite subst_U0 subst_subseq subst_leq subst_leqtp subst_nzero subst_nat subst_world subst_pw.
+
+Ltac simpsub1 :=
+  autorewrite with subst.
 
 
  Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
