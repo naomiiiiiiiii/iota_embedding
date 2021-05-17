@@ -472,15 +472,23 @@ intros. auto. Qed.
       apply tr_pi_formation_univ; auto.
       repeat rewrite subst_nzero. apply nat_U0.
       apply tr_eqtype_formation_univ.
-      eapply (tr_arrow_elim _ nattp); auto.
-      apply tr_univ_formation. repeat rewrite subst_nzero. auto.
+      eapply (tr_arrow_elim _ (fut nattp) ). constructor; auto.
+      apply tr_univ_formation.  auto.
       apply (tr_karrow_elim _ (fut preworld)).
       eapply kind_type. apply tr_fut_kind_formation. apply pw_kind. auto.
-      apply tr_arrow_formation; auto.
-      apply tr_univ_formation. repeat rewrite subst_nzero. auto.
-      apply (tr_arrow_elim _ (fut nattp)).
-      (*start here*)
-Admitted.
+      apply tr_arrow_formation. constructor; auto.
+      apply tr_univ_formation. auto. 
+      eapply nth_works.
+      rewrite - hseq3. rewrite - (subst_world (sh 3) ). rewrite subst_sh_shift.
+      apply tr_weakening_append; assumption.
+      rewrite - (subst_nat (sh 3) ).
+      var_solv. apply tr_fut_intro.
+      rewrite - (subst_pw (sh 2)). var_solv.
+      apply tr_fut_intro.
+      rewrite - (subst_nat (sh 1)). var_solv.
+      apply tr_fut_formation_univ; auto. apply IHA; auto. apply uworld.
+      auto. apply leq_refl. auto. apply tr_unittp_formation.
+Qed.
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
