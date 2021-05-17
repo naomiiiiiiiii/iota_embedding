@@ -10,7 +10,19 @@ Lemma tr_arrow_elim: forall G a b m n p q,
       tr G (deq m n (pi a (subst sh1 b)))
       -> tr G (deq p q a) 
       -> tr G (deq (app m p) (app n q) b).
-Admitted.
+intros. 
+suffices: (subst1 p (subst sh1 b)) = b. move => Heq.
+rewrite - Heq. eapply tr_pi_elim; try apply X; try assumption.
+simpsub. auto. Qed.
+
+Lemma tr_arrow_intro: forall G a b m n,
+    tr G (deqtype a a) ->
+      tr G (deqtype b b)
+      -> tr (cons (hyp_tm a) G) (deq m n (subst sh1 b))
+      -> tr G (deq (lam m) (lam n) (arrow a b) ).
+intros. eapply tr_eqtype_convert.
+apply tr_eqtype_symmetry. apply tr_arrow_pi_equal; try assumption.
+eapply tr_pi_intro; try assumption. Qed.
 
 Lemma kind_type: forall {G K i},
     tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
@@ -273,7 +285,7 @@ Lemma store_type: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
 Admitted.
 
-Lemma bar_type: forall A G i,
+Lemma laters_type: forall A G i,
     (tr G (oof A (univ i))) -> tr G (oof (laters A) (univ i)).
   Admitted.
 
@@ -323,7 +335,7 @@ rewrite - (subst_pw (sh 2)).
     rewrite subst_nat.
     repeat constructor.
   eapply tr_arrow_formation_univ.
-  apply store_type. assumption. apply bar_type.
+  apply store_type. assumption. apply laters_type.
   apply tr_exist_formation_univ.
   apply pw_kind. eapply tr_sigma_formation_univ.
   unfold nzero. simpsub. apply nat_U0.
@@ -430,6 +442,8 @@ Theorem typed_hygiene: forall G M M' A,
     (*apply extensionality.*)
     Admitted.
 
+Ltac var_solv :=
+  try (apply tr_hyp_tm; repeat constructor).
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
@@ -460,6 +474,22 @@ Theorem one: forall G D e T ebar w1 l1,
       apply tr_hyp_tm; repeat constructor.
         rewrite - (subst_nat (sh 1)).
         apply tr_hyp_tm; repeat constructor.*)
+assert (tr
+    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
+      & gamma_at G w1 l1 ++ D]
+    (oof (ppair (shift 3 (shift (size G) w1)) (var 2)) world)) as Hwv2.
+   rewrite shift_sum.
+    apply world_pair. 
+    (*rewrite subst_sh_shift. subst.
+    repeat rewrite - Hseq.*)
+    rewrite - {2}(subst_pw (sh (3 + size G))).
+    rewrite subst_sh_shift. repeat rewrite plusE.
+    repeat rewrite - Hsizel.
+    repeat rewrite - cat_cons. subst.
+    apply tr_weakening_append; auto.
+eapply split_world1. apply Dw.
+      rewrite - (subst_nat (sh 3)).
+      apply tr_hyp_tm; repeat constructor.
     (*actual proof*)
     simpl.
     suffices:
@@ -515,7 +545,7 @@ eapply tr_eqtype_convert. apply Heq.
         hyp_tm preworld,
         hyp_tm nattp
         & gamma_at G w1 l1])) as sizel.*)
-    eapply tr_pi_intro. eapply nat_type.
+-eapply tr_pi_intro. eapply nat_type.
     apply tr_all_intro.
     apply pw_kind.
     rewrite subst_lam.
@@ -528,31 +558,49 @@ eapply tr_eqtype_convert. apply Heq.
     apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-   +     rewrite shift_sum.
-    apply world_pair. 
-    (*rewrite subst_sh_shift. subst.
-    repeat rewrite - Hseq.*)
-    rewrite - {2}(subst_pw (sh (3 + size G))).
-    rewrite subst_sh_shift. repeat rewrite plusE.
-    repeat rewrite - Hsizel.
-    repeat rewrite - cat_cons.
-    apply tr_weakening_append; auto.
-eapply split_world1. apply Dw.
-      rewrite - (subst_nat (sh 3)).
-      apply tr_hyp_tm; repeat constructor.
-   + apply uworld.
-     (*back to main proof*)
-   + eapply tr_formation_weaken. apply compm1_type.
+   
+  + apply Hwv2. 
+  + apply uworld.
+  (*back to main proof*)
+  eapply tr_formation_weaken. apply compm1_type.
      apply uworld.
      apply trans_type_works. apply uworld.
-
-
-
-
-
-
-
-
+- apply tr_pi_intro.
+  eapply tr_formation_weaken. apply subseq_U0.
+  apply Hwv2. apply uworld.
+  rewrite subst_arrow.
+  apply tr_arrow_intro.
+  + repeat rewrite subst_store.
+    eapply tr_formation_weaken.
+    apply store_type. simpsub. simpl.
+    apply tr_sigma_intro. rewrite - (subst_pw (sh 3)).
+    var_solv.
+    unfold subst1.
+    rewrite subst_nat.
+    rewrite - (subst_nat (sh 2)). var_solv. auto.
+    rewrite subst_laters.
+    eapply (tr_formation_weaken _ nzero).
+    apply laters_type.
+    rewrite subst_exist.
+  apply tr_exist_formation_univ; try rewrite subst_nzero.
+  apply pw_kind. rewrite subst_sigma.
+  eapply tr_sigma_formation_univ.
+  repeat rewrite subst_nat.
+  apply nat_U0.
+  repeat rewrite subst_prod. 
+    repeat eapply tr_prod_formation_univ; try rewrite subst_nzero.
+    rewrite subst_subseq.
+    apply subseq_U0.
+    simpsub. simpl.
+    apply world_pair.
+    rewrite - (subst_pw (sh 5)). var_solv.
+    rewrite - (subst_pw (sh 4)). var_solv.
+    rewrite - (subst_world (sh 2)).
+    rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
+apply tr_weakening_append. assumption. assumption.
+    auto. unfold nzero. simpsub. apply store_type. auto.
+    rewrite subst_nzero. apply A_t.
+    auto. apply leq_refl. auto.
 
         (*do a suffices somehow*)
 suffices:
