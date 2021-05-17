@@ -148,6 +148,7 @@ Definition app3 w i u l : term False :=
 
                  ))))) W1) W2.
 
+ Definition nth w n: term False := app (ppi1 w) n.
 
 
 Lemma subst_pw: forall s,
@@ -181,10 +182,21 @@ Lemma subst_leqtp: forall s,
   rewrite project_dot_zero. auto. Qed.
 Hint Rewrite subst_leqtp.
 
+Lemma subst_lttp: forall s,
+    @subst False s (lttp) = lttp.
+  intros. unfold lttp.
+  simpsub. rewrite subst_leqtp. unfold nsucc. simpsub. simpl.
+  rewrite subst_leqtp. auto. Qed.
+Hint Rewrite subst_leqtp.
+
 Lemma subst_leq: forall s n1 n2,
     @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
   intros. unfold leq_t.  repeat rewrite subst_app. rewrite subst_leqtp. auto. 
 Qed.
+
+Lemma subst_lt: forall s n1 n2,
+    subst s (app (app lttp n1) n2) = (app (app lttp (subst s n1)) (@subst False s n2)).
+  intros. repeat rewrite subst_app. rewrite subst_lttp. auto. Qed. 
 
 Lemma subst_subseq: forall W1 W2 s,
        (subst s
@@ -221,6 +233,9 @@ Lemma subst_laters: forall s A, (subst s (laters A)) = (laters (subst s A)).
   intros. unfold laters. unfold plus. rewrite subst_rec. rewrite subst_sigma.
   rewrite subst_booltp. rewrite subst_bite. simpsub. simpl.
   repeat rewrite <- subst_sh_shift. simpsub. auto. Qed.
+
+Lemma subst_nth: forall s m1 m2, (subst s (nth m1 m2)) = (nth (subst s m1) (subst s m2)). intros. unfold nth. simpsub. auto. Qed.
+
 Opaque laters.
 Opaque preworld.
 Opaque U0.
@@ -229,24 +244,25 @@ Opaque leqtp.
 Opaque nzero.
 Opaque nattp.
 Opaque world.
-
+Opaque nth.
 
 Hint Rewrite subst_U0 : ssub1.
 Hint Rewrite subst_subseq: ssub1.
 Hint Rewrite subst_leq: ssub1.
 Hint Rewrite subst_leqtp: ssub1.
+Hint Rewrite subst_lttp: ssub1.
+Hint Rewrite subst_lt: ssub1.
 Hint Rewrite subst_nzero: ssub1.
 Hint Rewrite subst_nat: ssub1.
 Hint Rewrite subst_world: ssub1.
 Hint Rewrite subst_pw: ssub1.
 Hint Rewrite subst_world: ssub1.
+Hint Rewrite subst_nth: ssub1.
 
 Ltac simpsub1 :=
   autorewrite with ssub1.
 
 
- Definition test :=   (subst (dot (var 0) (dot (var 1) (sh 3)))
-                             (subseq (var 0) (ppair (var 1) (var 0)))).
 
  Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
 
@@ -264,7 +280,6 @@ Admitted.
  (*nats*)
 (*mysterious error Definition if_z (n: term False) := ppi1 n. *)
 
- Definition nth w n: term False := app (ppi1 w) n.
 
 
 (*start here get rid of vacuous cases w program module*)
