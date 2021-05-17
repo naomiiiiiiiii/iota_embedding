@@ -447,7 +447,7 @@ Theorem typed_hygiene: forall G M M' A,
 Ltac var_solv :=
   try (apply tr_hyp_tm; repeat constructor).
 
-Opaque laters.
+(*Opaque laters.
 Opaque preworld.
 Opaque U0.
 Opaque subseq.
@@ -455,9 +455,9 @@ Opaque leqtp.
 Opaque nzero.
 Opaque nattp.
 Opaque world.
-Opaque nth.
+Opaque nth.*)
 
-Lemma trans_type_subst : forall w l A s,
+Lemma subst_trans_type : forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
   move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub; simpl; repeat rewrite subst_lt; repeat rewrite subst_nth; repeat rewrite subst_nat; repeat rewrite subst_pw;
@@ -657,8 +657,14 @@ eapply tr_eqtype_convert. apply Heq.
     simpsub. simpl.
     auto. apply store_type. apply uworld.
     simpsub. simpl.
-    (*start here*)
-    repeat rewrite subst_nat. repeat rewrite subst_p
+    repeat rewrite subst_nat. repeat rewrite subst_pw.
+    rewrite subst_trans_type.
+    apply trans_type_works.
+    apply uworld. simpsub. auto.
+    auto. apply leq_refl. auto.
+(*at make_bind*)
+
+
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption. assumption.
