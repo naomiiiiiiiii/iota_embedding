@@ -284,10 +284,12 @@ Qed.
 Lemma store_type: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
 Admitted.
+Hint Resolve store_type.
 
 Lemma laters_type: forall A G i,
     (tr G (oof A (univ i))) -> tr G (oof (laters A) (univ i)).
   Admitted.
+Hint Resolve laters_type.
 
 Lemma sh_sum :
   forall m n t,
@@ -551,9 +553,7 @@ eapply tr_eqtype_convert. apply Heq.
     rewrite subst_lam.
     simpsub. simpl.
     apply tr_pi_intro.  apply nat_type.
-    eapply tr_eqtype_convert.
-    eapply tr_eqtype_symmetry.
-    eapply tr_arrow_pi_equal.
+    apply tr_arrow_intro.
     eapply tr_formation_weaken.
     apply subseq_U0. (*to show subseqs
                         are the same type,
@@ -561,13 +561,12 @@ eapply tr_eqtype_convert. apply Heq.
    
   + apply Hwv2. 
   + apply uworld.
+  +
+    eapply tr_formation_weaken.
+    eapply compm1_type. apply uworld.
+    apply trans_type_works. apply uworld.
   (*back to main proof*)
-  eapply tr_formation_weaken. apply compm1_type.
-     apply uworld.
-     apply trans_type_works. apply uworld.
-- apply tr_pi_intro.
-  eapply tr_formation_weaken. apply subseq_U0.
-  apply Hwv2. apply uworld.
+- 
   rewrite subst_arrow.
   apply tr_arrow_intro.
   + repeat rewrite subst_store.
@@ -590,11 +589,18 @@ eapply tr_eqtype_convert. apply Heq.
   repeat rewrite subst_prod. 
     repeat eapply tr_prod_formation_univ; try rewrite subst_nzero.
     rewrite subst_subseq.
-    apply subseq_U0.
-    simpsub. simpl.
+    apply subseq_U0;simpsub; simpl.
     apply world_pair.
     rewrite - (subst_pw (sh 5)). var_solv.
-    rewrite - (subst_pw (sh 4)). var_solv.
+    rewrite - (subst_nat (sh 4)). var_solv.
+    auto.
+    repeat rewrite subst_store. repeat rewrite subst_nat.
+    repeat rewrite subst_pw.
+    simpsub. simpl.
+    auto. apply store_type. apply uworld.
+    simpsub. simpl.
+    (*start here*)
+    repeat rewrite subst_nat. repeat rewrite subst_p
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption. assumption.
