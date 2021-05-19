@@ -58,6 +58,8 @@ Definition bind : term False := app Yc
                let f' := prev f in
                inr (next (app (app f' y') g))) )
         ))).
+
+Definition make_bind E1 E2 := app (app bind E1) E2.
 (*worlds*)
 
 
@@ -181,6 +183,11 @@ Lemma subst_leqtp: forall s,
   repeat rewrite project_dot_succ.
   rewrite project_dot_zero. auto. Qed.
 Hint Rewrite subst_leqtp.
+
+Lemma subst_bind: forall s m1 m2,
+    @subst False s (make_bind m1 m2) = make_bind (@subst False s m1) (@subst False s m2).
+  intros. auto. Qed.
+
 
 Lemma subst_lttp: forall s,
     @subst False s (lttp) = lttp.
@@ -327,7 +334,11 @@ end.
      (*assuming variables are stored in context with 0 first
       DONT need the counter cuz all the other variables get moved down a slot with the
       cons subtitution*)
-     end.
+   end.
+
+Opaque app.
+Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv (var 0) ) = unittp.
+  simpl.
 
 
 

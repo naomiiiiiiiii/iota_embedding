@@ -96,7 +96,6 @@ Fixpoint gamma_at (gamma: source.context) (w l: Syntax.term False) :=
 (*probably want to make the above a function also so that
  Gamma @ w can be calculated*)
 
-Definition make_bind E1 E2 := app (app bind E1) E2.
 
 (*every time you put stuff under a lambda you probably have to shift it*)
 Inductive trans: source.term -> (Syntax.term False) -> Type :=
@@ -122,7 +121,7 @@ make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
                                let btarg := app (lam (
                                                move_gamma G (make_subseq) (*G is almost definitely
                                                                            the wrong context to put here*)
-                                                          (app (subst (sh 6) Et2) lv))) x' in
+                                                          (app (subst (sh 5) Et2) lv))) x' in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
                                make_bind e2bar' (lam (

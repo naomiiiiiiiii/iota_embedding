@@ -327,6 +327,11 @@ Lemma laters_type: forall A G i,
   Admitted.
 Hint Resolve laters_type.
 
+Lemma bind_type: forall G A B M0 M1,
+    tr G (oof M0 (laters A)) ->
+    tr G (oof M1 (arrow A (laters B))) ->
+    tr G (oof (make_bind M0 M1) (laters B)). Admitted.
+
 Lemma sh_sum :
   forall m n t,
     @subst False (sh n) (subst (sh m) t) = @subst False (sh (n+m)) t.
@@ -727,6 +732,7 @@ eapply tr_eqtype_convert. apply Heq.
     apply trans_type_works.
     apply uworld. simpsub. auto.
     auto. apply leq_refl. auto.
+    rewrite subst_bind. repeat rewrite subst_laters. simpsub. simpl. eapply bind_type. simpsub.
 (*at make_bind*)
 
 
