@@ -339,7 +339,14 @@ end.
 Opaque app.
 Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv (var 0) ) = unittp.
   simpl.
+  (*want one that replaces var 0 but leaves the other vars the same*)
+  Admitted.
 
+  Lemma test: (@subst False (dot nattp sh1) (ppair (var 0) (var 1) )) = unittp.
+    unfold sh1. simpsub. simpl. (*seems to work*)
+    Admitted.
 
-
-
+  Lemma test1: (@subst False (dot nattp sh1) (ppair (var 0) (var 14) )) = unittp.
+    unfold sh1. simpsub. simpl.
+    (*found*)
+    Admitted.
