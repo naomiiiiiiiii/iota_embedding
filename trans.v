@@ -121,7 +121,17 @@ make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
                                let btarg := app (lam (
                                                move_gamma G (make_subseq) (*G is almost definitely
                                                                            the wrong context to put here*)
-                                                          (app (subst (sh 5) Et2) lv))) x' in
+                                                          5 (app (subst (sh 5)
+                                                                        (*
+in the context (T1 :: G) Et2 is a function which wants a length
+in the context G, Et2 has var 1 free. In context G, (lam Et2) is a function which wants an
+x, then a length
+make the lambda first before you introduce other variables and it's still the first var
+that. you want to bind 
+down here, 5th variable in Et2* is
+                                                                        the lambda variable
+                                                                         *)
+                                                                        Et2) lv))) x' in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
                                make_bind e2bar' (lam (

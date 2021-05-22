@@ -344,7 +344,7 @@ end.
    subst (sub_4_moveG G m n).
 
 Opaque app.
-Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unittp.
+(*Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unittp.
   simpl. simpsub. unfold move_app. simpsub. rewrite subst_move. unfold move. simpl.
   simpsub. simpl.
   (*want one that replaces var 0 but leaves the other vars the same*)
@@ -362,3 +362,4 @@ Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unit
     unfold sh1. simpsub. simpl.
     (*found*)
     Admitted.
+*)
