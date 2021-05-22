@@ -359,7 +359,12 @@ intros. auto. Qed.
                  [:: x, y, z & L].
 intros. auto. Qed.
 
-  Lemma uworld: forall G,
+Lemma hseq5: forall (T: Type) (x y z a b: T)
+                  (L: seq T), [:: x; y; z; a; b] ++ L=
+                 [:: x, y, z, a, b & L].
+intros. auto. Qed.
+
+  Lemma uworld10: forall G,
       (tr [:: hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 1) (var 0)) world)). intros.
      apply world_pair. 
@@ -368,7 +373,16 @@ intros. auto. Qed.
         rewrite - (subst_nat (sh 1)).
         apply tr_hyp_tm; repeat constructor. Admitted.
 
-  Hint Resolve uworld.
+  Hint Resolve uworld10.
+
+Lemma uworld32: forall G x y,
+      (tr [:: x, y, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 3) (var 2)) world)). intros.
+   apply world_pair.
+  rewrite - (subst_pw (sh 4)). var_solv.
+  rewrite - (subst_nat (sh 3)). var_solv. Qed. 
+
+Hint Resolve uworld32.
 
 Lemma compm2_type: forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
@@ -392,7 +406,7 @@ Lemma compm2_type: forall U A G,
     rewrite - (subst_world (sh 2)).
 assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
     rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
-apply tr_weakening_append. assumption. apply uworld. 
+apply tr_weakening_append. assumption. apply uworld10. 
     auto. unfold nzero. simpsub. apply store_type. auto.
     rewrite subst_nzero. apply X0. 
     auto. apply leq_refl. auto. Qed.
@@ -415,36 +429,9 @@ apply tr_weakening_append. assumption. apply uworld.
                                     )
          )) U0). (*A should be substed by 2 here start here fix this in trans also*)
   move => U A G U_t A_t.
-  assert ([:: hyp_tm nattp; hyp_tm preworld] ++ G=
-  [:: hyp_tm nattp, hyp_tm preworld & G]) as Hseq.
-  rewrite - cat1s. rewrite - catA.
-  repeat rewrite cat1s. reflexivity.
-assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
-  assert (tr [:: hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 1) (var 0)) world)) as Hworld.
-apply world_pair.
-rewrite - (subst_pw (sh 2)).
-    apply tr_hyp_tm. repeat constructor.
-    rewrite - (subst_nat (sh 1)). 
-    apply tr_hyp_tm.
-    rewrite subst_nat.
-    repeat constructor.
   eapply tr_arrow_formation_univ.
-  apply store_type. assumption. apply laters_type.
-  apply tr_exist_formation_univ.
-  apply pw_kind. eapply tr_sigma_formation_univ.
-  unfold nzero. simpsub. apply nat_U0.
-  simpl.
-    eapply tr_prod_formation_univ.
-    eapply tr_prod_formation_univ. unfold nzero. simpl.
-    apply subseq_U0.
-    rewrite - (subst_world (sh 2)).
-    rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
-apply tr_weakening_append. assumption. assumption.
-    auto. unfold nzero. simpsub. apply store_type. auto.
-    rewrite subst_nzero. apply A_t.
-    auto. apply leq_refl. auto.
-    Qed.
+  apply store_type. assumption. apply compm2_type; assumption.
+  Qed.
 
 
                         
@@ -467,7 +454,7 @@ apply tr_weakening_append. assumption. assumption.
       rewrite - (subst_world (sh 2)).
       rewrite subst_sh_shift. rewrite - hseq2.
       apply tr_weakening_append. assumption.
-      apply uworld.
+      apply uworld10.
         apply tr_arrow_formation_univ; try auto.
         repeat rewrite subst_nzero.
         eapply IHA1; try assumption; try auto. 
@@ -491,10 +478,10 @@ apply tr_weakening_append. assumption. assumption.
         eapply split_world1. apply Du.
         rewrite - (subst_nat (sh 3)).
         apply tr_hyp_tm. repeat constructor.
-        apply uworld.
+        apply uworld10.
         apply compm1_type.
-        apply uworld.
-        eapply IHA. apply uworld. auto.
+        apply uworld10.
+        eapply IHA. apply uworld10. auto.
         apply leq_refl. auto.
         eapply split_world2. apply Du.
     - (*ref type*)
@@ -523,7 +510,7 @@ apply tr_weakening_append. assumption. assumption.
       rewrite - (subst_pw (sh 2)). var_solv.
       apply tr_fut_intro.
       rewrite - (subst_nat (sh 1)). var_solv.
-      apply tr_fut_formation_univ; auto. apply IHA; auto. apply uworld.
+      apply tr_fut_formation_univ; auto. apply IHA; auto. apply uworld10.
       auto. apply leq_refl. auto. apply tr_unittp_formation.
 Qed.
 
@@ -718,13 +705,12 @@ eapply tr_eqtype_convert. apply Heq.
     apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-   
   + apply Hwv2. 
-  + apply uworld.
+  + apply uworld10.
   +
     eapply tr_formation_weaken.
-    eapply compm1_type. apply uworld.
-    apply trans_type_works. apply uworld.
+    eapply compm1_type. apply uworld10.
+    apply trans_type_works. apply uworld10.
   (*back to main proof*)
 - 
   rewrite subst_arrow.
@@ -757,18 +743,18 @@ eapply tr_eqtype_convert. apply Heq.
     repeat rewrite subst_store. repeat rewrite subst_nat.
     repeat rewrite subst_pw.
     simpsub. simpl.
-    auto. apply store_type. apply uworld.
+    auto. apply store_type. apply uworld10.
     simpsub. simpl.
     repeat rewrite subst_nat. repeat rewrite subst_pw.
     rewrite subst_trans_type.
     apply trans_type_works.
-    apply uworld. simpsub. auto.
+    apply uworld10. simpsub. auto.
     auto. apply leq_refl. auto.
     rewrite subst_bind. repeat rewrite subst_laters. simpsub. simpl.
     repeat rewrite - subst_sh_shift. 
     repeat rewrite subst_store. simpsub. simpl.
     eapply (bind_type _
-                      (laters (exist nzero preworld (
+                      (exist nzero preworld (
                                           sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
                                           (let u := Syntax.var 5 in
                                               let l := Syntax.var 4 in
@@ -779,16 +765,185 @@ eapply tr_eqtype_convert. apply Heq.
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
                                                     prod (prod (subseq U V) (store V))
                                                      (trans_type v lv A))))
-                                 )).
+                                 ).
                                                                              simpsub.
 (*at make_bind*)
-    eapply (tr_arrow_elim _ (shift 1 (store (ppair (var 2)
-                                                   (var 1)
-           )))).
-- repeat rewrite - subst_sh_shift. rewrite subst_store.
-  simpsub. simpl. eapply tr_formation_weaken. apply store_type.
+    eapply (tr_arrow_elim _  (store (ppair (var 3)
+                                                   (var 2)
+           ))).
+- 
+ eapply tr_formation_weaken. apply store_type.
   apply world_pair. rewrite - (subst_pw (sh 4)). var_solv.
-rewrite - (subst_nat (sh 3)). var_solv.
+  rewrite - (subst_nat (sh 3)). var_solv. eapply tr_formation_weaken.
+  assert (@ppair False (var 5) (var 4) = subst (sh 2) (ppair (var 3) (var 2))) as Hppair. simpsub. auto. rewrite Hppair.
+  apply compm2_type. apply uworld32. apply trans_type_works.
+  apply uworld10.
+apply (tr_arrow_elim _
+          (subseq
+             (ppair
+                (subst (sh (5 + size G)) w1)
+                (var 4)) (ppair (var 3) (var 2)))).
+eapply tr_formation_weaken. apply subseq_U0.
+apply world_pair.
+assert (size [:: hyp_tm (store (ppair (var 2) (var 1))),
+        hyp_tm
+          (subseq
+             (ppair
+                (subst (sh (size G + 3)%coq_nat) w1)
+                (var 2)) (ppair (var 1) (var 0))),
+        hyp_tm nattp, hyp_tm preworld, 
+       hyp_tm nattp
+      & gamma_at G w1 l1] = (5 + size G)
+       ) as Hsize. repeat rewrite size_cons. rewrite size_gamma_at.
+auto. rewrite - {2}(subst_pw  (sh (5 + size G))).
+repeat rewrite (subst_sh_shift _ (5 + size G)). rewrite - hseq5.
+rewrite - Hsize.
+rewrite catA.
+apply tr_weakening_append; try assumption.
+eapply split_world1. apply Dw.
+rewrite - (subst_nat (sh 5)). var_solv. apply uworld32.
+eapply tr_formation_weaken; apply compm1_type.
+auto. apply trans_type_works. auto.
+assert (
+       (arrow
+          (subseq (ppair (subst (sh (5 + size G)) w1) (var 4))
+             (ppair (var 3) (var 2)))
+          (arrow (store (ppair (var 3) (var 2)))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair (var 5) (var 4))
+                               (ppair (var 1) (var 0)))
+                            (store (ppair (var 1) (var 0))))
+                         (trans_type (var 1) (var 0) A))))))) =
+subst1 (var 2) 
+       (arrow
+          (subseq (ppair (subst (sh (6 + size G)) w1) (var 5))
+             (ppair (var 4) (var 0)))
+          (arrow (store (ppair (var 4) (var 0)))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair (var 6) (var 5))
+                               (ppair (var 1) (var 0)))
+                            (store (ppair (var 1) (var 0))))
+                         (trans_type (var 1) (var 0) A)))))))) as Hsub.
+simpsub. repeat unfold subst1. 
+rewrite - (sh_sum _ 6). repeat rewrite subst_subseq. rewrite subst_store.
+rewrite subst_laters.
+simpsub. simpl. rewrite subst_subseq. rewrite subst_store. simpsub. simpl.
+rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
+rewrite Hsub.
+eapply (tr_pi_elim _ nattp).
+    assert(   (pi nattp
+          (arrow
+             (subseq
+                (ppair (subst (sh (6 + size G)) w1) (var 5))
+                (ppair (var 4) (var 0)))
+             (arrow (store (ppair (var 4) (var 0)))
+                (laters
+                   (exist nzero preworld
+                      (sigma nattp
+                         (prod
+                            (prod
+                               (subseq (ppair (var 6) (var 5))
+                                  (ppair (var 1) (var 0)))
+                               (store (ppair (var 1) (var 0))))
+                            (trans_type (var 1) (var 0) A)))))))) =
+subst1 (var 4) (pi nattp
+          (arrow
+             (subseq
+                (ppair (subst (sh (7 + size G)) w1) (var 1))
+                (ppair (var 5) (var 0)))
+             (arrow (store (ppair (var 5) (var 0)))
+                (laters
+                   (exist nzero preworld
+                      (sigma nattp
+                         (prod
+                            (prod
+                               (subseq (ppair (var 7) (var 6))
+                                  (ppair (var 1) (var 0)))
+                               (store (ppair (var 1) (var 0))))
+                            (trans_type (var 1) (var 0) A))))))))
+          ) as Hsub2.
+    unfold subst1. rewrite subst_pi subst_arrow subst_subseq.
+    simpsub. simpl. simpl.
+    assert (6 + size G = (size G) .+2.+4). auto. rewrite - H.
+    unfold subst1. auto.
+     rewrite subst_nat. rewrite subst_laters. simpsub.
+    rewrite subst_subseq. rewrite subst_store.
+    simp_sub.
+    rewrite subst_store. rewrite subst_nat. rewrite subst_nzero.
+    simpsub. rewrite subst_trans_type.
+    auto. simpsub. auto.
+    rewrite Hsub2.
+    apply (tr_pi_elim _ nattp).
+    clear Hsub Hsub2.
+assert ( 
+       (pi nattp
+          (pi nattp
+             (arrow
+                (subseq
+                   (ppair (subst (sh (7 + size G)) w1) (var 1))
+                   (ppair (var 5) (var 0)))
+                (arrow (store (ppair (var 5) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq
+                                     (ppair (var 7) (var 6))
+                                     (ppair (var 1) (var 0)))
+                                  (store
+                                     (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) A)))))))))
+= subst1 (var 3)
+       (pi nattp
+          (pi nattp
+             (arrow
+                (subseq
+                   (ppair (subst (sh (8 + size G)) w1) (var 1))
+                   (ppair (var 2) (var 0)))
+                (arrow (store (ppair (var 2) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq
+                                     (ppair (var 8) (var 7))
+                                     (ppair (var 1) (var 0)))
+                                  (store
+                                     (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) A)))))))))
+  ) as Hsub3.
+simpsub. unfold subst1. 
+rewrite - (sh_sum _ 8). repeat rewrite subst_subseq. rewrite subst_store.
+rewrite subst_laters.
+simpsub. simpl. rewrite subst_subseq. rewrite subst_store. simpsub. simpl.
+rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
+
+apply tr_all_elim.
+    rewrite sh_sum.
+    rewrite - compose_sh.
+unfold subst1
+repeat rewrite subst_store. simpsub.
+
+eapply tr_pi_elim.
+
+apply world_pair.
+  rewrite - (subst_pw (sh 4)). var_solv.
+  rewrite - (subst_nat (sh 3)). var_solv. apply trans_type_works.
+
+
+
+
+
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption. assumption.
