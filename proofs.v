@@ -734,7 +734,7 @@ eapply tr_eqtype_convert. apply Heq.
     auto. apply leq_refl. auto.
     rewrite subst_bind. repeat rewrite subst_laters. simpsub. simpl. eapply bind_type. simpsub.
 (*at make_bind*)
-
+repeat rewrite - subst_sh_shift. simpsub. simpl.
 
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
