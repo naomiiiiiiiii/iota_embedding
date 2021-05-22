@@ -1,7 +1,7 @@
 
 From Coq Require Import Lists.List.
-From istari Require Import Tactics Sequence source subst_src rules_src basic_types
-     Syntax Subst SimpSub Promote Hygiene
+From istari Require Import Tactics Sequence source subst_src rules_src.
+From istari Require Import basic_types Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
 
@@ -330,23 +330,21 @@ end.
 
 
  (*subs v in for nth variable of m while leaving all other vars untouched*)
-Fixpoint subn (n: nat) (v: term False) (m: term False): (*start here*)
-
+ (*recursion will be to generate a substitution
+  that dots all of them on top of a shift |Gamma| *)
+ Fixpoint sub_4_moveG (G: source.context) (m: term False) (n: nat (*starting variable*)) :=
+ under n (match G with
+   nil => id
+          | b :: bs => dot (move_app b m (var 0)) (sub_4_moveG bs m (n + 1))
+       end
+).
 
  (*n is the counter *)
- Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) (n: nat) :=
-   match G with
-     nil => e
-   | b::bs => move_gamma bs m (subst ( dot (move_app b m (var n)) 
-                                                 sh1) e) (n + 1)
-
-     (*assuming variables are stored in context with 0 first
-      DONT need the counter cuz all the other variables get moved down a slot with the
-      cons subtitution*)
-   end.
+ Fixpoint move_gamma (G: source.context) (m: term False) (n: nat) :=
+   subst (sub_4_moveG G m n).
 
 Opaque app.
-Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv (var 0) ) 0 = unittp.
+Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unittp.
   simpl. simpsub. unfold move_app. simpsub. rewrite subst_move. unfold move. simpl.
   simpsub. simpl.
   (*want one that replaces var 0 but leaves the other vars the same*)

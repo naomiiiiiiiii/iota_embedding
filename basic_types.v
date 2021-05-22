@@ -2,7 +2,8 @@ Require Import ssreflect.
 From mathcomp Require Import ssreflect seq ssrnat.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Rules Defined.
+     ContextHygiene Equivalence.
+From istari Require Import Rules Defined.
 
 Definition oof M A: (@Syntax.judgement False) := deq M M A.
 
