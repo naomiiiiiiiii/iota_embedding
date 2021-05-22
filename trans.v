@@ -110,7 +110,7 @@ lam ( (*l1 := 0*) lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-let btarg := app (app (app (app Et1 l1) l) m) s in
+let btarg := app (app (app (app (shift 4 Et1) l1) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
                                let z1 := (var 0) in (*basically added 5 vars to my context*)
@@ -125,9 +125,9 @@ x, then a length
 make the lambda first before you introduce other variables and it's still the first var
 that. you want to bind 
                                                                          *)
-                               let btarg := app (shift 5 (lam (*x' lam*) (
-                                                     move_gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
-                                                 x' in
+                               let btarg := app (app (shift 5 (lam (*x' lam*) (
+                                                              move_gamma G (make_subseq)                                                           1 (*ignore x'*) Et2 ))) x') lv
+                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
                                make_bind e2bar' (lam (
@@ -202,3 +202,7 @@ l2: := 2
                     ))))
                       ) ).
 
+(*Problem with below is that lv isn't from G and can't be shifted 5
+app (shift 5 (lam (*x' lam*) (
+                                                     move_gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
+*)
