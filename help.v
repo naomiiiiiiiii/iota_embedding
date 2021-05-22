@@ -325,11 +325,20 @@ end.
  Definition move_app A m x :=
    app (app (move A) m) x.
 
- Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) :=
+ Lemma subst_move: forall A s, (subst s (move A)) = move A.
+   intros. induction A; simpsub; simpl; auto. Qed.
+
+
+ (*subs v in for nth variable of m while leaving all other vars untouched*)
+Fixpoint subn (n: nat) (v: term False) (m: term False): (*start here*)
+
+
+ (*n is the counter *)
+ Fixpoint move_gamma (G: source.context) (m: term False) (e: Syntax.term False) (n: nat) :=
    match G with
      nil => e
-   | b::bs => move_gamma bs m (subst ( dot (move_app b m (var 0)) 
-                                                 id) e)
+   | b::bs => move_gamma bs m (subst ( dot (move_app b m (var n)) 
+                                                 sh1) e) (n + 1)
 
      (*assuming variables are stored in context with 0 first
       DONT need the counter cuz all the other variables get moved down a slot with the
@@ -337,11 +346,16 @@ end.
    end.
 
 Opaque app.
-Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv (var 0) ) = unittp.
-  simpl.
+Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv (var 0) ) 0 = unittp.
+  simpl. simpsub. unfold move_app. simpsub. rewrite subst_move. unfold move. simpl.
+  simpsub. simpl.
   (*want one that replaces var 0 but leaves the other vars the same*)
   Admitted.
 
+
+(*problems with this:
+ always substs in for var 0
+ *)
   Lemma test: (@subst False (dot nattp sh1) (ppair (var 0) (var 1) )) = unittp.
     unfold sh1. simpsub. simpl. (*seems to work*)
     Admitted.
