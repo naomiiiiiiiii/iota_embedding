@@ -110,7 +110,7 @@ Inductive trans: source.term -> (Syntax.term False) -> Type :=
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-let btarg := app (app (app (app (shift 4 Et1) l1) l) m) s in
+let btarg := app (app (app (shift 4 (subst1 l1 Et1) ) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
                                let z1 := (var 0) in (*basically added 5 vars to my context*)

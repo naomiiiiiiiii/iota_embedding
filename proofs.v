@@ -833,11 +833,11 @@ rewrite - hseq4;
 rewrite - Hsize;
 rewrite catA;
 apply tr_weakening_append; try assumption;
-[eapply split_world1 | eapply split_world2]; apply Dw.
-eapply split_world2. apply Dw.
-rewrite - (subst_nat (sh 5)). var_solv. apply uworld32.
-eapply tr_formation_weaken; apply compm1_type.
+  [eapply split_world1 | eapply split_world2]; apply Dw.
+apply uworld32.
+eapply tr_formation_weaken; apply compm1_type. apply uworld32.
 auto. apply trans_type_works. auto.
+rewrite trunc_sh.
 assert (
        (arrow
           (subseq (ppair (subst (sh (5 + size G)) w1) (var 4))
