@@ -859,34 +859,29 @@ eapply (tr_pi_elim _ nattp).
                                   (ppair (var 1) (var 0)))
                                (store (ppair (var 1) (var 0))))
                             (trans_type (var 1) (var 0) A)))))))) =
-subst1 (var 4) (pi nattp
+subst1 (var 3) (pi nattp
           (arrow
              (subseq
-                (ppair (subst (sh (7 + size G)) w1) (var 1))
-                (ppair (var 5) (var 0)))
+                (ppair (subst (sh (7 + size G)) w1) (var 6))
+                (ppair (var 1) (var 0)))
              (arrow (store (ppair (var 5) (var 0)))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
                          (prod
                             (prod
-                               (subseq (ppair (var 7) (var 6))
+                               (subseq (ppair (var 3) (var 6))
                                   (ppair (var 1) (var 0)))
                                (store (ppair (var 1) (var 0))))
                             (trans_type (var 1) (var 0) A))))))))
           ) as Hsub2.
-    unfold subst1. rewrite subst_pi subst_arrow subst_subseq.
-    simpsub. simpl. simpl.
-    assert (6 + size G = (size G) .+2.+4). auto. rewrite - H.
-    unfold subst1. auto.
-     rewrite subst_nat. rewrite subst_laters. simpsub.
-    rewrite subst_subseq. rewrite subst_store.
-    simp_sub.
-    rewrite subst_store. rewrite subst_nat. rewrite subst_nzero.
-    simpsub. rewrite subst_trans_type.
-    auto. simpsub. auto.
+simpsub. repeat unfold subst1. 
+rewrite - (sh_sum _ 7). repeat rewrite subst_subseq. rewrite subst_store.
+rewrite subst_laters.
+simpsub. simpl. rewrite subst_subseq. rewrite subst_store. simpsub. simpl.
+rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
     rewrite Hsub2.
-    apply (tr_pi_elim _ nattp).
+    eapply (tr_all_elim _ preworld).
     clear Hsub Hsub2.
 assert ( 
        (pi nattp
