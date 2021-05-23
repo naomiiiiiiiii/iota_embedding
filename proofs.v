@@ -630,10 +630,9 @@ Theorem one: forall G D e T ebar w1 l1,
   10 : {
 (*Useful facts that will help us later*)
    remember (size ([:: hyp_tm nattp,
-        hyp_tm preworld,
-        hyp_tm nattp
+        hyp_tm preworld
         & gamma_at G w1 l1])) as sizel.
-    assert (sizel = (3 + size G)) as Hsizel. subst.
+    assert (sizel = (2 + size G)) as Hsizel. subst.
     repeat rewrite size_cons. repeat rewrite addnA.
     rewrite size_gamma_at. auto.
    (*assert (tr
@@ -645,22 +644,22 @@ Theorem one: forall G D e T ebar w1 l1,
       apply tr_hyp_tm; repeat constructor.
         rewrite - (subst_nat (sh 1)).
         apply tr_hyp_tm; repeat constructor.*)
-assert (tr
-    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
+(*assert (tr
+    [:: hyp_tm nattp, hyp_tm preworld
       & gamma_at G w1 l1 ++ D]
-    (oof (ppair (shift 3 (shift (size G) w1)) (var 2)) world)) as Hwv2.
+    (oof (ppair (shift 2 (shift (size G) w1)) (var 1)) world)) as Hwv2.
    rewrite shift_sum.
     apply world_pair. 
     (*rewrite subst_sh_shift. subst.
     repeat rewrite - Hseq.*)
-    rewrite - {2}(subst_pw (sh (3 + size G))).
+    rewrite - {2}(subst_pw (sh (2 + size G))).
     rewrite subst_sh_shift. repeat rewrite plusE.
     repeat rewrite - Hsizel.
     repeat rewrite - cat_cons. subst.
     apply tr_weakening_append; auto.
 eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
-      apply tr_hyp_tm; repeat constructor.
+      apply tr_hyp_tm; repeat constructor. *)
     (*actual proof*)
     simpl.
  (*   suffices:
@@ -710,24 +709,32 @@ eapply split_world1. apply Dw.
           (shift (size G) l1))
     ). move => Heq.
 eapply tr_eqtype_convert. apply Heq.*)
-    inversion Dtrans; subst. simpl.
-      eapply (tr_pi_elim _ nattp).
+    inversion Dtrans; subst. simpl. simpsub. simpl.
     (*remember (size ([:: hyp_tm nattp,
         hyp_tm preworld,
         hyp_tm nattp
         & gamma_at G w1 l1])) as sizel.*)
--eapply tr_pi_intro. eapply nat_type.
+- 
     apply tr_all_intro.
     apply pw_kind.
     rewrite subst_lam.
     simpsub. simpl.
     apply tr_pi_intro.  apply nat_type.
     apply tr_arrow_intro.
-    eapply tr_formation_weaken.
+    eapply tr_formation_weaken. rewrite subst_subseq.
+    simpsub. rewrite - (subst_sh_shift _ 3). simpsub.
     apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-  + apply Hwv2. 
+    +
+unfold subst1. rewrite subst_nat subst_pw.
+      rewrite - hseq2. rewrite catA.
+      repeat rewrite - subst_sh_shift. repeat rewrite sh_sum.
+      rewrite - subst_ppair.
+      rewrite - (subst_world (sh (2 + size G))).
+  repeat rewrite subst_sh_shift.
+      rewrite - Hsizel.
+      apply tr_weakening_append. assumption.
   + apply uworld10.
   +
     eapply tr_formation_weaken.
