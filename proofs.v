@@ -359,9 +359,9 @@ intros. auto. Qed.
                  [:: x, y, z & L].
 intros. auto. Qed.
 
-Lemma hseq4: forall (T: Type) (x y z a: T)
-                  (L: seq T), [:: x; y; z; a] ++ L=
-                 [:: x, y, z, a & L].
+Lemma hseq5: forall (T: Type) (x y z a b: T)
+                  (L: seq T), [:: x; y; z; a; b] ++ L=
+                 [:: x, y, z, a, b & L].
 intros. auto. Qed.
 
   Lemma uworld10: forall G,
@@ -631,11 +631,13 @@ Theorem one: forall G D e T ebar w1 l1,
   move => G D e T ebar w1 l1 De Dw Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
+    (*Useful facts that will help us later*)
 (*Useful facts that will help us later*)
    remember (size ([:: hyp_tm nattp,
-        hyp_tm preworld
+        hyp_tm preworld,
+        hyp_tm nattp
         & gamma_at G w1 l1])) as sizel.
-    assert (sizel = (2 + size G)) as Hsizel. subst.
+    assert (sizel = (3 + size G)) as Hsizel. subst.
     repeat rewrite size_cons. repeat rewrite addnA.
     rewrite size_gamma_at. auto.
    (*assert (tr
@@ -647,22 +649,21 @@ Theorem one: forall G D e T ebar w1 l1,
       apply tr_hyp_tm; repeat constructor.
         rewrite - (subst_nat (sh 1)).
         apply tr_hyp_tm; repeat constructor.*)
-(*assert (tr
-    [:: hyp_tm nattp, hyp_tm preworld
+assert (tr
+    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
       & gamma_at G w1 l1 ++ D]
-    (oof (ppair (shift 2 (shift (size G) w1)) (var 1)) world)) as Hwv2.
-   rewrite shift_sum.
+    (oof (ppair (subst (sh (3 + (size G))) w1) (var 2)) world)) as Hwv2.
     apply world_pair. 
     (*rewrite subst_sh_shift. subst.
     repeat rewrite - Hseq.*)
-    rewrite - {2}(subst_pw (sh (2 + size G))).
-    rewrite subst_sh_shift. repeat rewrite plusE.
+    rewrite - {2}(subst_pw (sh (3 + size G))).
+    repeat rewrite subst_sh_shift. repeat rewrite plusE.
     repeat rewrite - Hsizel.
     repeat rewrite - cat_cons. subst.
     apply tr_weakening_append; auto.
 eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
-      apply tr_hyp_tm; repeat constructor. *)
+      apply tr_hyp_tm; repeat constructor.
     (*actual proof*)
     simpl.
  (*   suffices:
@@ -720,10 +721,9 @@ eapply tr_eqtype_convert. apply Heq.*)
         & gamma_at G w1 l1])) as sizel.*)
    -      
      repeat rewrite - subst_sh_shift. repeat rewrite sh_sum.
-
+ eapply tr_pi_intro. eapply nat_type.
      apply tr_all_intro.
     apply pw_kind.
-    rewrite subst_lam.
     simpsub. simpl.
     apply tr_pi_intro.  apply nat_type. 
     apply tr_arrow_intro.
@@ -731,63 +731,43 @@ eapply tr_eqtype_convert. apply Heq.*)
     apply subseq_U0. (*to show subseqs
                         are the same type,
  need to show that the variables are both of type world*)
-    +
-      rewrite - hseq2. rewrite catA.
-      rewrite - subst_ppair.
-      rewrite - (subst_world (sh (2 + size G))).
-  repeat rewrite subst_sh_shift.
-      rewrite - Hsizel.
-      apply tr_weakening_append. assumption.
+    + apply Hwv2. 
   + apply uworld10.
   +
     eapply tr_formation_weaken.
-    repeat rewrite subst_store. rewrite subst_laters.
-    simpsub. simpl.
     eapply compm1_type. apply uworld10.
-    rewrite subst_trans_type.
-    apply trans_type_works. apply uworld10. simpsub. auto.
+    apply trans_type_works. apply uworld10. 
   (*back to main proof*)
 - 
-  rewrite subst_arrow.
+  rewrite subst_arrow. repeat rewrite subst_store. simpsub. simpl.
   apply tr_arrow_intro.
-  + repeat rewrite subst_store.
-    eapply tr_formation_weaken. simpsub. simpl.
-    apply store_type. simpsub. simpl.
-    apply tr_sigma_intro. rewrite - (subst_pw (sh 3)).
+  + 
+    eapply tr_formation_weaken. 
+    apply store_type.  apply world_pair.
+    rewrite - (subst_pw (sh 3)).
     var_solv.
-    unfold subst1.
-    repeat rewrite subst_nat.
-    rewrite - (subst_nat (sh 2)). var_solv. auto.
-    repeat rewrite subst_laters.
+    rewrite - (subst_nat (sh 2)). var_solv.
+    repeat rewrite subst_laters. simpsub. simpl.
+    repeat rewrite subst_nzero subst_pw subst_nat subst_subseq subst_store. simpsub. simpl. rewrite subst_trans_type.
     eapply (tr_formation_weaken _ nzero).
     apply laters_type.
-    repeat rewrite subst_exist.
-  apply tr_exist_formation_univ; try rewrite subst_nzero.
+  apply tr_exist_formation_univ.
   apply pw_kind. repeat rewrite subst_sigma.
   eapply tr_sigma_formation_univ.
-  repeat rewrite subst_nat.
   apply nat_U0.
-  repeat rewrite subst_prod. 
     repeat eapply tr_prod_formation_univ; try rewrite subst_nzero.
-    repeat rewrite subst_subseq.
-    apply subseq_U0;simpsub; simpl.
+    apply subseq_U0.
     apply world_pair.
     rewrite - (subst_pw (sh 5)). var_solv.
     rewrite - (subst_nat (sh 4)). var_solv.
     auto.
-    repeat rewrite subst_store. repeat rewrite subst_nat.
-    repeat rewrite subst_pw.
-    simpsub. simpl.
-    auto. apply store_type. apply uworld10.
-    simpsub. simpl.
-    repeat rewrite subst_nat. repeat rewrite subst_pw.
-    rewrite subst_trans_type.
+    apply store_type. apply uworld10.
     apply trans_type_works.
-    apply uworld10. simpsub. auto.
-    auto. apply leq_refl. auto.
+    apply uworld10. auto.
+    auto. apply leq_refl. auto. simpsub. auto.
     rewrite subst_bind. repeat rewrite subst_laters. simpsub. simpl.
     repeat rewrite - subst_sh_shift. 
-    repeat rewrite subst_store. simpsub. simpl.
+    repeat rewrite subst_nzero subst_pw subst_nat subst_subseq subst_store. simpsub. simpl. rewrite subst_trans_type.
     eapply (bind_type _
                       (exist nzero preworld (
                                           sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
@@ -809,38 +789,36 @@ eapply tr_eqtype_convert. apply Heq.*)
 - 
  eapply tr_formation_weaken. apply store_type.
   apply world_pair. rewrite - (subst_pw (sh 4)). var_solv.
-  rewrite - (subst_nat (sh 3)). var_solv. eapply tr_formation_weaken.
+  rewrite - (subst_nat (sh 3)). var_solv.
+  eapply tr_formation_weaken.
   assert (@ppair False (var 5) (var 4) = subst (sh 2) (ppair (var 3) (var 2))) as Hppair. simpsub. auto. rewrite Hppair.
   apply compm2_type. apply uworld32. apply trans_type_works.
   apply uworld10.
+  (*Et1 nonsense*)
 apply (tr_arrow_elim _
           (subseq
              (ppair
-                (subst (sh (4 + size G)) w1)
-                (subst (sh (4 + size G)) l1)) (ppair (var 3) (var 2)))).
+                (subst (sh (5 + size G)) w1)
+                (var 4)) (ppair (var 3) (var 2)))).
 eapply tr_formation_weaken. apply subseq_U0.
-assert (size [:: hyp_tm (store (ppair (var 2) (var 1))),
+assert (size
+          [:: hyp_tm (store (ppair (var 2) (var 1))),
         hyp_tm
-           (subseq
-              (ppair (subst (sh (2 + size G)) w1)
-                 (subst (sh (2 + size G)) l1))
-              (ppair (var 1) (var 0))), hyp_tm nattp,
- hyp_tm preworld 
-      & gamma_at G w1 l1] = (4 + size G)
-       ) as Hsize. repeat rewrite size_cons. rewrite size_gamma_at. auto.
-apply world_pair;
-  auto ; try rewrite - {2}(subst_pw  (sh (4 + size G)));
-    try rewrite - {2}(subst_nat (sh (4 + size G)));
-repeat rewrite (subst_sh_shift _ (4 + size G));
-rewrite - hseq4;
-rewrite - Hsize;
-rewrite catA;
-apply tr_weakening_append; try assumption;
-  [eapply split_world1 | eapply split_world2]; apply Dw.
+          (subseq (ppair (subst (sh (3 + size G)) w1) (var 2))
+             (ppair (var 1) (var 0))), hyp_tm nattp,
+        hyp_tm preworld, hyp_tm nattp & gamma_at G w1 l1] = (5 + size G)
+       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
+apply world_pair.
+  auto; rewrite - {2}(subst_pw  (sh (5 + size G)));
+  rewrite - {2}(subst_nat (sh (5 + size G)));
+repeat rewrite (subst_sh_shift _ (5 + size G));
+rewrite - hseq5;
+rewrite - {2 3}Hsize; rewrite catA.
+  apply tr_weakening_append. eapply split_world1. apply Dw.
+  rewrite - (subst_nat (sh 5)). var_solv.
 apply uworld32.
 eapply tr_formation_weaken; apply compm1_type. apply uworld32.
-auto. apply trans_type_works. auto.
-rewrite trunc_sh. simpsub.
+apply trans_type_works. auto.
 assert (
        (arrow
           (subseq (ppair (subst (sh (5 + size G)) w1) (var 4))
