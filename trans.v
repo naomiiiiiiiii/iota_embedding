@@ -104,7 +104,7 @@ Inductive trans: source.term -> (Syntax.term False) -> Type :=
                                    trans E1 Et1 ->
                                    trans E2 Et2 ->
                                    trans (bind_m E1 E2)(
-lam ( (*l1 := 0*) lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
+ lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
                            lam ( (*l1 := 3, l := 2, m := 1, s := 0*)
                                let l1 := (var 3) in
                                let l := (var 2) in
@@ -142,7 +142,7 @@ that. you want to bind
           )
 
     ))
-                                         )))
+                                         ))
   | t_ref: forall G E Et T, 
          of_m G E T -> trans E Et ->
          trans (ref_m E)

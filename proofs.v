@@ -553,7 +553,6 @@ Qed.
         apply uworld10.
         eapply IHA. apply uworld10. auto.
         apply leq_refl. auto. simpsub. auto.
-        eapply split_world2. apply Du.
     - (*ref type*)
       eapply tr_sigma_formation_univ; auto.
       eapply tr_prod_formation_univ. apply lt_type.
@@ -620,7 +619,7 @@ Theorem test: forall s, (@subst False s nattp) = nattp.
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 
-         tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
+         tr ((gamma_at G w1 l1) ++ D) (oof (subst1 (shift (size G) l1) ebar)
                                                    (trans_type
                                                       (shift (size G)
                                                              w1) (shift (size G)
@@ -664,7 +663,7 @@ eapply split_world1. apply Dw.
       apply tr_hyp_tm; repeat constructor.
     (*actual proof*)
     simpl.
-    suffices:
+ (*   suffices:
   tr (gamma_at G w1 l1 ++ D)
 (deqtype
       (
@@ -710,7 +709,7 @@ eapply split_world1. apply Dw.
                                      (trans_type (var 1) (var 0) B))))))))))
           (shift (size G) l1))
     ). move => Heq.
-eapply tr_eqtype_convert. apply Heq.
+eapply tr_eqtype_convert. apply Heq.*)
     inversion Dtrans; subst. simpl.
       eapply (tr_pi_elim _ nattp).
     (*remember (size ([:: hyp_tm nattp,
