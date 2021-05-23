@@ -49,7 +49,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                  ))
             )
 
-      | comp_m tau' => app (lam (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*)
+      | comp_m tau' => subst1 l1 (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*)
                       pi nattp  (*l1 := 2, u = 1, l := 0*)   (                         
                                                        let l1 := Syntax.var 2 in
                                                        let u := Syntax.var 1 in
@@ -70,7 +70,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                                      (trans_type v lv tau'))))
                                     )
                        ))
-                      ))) l1
+                      ))
       | _ => nattp end.
 
 (*proves the second part of the compm1 to be a type*)
