@@ -837,7 +837,7 @@ apply tr_weakening_append; try assumption;
 apply uworld32.
 eapply tr_formation_weaken; apply compm1_type. apply uworld32.
 auto. apply trans_type_works. auto.
-rewrite trunc_sh.
+rewrite trunc_sh. simpsub.
 assert (
        (arrow
           (subseq (ppair (subst (sh (5 + size G)) w1) (var 4))
