@@ -110,7 +110,12 @@ Inductive trans: source.term -> (Syntax.term False) -> Type :=
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-let btarg := app (app (app (shift 4 (subst1 l1 Et1) ) l) m) s in
+                               (*the free var 0 in Et1 is going to be captured
+should shift Et1 up by 3 to prevent capture.
+then put l1 in for the 3rd one.
+this is weird though to have open terms. you should be doing lambdas
+                                *)
+let btarg := app (app (app (subst (dot l1 (sh 3)) Et1) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
                                let z1 := (var 0) in (*basically added 5 vars to my context*)
@@ -120,13 +125,13 @@ make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
                                let x' := (picomp4 z1) in
                                                                         (*
 in the context (T1 :: G) Et2 is a function which wants a length
-in the context G, Et2 has var 1 free. In context G, (lam Et2) is a function which wants an
+in the context G, Et2 has var 0 free. In context G, (lam Et2) is a function which wants an
 x, then a length
 make the lambda first before you introduce other variables and it's still the first var
 that. you want to bind 
                                                                          *)
-                               let btarg := app (app (shift 5 (lam (*x' lam*) (
-                                                              move_gamma G (make_subseq)                                                           1 (*ignore x'*) Et2 ))) x') lv
+                               let btarg := (app (shift 5 (lam (*x' lam*) (
+                                                              move_gamma G (make_subseq)                                                           1 (*ignore x'*) (subst1 lv Et2 )))) x')
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
