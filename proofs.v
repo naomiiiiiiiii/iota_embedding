@@ -433,8 +433,77 @@ apply tr_weakening_append. assumption. apply uworld10.
   apply store_type. assumption. apply compm2_type; assumption.
   Qed.
 
+Lemma subst_trans_type : forall w l A s,
+    (subst s (ppair w l)) = (ppair w l) ->
+    (subst s (trans_type w l A)) = (trans_type w l A).
+  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub; simpl; repeat rewrite subst_lt; repeat rewrite subst_nth; repeat rewrite subst_nat; repeat rewrite subst_pw;
+  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
+ try rewrite subst_compose; try rewrite H. 
+  - (*arrow*)
+    suffices:  (subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1). move => Heq1.
+  suffices:  (subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2). move => Heq2.
+  rewrite Heq1 Heq2. auto. 
+eapply IHA2. simpsub. auto. 
+eapply IHA1. simpsub. auto.
+  - (*comp*)
+ rewrite subst_ppair in H. inversion H. rewrite H1.
+repeat rewrite subst_ppair.
+rewrite subst_laters. simpsub.  simpl.
+repeat rewrite subst_nat; repeat rewrite subst_pw;
+  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift. simpsub. simpl.
+repeat rewrite subst_compose.
+repeat rewrite H2. rewrite subst_laters.
+simpsub. simpl. rewrite subst_subseq.
+rewrite subst_nzero. rewrite subst_nat. rewrite subst_pw. 
+rewrite subst_store. simpsub.
+suffices: (
+            (subst
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot (var 2)
+                                     (dot (var 3)
+                                        (dot 
+                                           (subst (sh 4) l)
+                                           (compose s (sh 4)))))))
+                            (trans_type (var 1) (var 0) A)
+            ) = subst
+                            (dot (var 0)
+                               (dot 
+                                 (var 1)
+                                 (dot 
+                                 (var 2)
+                                 (dot 
+                                 (var 3)
+                                 (dot
+                                 (subst (sh 4) l)
+                                 (sh 4))))))
+                            (trans_type 
+                               (var 1) 
+                               (var 0) A)
 
-                        
+          ).
+move => Heq. rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
+  - (*ref*)
+    rewrite - subst_ppair. rewrite subst_compose. rewrite H.
+    suffices: (subst
+                      (dot (var 0)
+                         (dot (var 1)
+                            (dot (var 2) (compose s (sh 3)))))
+                      (trans_type (var 1) (var 0) A)) =
+              (trans_type (var 1) (var 0) A).
+    move => Heq. rewrite Heq. auto.
+eapply IHA. simpsub. auto.
+Qed.
+
+
+
+
+
+
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
@@ -461,29 +530,33 @@ apply tr_weakening_append. assumption. apply uworld10.
         eapply IHA2; try assumption; try auto.
         auto. apply leq_refl. auto.
         (*comp type*)
-      + unfold U0. rewrite - (subst_U0 (dot l id)).
+      + simpsub. simpl.
+        rewrite subst_subseq. simpsub.  rewrite subst_laters. simpsub. simpl.
+        rewrite subst_trans_type. repeat rewrite subst_nzero subst_nat subst_store. repeat rewrite subst_store. simpsub. repeat rewrite subst_subseq. simpsub. auto.
+        rewrite - subst_sh_shift. simpsub.
+       (* unfold U0. rewrite - (subst_U0 (dot l id)).
         eapply tr_pi_elim.
-        eapply tr_pi_intro. apply nat_type.
-        apply tr_all_formation_univ.
-         apply pw_kind.
+        eapply tr_pi_intro. apply nat_type.*)
+        apply tr_all_formation_univ. auto.
         apply tr_pi_formation_univ.
         rewrite subst_nzero. apply nat_U0.
         apply tr_arrow_formation_univ.
         apply subseq_U0.
         apply world_pair.
-        rewrite - (subst_pw (sh 3)).
-        rewrite - hseq3.
-        rewrite subst_sh_shift.
+        rewrite - (subst_pw (sh 2)).
+        rewrite - hseq2.
+        repeat rewrite subst_sh_shift.
         apply tr_weakening_append.
         eapply split_world1. apply Du.
-        rewrite - (subst_nat (sh 3)).
-        apply tr_hyp_tm. repeat constructor.
+        rewrite - (subst_nat (sh 2)).
+        rewrite - hseq2.
+        repeat rewrite subst_sh_shift.
+        apply tr_weakening_append. eapply split_world2. apply Du.
         apply uworld10.
         apply compm1_type.
         apply uworld10.
         eapply IHA. apply uworld10. auto.
-        apply leq_refl. auto.
-        eapply split_world2. apply Du.
+        apply leq_refl. auto. simpsub. auto.
     - (*ref type*)
       eapply tr_sigma_formation_univ; auto.
       eapply tr_prod_formation_univ. apply lt_type.
@@ -542,62 +615,14 @@ Opaque nattp.
 Opaque world.
 Opaque nth.*)
 
-Lemma subst_trans_type : forall w l A s,
-    (subst s (ppair w l)) = (ppair w l) ->
-    (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub; simpl; repeat rewrite subst_lt; repeat rewrite subst_nth; repeat rewrite subst_nat; repeat rewrite subst_pw;
-  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
- try rewrite subst_compose; try rewrite H. 
-  - (*arrow*)
-    suffices:  (subst
-                (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1). move => Heq1.
-  suffices:  (subst
-                (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2). move => Heq2.
-  rewrite Heq1 Heq2. auto. 
-eapply IHA2. simpsub. auto. 
-eapply IHA1. simpsub. auto.
-  - (*comp*)
- rewrite subst_ppair in H. inversion H. rewrite H1.
-repeat rewrite subst_ppair.
-rewrite subst_laters. simpsub.  simpl.
-repeat rewrite subst_nat; repeat rewrite subst_pw;
-  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift. simpsub. simpl.
-repeat rewrite subst_compose.
-repeat rewrite H1. repeat rewrite H2.
-suffices: (subst (dot (var 0) (dot (var 1)
-                                       (dot 
-                                       (var 2)
-                                       (dot 
-                                       (var 3)
-                                       (dot 
-                                       (var 4)
-                                       (compose s (sh 5)))))))
-                                  (trans_type 
-                                     (var 1) 
-                                     (var 0) A)) = (trans_type (var 1) (var 0) A).
-move => Heq. rewrite Heq. auto. eapply IHA. simpsub. auto.
-  - (*ref*)
-    rewrite - subst_ppair. rewrite subst_compose. rewrite H.
-    suffices: (subst
-                      (dot (var 0)
-                         (dot (var 1)
-                            (dot (var 2) (compose s (sh 3)))))
-                      (trans_type (var 1) (var 0) A)) =
-              (trans_type (var 1) (var 0) A).
-    move => Heq. rewrite Heq. auto.
-eapply IHA. simpsub. auto.
-Qed.
 
 Theorem test: forall s, (@subst False s nattp) = nattp.
   intros. simpsub1. Admitted.
 
-
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans e ebar -> 
-         tr ((gamma_at G w1 l1) ++ D) (oof (subst1 (shift (size G) l1) ebar)
+         tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
                                                    (trans_type
                                                       (shift (size G)
                                                              w1) (shift (size G)
@@ -687,16 +712,16 @@ eapply split_world1. apply Dw.
           (shift (size G) l1))
     ). move => Heq.
 eapply tr_eqtype_convert. apply Heq.*)
-    inversion Dtrans; subst. simpl. simpsub. simpl.
+    inversion Dtrans; subst. simpl.
+     eapply (tr_pi_elim _ nattp).
     (*remember (size ([:: hyp_tm nattp,
         hyp_tm preworld,
         hyp_tm nattp
         & gamma_at G w1 l1])) as sizel.*)
-   - unfold subst1. rewrite subst_pw subst_nzero subst_nat.
-     rewrite subst_subseq. simpsub.
-     rewrite - (subst_sh_shift _ 3). simpsub.
-      repeat rewrite - subst_sh_shift. repeat rewrite sh_sum.
-    apply tr_all_intro.
+   -      
+     repeat rewrite - subst_sh_shift. repeat rewrite sh_sum.
+
+     apply tr_all_intro.
     apply pw_kind.
     rewrite subst_lam.
     simpsub. simpl.

@@ -49,7 +49,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                  ))
             )
 
-      | comp_m tau' => app (lam (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*)
+      | comp_m tau' => subst1 l1 (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*) 
                       pi nattp  (*l1 := 2, u = 1, l := 0*)   (                         
                                                        let l1 := Syntax.var 2 in
                                                        let u := Syntax.var 1 in
@@ -70,7 +70,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                                      (trans_type v lv tau'))))
                                     )
                        ))
-                      ))) l1
+                      ))
       | _ => nattp end.
 
 (*proves the second part of the compm1 to be a type*)
@@ -104,7 +104,7 @@ Inductive trans: source.term -> (Syntax.term False) -> Type :=
                                    trans E1 Et1 ->
                                    trans E2 Et2 ->
                                    trans (bind_m E1 E2)(
- lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
+ lam ( lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
                            lam ( (*l1 := 3, l := 2, m := 1, s := 0*)
                                let l1 := (var 3) in
                                let l := (var 2) in
@@ -115,7 +115,7 @@ should shift Et1 up by 3 to prevent capture.
 then put l1 in for the 3rd one.
 this is weird though to have open terms. you should be doing lambdas
                                 *)
-let btarg := app (app (app (subst (dot l1 (sh 3)) Et1) l) m) s in
+let btarg := app (app (app (app (shift 4 Et1) l1) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
                                let z1 := (var 0) in (*basically added 5 vars to my context*)
@@ -130,8 +130,10 @@ x, then a length
 make the lambda first before you introduce other variables and it's still the first var
 that. you want to bind 
                                                                          *)
-                               let btarg := (app (shift 5 (lam (*x' lam*) (
-                                                              move_gamma G (make_subseq)                                                           1 (*ignore x'*) (subst1 lv Et2 )))) x')
+                               let btarg :=
+                                   app (app
+                                          (shift 5 (lam (*x' lam*)
+                                                      ( move_gamma G (make_subseq) 1 (*ignore x'*) Et2 ))) x') lv
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
@@ -147,7 +149,7 @@ that. you want to bind
           )
 
     ))
-                                         ))
+                                         )))
   | t_ref: forall G E Et T, 
          of_m G E T -> trans E Et ->
          trans (ref_m E)
