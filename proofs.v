@@ -839,6 +839,11 @@ simpsub. simpl. rewrite subst_subseq. rewrite subst_store. simpsub. simpl.
 rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
 rewrite Hsub.
 eapply (tr_pi_elim _ nattp).
+
+
+(*do forall first, then the subst1 as below
+ only dif is you dont need to do the pi_elim
+ after the subst1*)
     assert(   (pi nattp
           (arrow
              (subseq
@@ -927,8 +932,54 @@ rewrite - (sh_sum _ 8). repeat rewrite subst_subseq. rewrite subst_store.
 rewrite subst_laters.
 simpsub. simpl. rewrite subst_subseq. rewrite subst_store. simpsub. simpl.
 rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
+rewrite Hsub3.
+eapply tr_all_elim. clear Hsub3.
+(*IH features l1 specifically*)
+assert(
+       (all nzero preworld
+          (pi nattp
+             (pi nattp
+                (arrow
+                   (subseq
+                      (ppair (subst (sh (8 + size G)) w1)
+                         (var 1)) (ppair (var 2) (var 0)))
+                   (arrow (store (ppair (var 2) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq
+                                        (ppair (var 8) (var 7))
+                                        (ppair (var 1) (var 0)))
+                                     (store
+                                        (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A)))))))))) =
+       subst (sh 5)
+(all nzero preworld
+          (pi nattp
+             (pi nattp
+                (arrow
+                   (subseq
+                      (ppair (subst (sh (8 + size G)) w1)
+                         (var 1)) (ppair (var 2) (var 0)))
+                   (arrow (store (ppair (var 2) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq
+                                        (ppair (var 8) (var 7))
+                                        (ppair (var 1) (var 0)))
+                                     (store
+                                        (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A))))))))))
 
-apply tr_all_elim.
+  )
+
+
+
     rewrite sh_sum.
     rewrite - compose_sh.
 unfold subst1
