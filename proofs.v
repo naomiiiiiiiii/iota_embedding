@@ -1051,6 +1051,9 @@ rewrite - (addn2 (size G)).
 repeat rewrite plusE.
 repeat rewrite - (sh_sum (size G) 4).
 rewrite - sh_trans_type. rewrite - subst_app.
+unfold subst1. rewrite subst_pw. rewrite - hseq4.
+repeat rewrite subst_sh_shift. apply tr_weakening_append.
+eapply IHDe1.
 
 (*start here with the bring shift out lemma*)
 eapply tr_all_elim. clear Hsub3.
