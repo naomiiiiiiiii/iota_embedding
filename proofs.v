@@ -292,20 +292,21 @@ assumption. assumption.
 Qed.
 
 
-Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (G2 ++ G1) (
-                       (deq (shift (size G2) J1)
-                            (shift (size G2) J2)
-                            (shift (size G2) t))).
- intros. induction G2.
- -  simpl. repeat rewrite - subst_sh_shift. simpsub. assumption.
+Lemma tr_weakening_appends: forall G1 G2 G3 J1 J2 t J1' J2' t',
+    tr G1 (deq J1 J2 t) ->
+    J1' = (shift (size G2) J1) ->
+    J2' = (shift (size G2) J2) ->
+    t' = (shift (size G2) t) ->
+    G3 = G2 ++ G1 ->
+      tr G3 (deq J1' J2' t').
+ intros. move: G3 t t' J1' J2' J1 J2 H H0 H1 H2 X. induction G2; intros.
+ -  simpl. subst. repeat rewrite - subst_sh_shift. simpsub. assumption.
  -
   suffices: (tr (substctx sh1 [::] ++ cons a (G2 ++ G1))
                 (substj (under (length [::]) sh1)
                         (substj (sh (size G2)) (deq J1 J2 t)))).
   move => Hdone.
-  simpl in Hdone.
+  simpl in Hdone. subst.
   rewrite (size_ncons 1).
   rewrite - plusE. 
   repeat rewrite subst_sh_shift.
@@ -315,8 +316,17 @@ Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
  apply (Hdone False). 
  intros.
  eapply tr_weakening.
- simpl. repeat rewrite subst_sh_shift. assumption.
+ simpl. repeat rewrite subst_sh_shift. eapply IHG2; try reflexivity. assumption.
 Qed.
+
+ Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (G2 ++ G1) (
+                       (deq (shift (size G2) J1)
+                            (shift (size G2) J2)
+                            (shift (size G2) t))).
+   intros. eapply tr_weakening_appends; try apply X; try reflexivity.
+   Qed.
 
 Lemma store_type: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
@@ -499,7 +509,7 @@ Lemma compm2_type: forall U A G,
     rewrite - (subst_world (sh 2)).
 assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
     rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
-apply tr_weakening_append. assumption. apply uworld10. 
+eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
     auto. unfold nzero. simpsub. apply store_type. auto.
     rewrite subst_nzero. apply X0. 
     auto. apply leq_refl. auto. Qed.
@@ -560,11 +570,8 @@ apply tr_weakening_append. assumption. apply uworld10.
         apply tr_pi_formation_univ. auto.
         apply tr_arrow_formation_univ.
         apply subseq_U0.
-        rewrite - subst_ppair.
-        rewrite - (subst_world (sh 2)).
-        rewrite - hseq2.
-        repeat rewrite subst_sh_shift.
-        apply tr_weakening_append. assumption.
+        eapply (tr_weakening_appends _ [:: hyp_tm nattp; hyp_tm preworld]); try apply X; try reflexivity;
+        try (rewrite - subst_ppair; rewrite subst_sh_shift; auto); auto.
         apply uworld10.
         apply compm1_type; auto. Qed. 
 
@@ -585,7 +592,7 @@ apply tr_weakening_append. assumption. apply uworld10.
     - (*showing w, l world*)
       rewrite - (subst_world (sh 2)).
       rewrite subst_sh_shift. rewrite - hseq2.
-      apply tr_weakening_append. assumption.
+      eapply tr_weakening_appends; try apply Du; try reflexivity; auto. 
       apply uworld10.
         apply tr_arrow_formation_univ; try auto.
         repeat rewrite subst_nzero.
@@ -610,7 +617,7 @@ apply tr_weakening_append. assumption. apply uworld10.
       rewrite subst_ppi2. apply split_world_elim2.
       rewrite - (subst_world sh1).
       rewrite - cat1s. repeat rewrite subst_sh_shift.
-      apply tr_weakening_append. assumption.
+      eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       apply tr_all_formation_univ. apply pw_kind.
       apply tr_pi_formation_univ; auto.
       repeat rewrite subst_nzero. apply nat_U0.
@@ -623,7 +630,7 @@ apply tr_weakening_append. assumption. apply uworld10.
       apply tr_univ_formation. auto. 
       eapply nth_works.
       rewrite - hseq3. rewrite - (subst_world (sh 3) ). rewrite subst_sh_shift.
-      apply tr_weakening_append; assumption.
+      eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       rewrite - (subst_nat (sh 3) ).
       var_solv. apply tr_fut_intro.
       rewrite - (subst_pw (sh 2)). var_solv.
@@ -684,6 +691,7 @@ Theorem one: forall G D e T ebar w1 l1,
   move => G D e T ebar w1 l1 De Dw Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
+    (*Useful facts that will help us later*)
 assert (size
          [:: hyp_tm (store (ppair (var 2) (var 1))),
       hyp_tm
@@ -694,7 +702,27 @@ assert (size
      hyp_tm nattp, hyp_tm preworld & gamma_at G w1 l1]
 = (4 + size G)
        ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
-    (*Useful facts that will help us later*)
+
+assert (tr 
+    [:: hyp_tm (store (ppair (var 2) (var 1))),
+        hyp_tm
+          (subseq
+             (ppair (subst (sh (size G).+2) w1)
+                (subst (sh (size G + 2)) l1))
+             (ppair (var 1) (var 0))), hyp_tm nattp,
+        hyp_tm (subst1 (subst (sh (size G)) l1) preworld)
+      & gamma_at G w1 l1 ++ D]
+    (oof
+       (ppair (subst (sh (4 + size G)) w1)
+          (subst (sh (4 + size G)) l1)) world)) as wworld4.
+apply world_pair;
+  auto; try rewrite - {2}(subst_pw  (sh (4 + size G)));
+  try rewrite - {2}(subst_nat (sh (4 + size G)));
+repeat rewrite (subst_sh_shift _ (4 + size G));
+rewrite - hseq4; rewrite - (addn2 (size G));
+rewrite - Hsize; rewrite catA;
+  apply tr_weakening_append; [eapply split_world1 | eapply split_world2]; apply Dw.
+
      remember (size ([:: hyp_tm nattp,
         hyp_tm preworld
         & gamma_at G w1 l1])) as sizel.
@@ -837,7 +865,7 @@ rewrite subst_trans_type. simpl.
       rewrite - (subst_world (sh (2 + size G))).
   repeat rewrite subst_sh_shift.
       repeat rewrite addnC - Hsizel.
-      apply tr_weakening_append. assumption.
+      eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
   + apply uworld10.
   +
     eapply tr_formation_weaken.
@@ -891,13 +919,7 @@ apply (tr_arrow_elim _
                 (subst (sh (4 + size G)) l1))
  (ppair (var 3) (var 2)))).
 eapply tr_formation_weaken. apply subseq_U0.
-apply world_pair;
-  auto; try rewrite - {2}(subst_pw  (sh (4 + size G)));
-  try rewrite - {2}(subst_nat (sh (4 + size G)));
-repeat rewrite (subst_sh_shift _ (4 + size G));
-rewrite - hseq4; rewrite - (addn2 (size G));
-rewrite - Hsize; rewrite catA;
-  apply tr_weakening_append; [eapply split_world1 | eapply split_world2]; apply Dw.
+apply wworld4.
 apply uworld32.
 eapply tr_formation_weaken; apply compm1_type. apply uworld32.
 apply trans_type_works. auto.
@@ -1081,6 +1103,26 @@ eapply IHDe1; try assumption.
 rewrite - (subst_pw (sh 4)). var_solv.
 replace 6 with (2 + 4). rewrite - addnA.
 repeat rewrite - (sh_sum (4 + size G) 2). eapply tr_formation_weaken; apply compm0_type.
+apply wworld4. apply trans_type_works. apply uworld10. auto.
+rewrite - (subst_nat (sh 3)). var_solv.
+rewrite - (addn2 (size G)).
+replace ( subseq
+          (ppair (subst (sh (4 + size G)) w1)
+             (subst (sh (4 + size G)) l1))
+          (ppair (var 3) (var 2)))
+  with (subst (sh 2)
+          (subseq
+             (ppair (subst (sh (size G + 2)) w1)
+                (subst (sh (size G + 2)) l1)) (ppair (var 1) (var 0))
+       )). var_solv. simpsub_big. auto. rewrite plusE.
+replace (size G + 2 + 2) with (4 + size G); auto.
+rewrite addnC. rewrite - addnA. auto.
+replace (store (ppair (var 3) (var 2)))
+with (subst (sh 1) (store (ppair (var 2) (var 1)))). var_solv.
+simpsub_big. auto.
+
+(*STOP and find spots where you want to ask karl*)
+
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
 rewrite - (addn2 (size G)).
 unfold subst1. rewrite subst_pw. rewrite - Hsize.
