@@ -253,21 +253,23 @@ Opaque nattp.
 Opaque world.
 Opaque nth.
 
-Hint Rewrite subst_U0 : ssub1.
-Hint Rewrite subst_subseq: ssub1.
-Hint Rewrite subst_leq: ssub1.
-Hint Rewrite subst_leqtp: ssub1.
-Hint Rewrite subst_lttp: ssub1.
-Hint Rewrite subst_lt: ssub1.
-Hint Rewrite subst_nzero: ssub1.
-Hint Rewrite subst_nat: ssub1.
-Hint Rewrite subst_world: ssub1.
-Hint Rewrite subst_pw: ssub1.
-Hint Rewrite subst_world: ssub1.
-Hint Rewrite subst_nth: ssub1.
+Hint Rewrite subst_U0 : subst.
+Hint Rewrite subst_subseq: subst.
+Hint Rewrite subst_leq: subst.
+Hint Rewrite subst_leqtp: subst.
+Hint Rewrite subst_lttp: subst.
+Hint Rewrite subst_lt: subst.
+Hint Rewrite subst_nzero: subst.
+Hint Rewrite subst_nat: subst.
+Hint Rewrite subst_world: subst.
+Hint Rewrite subst_pw: subst.
+Hint Rewrite subst_world: subst.
+Hint Rewrite subst_nth: subst.
+Hint Rewrite subst_store: subst.
+Hint Rewrite subst_laters: subst.
 
 Ltac simpsub1 :=
-  autorewrite with ssub1.
+  autorewrite with subst.
 
 
 
