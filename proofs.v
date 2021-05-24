@@ -392,55 +392,6 @@ Lemma uworld21: forall G x,
   rewrite - (subst_pw (sh 3)). var_solv.
   rewrite - (subst_nat (sh 2)). var_solv. Qed. 
 
-Lemma compm2_type: forall U A G,
-    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-                    tr G  (oof (laters (exist nzero preworld (
-                                          sigma nattp 
-                                          ( let v := Syntax.var 1 in
-                                              let lv := Syntax.var 0 in
-                                              let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
-                                                   A
-                                                    ))
-                               )) U0).
-  intros. apply laters_type.
-  apply tr_exist_formation_univ.
-  apply pw_kind. eapply tr_sigma_formation_univ.
-  unfold nzero. simpsub. apply nat_U0.
-  simpl.
-    eapply tr_prod_formation_univ.
-    eapply tr_prod_formation_univ. unfold nzero. simpl.
-    apply subseq_U0.
-    rewrite - (subst_world (sh 2)).
-assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
-    rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
-apply tr_weakening_append. assumption. apply uworld10. 
-    auto. unfold nzero. simpsub. apply store_type. auto.
-    rewrite subst_nzero. apply X0. 
-    auto. apply leq_refl. auto. Qed.
-
-
-
-  Lemma compm1_type : forall U A G,
-    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-    tr G (oof (arrow (store U)
-                     (*split the theorem up so that this
-                      laters part stands alone*)
-                         (laters (exist nzero preworld (
-                                          sigma nattp 
-                                          ( let v := Syntax.var 1 in
-                                              let lv := Syntax.var 0 in
-                                              let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
-                                                   A
-                                                    ))
-                                    )
-         )) U0). (*A should be substed by 2 here start here fix this in trans also*)
-  move => U A G U_t A_t.
-  eapply tr_arrow_formation_univ.
-  apply store_type. assumption. apply compm2_type; assumption.
-  Qed.
-
 Lemma subst_trans_type : forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
@@ -526,8 +477,96 @@ repeat rewrite - addnA;
     rewrite subst_lt. simpsub. auto.
 Qed.
 
+Lemma compm2_type: forall U A G,
+    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+                    tr G  (oof (laters (exist nzero preworld (
+                                          sigma nattp 
+                                          ( let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let V := ppair v lv in
+                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   A
+                                                    ))
+                               )) U0).
+  intros. apply laters_type.
+  apply tr_exist_formation_univ.
+  apply pw_kind. eapply tr_sigma_formation_univ.
+  unfold nzero. simpsub. apply nat_U0.
+  simpl.
+    eapply tr_prod_formation_univ.
+    eapply tr_prod_formation_univ. unfold nzero. simpl.
+    apply subseq_U0.
+    rewrite - (subst_world (sh 2)).
+assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
+    rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
+apply tr_weakening_append. assumption. apply uworld10. 
+    auto. unfold nzero. simpsub. apply store_type. auto.
+    rewrite subst_nzero. apply X0. 
+    auto. apply leq_refl. auto. Qed.
 
 
+
+  Lemma compm1_type : forall U A G,
+    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+    tr G (oof (arrow (store U)
+                     (*split the theorem up so that this
+                      laters part stands alone*)
+                         (laters (exist nzero preworld (
+                                          sigma nattp 
+                                          ( let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let V := ppair v lv in
+                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   A
+                                                    ))
+                                    )
+         )) U0). (*A should be substed by 2 here start here fix this in trans also*)
+  move => U A G U_t A_t.
+  eapply tr_arrow_formation_univ.
+  apply store_type. assumption. apply compm2_type; assumption.
+  Qed.
+
+
+  Lemma compm0_type : forall A G w1 l1,
+      (tr G (oof (ppair w1 l1) world)) ->
+      (tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+    tr [:: hyp_tm preworld & G] (oof
+       (pi nattp
+          (arrow
+             (subseq
+                (ppair (subst (sh 2) w1)
+                   (subst (sh 2) l1))
+                (ppair (var 1) (var 0)))
+             (arrow (store (ppair (var 1) (var 0)))
+                (laters
+                   (exist nzero preworld
+                      (sigma nattp
+                         (prod
+                            (prod
+                               (subseq
+                                  (ppair 
+                                   (var 3) 
+                                   (var 2))
+                                  (ppair 
+                                   (var 1) 
+                                   (var 0)))
+                               (store
+                                  (ppair 
+                                   (var 1) 
+                                   (var 0))))
+                            A))))))) U0
+          ).
+         intros. 
+        apply tr_pi_formation_univ. auto.
+        apply tr_arrow_formation_univ.
+        apply subseq_U0.
+        rewrite - subst_ppair.
+        rewrite - (subst_world (sh 2)).
+        rewrite - hseq2.
+        repeat rewrite subst_sh_shift.
+        apply tr_weakening_append. assumption.
+        apply uworld10.
+        apply compm1_type; auto. Qed. 
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
@@ -554,29 +593,14 @@ Qed.
         eapply IHA2; try assumption; try auto.
         auto. apply leq_refl. auto.
         (*comp type*)
-      + simpsub_big. simpl.
+      + simpsub_big. simpl. unfold subst1. simpsub1.
        (* unfold U0. rewrite - (subst_U0 (dot l id)).
         eapply tr_pi_elim.
         eapply tr_pi_intro. apply nat_type.*)
         apply tr_all_formation_univ. auto.
-        apply tr_pi_formation_univ.
-        rewrite subst_nzero. apply nat_U0.
-        apply tr_arrow_formation_univ.
-        apply subseq_U0.
         rewrite - subst_sh_shift. simpsub.
-        apply world_pair.
-        rewrite - (subst_pw (sh 2)).
-        rewrite - hseq2.
-        repeat rewrite subst_sh_shift.
-        apply tr_weakening_append.
-        eapply split_world1. apply Du.
-        rewrite - (subst_nat (sh 2)).
-        rewrite - hseq2.
-        repeat rewrite subst_sh_shift.
-        apply tr_weakening_append. eapply split_world2. apply Du.
-        apply uworld10.
-        apply compm1_type.
-        apply uworld10. rewrite subst_trans_type.
+        apply compm0_type; try assumption.
+        rewrite subst_trans_type.
         eapply IHA; auto.  auto. auto.
         apply leq_refl. auto. 
     - (*ref type*)
@@ -914,9 +938,6 @@ rewrite addnC. auto. simpsub. rewrite - (addn4 (size G)).
 auto. simpsub. auto.
 rewrite Hsub.
 eapply (tr_pi_elim _ nattp).
-(*do forall first, then the subst1 as below
- only dif is you dont need to do the pi_elim
- after the subst1*)
     assert(   (pi nattp
           (arrow
              (subseq
@@ -956,6 +977,9 @@ subst1 (var 3) (pi nattp
     rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
     rewrite Hsub2.
     eapply (tr_all_elim _ nzero preworld).
+    (*strange goal comes from here
+     get this out of comp type
+     get w to have the shift in front from the start*)
     clear Hsub Hsub2.
 assert 
        (all nzero preworld
@@ -1053,7 +1077,34 @@ repeat rewrite - (sh_sum (size G) 4).
 rewrite - sh_trans_type. rewrite - subst_app.
 unfold subst1. rewrite subst_pw. rewrite - hseq4.
 repeat rewrite subst_sh_shift. apply tr_weakening_append.
-eapply IHDe1.
+eapply IHDe1; try assumption.
+rewrite - (subst_pw (sh 4)). var_solv.
+replace 6 with (2 + 4). rewrite - addnA.
+repeat rewrite - (sh_sum (4 + size G) 2). eapply tr_formation_weaken; apply compm0_type.
+rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
+rewrite - (addn2 (size G)).
+unfold subst1. rewrite subst_pw. rewrite - Hsize.
+rewrite - hseq4. rewrite catA.
+rewrite hseq4. rewrite - (subst_world 4)
+apply tr_weakening_append.
+
+(*start here
+ not sure where this goal comes from
+ looks like the comp type*)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 (*start here with the bring shift out lemma*)
 eapply tr_all_elim. clear Hsub3.
