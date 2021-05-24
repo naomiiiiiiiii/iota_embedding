@@ -660,6 +660,16 @@ Theorem one: forall G D e T ebar w1 l1,
   move => G D e T ebar w1 l1 De Dw Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
+assert (size
+         [:: hyp_tm (store (ppair (var 2) (var 1))),
+      hyp_tm
+        (subseq
+           (ppair (subst (sh (size G + 2)) w1)
+              (subst (sh (size G + 2)) l1))
+           (ppair (var 1) (var 0))),
+     hyp_tm nattp, hyp_tm preworld & gamma_at G w1 l1]
+= (4 + size G)
+       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
     (*Useful facts that will help us later*)
      remember (size ([:: hyp_tm nattp,
         hyp_tm preworld
@@ -857,16 +867,6 @@ apply (tr_arrow_elim _
                 (subst (sh (4 + size G)) l1))
  (ppair (var 3) (var 2)))).
 eapply tr_formation_weaken. apply subseq_U0.
-assert (size
-         [:: hyp_tm (store (ppair (var 2) (var 1))),
-      hyp_tm
-        (subseq
-           (ppair (subst (sh (size G + 2)) w1)
-              (subst (sh (size G + 2)) l1))
-           (ppair (var 1) (var 0))),
-     hyp_tm nattp, hyp_tm preworld & gamma_at G w1 l1]
-= (4 + size G)
-       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
 apply world_pair;
   auto; try rewrite - {2}(subst_pw  (sh (4 + size G)));
   try rewrite - {2}(subst_nat (sh (4 + size G)));
@@ -1046,7 +1046,11 @@ assert(
 trans_type (subst (sh (4 + size G)) w1) (subst (sh (4 + size G)) l1) (comp_m A) ) as Hsub4.
 simpl. auto.
 rewrite Hsub4.
-
+clear Hsub4.
+rewrite - (addn2 (size G)).
+repeat rewrite plusE.
+repeat rewrite - (sh_sum (size G) 4).
+rewrite - sh_trans_type. rewrite - subst_app.
 
 (*start here with the bring shift out lemma*)
 eapply tr_all_elim. clear Hsub3.
