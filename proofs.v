@@ -955,10 +955,10 @@ subst1 (var 3) (pi nattp
     auto. unfold subst1. simpsub1. rewrite - addnA.
     rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
     rewrite Hsub2.
-    eapply (tr_all_elim _ preworld nzero).
+    eapply (tr_all_elim _ nzero preworld).
     clear Hsub Hsub2.
 assert 
-       (all preworld nzero
+       (all nzero preworld
           (pi nattp
              (arrow
                 (subseq
@@ -991,7 +991,7 @@ assert
                               (var 1) 
                               (var 0) A))))))))
 = subst1 (subst (sh (4 + size G)) l1)
-       (all preworld nzero
+       (all nzero preworld
           (pi nattp
              (arrow
                 (subseq
@@ -1024,6 +1024,29 @@ replace (5 + 1) with 6; auto.
 replace (2 + 4) with 6; auto.
 (*ask karl: a mess!!*)
 rewrite Hsub3.
+clear Hsub3.
+assert( 
+       (subst1 (subst (sh (4 + size G)) l1)
+          (all nzero preworld
+             (pi nattp
+                (arrow
+                   (subseq
+                      (ppair (shift 3 (subst (sh (4 + size G)) w1))
+                         (var 2)) (ppair (var 1) (var 0)))
+                   (arrow (store (ppair (var 1) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq (ppair (var 3) (var 2))
+                                        (ppair (var 1) (var 0)))
+                                     (store (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A)))))))))) =
+trans_type (subst (sh (4 + size G)) w1) (subst (sh (4 + size G)) l1) (comp_m A) ) as Hsub4.
+simpl. auto.
+rewrite Hsub4.
+
 
 (*start here with the bring shift out lemma*)
 eapply tr_all_elim. clear Hsub3.
