@@ -393,6 +393,13 @@ Lemma uworld32: forall G x y,
   rewrite - (subst_pw (sh 4)). var_solv.
   rewrite - (subst_nat (sh 3)). var_solv. Qed. 
 
+  Lemma uworld43: forall G x y z,
+      (tr [:: x, y, z, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 4) (var 3)) world)). intros.
+   apply world_pair.
+  rewrite - (subst_pw (sh 5)). var_solv.
+  rewrite - (subst_nat (sh 4)). var_solv. Qed. 
+
 Hint Resolve uworld32.
 
 Lemma uworld21: forall G x,
@@ -488,16 +495,29 @@ repeat rewrite - addnA;
 Qed.
 
 (*pick up here*)
-Lemma compm4_Type: forall U A G,
-    (tr [:: hyp_tm preworld & G] (oof U world)) ->
+Lemma compm4_type: forall U A G,
+    (tr G (oof U world)) ->
     (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-    sigma nattp ( let v := Syntax.var 1 in
+   tr [:: hyp_tm preworld & G] (oof (sigma nattp ( let v := Syntax.var 1 in
                   let lv := Syntax.var 0 in
                   let V := ppair v lv in
-                  prod (prod (subseq (subst (sh 1) U) V) (store V))
-                                                   A
-                                                    ))
-                               ) U0).
+                  prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   A))
+                                                    
+             U0). intros.
+  eapply tr_sigma_formation_univ.
+  unfold nzero. simpsub. apply nat_U0.
+  simpl.
+    eapply tr_prod_formation_univ.
+    eapply tr_prod_formation_univ. unfold nzero. simpl.
+    apply subseq_U0.
+    rewrite - (subst_world (sh 2)).
+assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
+    rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
+eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
+    auto. unfold nzero. simpsub. apply store_type. auto.
+    rewrite subst_nzero. apply X0. Qed. 
+
 Lemma compm3_type: forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
                     tr G  (oof (exist nzero preworld (
@@ -510,19 +530,8 @@ Lemma compm3_type: forall U A G,
                                                     ))
                                ) U0).
   intros. apply tr_exist_formation_univ.
-  apply pw_kind. eapply tr_sigma_formation_univ.
-  unfold nzero. simpsub. apply nat_U0.
-  simpl.
-    eapply tr_prod_formation_univ.
-    eapply tr_prod_formation_univ. unfold nzero. simpl.
-    apply subseq_U0.
-    rewrite - (subst_world (sh 2)).
-assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
-    rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
-eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
-    auto. unfold nzero. simpsub. apply store_type. auto.
-    rewrite subst_nzero. apply X0. 
-    auto. apply leq_refl. auto. Qed.
+  apply pw_kind. eapply compm4_type; try assumption; auto. auto.
+ apply leq_refl. auto. Qed.
 
 
 Lemma compm2_type: forall U A G,
@@ -1199,6 +1208,7 @@ simpsub_big. auto. simpsub.
                 (ppair (ppi1 (var 0))
                    (ppair make_subseq
                           (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))) ).
+   (*rule 72*)
    eapply (tr_exist_elim _ (subst (sh 1) nzero)
                          (subst (sh 1) preworld) 
              (subst (under 1 (sh 1)) (sigma nattp
@@ -1210,17 +1220,25 @@ simpsub_big. auto. simpsub.
                    (trans_type (var 1) (var 0) A)))) ).
  -  rewrite - subst_exist. var_solv.
     apply pw_type. simpsub_big. simpl.
-
-(*get this out of comp type*)
-
-
-   (*first apply rule 72 before
-    you touch the bind type*)
+   replace (ppair (var 6) (var 5)) with
+       (@subst False (sh 2)
+              (ppair (var 4) (var 3))
+       ).
+   eapply tr_formation_weaken; apply compm4_type.
+   clear Hequiv Hequivt.
+   eapply uworld43.
+   rewrite subst_trans_type. apply trans_type_works.
+   auto. simpsub. auto. simpsub. auto.
+   simpsub_big. simpl.
+   rewrite subst_trans_type.
+   unfold subst1. simpsub1.
+   (*make bind*)
+   rewrite subst_bind. simpsub_big. simpl.
     eapply (bind_type _
                       (exist nzero preworld (
                                           sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
-                                          (let u := Syntax.var 1 in
-                                              let l := Syntax.var 0 in
+                                          (let u := Syntax.var 3 in
+                              let l := (picomp1 (Syntax.var 2)) in
                                               let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let U := ppair u l in
@@ -1229,8 +1247,7 @@ simpsub_big. auto. simpsub.
                                                     prod (prod (subseq U V) (store V))
                                                      (trans_type v lv A))))
                                  ).
-    simpsub.
- (*start here*)
+    (*et2*)
 
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
 rewrite - (addn2 (size G)).
