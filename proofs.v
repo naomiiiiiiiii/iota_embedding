@@ -487,9 +487,10 @@ repeat rewrite - addnA;
     rewrite subst_lt. simpsub. auto.
 Qed.
 
-Lemma compm2_type: forall U A G,
+
+Lemma compm3_type: forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-                    tr G  (oof (laters (exist nzero preworld (
+                    tr G  (oof (exist nzero preworld (
                                           sigma nattp 
                                           ( let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
@@ -497,9 +498,8 @@ Lemma compm2_type: forall U A G,
                                               prod (prod (subseq (subst (sh 2) U) V) (store V))
                                                    A
                                                     ))
-                               )) U0).
-  intros. apply laters_type.
-  apply tr_exist_formation_univ.
+                               ) U0).
+  intros. apply tr_exist_formation_univ.
   apply pw_kind. eapply tr_sigma_formation_univ.
   unfold nzero. simpsub. apply nat_U0.
   simpl.
@@ -513,6 +513,20 @@ eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10.
     auto. unfold nzero. simpsub. apply store_type. auto.
     rewrite subst_nzero. apply X0. 
     auto. apply leq_refl. auto. Qed.
+
+
+Lemma compm2_type: forall U A G,
+    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+                    tr G  (oof (laters (exist nzero preworld (
+                                          sigma nattp 
+                                          ( let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let V := ppair v lv in
+                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   A
+                                                    ))
+                               )) U0).
+  intros. apply laters_type. apply compm3_type; try assumption. Qed.
 
 
 
@@ -1123,6 +1137,9 @@ simpsub_big. auto. simpsub.
 (*e2bar*)
  rewrite subst_bind.
  simpsub_big. simpl. simpsub.
+ apply tr_arrow_intro.
+ - eapply tr_formation_weaken; eapply compm2_type.
+
 
  (*start here*)
 
