@@ -487,7 +487,17 @@ repeat rewrite - addnA;
     rewrite subst_lt. simpsub. auto.
 Qed.
 
-
+(*pick up here*)
+Lemma compm4_Type: forall U A G,
+    (tr [:: hyp_tm preworld & G] (oof U world)) ->
+    (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+    sigma nattp ( let v := Syntax.var 1 in
+                  let lv := Syntax.var 0 in
+                  let V := ppair v lv in
+                  prod (prod (subseq (subst (sh 1) U) V) (store V))
+                                                   A
+                                                    ))
+                               ) U0).
 Lemma compm3_type: forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
                     tr G  (oof (exist nzero preworld (
@@ -1138,12 +1148,88 @@ simpsub_big. auto. simpsub.
  rewrite subst_bind.
  simpsub_big. simpl. simpsub.
  apply tr_arrow_intro.
- - eapply tr_formation_weaken; eapply compm3_type.
+ - 
    replace (ppair (var 5) (var 4)) with
-       (subst (sh 2)
+       (@subst False (sh 2)
               (ppair (var 3) (var 2))
        ).
+   eapply tr_formation_weaken; eapply compm3_type; auto.
+   apply trans_type_works; auto.
+   simpsub. auto.
+ -
+   replace (ppair (var 5) (var 4)) with
+       (@subst False (sh 2)
+              (ppair (var 3) (var 2))
+       ).
+   eapply tr_formation_weaken; eapply compm2_type; auto.
+   apply trans_type_works; auto.
+   simpsub. auto.
+ - simpsub_big. simpl.
+   replace (make_bind
+          (app
+             (app
+                (app
+                   (app
+                      (app
+                         (lam
+                            (subst (dot (var 0) (sh 6))
+                               (move_gamma G0 make_subseq 1 Et2)))
+                         (picomp4 (var 0))) 
+                      (ppi1 (var 0))) (ppi1 (var 0)))
+                make_subseq) (picomp3 (var 0)))
+          (lam
+             (app ret
+                (ppair (ppi1 (var 0))
+                   (ppair make_subseq
+                          (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))) with
+       (subst1 (var 0) (make_bind
+          (app
+             (app
+                (app
+                   (app
+                      (app
+                         (lam
+                            (subst (dot (var 0) (sh 6))
+                               (move_gamma G0 make_subseq 1 Et2)))
+                         (picomp4 (var 0))) 
+                      (ppi1 (var 0))) (ppi1 (var 0)))
+                make_subseq) (picomp3 (var 0)))
+          (lam
+             (app ret
+                (ppair (ppi1 (var 0))
+                   (ppair make_subseq
+                          (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))) ).
+   eapply (tr_exist_elim _ (subst (sh 1) nzero)
+                         (subst (sh 1) preworld) 
+             (subst (under 1 (sh 1)) (sigma nattp
+                (prod
+                   (prod
+                      (subseq (ppair (var 5) (var 4))
+                         (ppair (var 1) (var 0)))
+                      (store (ppair (var 1) (var 0))))
+                   (trans_type (var 1) (var 0) A)))) ).
+ -  rewrite - subst_exist. var_solv.
+    apply pw_type. simpsub_big. simpl.
 
+(*get this out of comp type*)
+
+
+   (*first apply rule 72 before
+    you touch the bind type*)
+    eapply (bind_type _
+                      (exist nzero preworld (
+                                          sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
+                                          (let u := Syntax.var 1 in
+                                              let l := Syntax.var 0 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
+                                                    prod (prod (subseq U V) (store V))
+                                                     (trans_type v lv A))))
+                                 ).
+    simpsub.
  (*start here*)
 
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
