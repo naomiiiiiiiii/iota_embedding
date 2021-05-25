@@ -1138,8 +1138,11 @@ simpsub_big. auto. simpsub.
  rewrite subst_bind.
  simpsub_big. simpl. simpsub.
  apply tr_arrow_intro.
- - eapply tr_formation_weaken; eapply compm2_type.
-
+ - eapply tr_formation_weaken; eapply compm3_type.
+   replace (ppair (var 5) (var 4)) with
+       (subst (sh 2)
+              (ppair (var 3) (var 2))
+       ).
 
  (*start here*)
 
