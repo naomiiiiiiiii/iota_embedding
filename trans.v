@@ -79,10 +79,6 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
   (*after this return to bind proof, use above for next goal,
    probably should save as hypothesis that W and U are worlds*)
 
-Definition picomp1 (M: term False) := ppi1 M. 
-Definition picomp2 (M: term False) := ppi1 (ppi1 (ppi2 M) ). 
-Definition picomp3 (M: term False) := ppi2 (ppi1 (ppi2 M)). 
-Definition picomp4 (M: term False) := ppi2 (ppi2 M). 
 
 Fixpoint gamma_at (gamma: source.context) (w l: Syntax.term False) :=
   map (fun t => hyp_tm (trans_type w l t)) gamma.
@@ -139,17 +135,17 @@ that. you want to bind
                                (*start here*)
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
-                                                    app ret (ppair (picomp1 z2)
+                                                    ret_t (ppair (picomp1 z2)
                                                                    (ppair make_subseq (*z2 \circ z1*)
                                                         (ppair (picomp3 z2) (picomp4 z2))                         
-                                                        ))
+                                                        )
                                                ))
               )
 
           )
 
     ))
-                                         )))
+                                         ))))
   | t_ref: forall G E Et T, 
          of_m G E T -> trans E Et ->
          trans (ref_m E)

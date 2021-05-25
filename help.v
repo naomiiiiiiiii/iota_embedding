@@ -126,6 +126,11 @@ ie uses default value of w2*)
 Definition app3 w i u l : term False :=
  app (app (app w i) u) l.
 
+Definition picomp1 (M: term False) := ppi1 M.
+Definition picomp2 (M: term False) := ppi1 (ppi1 (ppi2 M) ). 
+Definition picomp3 (M: term False) := ppi2 (ppi1 (ppi2 M)). 
+Definition picomp4 (M: term False) := ppi2 (ppi2 M). 
+
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun W1 => fun W2 =>
        app  (app   (lam (lam
@@ -151,6 +156,8 @@ Definition app3 w i u l : term False :=
                  ))))) W1) W2.
 
  Definition nth w n: term False := app (ppi1 w) n.
+
+ Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
 
 
 Lemma subst_pw: forall s,
@@ -213,6 +220,13 @@ Lemma subst_subseq: forall W1 W2 s,
 Qed.
 
 
+Lemma subst_ret: forall s, subst s ret = ret.
+  intros. unfold ret. unfold inl. simpsub. auto. Qed.
+
+Lemma subst_ret_t: forall s m, subst s (ret_t m) = ret_t (subst s m).
+  intros. unfold ret_t. unfold ret. unfold inl. simpsub. auto. Qed.
+
+
 
  Definition getstore w v: (term False) := pi nattp ((*i = 0*)
                                            let i := var 0 in
@@ -243,6 +257,21 @@ Lemma subst_laters: forall s A, (subst s (laters A)) = (laters (subst s A)).
 
 Lemma subst_nth: forall s m1 m2, (subst s (nth m1 m2)) = (nth (subst s m1) (subst s m2)). intros. unfold nth. simpsub. auto. Qed.
 
+Lemma subst_make_subseq: forall s, (subst s make_subseq) = make_subseq.
+  intros. unfold make_subseq. simpsub. auto. Qed.
+
+Lemma subst_picomp1: forall s m, (subst s (picomp1 m)) = picomp1 (subst s m).
+  intros. unfold picomp1. simpsub. auto. Qed.
+
+Lemma subst_picomp2: forall s m, (subst s (picomp2 m)) = picomp2 (subst s m).
+  intros. unfold picomp2. simpsub. auto. Qed.
+
+Lemma subst_picomp3: forall s m, (subst s (picomp3 m)) = picomp3 (subst s m).
+  intros. unfold picomp3. simpsub. auto. Qed.
+
+Lemma subst_picomp4: forall s m, (subst s (picomp4 m)) = picomp4 (subst s m).
+  intros. unfold picomp4. simpsub. auto. Qed.
+
 Opaque laters.
 Opaque preworld.
 Opaque U0.
@@ -253,7 +282,7 @@ Opaque nattp.
 Opaque world.
 Opaque nth.
 
-Hint Rewrite subst_U0 : subst1.
+Hint Rewrite subst_U0 subst_ret subst_ret_t: subst1.
 Hint Rewrite subst_subseq: subst1.
 Hint Rewrite subst_leq: subst1.
 Hint Rewrite subst_leqtp: subst1.
@@ -266,14 +295,15 @@ Hint Rewrite subst_pw: subst1.
 Hint Rewrite subst_world: subst1.
 Hint Rewrite subst_nth: subst1.
 Hint Rewrite subst_store: subst1.
-Hint Rewrite subst_laters: subst1.
+Hint Rewrite subst_laters
+subst_picomp1 subst_picomp2 subst_picomp4
+     subst_picomp3 subst_make_subseq: subst1.
 
 Ltac simpsub1 :=
   autorewrite with subst1.
 
 
 
- Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
 
  (*M o M'*)
 
@@ -365,3 +395,9 @@ Opaque app.
     (*found*)
     Admitted.
 *)
+(* p sure this is wrong
+Lemma mg_bind_help: forall G m e s,
+    subst (dot (var 0) s) (move_gamma G m 1 e) =
+    subst s (move_gamma G m 1 e).
+  intros. unfold move_gamma. induction G.
+simpl. simpsub. simpl.*)

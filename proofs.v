@@ -1119,9 +1119,12 @@ replace (size G + 2 + 2) with (4 + size G); auto.
 rewrite addnC. rewrite - addnA. auto.
 replace (store (ppair (var 3) (var 2)))
 with (subst (sh 1) (store (ppair (var 2) (var 1)))). var_solv.
-simpsub_big. auto.
+simpsub_big. auto. simpsub.
 (*e2bar*)
+ rewrite subst_bind.
+ simpsub_big. simpl. simpsub.
 
+ (*start here*)
 
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
 rewrite - (addn2 (size G)).
@@ -1130,9 +1133,6 @@ rewrite - hseq4. rewrite catA.
 rewrite hseq4. rewrite - (subst_world 4)
 apply tr_weakening_append.
 
-(*start here
- not sure where this goal comes from
- looks like the comp type*)
 
 
 
