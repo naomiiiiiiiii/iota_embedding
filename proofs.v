@@ -954,7 +954,7 @@ subst1 (var 2)
                             (store (ppair (var 1) (var 0))))
                          (trans_type (var 1) (var 0) A)))))))) as Hsub.
 simpsub. unfold subst1; simpsub1. simpsub_big.
-simpl. unfold subst1. simpsub1.
+(*ask karl arrow subseq*) simpl. unfold subst1. simpsub1.
 rewrite subst_trans_type.
 rewrite addnC. auto. simpsub. rewrite - (addn4 (size G)).
 auto. simpsub. auto.
@@ -1120,8 +1120,8 @@ rewrite addnC. rewrite - addnA. auto.
 replace (store (ppair (var 3) (var 2)))
 with (subst (sh 1) (store (ppair (var 2) (var 1)))). var_solv.
 simpsub_big. auto.
+(*e2bar*)
 
-(*STOP and find spots where you want to ask karl*)
 
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
 rewrite - (addn2 (size G)).
