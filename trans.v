@@ -129,6 +129,9 @@ that. you want to bind
                                let btarg :=
                                    app (app
                                           (shift 5 (lam (*x' lam*)
+(*et2's var 0 is the x.
+ maybe plan is bring the subst outside the lamda so that you type check the lamda in the
+ weakened context*)                                                      
                                                       ( move_gamma G (make_subseq) 1 (*ignore x'*) Et2 ))) x') lv
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
