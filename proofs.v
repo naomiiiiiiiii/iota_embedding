@@ -608,6 +608,23 @@ Lemma compm2_type: forall U A G,
         apply uworld10.
         apply compm1_type; auto. Qed. 
 
+  (*ppicomps*)
+  Lemma picomp1_works: forall G x y z a A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                A)),
+       x, y, z, a,
+       hyp_tm nattp, hyp_tm preworld
+      & G]
+    (oof (picomp1 (var 0)) nattp).
+    intros.
+
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
@@ -943,7 +960,6 @@ simpsub. auto.
   apply compm2_type. apply uworld32. apply trans_type_works.
   apply uworld10.
   (*Et1 nonsense
-just make below more shifts maybe?
    *)
 apply (tr_arrow_elim _
           (subseq
@@ -1248,6 +1264,216 @@ simpsub_big. auto. simpsub.
                                                      (trans_type v lv A))))
                                  ).
     (*et2*)
+    apply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))) )).
+ - eapply tr_formation_weaken; eapply store_type.
+   apply world_pair. rewrite - (subst_pw (sh 2)). var_solv.
+   unfold picomp1. apply (tr_sigma_elim1 _ _
+       (subst (under 1 (sh 1))
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                (trans_type (var 1) (var 0) A)))).
+   rewrite - (subst_nat (sh 1)). rewrite - subst_sigma.
+   var_solv.
+ - simpl.
+   replace (ppair (var 3) (picomp1 (var 2))) with
+       (subst (sh 2) (ppair (var 1) (picomp1 (var 0)))). 
+   eapply tr_formation_weaken; apply compm2_type.
+       )
+   replace 
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 5) (var 4))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                (trans_type (var 1) (var 0) A))) with
+
+
+eapply tr_formation_weaken. apply subseq_U0.
+apply wworld4.
+apply uworld32.
+eapply tr_formation_weaken; apply compm1_type. apply uworld32.
+apply trans_type_works. auto.
+assert (
+       (arrow
+          (subseq (ppair (subst (sh (4 + size G)) w1)
+                         (subst (sh (4 + size G)) l1))
+             (ppair (var 3) (var 2)))
+          (arrow (store (ppair (var 3) (var 2)))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair (var 5) (var 4))
+                               (ppair (var 1) (var 0)))
+                            (store (ppair (var 1) (var 0))))
+                         (trans_type (var 1) (var 0) A))))))) =
+subst1 (var 2) 
+       (arrow
+          (subseq (ppair (subst (sh (5 + size G)) w1)
+                         (subst (sh (5 + size G)) l1))
+             (ppair (var 4) (var 0)))
+          (arrow (store (ppair (var 4) (var 0)))
+             (laters
+                (exist nzero preworld
+                   (sigma nattp
+                      (prod
+                         (prod
+                            (subseq (ppair (var 6) (var 2))
+                               (ppair (var 1) (var 0)))
+                            (store (ppair (var 1) (var 0))))
+                         (trans_type (var 1) (var 0) A)))))))) as Hsub.
+simpsub. unfold subst1; simpsub1. simpsub_big.
+(*ask karl arrow subseq*) simpl. unfold subst1. simpsub1.
+rewrite subst_trans_type.
+rewrite addnC. auto. simpsub. rewrite - (addn4 (size G)).
+auto. simpsub. auto.
+rewrite Hsub.
+eapply (tr_pi_elim _ nattp).
+    assert(   (pi nattp
+          (arrow
+             (subseq
+                (ppair (subst (sh (5 + size G)) w1)
+                       (subst (sh (5 + size G)) l1))
+                (ppair (var 4) (var 0)))
+             (arrow (store (ppair (var 4) (var 0)))
+                (laters
+                   (exist nzero preworld
+                      (sigma nattp
+                         (prod
+                            (prod
+                               (subseq (ppair (var 6) (var 2))
+                                  (ppair (var 1) (var 0)))
+                               (store (ppair (var 1) (var 0))))
+                            (trans_type (var 1) (var 0) A)))))))) =
+subst1 (var 3) (pi nattp
+          (arrow
+             (subseq
+                (ppair (subst (sh (6 + size G)) w1)
+                       (subst (sh (6 + size G)) l1))
+                (ppair (var 1) (var 0)))
+             (arrow (store (ppair (var 1) (var 0)))
+                (laters
+                   (exist nzero preworld
+                      (sigma nattp
+                         (prod
+                            (prod
+                               (subseq (ppair (var 3) (var 2))
+                                  (ppair (var 1) (var 0)))
+                               (store (ppair (var 1) (var 0))))
+                            (trans_type (var 1) (var 0) A))))))))
+       )
+           as Hsub2.
+    simpsub_big. simpl. rewrite - (addn4 (size G)) - (addn1 (size G + 4)).
+    auto. unfold subst1. simpsub1. rewrite - addnA.
+    rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
+    rewrite Hsub2.
+    eapply (tr_all_elim _ nzero preworld).
+    (*strange goal comes from here
+     get this out of comp type
+     get w to have the shift in front from the start*)
+    clear Hsub Hsub2.
+assert 
+       (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq
+                   (ppair
+                      (subst (sh (6 + size G))
+                         w1)
+                      (subst (sh (6 + size G))
+                         l1))
+                   (ppair (var 1) (var 0)))
+                (arrow
+                   (store
+                      (ppair (var 1) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                              (prod
+                              (subseq
+                              (ppair 
+                              (var 3) 
+                              (var 2))
+                              (ppair 
+                              (var 1) 
+                              (var 0)))
+                              (store
+                              (ppair 
+                              (var 1) 
+                              (var 0))))
+                              (trans_type
+                              (var 1) 
+                              (var 0) A))))))))
+= subst1 (subst (sh (4 + size G)) l1)
+       (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq
+                   (ppair (shift 3(subst (sh (4 + size G)) w1))
+                          (var 2))
+                   (ppair (var 1) (var 0)))
+                (arrow (store (ppair (var 1) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq
+                                     (ppair (var 3) (var 2))
+                                     (ppair (var 1) (var 0)))
+                                  (store
+                                     (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) A))))))))))
+      as Hsub3.
+rewrite - subst_sh_shift.
+simpsub. simpl. unfold subst1. simpsub1. simpsub_big. simpl.
+repeat rewrite plusE.
+rewrite subst_trans_type. repeat rewrite - addnA.
+replace (3 + 2) with 5; auto.
+replace (1 + 1) with 2; auto.
+repeat rewrite - (addn1 (size G + 5)).
+repeat rewrite - (addn4 (size G + 2)).
+rewrite addnC. auto. repeat rewrite - addnA.
+replace (5 + 1) with 6; auto.
+replace (2 + 4) with 6; auto.
+(*ask karl: a mess!!*)
+rewrite Hsub3.
+clear Hsub3.
+assert( 
+       (subst1 (subst (sh (4 + size G)) l1)
+          (all nzero preworld
+             (pi nattp
+                (arrow
+                   (subseq
+                      (ppair (shift 3 (subst (sh (4 + size G)) w1))
+                         (var 2)) (ppair (var 1) (var 0)))
+                   (arrow (store (ppair (var 1) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq (ppair (var 3) (var 2))
+                                        (ppair (var 1) (var 0)))
+                                     (store (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A)))))))))) =
+trans_type (subst (sh (4 + size G)) w1) (subst (sh (4 + size G)) l1) (comp_m A) ) as Hsub4.
+simpl. auto.
+rewrite Hsub4.
+clear Hsub4.
+rewrite - (addn2 (size G)).
+repeat rewrite plusE.
+repeat rewrite - (sh_sum (size G) 4).
+rewrite - sh_trans_type. rewrite - subst_app.
+unfold subst1. rewrite subst_pw. rewrite - hseq4.
+repeat rewrite subst_sh_shift. apply tr_weakening_append.
+eapply IHDe1; try assumption.
 
 rewrite - subst_ppair. rewrite (subst_sh_shift _ (4 + (size G))).
 rewrite - (addn2 (size G)).
