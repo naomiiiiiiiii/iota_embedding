@@ -623,7 +623,51 @@ Lemma compm2_type: forall U A G,
        hyp_tm nattp, hyp_tm preworld
       & G]
     (oof (picomp1 (var 0)) nattp).
-    intros.
+    intros. 
+   unfold picomp1. apply (tr_sigma_elim1 _ _
+       (subst (under 1 (sh 1))
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                A)) ).
+   rewrite - (subst_nat (sh 1)). rewrite - subst_sigma.
+   var_solv. Qed.
+
+  Lemma picomp2_works: forall G x y z a A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                A)),
+       x, y, z, a,
+       hyp_tm nattp, hyp_tm preworld
+      & G]
+    (oof (picomp2 (var 0))
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+    ).
+  Admitted.
+
+  Lemma picomp_world: forall G y z a A,
+      tr 
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                A)),
+       hyp_tm preworld, y, z, a,
+       hyp_tm nattp, hyp_tm preworld
+                     & G] (oof (ppair (var 1) (picomp1 (var 0))) world).
+   intros. apply world_pair. rewrite - (subst_pw (sh 2)). var_solv. eapply picomp1_works. Qed. 
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
@@ -1266,37 +1310,24 @@ simpsub_big. auto. simpsub.
     (*et2*)
     apply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))) )).
  - eapply tr_formation_weaken; eapply store_type.
-   apply world_pair. rewrite - (subst_pw (sh 2)). var_solv.
-   unfold picomp1. apply (tr_sigma_elim1 _ _
-       (subst (under 1 (sh 1))
-             (prod
-                (prod
-                   (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                (trans_type (var 1) (var 0) A)))).
-   rewrite - (subst_nat (sh 1)). rewrite - subst_sigma.
-   var_solv.
+   apply world_pair. rewrite - (subst_pw (sh 2)). var_solv. eapply picomp1_works.
  - simpl.
    replace (ppair (var 3) (picomp1 (var 2))) with
        (subst (sh 2) (ppair (var 1) (picomp1 (var 0)))). 
    eapply tr_formation_weaken; apply compm2_type.
-       )
-   replace 
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (ppair (var 5) (var 4))
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                (trans_type (var 1) (var 0) A))) with
-
-
-eapply tr_formation_weaken. apply subseq_U0.
-apply wworld4.
-apply uworld32.
-eapply tr_formation_weaken; apply compm1_type. apply uworld32.
-apply trans_type_works. auto.
+   apply picomp_world. apply trans_type_works; auto. simpsub; auto.
+ - apply (tr_arrow_elim _ (subseq (ppair (var 1) (picomp1 (var 0)))
+                                  (ppair (var 1) (picomp1 (var 0)))
+         )).
+   eapply tr_formation_weaken; apply subseq_U0.
+   apply picomp_world.
+   apply picomp_world.
+simpl.
+   replace (ppair (var 3) (picomp1 (var 2))) with
+       (subst (sh 2) (ppair (var 1) (picomp1 (var 0)))). 
+eapply tr_formation_weaken; apply compm1_type. apply picomp_world.
+apply trans_type_works. auto. simpsub; auto.
+apply (tr_arrow_elim _ nattp); auto.
 assert (
        (arrow
           (subseq (ppair (subst (sh (4 + size G)) w1)
