@@ -887,7 +887,11 @@ eapply split_world1. apply Dw.
        (trans_type (shift (size G) w1) 
           (shift (size G) l1) (comp_m B))
        (trans_type (shift (size G) w1) 
-          (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
+                   (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
+    (*start here NEED A CONTEXT IN THE TRANS RELATION STAT
+     to fix G0 problem below
+     translation IS dependent on context for SURE cuz sometimes
+     you have move gamma*)
     inversion Dtrans; subst. simpl.
     suffices: (equiv 
        (app
@@ -1455,11 +1459,14 @@ subst1 (var 1)
     rewrite Hsub2.
     eapply (tr_all_elim _ nzero preworld).
     clear Hsub Hsub2.
+  (* have to rewrite this with a subst1 in front for it to have
+comp as the output type
+   also why do you think index of G is 1 anyways (ok cuz under a shift 5)
+   also what on gods earth is G0*)
     apply (tr_arrow_elim _ (trans_type (var 1)
                                        (ppi1 (var 0)) A)).
 - eapply tr_formation_weaken; apply trans_type_works.
   apply picomp_world.
-  (*start here*)
   apply uworld10.
 assert 
        (all nzero preworld
