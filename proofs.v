@@ -571,14 +571,13 @@ Lemma compm2_type: forall U A G,
 
 
   Lemma compm0_type : forall A G w1 l1,
-      (tr G (oof (ppair w1 l1) world)) ->
+      (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof (ppair w1 l1) world)) ->
       (tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
     tr [:: hyp_tm preworld & G] (oof
        (pi nattp
           (arrow
              (subseq
-                (ppair (subst (sh 2) w1)
-                   (subst (sh 2) l1))
+                (ppair w1 l1)
                 (ppair (var 1) (var 0)))
              (arrow (store (ppair (var 1) (var 0)))
                 (laters
@@ -602,9 +601,7 @@ Lemma compm2_type: forall U A G,
          intros. 
         apply tr_pi_formation_univ. auto.
         apply tr_arrow_formation_univ.
-        apply subseq_U0.
-        eapply (tr_weakening_appends _ [:: hyp_tm nattp; hyp_tm preworld]); try apply X; try reflexivity;
-        try (rewrite - subst_ppair; rewrite subst_sh_shift; auto); auto.
+        apply subseq_U0. assumption.
         apply uworld10.
         apply compm1_type; auto. Qed. 
 
@@ -701,6 +698,14 @@ Lemma compm2_type: forall U A G,
         apply tr_all_formation_univ. auto.
         rewrite - subst_sh_shift. simpsub.
         apply compm0_type; try assumption.
+        rewrite - subst_ppair.
+        eapply (tr_weakening_appends _
+                                     [:: hyp_tm nattp; hyp_tm preworld])
+        ; try apply Du; try assumption.
+        replace (size [:: hyp_tm nattp; hyp_tm preworld]) with 2; auto.
+        rewrite - subst_sh_shift. auto.
+        replace (size [:: hyp_tm nattp; hyp_tm preworld]) with 2; auto.
+        rewrite - subst_sh_shift. auto. simpsub1. auto. auto.
         rewrite subst_trans_type.
         eapply IHA; auto.  auto. auto.
         apply leq_refl. auto. 
@@ -772,6 +777,38 @@ Theorem test: forall s, (@subst False s nattp) = nattp.
                                                       (var 1) (var 0)
                                                     T )))).*)
 
+Lemma wworld4: forall G x y z a w1 l1,
+    tr G (oof (ppair w1 l1) world) ->
+tr
+    [:: x, y, z, a & G]
+    (oof
+       (ppair (subst (sh 4) w1)
+          (subst (sh 4 ) l1)) world).
+  intros. rewrite - (subst_world (sh 4)).
+  repeat rewrite (subst_sh_shift _ ).
+rewrite - hseq4. eapply tr_weakening_appends; try apply X; try reflexivity; auto. Qed.
+
+Lemma wworld5: forall G x y z a b w1 l1,
+    tr G (oof (ppair w1 l1) world) ->
+tr
+    [:: x, y, z, a, b & G]
+    (oof
+       (ppair (subst (sh 5) w1)
+          (subst (sh 5) l1)) world).
+  intros. rewrite - (subst_world (sh 5)).
+  repeat rewrite (subst_sh_shift _ ).
+  eapply (tr_weakening_appends _
+                               [:: x; y; z; a; b]); try apply X; try reflexivity; auto.
+Qed.
+
+Lemma wworld_app: forall G D w1 l1,
+    tr D (oof (ppair w1 l1) world) ->
+    tr (G ++ D) (oof
+                   (subst (sh (size G)) (ppair w1 l1)) world
+                ).
+  intros. eapply tr_weakening_appends; try apply X; try reflexivity; auto.
+  rewrite - subst_sh_shift. auto.
+  rewrite - subst_sh_shift. auto. Qed.
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
@@ -797,25 +834,6 @@ assert (size
 = (4 + size G)
        ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
 
-assert (tr 
-    [:: hyp_tm (store (ppair (var 2) (var 1))),
-        hyp_tm
-          (subseq
-             (ppair (subst (sh (size G).+2) w1)
-                (subst (sh (size G + 2)) l1))
-             (ppair (var 1) (var 0))), hyp_tm nattp,
-        hyp_tm (subst1 (subst (sh (size G)) l1) preworld)
-      & gamma_at G w1 l1 ++ D]
-    (oof
-       (ppair (subst (sh (4 + size G)) w1)
-          (subst (sh (4 + size G)) l1)) world)) as wworld4.
-apply world_pair;
-  auto; try rewrite - {2}(subst_pw  (sh (4 + size G)));
-  try rewrite - {2}(subst_nat (sh (4 + size G)));
-repeat rewrite (subst_sh_shift _ (4 + size G));
-rewrite - hseq4; rewrite - (addn2 (size G));
-rewrite - Hsize; rewrite catA;
-  apply tr_weakening_append; [eapply split_world1 | eapply split_world2]; apply Dw.
 
      remember (size ([:: hyp_tm nattp,
         hyp_tm preworld
@@ -1012,7 +1030,9 @@ apply (tr_arrow_elim _
                 (subst (sh (4 + size G)) l1))
  (ppair (var 3) (var 2)))).
 eapply tr_formation_weaken. apply subseq_U0.
-apply wworld4.
+rewrite - hseq4.
+do 2! rewrite - (sh_sum _ 4).
+apply wworld4. erewrite <- size_gamma_at. apply wworld_app; assumption.
 apply uworld32.
 eapply tr_formation_weaken; apply compm1_type. apply uworld32.
 apply trans_type_works. auto.
@@ -1195,7 +1215,8 @@ repeat rewrite subst_sh_shift. apply tr_weakening_append.
 eapply IHDe1; try assumption.
 rewrite - (subst_pw (sh 4)). var_solv.
 replace 6 with (2 + 4). rewrite - addnA.
-repeat rewrite - (sh_sum (4 + size G) 2). eapply tr_formation_weaken; apply compm0_type.
+(*repeat rewrite - (sh_sum (4 + size G) 2). *)
+eapply tr_formation_weaken; apply compm0_type.
 apply wworld4. apply trans_type_works. apply uworld10. auto.
 rewrite - (subst_nat (sh 3)). var_solv.
 rewrite - (addn2 (size G)).
