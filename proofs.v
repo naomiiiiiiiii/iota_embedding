@@ -1383,7 +1383,7 @@ assert (
                          (trans_type v lv B))))))) =
 subst1 (picomp1 (var 0)) 
        (arrow
-          (subseq (ppair (var 2) (var 0))
+          (subseq (ppair (var 2) (picomp1 (var 1)))
              (ppair (var 2) (var 0)))
           (arrow
              (store
@@ -1410,7 +1410,7 @@ eapply (tr_pi_elim _ nattp).
     assert(   
        (pi nattp
           (arrow
-             (subseq (ppair (var 2) (var 0))
+          (subseq (ppair (var 2) (picomp1 (var 1)))
                 (ppair (var 2) (var 0)))
              (arrow (store (ppair (var 2) (var 0)))
                 (laters
@@ -1431,7 +1431,7 @@ eapply (tr_pi_elim _ nattp).
 subst1 (var 1) 
        (pi nattp
           (arrow
-             (subseq (ppair (var 1) (var 0))
+          (subseq (ppair (var 3) (picomp1 (var 2)))
                 (ppair (var 1) (var 0)))
              (arrow (store (ppair (var 1) (var 0)))
                 (laters
@@ -1459,6 +1459,7 @@ subst1 (var 1)
                                        (ppi1 (var 0)) A)).
 - eapply tr_formation_weaken; apply trans_type_works.
   apply picomp_world.
+  (*start here*)
   apply uworld10.
 assert 
        (all nzero preworld
