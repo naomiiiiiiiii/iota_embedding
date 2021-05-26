@@ -1257,34 +1257,43 @@ simpsub_big. auto. simpsub.
    apply trans_type_works; auto.
    simpsub. auto.
  - simpsub_big. simpl.
-   replace (make_bind
+   replace 
+       (make_bind
           (app
              (app
                 (app
                    (app
-                      (app
-                         (lam
-                            (subst (dot (var 0) (sh 6))
-                               (move_gamma G0 make_subseq 1 Et2)))
-                         (picomp4 (var 0))) 
-                      (ppi1 (var 0))) (ppi1 (var 0)))
-                make_subseq) (picomp3 (var 0)))
+                      (lam
+                         (subst
+                            (dot (var 0) (sh 6))
+                            (move_gamma G0
+                              make_subseq 1
+                              (app Et2
+                              (picomp1 (var 0))))))
+                      (picomp4 (var 0)))
+                   (ppi1 (var 0))) make_subseq)
+             (picomp3 (var 0)))
           (lam
-             (app ret
+             (ret_t
                 (ppair (ppi1 (var 0))
                    (ppair make_subseq
-                          (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))) with
+                      (ppair (picomp3 (var 0))
+                         (picomp4 (var 0)))))))) with
        (subst1 (var 0) (make_bind
-          (app
              (app
                 (app
                    (app
                       (app
                          (lam
                             (subst (dot (var 0) (sh 6))
-                               (move_gamma G0 make_subseq 1 Et2)))
+                               
+                            (move_gamma G0
+                              make_subseq 1
+                              (app Et2
+                              (picomp1 (var 0))))))
+
                          (picomp4 (var 0))) 
-                      (ppi1 (var 0))) (ppi1 (var 0)))
+                      (ppi1 (var 0)))
                 make_subseq) (picomp3 (var 0)))
           (lam
              (app ret
@@ -1397,48 +1406,54 @@ simpl. unfold subst1. simpsub1.
 rewrite subst_trans_type. auto. simpsub. auto.
 rewrite Hsub.
 eapply (tr_pi_elim _ nattp).
-    assert(   (pi nattp
+(*need a forall here to get exactly comp 2 before i go into the x lambda*)
+    assert(   
+       (pi nattp
           (arrow
-             (subseq
-                (ppair (subst (sh (5 + size G)) w1)
-                       (subst (sh (5 + size G)) l1))
-                (ppair (var 4) (var 0)))
-             (arrow (store (ppair (var 4) (var 0)))
+             (subseq (ppair (var 2) (var 0))
+                (ppair (var 2) (var 0)))
+             (arrow (store (ppair (var 2) (var 0)))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
-                         (prod
-                            (prod
-                               (subseq (ppair (var 6) (var 2))
-                                  (ppair (var 1) (var 0)))
-                               (store (ppair (var 1) (var 0))))
-                            (trans_type (var 1) (var 0) A)))))))) =
-subst1 (var 3) (pi nattp
+                         (let u := var 4 in
+                          let l := var 2 in
+                          let v := var 1 in
+                          let lv := var 0 in
+                          let U := ppair u l in
+                          let V0 := ppair v lv in
+                          prod
+                            (prod 
+                               (subseq U V0)
+                               (store V0))
+                            (trans_type v lv B))))))))
+ =
+subst1 (var 1) 
+       (pi nattp
           (arrow
-             (subseq
-                (ppair (subst (sh (6 + size G)) w1)
-                       (subst (sh (6 + size G)) l1))
+             (subseq (ppair (var 1) (var 0))
                 (ppair (var 1) (var 0)))
              (arrow (store (ppair (var 1) (var 0)))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
-                         (prod
-                            (prod
-                               (subseq (ppair (var 3) (var 2))
-                                  (ppair (var 1) (var 0)))
-                               (store (ppair (var 1) (var 0))))
-                            (trans_type (var 1) (var 0) A))))))))
-       )
+                         (let u := var 3 in
+                          let l := var 2 in
+                          let v := var 1 in
+                          let lv := var 0 in
+                          let U := ppair u l in
+                          let V0 := ppair v lv in
+                          prod
+                            (prod 
+                               (subseq U V0)
+                               (store V0))
+                            (trans_type v lv B)))))))))
            as Hsub2.
-    simpsub_big. simpl. rewrite - (addn4 (size G)) - (addn1 (size G + 4)).
-    auto. unfold subst1. simpsub1. rewrite - addnA.
-    rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
+    simpsub_big. simpl.
+    rewrite subst_trans_type.
+    unfold subst1. simpsub1. auto. simpsub; auto.
     rewrite Hsub2.
     eapply (tr_all_elim _ nzero preworld).
-    (*strange goal comes from here
-     get this out of comp type
-     get w to have the shift in front from the start*)
     clear Hsub Hsub2.
 assert 
        (all nzero preworld
