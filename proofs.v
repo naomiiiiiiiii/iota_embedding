@@ -1455,6 +1455,11 @@ subst1 (var 1)
     rewrite Hsub2.
     eapply (tr_all_elim _ nzero preworld).
     clear Hsub Hsub2.
+    apply (tr_arrow_elim _ (trans_type (var 1)
+                                       (ppi1 (var 0)) A)).
+- eapply tr_formation_weaken; apply trans_type_works.
+  apply picomp_world.
+  apply uworld10.
 assert 
        (all nzero preworld
           (pi nattp
