@@ -1341,7 +1341,7 @@ simpsub_big. auto. simpsub.
                                               let V := ppair v lv in
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
                                                     prod (prod (subseq U V) (store V))
-                                                     (trans_type v lv A))))
+                                                     (trans_type v lv B))))
                                  ).
     (*et2*)
     apply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))) )).
@@ -1364,43 +1364,50 @@ simpl.
 eapply tr_formation_weaken; apply compm1_type. apply picomp_world.
 apply trans_type_works. auto. simpsub; auto.
 (*need to have a sub before i can pi elim*)
-apply (tr_pi_elim _ nattp); auto.
-- apply compm0_type.
+- 
 assert (
        (arrow
-          (subseq (ppair (subst (sh (4 + size G)) w1)
-                         (subst (sh (4 + size G)) l1))
-             (ppair (var 3) (var 2)))
-          (arrow (store (ppair (var 3) (var 2)))
+          (subseq (ppair (var 1) (picomp1 (var 0)))
+             (ppair (var 1) (picomp1 (var 0))))
+          (arrow
+             (store
+                (ppair (var 1) (picomp1 (var 0))))
              (laters
                 (exist nzero preworld
                    (sigma nattp
-                      (prod
-                         (prod
-                            (subseq (ppair (var 5) (var 4))
-                               (ppair (var 1) (var 0)))
-                            (store (ppair (var 1) (var 0))))
-                         (trans_type (var 1) (var 0) A))))))) =
-subst1 (var 2) 
+                      (let u := var 3 in
+                       let l := picomp1 (var 2) in
+                       let v := var 1 in
+                       let lv := var 0 in
+                       let U := ppair u l in
+                       let V0 := ppair v lv in
+                       prod
+                         (prod (subseq U V0)
+                            (store V0))
+                         (trans_type v lv B))))))) =
+subst1 (picomp1 (var 0)) 
        (arrow
-          (subseq (ppair (subst (sh (5 + size G)) w1)
-                         (subst (sh (5 + size G)) l1))
-             (ppair (var 4) (var 0)))
-          (arrow (store (ppair (var 4) (var 0)))
+          (subseq (ppair (var 2) (var 0))
+             (ppair (var 2) (var 0)))
+          (arrow
+             (store
+                (ppair (var 2) (var 0)))
              (laters
                 (exist nzero preworld
                    (sigma nattp
-                      (prod
-                         (prod
-                            (subseq (ppair (var 6) (var 2))
-                               (ppair (var 1) (var 0)))
-                            (store (ppair (var 1) (var 0))))
-                         (trans_type (var 1) (var 0) A)))))))) as Hsub.
+                      (let u := var 4 in
+                       let l := var 2 in
+                       let v := var 1 in
+                       let lv := var 0 in
+                       let U := ppair u l in
+                       let V0 := ppair v lv in
+                       prod
+                         (prod (subseq U V0)
+                            (store V0))
+                         (trans_type v lv B)))))))) as Hsub.
 simpsub. unfold subst1; simpsub1. simpsub_big.
-(*ask karl arrow subseq*) simpl. unfold subst1. simpsub1.
-rewrite subst_trans_type.
-rewrite addnC. auto. simpsub. rewrite - (addn4 (size G)).
-auto. simpsub. auto.
+simpl. unfold subst1. simpsub1.
+rewrite subst_trans_type. auto. simpsub. auto.
 rewrite Hsub.
 eapply (tr_pi_elim _ nattp).
     assert(   (pi nattp
