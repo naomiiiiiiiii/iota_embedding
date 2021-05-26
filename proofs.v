@@ -801,6 +801,19 @@ tr
                                [:: x; y; z; a; b]); try apply X; try reflexivity; auto.
 Qed.
 
+Lemma wworld6: forall G x y z a b c w1 l1,
+    tr G (oof (ppair w1 l1) world) ->
+tr
+    [:: x, y, z, a, b, c & G]
+    (oof
+       (ppair (subst (sh 6) w1)
+          (subst (sh 6) l1)) world).
+  intros. rewrite - (subst_world (sh 6)).
+  repeat rewrite (subst_sh_shift _ ).
+  eapply (tr_weakening_appends _
+                               [:: x; y; z; a; b; c]); try apply X; try reflexivity; auto.
+Qed.
+
 Lemma wworld_app: forall G D w1 l1,
     tr D (oof (ppair w1 l1) world) ->
     tr (G ++ D) (oof
@@ -1214,10 +1227,12 @@ unfold subst1. rewrite subst_pw. rewrite - hseq4.
 repeat rewrite subst_sh_shift. apply tr_weakening_append.
 eapply IHDe1; try assumption.
 rewrite - (subst_pw (sh 4)). var_solv.
-replace 6 with (2 + 4). rewrite - addnA.
+(*replace 6 with (2 + 4). rewrite - addnA.*)
 (*repeat rewrite - (sh_sum (4 + size G) 2). *)
 eapply tr_formation_weaken; apply compm0_type.
-apply wworld4. apply trans_type_works. apply uworld10. auto.
+do 2! rewrite - (sh_sum _ 6).
+apply wworld6. erewrite <- size_gamma_at. apply wworld_app. assumption.
+apply trans_type_works. apply uworld10. 
 rewrite - (subst_nat (sh 3)). var_solv.
 rewrite - (addn2 (size G)).
 replace ( subseq
@@ -1348,7 +1363,9 @@ simpl.
        (subst (sh 2) (ppair (var 1) (picomp1 (var 0)))). 
 eapply tr_formation_weaken; apply compm1_type. apply picomp_world.
 apply trans_type_works. auto. simpsub; auto.
-apply (tr_arrow_elim _ nattp); auto.
+(*need to have a sub before i can pi elim*)
+apply (tr_pi_elim _ nattp); auto.
+- apply compm0_type.
 assert (
        (arrow
           (subseq (ppair (subst (sh (4 + size G)) w1)
