@@ -889,7 +889,7 @@ eapply split_world1. apply Dw.
        (trans_type (shift (size G) w1) 
           (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
     inversion Dtrans; subst. simpl.
-    suffices: equiv (
+    suffices: (equiv 
        (app
           (lam
              (lam
@@ -907,30 +907,23 @@ eapply split_world1. apply Dw.
                             (var 0))
                          (lam
                             (make_bind
-                               (app
                                   (app
                                      (app
                                      (app
                                      (app
                                      (shift 5
-                                     (lam
-                                     (move_gamma G0
-                                     make_subseq 1 Et2)))
-                                     (picomp4 (var 0)))
-                                     (picomp1 (var 0)))
-                                     (picomp1 (var 0)))
-                                     make_subseq)
+                                              (lam
+                                                 (move_gamma G0 make_subseq 1
+                                                    (app Et2 (picomp1 (var 0))))))
+                                           (picomp4 (var 0))) 
+                                        (picomp1 (var 0))) make_subseq) 
                                   (picomp3 (var 0)))
                                (lam
-                                  (app ret
-                                     (ppair
-                                     (picomp1 (var 0))
-                                     (ppair make_subseq
-                                     (ppair
-                                     (picomp3 (var 0))
-                                     (picomp4 (var 0))))))))))))))
+                                  (ret_t
+                                     (ppair (picomp1 (var 0))
+                                        (ppair make_subseq
+                                           (ppair (picomp3 (var 0)) (picomp4 (var 0))))))))))))))
           (shift (size G) l1))
-)
           (subst1 (subst (sh (size G)) l1)
              (lam
                 (lam
@@ -943,27 +936,21 @@ eapply split_world1. apply Dw.
                             (var 0))
                          (lam
                             (make_bind
-                               (app
                                   (app
                                      (app
                                         (app
                                            (app
                                               (subst 
                                                 (sh 5)
-                                                (lam
-                                                (move_gamma G0 make_subseq
-                                                1 Et2))) 
-                                              (picomp4 (var 0)))
-                                           (picomp1 (var 0)))
-                                        (picomp1 (var 0))) make_subseq)
+                                              (lam
+                                                 (move_gamma G0 make_subseq 1
+                                                    (app Et2 (picomp1 (var 0)))))) 
+                                           (picomp4 (var 0))) (picomp1 (var 0))) make_subseq)
                                   (picomp3 (var 0)))
                                (lam
-                                  (app ret
+                                  (ret_t
                                      (ppair (picomp1 (var 0))
-                                        (ppair make_subseq
-                                           (ppair 
-                                              (picomp3 (var 0))
-                                              (picomp4 (var 0)))))))))))))).
+                                        (ppair make_subseq (ppair (picomp3 (var 0)) (picomp4 (var 0))))))))))))))).
     move => Hequiv.
 apply (tr_compute _ _ _ _ _ _ _ Hh1 Hh2 Hh2 Hequivt Hequiv Hequiv); try assumption.
 (*get the substitutions nice before i split

@@ -127,12 +127,12 @@ make the lambda first before you introduce other variables and it's still the fi
 that. you want to bind 
                                                                          *)
                                let btarg :=
-                                   app (app
-                                          (shift 5 (lam (*x' lam*)
+                                   (app
+                                          (shift 5 (lam (*x' lam, floating around in the context as var 0*)
 (*et2's var 0 is the x.
  maybe plan is bring the subst outside the lamda so that you type check the lamda in the
  weakened context*)                                                      
-                                                      ( move_gamma G (make_subseq) 1 (*ignore x'*) Et2 ))) x') lv
+                                                      ( move_gamma G (make_subseq) 1 (*ignore x'*) (app Et2 lv) ))) x')
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
