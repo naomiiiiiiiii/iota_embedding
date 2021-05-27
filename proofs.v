@@ -825,11 +825,17 @@ Lemma wworld_app: forall G D w1 l1,
 
 (*Definition gen_sub G s := foldr (fun _  => fun s => )*)
 
-Fixpoint gen_sub (G: @context False) (s: @sub False) := match G with
-                        [::] => s
-                      | g::gs => gen_sub gs (dot (var (size G)) s) end.
+Fixpoint gen_sub (G: @context False) := match G with
+                        [::] => id
+                      | g::gs => @compose False (under (size gs) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub gs)
+                                    end.
 
-Definition gen_sub_mvr G := gen_sub G (dot (var 0) (sh ((size G) + 1))). 
+
+Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
+                                  (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
+                            subst (gen_sub ([:: hyp_tm nattp; hyp_tm nattp])) t.
+intros. simpl. simpsub. simpl. auto. Qed.
+
 
 Lemma substctx_eqsub :
   forall (s: @sub False) s' t,
@@ -841,7 +847,8 @@ Lemma substctx_eqsub :
                             t.
   intros. simpsub. ring.*)
 
-
+(*start here*)
+(*IDEA: do the move when there's only one variable to move: before 72*)
 Lemma move_var_r: forall E v G D m m' a,
     tr ((substctx (gen_sub_mvr G) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
                                          (subst (under (size E) (gen_sub_mvr G)) a)
