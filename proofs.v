@@ -349,6 +349,11 @@ Lemma sh_sum :
   intros. repeat rewrite subst_sh_shift.
   rewrite shift_sum. auto. Qed.
 
+Lemma shh_sum :
+  forall m n t,
+    @substh False (sh n) (substh (sh m) t) = @substh False (sh (n+m)) t.
+Admitted.
+
 Lemma world_pair: forall w l G, tr G (oof w preworld) ->
                            tr G (oof l nattp) ->
     tr G (oof (ppair w l) world).
@@ -837,6 +842,14 @@ Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
 intros. simpl. simpsub. simpl. auto. Qed.
 
 
+(*Lemma test2:
+  @subst False (dot (var 0) (sh 2)) (ppair (var 0)
+                                    (var 1)
+                             ) = subst sh1 (ppair (var 0)
+                                    (var 1)
+                                           ).
+  simpsub. simpl.*)
+
 Lemma substctx_eqsub :
   forall (s: @sub False) s' t,
     eqsub s s'
@@ -850,6 +863,36 @@ Lemma substctx_eqsub :
 (*start here*)
 (*IDEA: do the move when there's only one variable to move: before 72*)
 
+Lemma substctx_mvr: forall G,
+    (substctx (dot (var 1) (dot (var 0) (sh 2))) (substctx sh1 G)) =
+    (@substctx False (under 1 sh1) G).
+  intros. simpsub. auto. Qed.
+
+Lemma substctx_app: forall G1 G2 s,
+    @substctx False s (G1 ++ G2) = (substctx (under (size G2) s) G1) ++ (substctx s G2).
+  intros. induction G1; simpsub. repeat rewrite cat0s. auto.
+  simpl. simpsub. repeat rewrite plusE.
+  replace ((length G1) + (size G2)) with (size (G1 ++ G2)).
+  rewrite - IHG1. auto.
+  rewrite size_cat. auto. Qed.
+
+
+(*induction G; simpsub. auto.
+  simpl. move: IHG. simpsub. move => IHG. simpl. auto.
+  rewrite IHG.
+  suffices: (@eqsub False (dot (var 0) (sh 2)) sh1).
+  move/(eqsub_under _ (length G)) => Heqsub.
+  rewrite (substh_eqsub _ _ _ _ Heqsub). auto.
+  intros b c. induction b; simpsub.
+  .
+  rewrite - (sh_sum 1 1).*)
+
+
+Lemma size_substctx :
+  forall s G, size (@substctx False s G) = size G.
+Proof.
+  intros. move: (length_substctx False s G). apply.
+Qed.
 
 Lemma move_var_r: forall E v G D m m' a,
     tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
@@ -863,8 +906,26 @@ Lemma move_var_r: forall E v G D m m' a,
   (*suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
   clear HeqHeq1. move/eqsub_under : Heq1 => Heq1.
   rewrite - !(subst_eqsub _ _ _ _ (Heq1 (size E))) - !(substctx_eqsub _ _ _ Heq). simpsub. auto. *)
-  - simpl. rewrite compose_under. rewrite subst_compose.
+  - rewrite size_rcons. simpl. rewrite !compose_under !subst_compose.
+    rewrite - 1!(addn1 (size G)). rewrite - shh_sum.
+    rewrite cat_rcons.
     eapply IHG.
+    rewrite catA. rewrite under_sum. rewrite !plusE.
+    replace (size E + size G) with
+        (size (substctx (gen_sub_mvr (size G)) E ++ substctx sh1 G)).
+    apply tr_exchange.
+    rewrite substctx_app.
+    repeat rewrite size_substctx. rewrite - substctx_compose.
+Assert (dot)
+
+
+    simpsub.
+    replace
+      (substctx (dot (var 1) (dot (var 0) (sh 2)))
+                (substctx (gen_sub_mvr (size G)) E)) with
+        (substctx (gen_sub_mvr (size (rcons G x))) E).
+    rewrite - catA.
+    apply tr_exchange.
     rewrite size_cons.
 
     simpl.
