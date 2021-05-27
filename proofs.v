@@ -825,15 +825,15 @@ Lemma wworld_app: forall G D w1 l1,
 
 (*Definition gen_sub G s := foldr (fun _  => fun s => )*)
 
-Fixpoint gen_sub (G: @context False) := match G with
+Fixpoint gen_sub_mvr (G: @context False) := match G with
                         [::] => id
-                      | g::gs => @compose False (under (size gs) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub gs)
+                      | g::gs => @compose False (under (size gs) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr gs)
                                     end.
 
 
 Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
                                   (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
-                            subst (gen_sub ([:: hyp_tm nattp; hyp_tm nattp])) t.
+                            subst (gen_sub_mvr ([:: hyp_tm nattp; hyp_tm nattp])) t.
 intros. simpl. simpsub. simpl. auto. Qed.
 
 
@@ -857,12 +857,13 @@ Lemma move_var_r: forall E v G D m m' a,
                                (subst (under (size E) (gen_sub_mvr G)) m')
                                a).
   move => E v G. move: E v. induction G; intros. move: X.
-  simpl. unfold gen_sub_mvr. unfold gen_sub. simpl. unfold sh1. simpsub.
-  suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
+  simpl. unfold gen_sub_mvr. simpl. unfold sh1. simpsub. auto.
+  (*suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
   clear HeqHeq1. move/eqsub_under : Heq1 => Heq1.
-  rewrite - !(subst_eqsub _ _ _ _ (Heq1 (size E))) - !(substctx_eqsub _ _ _ Heq). simpsub. auto. 
-  apply eqsub_expand_id.
-  - rewrite size_cons.
+  rewrite - !(subst_eqsub _ _ _ _ (Heq1 (size E))) - !(substctx_eqsub _ _ _ Heq). simpsub. auto. *)
+  - simpl. rewrite compose_under. rewrite subst_compose.
+    eapply IHG.
+    rewrite size_cons.
 
     simpl.
   unfold gen_sub_mvr. unfold gen_sub. simpl.
