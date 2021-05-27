@@ -1,4 +1,4 @@
-Require Import Program.Equality.
+Require Import Program.Equality Ring.
 From mathcomp Require Import ssreflect seq ssrnat.
 From istari Require Import source subst_src rules_src help trans basic_types.
 From istari Require Import Sigma Tactics
@@ -823,9 +823,47 @@ Lemma wworld_app: forall G D w1 l1,
   rewrite - subst_sh_shift. auto.
   rewrite - subst_sh_shift. auto. Qed.
 
+(*Definition gen_sub G s := foldr (fun _  => fun s => )*)
+
+Fixpoint gen_sub (G: @context False) (s: @sub False) := match G with
+                        [::] => s
+                      | g::gs => gen_sub gs (dot (var (size G)) s) end.
+
+Definition gen_sub_mvr G := gen_sub G (dot (var 0) (sh ((size G) + 1))). 
+
+Lemma substctx_eqsub :
+  forall (s: @sub False) s' t,
+    eqsub s s'
+    -> substctx s t = substctx s' t. Admitted.
+
+(*Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
+                       (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
+                            t.
+  intros. simpsub. ring.*)
+
+
+Lemma move_var_r: forall E v G D m m' a,
+    tr ((substctx (gen_sub_mvr G) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
+                                         (subst (under (size E) (gen_sub_mvr G)) a)
+                                                               )
+    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvr G)) m)
+                               (subst (under (size E) (gen_sub_mvr G)) m')
+                               a).
+  move => E v G. move: E v. induction G; intros. move: X.
+  simpl. unfold gen_sub_mvr. unfold gen_sub. simpl. unfold sh1. simpsub.
+  suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
+  clear HeqHeq1. move/eqsub_under : Heq1 => Heq1.
+  rewrite - !(subst_eqsub _ _ _ _ (Heq1 (size E))) - !(substctx_eqsub _ _ _ Heq). simpsub. auto. 
+  apply eqsub_expand_id.
+  - rewrite size_cons.
+
+    simpl.
+  unfold gen_sub_mvr. unfold gen_sub. simpl.
+-
+
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
-    trans e ebar -> 
+    trans G e ebar -> 
          tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
                                                    (trans_type
                                                       (shift (size G)
@@ -846,8 +884,6 @@ assert (size
      hyp_tm nattp, hyp_tm preworld & gamma_at G w1 l1]
 = (4 + size G)
        ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
-
-
      remember (size ([:: hyp_tm nattp,
         hyp_tm preworld
         & gamma_at G w1 l1])) as sizel.
@@ -889,7 +925,7 @@ eapply split_world1. apply Dw.
        (trans_type (shift (size G) w1) 
                    (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
     (*start here NEED A CONTEXT IN THE TRANS RELATION STAT
-     to fix G0 problem below
+     to fix G problem below
      translation IS dependent on context for SURE cuz sometimes
      you have move gamma*)
     inversion Dtrans; subst. simpl.
@@ -917,7 +953,7 @@ eapply split_world1. apply Dw.
                                      (app
                                      (shift 5
                                               (lam
-                                                 (move_gamma G0 make_subseq 1
+                                                 (move_gamma G make_subseq 1
                                                     (app Et2 (picomp1 (var 0))))))
                                            (picomp4 (var 0))) 
                                         (picomp1 (var 0))) make_subseq) 
@@ -947,7 +983,7 @@ eapply split_world1. apply Dw.
                                               (subst 
                                                 (sh 5)
                                               (lam
-                                                 (move_gamma G0 make_subseq 1
+                                                 (move_gamma G make_subseq 1
                                                     (app Et2 (picomp1 (var 0)))))) 
                                            (picomp4 (var 0))) (picomp1 (var 0))) make_subseq)
                                   (picomp3 (var 0)))
@@ -1270,7 +1306,7 @@ simpsub_big. auto. simpsub.
                       (lam
                          (subst
                             (dot (var 0) (sh 6))
-                            (move_gamma G0
+                            (move_gamma G
                               make_subseq 1
                               (app Et2
                               (picomp1 (var 0))))))
@@ -1291,7 +1327,7 @@ simpsub_big. auto. simpsub.
                          (lam
                             (subst (dot (var 0) (sh 6))
                                
-                            (move_gamma G0
+                            (move_gamma G
                               make_subseq 1
                               (app Et2
                               (picomp1 (var 0))))))
@@ -1459,14 +1495,72 @@ subst1 (var 1)
     rewrite Hsub2.
     eapply (tr_all_elim _ nzero preworld).
     clear Hsub Hsub2.
-  (* have to rewrite this with a subst1 in front for it to have
-comp as the output type
-   also why do you think index of G is 1 anyways (ok cuz under a shift 5)
-   also what on gods earth is G0*)
+    simpsub.
+replace (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq (ppair (var 3) (picomp1 (var 2)))
+                   (ppair (var 1) (var 0)))
+                (arrow (store (ppair (var 1) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq (ppair (var 3) (var 2))
+                                     (ppair (var 1) (var 0)))
+                                  (store (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) B))))))))) with
+    (subst1 (picomp1 (var 0)) (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq (ppair (var 4) (var 2))
+                   (ppair (var 1) (var 0)))
+                (arrow (store (ppair (var 1) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq (ppair (var 3) (var 2))
+                                     (ppair (var 1) (var 0)))
+                                  (store (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) B)))))))))).
+replace 
+    (subst1 (picomp1 (var 0)) (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq (ppair (var 4) (var 2))
+                   (ppair (var 1) (var 0)))
+                (arrow (store (ppair (var 1) (var 0)))
+                   (laters
+                      (exist nzero preworld
+                         (sigma nattp
+                            (prod
+                               (prod
+                                  (subseq (ppair (var 3) (var 2))
+                                     (ppair (var 1) (var 0)))
+                                  (store (ppair (var 1) (var 0))))
+                               (trans_type (var 1) (var 0) B))))))))))
+  with (trans_type (var 1) (picomp1 (var 0)) (comp_m B)).
+2 : {
+simpl. auto.
+}
+2 : { simpsub_big. simpl. unfold subst1. simpsub1.
+      rewrite subst_trans_type. auto.
+      simpsub; auto.
+}
+(*going into the et2 function*)
     apply (tr_arrow_elim _ (trans_type (var 1)
-                                       (ppi1 (var 0)) A)).
-- eapply tr_formation_weaken; apply trans_type_works.
-  apply picomp_world.
+                                       (ppi1 (var 0)) A));
+  try (eapply tr_formation_weaken; apply trans_type_works; apply picomp_world).
+replace (dot (var 0) (sh 7)) with (@under False 1 (sh 6)).
+2: {simpsub; auto. }
+rewrite - subst_lam.
+(*can't get rid of all of them, def still need var 1 and var 0 for the type to even work*)
+
+apply tr_arrow_intro; try (eapply tr_formation_weaken; apply trans_type_works; apply picomp_world).
+.
   apply uworld10.
 assert 
        (all nzero preworld

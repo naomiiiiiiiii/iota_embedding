@@ -94,12 +94,12 @@ Fixpoint gamma_at (gamma: source.context) (w l: Syntax.term False) :=
 
 
 (*every time you put stuff under a lambda you probably have to shift it*)
-Inductive trans: source.term -> (Syntax.term False) -> Type :=
+Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 T1 T2, of_m G E1 (comp_m T1) ->
                                   of_m (cons T1 G) E2 (comp_m T2) ->
-                                   trans E1 Et1 ->
-                                   trans E2 Et2 ->
-                                   trans (bind_m E1 E2)(
+                                   trans G E1 Et1 ->
+                                   trans (cons T1 G) E2 Et2 ->
+                                   trans G (bind_m E1 E2)(
  lam ( lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
                            lam ( (*l1 := 3, l := 2, m := 1, s := 0*)
                                let l1 := (var 3) in
@@ -150,8 +150,8 @@ that. you want to bind
     ))
                                          ))))
   | t_ref: forall G E Et T, 
-         of_m G E T -> trans E Et ->
-         trans (ref_m E)
+         of_m G E T -> trans G E Et ->
+         trans G (ref_m E)
                (lam ( (*l1  := 0*) lam (*l1 := 1, l := 0*)
                     ( lam (*l1 := 2, l := 1, m := 0*)
                        (  lam (*l1 := 3, l := 2, m := 1, s := 0*)
