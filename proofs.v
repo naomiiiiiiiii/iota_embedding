@@ -825,15 +825,15 @@ Lemma wworld_app: forall G D w1 l1,
 
 (*Definition gen_sub G s := foldr (fun _  => fun s => )*)
 
-Fixpoint gen_sub_mvr (G: @context False) := match G with
-                        [::] => id
-                      | g::gs => @compose False (under (size gs) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr gs)
+Fixpoint gen_sub_mvr G := match G with
+                        0 => id
+                      | n'.+1 => @compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr n')
                                     end.
 
 
 Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
                                   (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
-                            subst (gen_sub_mvr ([:: hyp_tm nattp; hyp_tm nattp])) t.
+                            subst (gen_sub_mvr 2) t.
 intros. simpl. simpsub. simpl. auto. Qed.
 
 
@@ -849,14 +849,16 @@ Lemma substctx_eqsub :
 
 (*start here*)
 (*IDEA: do the move when there's only one variable to move: before 72*)
+
+
 Lemma move_var_r: forall E v G D m m' a,
-    tr ((substctx (gen_sub_mvr G) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
-                                         (subst (under (size E) (gen_sub_mvr G)) a)
+    tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
+                                         (subst (under (size E) (gen_sub_mvr (size G))) a)
                                                                )
-    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvr G)) m)
-                               (subst (under (size E) (gen_sub_mvr G)) m')
+    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvr (size G))) m)
+                               (subst (under (size E) (gen_sub_mvr (size G))) m')
                                a).
-  move => E v G. move: E v. induction G; intros. move: X.
+  move => E v G. move: E v. induction G using last_ind; intros. move: X.
   simpl. unfold gen_sub_mvr. simpl. unfold sh1. simpsub. auto.
   (*suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
   clear HeqHeq1. move/eqsub_under : Heq1 => Heq1.
