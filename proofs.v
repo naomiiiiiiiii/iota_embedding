@@ -832,9 +832,15 @@ Lemma wworld_app: forall G D w1 l1,
 
 Fixpoint gen_sub_mvr G := match G with
                         0 => id
-                      | n'.+1 => @compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr n')
+                          | n'.+1 =>
+@compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr n')
                                     end.
 
+Fixpoint gen_sub_mvr_ctx E := match E with
+                        0 => id
+    | n'.+1 => @compose False (gen_sub_mvr_ctx n')
+(under n' (dot (var 1) (dot (var 0) (sh 2))))
+                                    end.
 
 Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
                                   (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
@@ -895,8 +901,8 @@ Proof.
 Qed.
 
 Lemma move_var_r: forall E v G D m m' a,
-    tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
-                                         (subst (under (size E) (gen_sub_mvr (size G))) a)
+    tr ((substctx (gen_sub_mvr_ctx (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
+                                         (subst (under (size E) (gen_sub_mvr_ctx (size G))) a)
                                                                )
     -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvr (size G))) m)
                                (subst (under (size E) (gen_sub_mvr (size G))) m')
@@ -912,25 +918,53 @@ Lemma move_var_r: forall E v G D m m' a,
     eapply IHG.
     rewrite catA. rewrite under_sum. rewrite !plusE.
     replace (size E + size G) with
-        (size (substctx (gen_sub_mvr (size G)) E ++ substctx sh1 G)).
+        (size (substctx (gen_sub_mvr_ctx (size G)) E ++ substctx sh1 G)).
     apply tr_exchange.
     rewrite substctx_app.
     repeat rewrite size_substctx. rewrite - substctx_compose.
-Assert (dot)
-
-
-    simpsub.
-    replace
-      (substctx (dot (var 1) (dot (var 0) (sh 2)))
-                (substctx (gen_sub_mvr (size G)) E)) with
-        (substctx (gen_sub_mvr (size (rcons G x))) E).
-    rewrite - catA.
-    apply tr_exchange.
-    rewrite size_cons.
-
-    simpl.
-  unfold gen_sub_mvr. unfold gen_sub. simpl.
--
+    replace (substctx
+        (compose (gen_sub_mvr_ctx (size G))
+           (under (size G)
+                  (dot (var 1) (dot (var 0) (sh 2))))) E) with
+        (substctx (gen_sub_mvr_ctx (size (rcons G x))) E).
+    rewrite substctx_mvr.
+    suffices: (((substctx (gen_sub_mvr_ctx (size (rcons G x))) E) ++
+      substctx (under 1 sh1) G) ++
+                                [:: substh sh1 x, v & D])%list=
+((substctx (gen_sub_mvr_ctx (size (rcons G x))) E) ++
+                                                   (rcons (substctx (under 1 sh1) G) (substh sh1 x)) ++ [:: v & D]).
+    move => Heq. rewrite Heq. rewrite - (cats1 _ (substh sh1 x)).
+    replace (substctx (under 1 sh1) G ++ [:: substh sh1 x]) with
+        (substctx sh1 (rcons G x)).
+    replace 
+       (subst
+          (under
+             (length
+                (substctx
+                   (gen_sub_mvr_ctx
+                      (size G)) E ++
+                 substctx sh1 G))
+             (dot (var 1)
+                (dot (var 0) (sh 2))))
+          (subst
+             (under (size E)
+                (gen_sub_mvr_ctx
+                   (size G))) a))
+ with
+           (subst
+              (under (size E)
+                     (gen_sub_mvr_ctx (size (rcons G x)))) a). apply X.
+    rewrite size_rcons. simpl. rewrite List.app_length.
+    repeat rewrite length_substctx.
+    rewrite compose_under. rewrite under_sum.
+    rewrite - subst_compose. auto.
+    rewrite - cats1. rewrite substctx_app. simpl. auto.
+    rewrite - (cats1 _ (substh sh1 x)).
+    rewrite - catA. rewrite (cat1s _ (v::D)). auto.
+    rewrite catA. auto.
+    rewrite size_rcons. auto.
+    rewrite size_cat. repeat rewrite size_substctx. auto.
+Qed.
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
