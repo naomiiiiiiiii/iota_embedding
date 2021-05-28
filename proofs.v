@@ -866,6 +866,10 @@ Lemma substctx_app: forall G1 G2 s,
   rewrite - IHG1. auto.
   rewrite size_cat. auto. Qed.
 
+Lemma substctx_rcons: forall G1 g s,
+    @substctx False s (rcons G1 g) = rcons (substctx (under 1 s) G1) (substh s g).
+  intros. repeat rewrite - cats1. rewrite substctx_app. simpl. auto. Qed.
+
 
 (*induction G; simpsub. auto.
   simpl. move: IHG. simpsub. move => IHG. simpl. auto.
@@ -949,6 +953,65 @@ Lemma move_var_r: forall E v G D m m' a,
     rewrite size_rcons. auto.
     rewrite size_cat. repeat rewrite size_substctx. auto.
 Qed.
+
+Fixpoint gen_sub_mvl_list g v :=
+  match v with
+    0 => id
+          | S v' => compose (under v' (gen_sub_mvl g)) (gen_sub_mvl_list g v') end.
+
+Fixpoint gen_sub_mvr_list g v :=
+  match v with
+    0 => id
+          | S v' => compose (under v' (gen_sub_mvr g )) (gen_sub_mvr_list g v') end.
+
+Fixpoint gen_sub_mvr_ctx g v :=
+  match v with
+    0 => id
+          | S v' => compose (gen_sub_mvr g ) (gen_sub_mvr_ctx g v') end.
+
+(*prove this
+ try and implement it practically with trans
+Lemma move_var_r: forall E v G D m m' a,
+    tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
+                                         (subst (under (size E) (gen_sub_mvr (size G))) a)
+                                                               )
+    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvl (size G))) m)
+                               (subst (under (size E) (gen_sub_mvl (size G))) m')
+                               a).*)
+
+
+Lemma move_list_r: forall E V G D m m' a,
+    tr ((substctx (gen_sub_mvr_ctx (size G) (size V)) E) ++
+        (substctx (sh (size V)) G) ++ V ++ D) (deq m m'
+                                         (subst (gen_sub_mvr_list (size G) (size V)) a)
+                                                               )
+    -> tr (E ++ (substctx (sh (size G)) V)++ G ++ D)
+         (deq
+
+            (subst (under (size E) (gen_sub_mvl_list (size G) (size V))) m)
+            (subst (under (size E)  (gen_sub_mvl_list (size G) (size V))) m')
+                               a).
+  intros. induction V using last_ind; move: X; simpl; simpsub.
+ apply.
+  repeat rewrite size_rcons. simpl.
+  move => X. rewrite substctx_rcons.
+replace 
+    (E ++
+     rcons (substctx (under 1 (sh (size G))) V)
+       (substh (sh (size G)) x) ++ 
+       G ++ D) with
+    ((E ++ (substctx (under 1 (sh (size G))) V)) ++
+       (substh (sh (size G)) x::
+     (G ++ D))).
+
+  rewrite - cats1.
+replace 
+
+  rewrite catA.
+  rewrite 
+  simpl in X. simpsub in X.
+
+  unfold gen_sub_mvl_list. simpl.
 
 Arguments compose _ s1 s2: simpl nomatch.
 
