@@ -5,7 +5,6 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 Check context.
-
 Ltac var_solv :=
   try (apply tr_hyp_tm; repeat constructor).
 
@@ -830,21 +829,10 @@ Lemma wworld_app: forall G D w1 l1,
 
 (*Definition gen_sub G s := foldr (fun _  => fun s => )*)
 
-Fixpoint gen_sub_mvr G := match G with
-                        0 => id
-                          | n'.+1 =>
-@compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvr n')
-                                    end.
-
-Fixpoint gen_sub_mvr_ctx E := match E with
-                        0 => id
-    | n'.+1 => @compose False (gen_sub_mvr_ctx n')
-(under n' (dot (var 1) (dot (var 0) (sh 2))))
-                                    end.
 
 Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
                                   (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
-                            subst (gen_sub_mvr 2) t.
+                            subst (gen_sub_mvl 2) t.
 intros. simpl. simpsub. simpl. auto. Qed.
 
 
@@ -869,10 +857,6 @@ Lemma substctx_eqsub :
 (*start here*)
 (*IDEA: do the move when there's only one variable to move: before 72*)
 
-Lemma substctx_mvr: forall G,
-    (substctx (dot (var 1) (dot (var 0) (sh 2))) (substctx sh1 G)) =
-    (@substctx False (under 1 sh1) G).
-  intros. simpsub. auto. Qed.
 
 Lemma substctx_app: forall G1 G2 s,
     @substctx False s (G1 ++ G2) = (substctx (under (size G2) s) G1) ++ (substctx s G2).
@@ -901,14 +885,14 @@ Proof.
 Qed.
 
 Lemma move_var_r: forall E v G D m m' a,
-    tr ((substctx (gen_sub_mvr_ctx (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
-                                         (subst (under (size E) (gen_sub_mvr_ctx (size G))) a)
+    tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
+                                         (subst (under (size E) (gen_sub_mvr (size G))) a)
                                                                )
-    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvr (size G))) m)
-                               (subst (under (size E) (gen_sub_mvr (size G))) m')
+    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvl (size G))) m)
+                               (subst (under (size E) (gen_sub_mvl (size G))) m')
                                a).
   move => E v G. move: E v. induction G using last_ind; intros. move: X.
-  simpl. unfold gen_sub_mvr. simpl. unfold sh1. simpsub. auto.
+  simpl. unfold gen_sub_mvl. simpl. unfold sh1. simpsub. auto.
   (*suffices: @ eqsub False id (dot (var 0) sh1). move => Heq. remember Heq as Heq1.
   clear HeqHeq1. move/eqsub_under : Heq1 => Heq1.
   rewrite - !(subst_eqsub _ _ _ _ (Heq1 (size E))) - !(substctx_eqsub _ _ _ Heq). simpsub. auto. *)
@@ -918,20 +902,20 @@ Lemma move_var_r: forall E v G D m m' a,
     eapply IHG.
     rewrite catA. rewrite under_sum. rewrite !plusE.
     replace (size E + size G) with
-        (size (substctx (gen_sub_mvr_ctx (size G)) E ++ substctx sh1 G)).
+        (size (substctx (gen_sub_mvr (size G)) E ++ substctx sh1 G)).
     apply tr_exchange.
     rewrite substctx_app.
     repeat rewrite size_substctx. rewrite - substctx_compose.
     replace (substctx
-        (compose (gen_sub_mvr_ctx (size G))
+        (compose (gen_sub_mvr (size G))
            (under (size G)
                   (dot (var 1) (dot (var 0) (sh 2))))) E) with
-        (substctx (gen_sub_mvr_ctx (size (rcons G x))) E).
+        (substctx (gen_sub_mvr (size (rcons G x))) E).
     rewrite substctx_mvr.
-    suffices: (((substctx (gen_sub_mvr_ctx (size (rcons G x))) E) ++
+    suffices: (((substctx (gen_sub_mvr (size (rcons G x))) E) ++
       substctx (under 1 sh1) G) ++
                                 [:: substh sh1 x, v & D])%list=
-((substctx (gen_sub_mvr_ctx (size (rcons G x))) E) ++
+((substctx (gen_sub_mvr (size (rcons G x))) E) ++
                                                    (rcons (substctx (under 1 sh1) G) (substh sh1 x)) ++ [:: v & D]).
     move => Heq. rewrite Heq. rewrite - (cats1 _ (substh sh1 x)).
     replace (substctx (under 1 sh1) G ++ [:: substh sh1 x]) with
@@ -941,19 +925,19 @@ Lemma move_var_r: forall E v G D m m' a,
           (under
              (length
                 (substctx
-                   (gen_sub_mvr_ctx
+                   (gen_sub_mvr
                       (size G)) E ++
                  substctx sh1 G))
              (dot (var 1)
                 (dot (var 0) (sh 2))))
           (subst
              (under (size E)
-                (gen_sub_mvr_ctx
+                (gen_sub_mvr
                    (size G))) a))
  with
            (subst
               (under (size E)
-                     (gen_sub_mvr_ctx (size (rcons G x)))) a). apply X.
+                     (gen_sub_mvr (size (rcons G x)))) a). apply X.
     rewrite size_rcons. simpl. rewrite List.app_length.
     repeat rewrite length_substctx.
     rewrite compose_under. rewrite under_sum.
@@ -965,6 +949,33 @@ Lemma move_var_r: forall E v G D m m' a,
     rewrite size_rcons. auto.
     rewrite size_cat. repeat rewrite size_substctx. auto.
 Qed.
+
+Arguments compose _ s1 s2: simpl nomatch.
+
+Lemma testing1: (dot (var 0) (dot (var 1) (sh 6)) ) =
+                under 1 (dot (var 0) (sh 5)).
+
+Lemma testing :
+   (dot (var 0)
+                               (compose (sh 4)
+                                  (compose
+                                     (gen_sub_mvl (4 + (*here*) 2))
+                                     (dot 
+                                        (var 1)
+                                        (dot 
+                                         (var 2)
+                                         (dot 
+                                         (var 3)
+                                         (dot 
+                                         (var 4)
+                                         (dot
+                                         (subst
+                                         (sh
+                                         ((1+ 2(*here*))%coq_nat +
+                                         1)%coq_nat.+4) (nattp))
+                                         (sh 6))))))))) = id.
+ Transparent gen_sub_mvl. simpl.
+simpsub. simpl. simpsub. simpl.
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
@@ -1033,7 +1044,9 @@ eapply split_world1. apply Dw.
      to fix G problem below
      translation IS dependent on context for SURE cuz sometimes
      you have move gamma*)
-    inversion Dtrans; subst. simpl.
+    inversion Dtrans; subst.
+    Opaque gen_sub_mvl gen_sub_mvr.
+    simpl.
     suffices: (equiv 
        (app
           (lam
@@ -1053,15 +1066,21 @@ eapply split_world1. apply Dw.
                          (lam
                             (make_bind
                                   (app
+                                  (app
                                      (app
-                                     (app
-                                     (app
-                                     (shift 5
-                                              (lam
-                                                 (move_gamma G make_subseq 1
-                                                    (app Et2 (picomp1 (var 0))))))
-                                           (picomp4 (var 0))) 
-                                        (picomp1 (var 0))) make_subseq) 
+                                        (app
+                                           (subst
+                                           (gen_sub_mvl
+                                           (4 + size G))
+                                           (subst 
+                                           (sh 4)
+                                           (lam
+                                           (move_gamma G
+                                           make_subseq 1
+                                           (app Et2 (var (size G)))))))
+                                           (picomp4 (var 0)))
+                                        (picomp1 (var 0)))
+                                     make_subseq) 
                                   (picomp3 (var 0)))
                                (lam
                                   (ret_t
@@ -1082,15 +1101,21 @@ eapply split_world1. apply Dw.
                          (lam
                             (make_bind
                                   (app
+                                  (app
                                      (app
                                         (app
-                                           (app
-                                              (subst 
-                                                (sh 5)
-                                              (lam
-                                                 (move_gamma G make_subseq 1
-                                                    (app Et2 (picomp1 (var 0)))))) 
-                                           (picomp4 (var 0))) (picomp1 (var 0))) make_subseq)
+                                           (subst
+                                           (gen_sub_mvl
+                                           (4 + size G))
+                                           (subst 
+                                           (sh 4)
+                                           (lam
+                                           (move_gamma G
+                                           make_subseq 1
+                                           (app Et2 (var (size G)))))))
+                                           (picomp4 (var 0)))
+                                        (picomp1 (var 0)))
+                                     make_subseq) 
                                   (picomp3 (var 0)))
                                (lam
                                   (ret_t

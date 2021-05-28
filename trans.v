@@ -1,4 +1,5 @@
 From Coq.Lists Require Import List.
+From mathcomp Require Import ssreflect seq ssrnat.
 From istari Require Import source subst_src rules_src help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -12,6 +13,25 @@ From istari Require Import Sigma Tactics
 
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
+
+Fixpoint gen_sub_mvl G := match G with
+                        0 => id
+                          | n'.+1 =>
+@compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl n')
+                                    end.
+
+Fixpoint gen_sub_mvr E := match E with
+                        0 => id
+    | n'.+1 => @compose False (gen_sub_mvr n')
+(under n' (dot (var 1) (dot (var 0) (sh 2))))
+                          end.
+
+Opaque gen_sub_mvl gen_sub_mvr.
+
+Lemma substctx_mvr: forall G,
+    (substctx (dot (var 1) (dot (var 0) (sh 2))) (substctx sh1 G)) =
+    (@substctx False (under 1 sh1) G).
+  intros. simpsub. auto. Qed.
 
 
 Definition test : term False := subst1 unittp (var 0).
@@ -126,13 +146,18 @@ x, then a length
 make the lambda first before you introduce other variables and it's still the first var
 that. you want to bind 
                                                                          *)
-                               let btarg :=
-                                   (app
-                                          (shift 5 (lam (*x' lam, floating around in the context as var 0*)
+                               (*x' lam, floating around in the context as var 0*)
 (*et2's var 0 is the x.
  maybe plan is bring the subst outside the lamda so that you type check the lamda in the
  weakened context*)                                                      
-                                                      ( move_gamma G (make_subseq) 1 (*ignore x'*) (app Et2 lv) ))) x')
+
+                               let btarg := app
+                                              (subst (gen_sub_mvl (4 + (size G)))
+                                                           (subst (sh 4)
+                                                                  (lam
+                                                                     ( move_gamma G (make_subseq) 1 (*ignore x'*)
+                                                                                  (app Et2 (picomp1 (var (size G + 1))) ))))
+                                      x'
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
