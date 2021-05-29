@@ -1,5 +1,5 @@
 Require Import Program.Equality Ring.
-From mathcomp Require Import ssreflect seq ssrnat.
+From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import source subst_src rules_src help trans basic_types.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -997,7 +997,18 @@ Lemma eqsub_project : forall s s',
 works for g > 1
 *)
 
-Lemma mvr_shift_help: forall g,
+Lemma mvr_works_n0_lt: forall (g i: nat), (i < g ->
+                                 project (gen_sub_mvr g) (S i) = (var i)).
+  intros.
+  move: (mvr_works_nz g i) => [one two]. apply one. assumption. Qed.
+
+Lemma mvr_works_n0_gt: forall (g i: nat), ((i >= g) -> project (gen_sub_mvr g) (S i) = (var (S i))).
+  intros.
+  move: (mvr_works_nz g i) => [one two]. apply two. assumption. Qed.
+
+
+
+  Lemma mvr_shift_help: forall g,
     eqsub (compose (compose (under 1 (sh g))
                            (gen_sub_mvr g)) (sh1))
 (compose (under 1 (sh (g + 1)))
@@ -1011,6 +1022,18 @@ induction i. simpl. simpsub.
   Opaque compose.
   simpl. rewrite - addnE. simpl.
   simpl in IHg. rewrite addnC in IHg. simpl in IHg.
+  repeat rewrite mvr_works0. simpsub.
+  repeat rewrite project_under_eq. simpsub.
+  rewrite plusE.
+replace (1 + (g + 1)) with (g + 1 + 1). auto.
+ring.
+simpsub. rewrite plusE. Opaque addn.
+replace (g.+1 + 1 + i) with ((g+1 +i).+1).
+replace (g.+1 + 1 + 1 + i) with ((g+1 + 1 +i).+1).
+repeat rewrite mvr_works_n0_gt. simpsub. apply succ_inj.
+(g.+1) (g.+1 + 1 + i)).
+simpl.
+
   rewrite - ! (addn1 g). 
   rewrite (addnC g 1). simpl.
   rewrite - IHg.

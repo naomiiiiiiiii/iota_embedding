@@ -214,7 +214,7 @@ that. you want to bind
                                                            (subst (sh 4)
                                                                   (lam
                                                                      ( move_gamma G (make_subseq) 1 (*ignore x'*)
-                                                                                  (app Et2 (picomp1 (var (size G + 1))) ))))
+                                                                                  (app Et2 (picomp1 (var (size G + 1))) )))))
                                       x'
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
