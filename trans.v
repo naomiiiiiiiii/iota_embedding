@@ -73,43 +73,16 @@ apply / negbT : Hbool.
     simpl. rewrite - 1! (addn2). simpl.
     replace (i.+1 - g) with (i - g - 1 + 2). auto.
     rewrite subn1. rewrite addn2. simpl. rewrite prednK.
-    rewrite - addn1. rewrite addnBAC.
-    rewrite - subnS. rewrite - 1! addn2.
-    erewrite ltn_predK.
-    replace (i - g - 1 + 2) with (i - g - (1 -2)).
-    simpl.
-    lia.
-    replace (i - g - 1) with (i - (g + 1)).
-    rewrite - addnA.
-    rewrite - addnBA.
-
-
-    rewrite project_dot_succ.
-    rewrite ltnS.
-(*use that (dot (var 1) (dot (var 0) (sh 2))) is gen_sub 1
-and i + 1 -g > 1
-IH from 1 case
-*)
-
-leq_eqVlt
-    rewrite - 1! (addn1 g). rewrite addnC.
-    replace ((1 + g) - g) with (1 + (g - g)).
-
-    rewrite rewrite subnn.
-    
-  rewrite IH1.
-  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst.
-  simpl. simpsub. simpl.
-  induction i. exfalso. apply H0. auto.
-  case : IHg => [IH1 IH2]. rewrite (IH2 (g.+1)).
-  rewrite subst_var. rewrite project_under_geq. rewrite minusE.
-  replace (g.+1 - g) with 1. simpsub.
-  rewrite IHg. simpsub.
-
-
-  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst. 
-  simpsub.  auto.
-rewrite project_under_eq. simpsub. rewrite plusE. rewrite addn1. auto.
+    rewrite - addn1. rewrite addnBAC. rewrite addn1. auto.
+    rewrite leq_eqVlt. apply/orP. right. assumption. rewrite subn_gt0.
+    assumption. rewrite subn_gt0.
+    assumption.
+    replace (i.+1 - g - 1) with (i.+1 - (g.+1)).
+    rewrite subSS. auto.
+    rewrite subn1. rewrite subSKn. rewrite subSS. auto.
+    rewrite subn_gt0. eapply (ltn_trans H). auto.
+    apply/ leP. apply leqW. rewrite leq_eqVlt. apply/ orP. right. assumption.
+rewrite leq_eqVlt. apply/ orP. right. assumption.
 Qed.
 
 
