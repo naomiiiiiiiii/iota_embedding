@@ -858,6 +858,7 @@ Lemma substctx_eqsub :
 (*IDEA: do the move when there's only one variable to move: before 72*)
 
 
+
 Lemma substctx_app: forall G1 G2 s,
     @substctx False s (G1 ++ G2) = (substctx (under (size G2) s) G1) ++ (substctx s G2).
   intros. induction G1; simpsub. repeat rewrite cat0s. auto.
@@ -891,8 +892,8 @@ Qed.
 Lemma move_var_r: forall E v G D m m' a,
     tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
                                          (subst (under (size E) (gen_sub_mvr (size G))) a)
-                                                               )
-    -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvl (size G))) m)
+                                                               ) ->
+    tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvl (size G))) m)
                                (subst (under (size E) (gen_sub_mvl (size G))) m')
                                a).
   move => E v G. move: E v. induction G using last_ind; intros. move: X.
@@ -957,7 +958,7 @@ Qed.
 Fixpoint gen_sub_mvl_list g v :=
   match v with
     0 => id
-          | S v' => compose (under v' (gen_sub_mvl g)) (gen_sub_mvl_list g v') end.
+          | S v' => compose (gen_sub_mvl_list g v') (under v' (gen_sub_mvl g)) end.
 
 Fixpoint gen_sub_mvr_list g v :=
   match v with
@@ -978,6 +979,70 @@ Lemma move_var_r: forall E v G D m m' a,
     -> tr (E ++ ((substh (sh (size G)) v):: (G ++ D))) (deq (subst (under (size E) (gen_sub_mvl (size G))) m)
                                (subst (under (size E) (gen_sub_mvl (size G))) m')
                                a).*)
+(*looks a lot like substctx_mvr*)
+Lemma eqsub_project : forall s s',
+  (forall i,
+      project s i = project s' i) ->
+    @eqsub False s s'
+.
+  Admitted. 
+
+
+(*Lemma aa: forall g,
+    project (gen_sub_mvr g) 0 = (var 0).
+  intros. induction g; simpl; simpsub. auto.
+  rewrite IHg. simpsub.
+  suffices:  g = 0.
+  intros. subst. simpsub.
+works for g > 1
+*)
+
+Lemma mvr_shift_help: forall g,
+    eqsub (compose (compose (under 1 (sh g))
+                           (gen_sub_mvr g)) (sh1))
+(compose (under 1 (sh (g + 1)))
+                           (gen_sub_mvr (g + 1))). 
+  intros. induction g.
+  simpl. simpsub. simpl. apply eqsub_refl.
+  apply eqsub_project.
+  intros. simpsub. rewrite plusE.
+induction i. simpl. simpsub.
+  simpl.
+  Opaque compose.
+  simpl. rewrite - addnE. simpl.
+  simpl in IHg. rewrite addnC in IHg. simpl in IHg.
+  rewrite - ! (addn1 g). 
+  rewrite (addnC g 1). simpl.
+  rewrite - IHg.
+  Transparent compose. simpsub. simpl.
+  rewrite - addnE. 
+  simpsub. rewrite plusE. rewrite - addnE.
+  rewrite addnC. simpl. simpsub.
+
+Lemma mvr_shift : forall g,
+    eqsub (compose (under 1 (sh g))
+                   (gen_sub_mvr g)) (sh g).
+  induction g.
+  simpsub. simpl. simpsub. apply (eqsub_symm _ _ _
+                                             (@eqsub_expand_id False)).
+
+  rewrite - {1 3}(addn1 g). simpsub.
+  simpl. rewrite plusE.
+  replace (g + 1 + 1) with (g + 2). simpsub.
+  rewrite - trunc_sum. simpsub.
+  replace (g + 1) with (1 + g).
+  rewrite - sh_sum. simpsub.
+
+  intros n t. simpsub. rewrite plusE.
+
+
+  simpl.
+
+  intros. induction g. simpsub.
+  Transparent gen_sub_mvr.
+  rewrite - {1 3}(addn1 g).
+  simpl. simpsub.
+  apply (eqsub_symm _ _ _ (@eqsub_expand_sh False 1)).
 
 
 Lemma move_list_r: forall E V G D m m' a,
@@ -987,11 +1052,10 @@ Lemma move_list_r: forall E V G D m m' a,
                                                                )
     -> tr (E ++ (substctx (sh (size G)) V)++ G ++ D)
          (deq
-
             (subst (under (size E) (gen_sub_mvl_list (size G) (size V))) m)
             (subst (under (size E)  (gen_sub_mvl_list (size G) (size V))) m')
                                a).
-  intros. induction V using last_ind; move: X; simpl; simpsub.
+  intros. move: m m' a G D E X. induction V using last_ind; intros; move: X; simpl; simpsub.
  apply.
   repeat rewrite size_rcons. simpl.
   move => X. rewrite substctx_rcons.
@@ -1002,7 +1066,14 @@ replace
        G ++ D) with
     ((E ++ (substctx (under 1 (sh (size G))) V)) ++
        (substh (sh (size G)) x::
-     (G ++ D))).
+               (G ++ D))).
+rewrite !compose_under !under_sum !subst_compose !plusE. 
+replace (size E + size V) with
+    (size (E ++
+substctx (under 1 (sh (size G))) V
+    )). apply move_var_r.
+rewrite substctx_app.
+
 
   rewrite - cats1.
 replace 

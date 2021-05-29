@@ -1,5 +1,5 @@
 From Coq.Lists Require Import List.
-From mathcomp Require Import ssreflect seq ssrnat.
+From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import source subst_src rules_src help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -26,7 +26,34 @@ Fixpoint gen_sub_mvr E := match E with
 (under n' (dot (var 1) (dot (var 0) (sh 2))))
                           end.
 
-Opaque gen_sub_mvl gen_sub_mvr.
+Check eqnP.
+
+Lemma mvr_works0: forall (g: nat), project (gen_sub_mvr g) 0 = (var g).
+  intros. induction g; simpl.
+  simpsub. auto.
+  simpsub. rewrite IHg. simpsub.
+  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst. 
+  simpsub.  auto.
+rewrite project_under_eq. simpsub. rewrite plusE. rewrite addn1. auto.
+Qed.
+
+Lemma mvr_works_nz: forall (g i: nat), g <> 0 -> i <> 0 -> project (gen_sub_mvr g) i = (var (i - 1)).
+  intros. induction g; simpl. exfalso. apply H. auto.
+  simpsub.
+  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst.
+  simpl. simpsub. simpl.
+  induction i. exfalso. apply H0. auto.
+  case : IHg => [IH1 IH2]. rewrite (IH2 (g.+1)).
+  rewrite subst_var. rewrite project_under_geq. rewrite minusE.
+  replace (g.+1 - g) with 1. simpsub.
+  rewrite IHg. simpsub.
+
+
+  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst. 
+  simpsub.  auto.
+rewrite project_under_eq. simpsub. rewrite plusE. rewrite addn1. auto.
+Qed.
+
 
 Lemma substctx_mvr: forall G,
     (substctx (dot (var 1) (dot (var 0) (sh 2))) (substctx sh1 G)) =

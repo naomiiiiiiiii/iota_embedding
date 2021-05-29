@@ -361,7 +361,10 @@ end.
    intros. induction A; simpsub; simpl; auto. Qed.
 
 
- (*subs v in for nth variable of m while leaving all other vars untouched*)
+ (* for (var i): B in [n .. |G| + n],
+substitutes (move_B m i) in for i while leaving all other variables untouched
+
+ in for nth variable of m while leaving all other vars untouched*)
  (*recursion will be to generate a substitution
   that dots all of them on top of a shift |Gamma| *)
  Fixpoint sub_4_moveG (G: source.context) (m: term False) (n: nat (*starting variable*)) :=
