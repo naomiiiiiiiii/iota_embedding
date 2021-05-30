@@ -867,13 +867,7 @@ eapply split_world1. apply Dw.
           (shift (size G) l1) (comp_m B))
        (trans_type (shift (size G) w1) 
                    (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
-    (*start here NEED A CONTEXT IN THE TRANS RELATION STAT
-     to fix G problem below
-     translation IS dependent on context for SURE cuz sometimes
-     you have move gamma*)
     inversion Dtrans; subst.
-    Opaque gen_sub_mvl gen_sub_mvr.
-    simpl.
     suffices: (equiv 
        (app
           (lam
@@ -895,17 +889,18 @@ eapply split_world1. apply Dw.
                                   (app
                                   (app
                                      (app
+
                                         (app
-                                           (subst
-                                           (gen_sub_mvl
-                                           (4 + size G))
-                                           (subst 
-                                           (sh 4)
-                                           (lam
-                                           (move_gamma G
-                                           make_subseq 1
-                                           (app Et2 (var (size G)))))))
-                                           (picomp4 (var 0)))
+  (lam
+     (subst (under 1 (gen_sub_mvl_list (size G) 5))
+     (move_gamma G (make_subseq) 1 (*ignore x'*)
+                 (app Et2 (picomp1 (var (size G + 1)))
+                 )
+     ))
+  ) (picomp4 (var 0))
+)
+
+
                                         (picomp1 (var 0)))
                                      make_subseq) 
                                   (picomp3 (var 0)))
@@ -930,17 +925,18 @@ eapply split_world1. apply Dw.
                                   (app
                                   (app
                                      (app
+
                                         (app
-                                           (subst
-                                           (gen_sub_mvl
-                                           (4 + size G))
-                                           (subst 
-                                           (sh 4)
-                                           (lam
-                                           (move_gamma G
-                                           make_subseq 1
-                                           (app Et2 (var (size G)))))))
-                                           (picomp4 (var 0)))
+  (lam
+     (subst (under 1 (gen_sub_mvl_list (size G) 5))
+     (move_gamma G (make_subseq) 1 (*ignore x'*)
+                 (app Et2 (picomp1 (var (size G + 1)))
+                 )
+     ))
+  ) (picomp4 (var 0))
+)
+
+
                                         (picomp1 (var 0)))
                                      make_subseq) 
                                   (picomp3 (var 0)))
