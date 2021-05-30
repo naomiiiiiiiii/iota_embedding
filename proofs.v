@@ -1128,49 +1128,7 @@ rewrite size_substctx. auto.
 rewrite size_substctx. auto.
 rewrite size_cat size_substctx. auto.
 rewrite - catA. rewrite cat_rcons. auto. Qed.
-(*why are there binders over E?*)
-apply (IHV m m'
-       (subst
-          (under (size (E ++ substctx (under 1 (sh (size (substctx sh1 G)))) V))
-                 (gen_sub_mvr (size (substctx sh1 G)))) a)
 
-     (substctx sh1 G) (x::D) E').
-
-  rewrite - cats1.
-replace 
-
-  rewrite catA.
-  rewrite 
-  simpl in X. simpsub in X.
-
-  unfold gen_sub_mvl_list. simpl.
-
-Arguments compose _ s1 s2: simpl nomatch.
-
-Lemma testing1: (dot (var 0) (dot (var 1) (sh 6)) ) =
-                under 1 (dot (var 0) (sh 5)).
-
-Lemma testing :
-   (dot (var 0)
-                               (compose (sh 4)
-                                  (compose
-                                     (gen_sub_mvl (4 + (*here*) 2))
-                                     (dot 
-                                        (var 1)
-                                        (dot 
-                                         (var 2)
-                                         (dot 
-                                         (var 3)
-                                         (dot 
-                                         (var 4)
-                                         (dot
-                                         (subst
-                                         (sh
-                                         ((1+ 2(*here*))%coq_nat +
-                                         1)%coq_nat.+4) (nattp))
-                                         (sh 6))))))))) = id.
- Transparent gen_sub_mvl. simpl.
-simpsub. simpl. simpsub. simpl.
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->

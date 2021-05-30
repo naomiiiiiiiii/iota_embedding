@@ -210,12 +210,13 @@ that. you want to bind
  weakened context*)                                                      
 
                                let btarg := app
-                                              (subst (gen_sub_mvl (4 + (size G)))
-                                                           (subst (sh 4)
-                                                                  (lam
-                                                                     ( move_gamma G (make_subseq) 1 (*ignore x'*)
-                                                                                  (app Et2 (picomp1 (var (size G + 1))) )))))
-                                      x'
+  (lam
+     subst (under 1 (gen_sub_mvl_list) (size G) 5)
+     (move_gamma G (make_subseq) 1 (*ignore x'*)
+                 (app Et2 (picomp1 (var (size G + 1)))
+                 )
+     )
+  ) x'
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                (*start here*)
