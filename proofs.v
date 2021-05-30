@@ -964,10 +964,10 @@ Fixpoint gen_sub_mvr_list g v :=
     0 => id
           | S v' => compose (under v' (gen_sub_mvr g )) (gen_sub_mvr_list g v') end.
 
-Fixpoint gen_sub_mvr_ctx g v :=
+(*Fixpoint gen_sub_mvr_ctx g v :=
   match v with
     0 => id
-          | S v' => compose (gen_sub_mvr g ) (gen_sub_mvr_ctx g v') end.
+          | S v' => compose (gen_sub_mvr g ) (gen_sub_mvr_ctx g v') end.*)
 
 (*prove this
  try and implement it practically with trans
@@ -1048,10 +1048,10 @@ Admitted.
 
 
 Lemma move_list_r: forall E V G D m m' a,
-    tr ((substctx (gen_sub_mvr_ctx (size G) (size V)) E) ++
+    tr ((substctx (gen_sub_mvr_list (size G) (size V)) E) ++
         (substctx (sh (size V)) G) ++ V ++ D) (deq m m'
                                          (subst (gen_sub_mvr_list (size G) (size V)) a)
-                                                               )
+                                                               ) (*need an under for a i think*)
     -> tr (E ++ (substctx (sh (size G)) V)++ G ++ D)
          (deq
             (subst (under (size E) (gen_sub_mvl_list (size G) (size V))) m)
@@ -1081,10 +1081,7 @@ remember (substctx
         (under (size (substctx (under 1 (sh (size (substctx sh1 G)))) V))
            (gen_sub_mvr (size (substctx sh1 G)))) E) as E'. 
 replace (size E) with (size E').
-(*shift V by size sh1 G
- under size (waht E) actually is m
- what G actually is m (sh1 G)
- *) rewrite - catA.
+rewrite - catA.
 apply IHV.
 repeat rewrite size_substctx. subst.
 simpsub. rewrite plusE.
