@@ -1,6 +1,6 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help.
+From istari Require Import source subst_src rules_src help subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -14,89 +14,8 @@ From istari Require Import Sigma Tactics
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
 
-Fixpoint gen_sub_mvl G := match G with
-                        0 => id
-                          | n'.+1 =>
-@compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl n')
-                                    end.
-
-Fixpoint gen_sub_mvr E := match E with
-                        0 => id
-    | n'.+1 => @compose False (gen_sub_mvr n')
-(under n' (dot (var 1) (dot (var 0) (sh 2))))
-                          end.
-
-Check eqnP.
-
-Lemma mvr_works0: forall (g: nat), project (gen_sub_mvr g) 0 = (var g).
-  intros. induction g; simpl.
-  simpsub. auto.
-  simpsub. rewrite IHg. simpsub.
-  destruct (0 == g) eqn: Hbool. move/ eqP : Hbool => Hbool; subst. 
-  simpsub.  auto.
-rewrite project_under_eq. simpsub. rewrite plusE. rewrite addn1. auto.
-Qed.
-
-Lemma project_dot_geq :
-  forall t s i, i > 0 ->
-           project (dot t s) i = @project False s (i - 1).
-  Admitted.
-
-Lemma mvr_works_nz: forall (g i: nat), (i < g ->
-                                 project (gen_sub_mvr g) (S i) = (var i))
-/\ ((i >= g) -> project (gen_sub_mvr g) (S i) = (var (S i))).
-  move => g. induction g; simpl; intros; split; intros. discriminate H. 
-  simpsub. auto.
-  simpsub. move: (IHg i) => [IH1 IH2].
-  destruct (i < g) eqn: Hbool.
-  - rewrite IH1. rewrite subst_var. rewrite project_under_lt. auto.
-    apply/ltP. rewrite Hbool; try constructor. constructor.
-    suffices: i = g. intros. subst.
-    rewrite IH2. rewrite subst_var. rewrite project_under_geq.
-    rewrite minusE. replace (g.+1 - g) with 1.
-    simpsub. rewrite plusE. rewrite addn0. auto.
-    rewrite subSnn. auto. auto. auto.
-apply anti_leq. apply/ andP. split.
-rewrite - ltnS. assumption. rewrite leqNgt.
-apply / negbT : Hbool.
-  - simpsub. move: (IHg i) => [IH1 IH2]. rewrite IH2. simpsub. rewrite project_under_geq.
-    rewrite - subst_var. rewrite minusE.
-    replace
-(subst (dot (var 1) (dot (var 0) (sh 2)))
-       (varx False (i.+1 - g))) with (@var False (i.+1 - g)). simpsub. 
-    rewrite plusE. simpl. rewrite subnKC. auto.
-    apply ltnW in H.
-    eapply (leq_trans H). auto. simpsub.
-    rewrite project_dot_geq.
-    replace (i.+1 - g - 1) with (i- g).
-    rewrite project_dot_geq. simpsub.
-    simpl. rewrite - 1! (addn2). simpl.
-    replace (i.+1 - g) with (i - g - 1 + 2). auto.
-    rewrite subn1. rewrite addn2. simpl. rewrite prednK.
-    rewrite - addn1. rewrite addnBAC. rewrite addn1. auto.
-    rewrite leq_eqVlt. apply/orP. right. assumption. rewrite subn_gt0.
-    assumption. rewrite subn_gt0.
-    assumption.
-    replace (i.+1 - g - 1) with (i.+1 - (g.+1)).
-    rewrite subSS. auto.
-    rewrite subn1. rewrite subSKn. rewrite subSS. auto.
-    rewrite subn_gt0. eapply (ltn_trans H). auto.
-    apply/ leP. apply leqW. rewrite leq_eqVlt. apply/ orP. right. assumption.
-rewrite leq_eqVlt. apply/ orP. right. assumption.
-Qed.
 
 
-Lemma substctx_mvr: forall G,
-    (substctx (dot (var 1) (dot (var 0) (sh 2))) (substctx sh1 G)) =
-    (@substctx False (under 1 sh1) G).
-  intros. simpsub. auto. Qed.
-
-
-Definition test : term False := subst1 unittp (var 0).
-Compute test. (*sends var 0 to unittp*)
-
-Definition test1 : term False := subst1 unittp (ppair (var 0) (var 1)).
-Compute test1. (*sends var 0 to unittp and var 1 to var 0*)
 
 Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)                                                                          
   :=
@@ -211,11 +130,11 @@ that. you want to bind
 
                                let btarg := app
   (lam
-     subst (under 1 (gen_sub_mvl_list) (size G) 5)
+     (subst (under 1 (gen_sub_mvl_list (size G) 5))
      (move_gamma G (make_subseq) 1 (*ignore x'*)
                  (app Et2 (picomp1 (var (size G + 1)))
                  )
-     )
+     ))
   ) x'
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
