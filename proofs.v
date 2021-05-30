@@ -888,6 +888,8 @@ Proof.
   intros. move: (length_substctx False s G). apply.
 Qed.
 
+Hint Rewrite size_substctx.
+
 Lemma move_var_r: forall E v G D m m' a,
     tr ((substctx (gen_sub_mvr (size G)) E) ++ (substctx (sh1) G) ++ v::D) (deq m m'
                                          (subst (under (size E) (gen_sub_mvr (size G))) a)
@@ -1050,7 +1052,8 @@ Admitted.
 Lemma move_list_r: forall E V G D m m' a,
     tr ((substctx (gen_sub_mvr_list (size G) (size V)) E) ++
         (substctx (sh (size V)) G) ++ V ++ D) (deq m m'
-                                         (subst (gen_sub_mvr_list (size G) (size V)) a)
+                                                   (subst (under (size E)
+                                                      (gen_sub_mvr_list (size G) (size V))) a)
                                                                ) (*need an under for a i think*)
     -> tr (E ++ (substctx (sh (size G)) V)++ G ++ D)
          (deq
@@ -1086,6 +1089,45 @@ apply IHV.
 repeat rewrite size_substctx. subst.
 simpsub. rewrite plusE.
 repeat rewrite size_substctx.
+replace 
+       
+       (subst
+          (compose
+             (under
+                (size
+                   (E ++
+                    substctx (dot (var 0) (sh (size G + 1))) V))
+                (gen_sub_mvr (size G)))
+             (under (size E)
+                (gen_sub_mvr_list (size G) (size V)))) a)
+ with
+           (subst
+              (under (size E)
+                 (compose
+                    (under 
+                       (size V)
+                       (gen_sub_mvr
+                        (size G)))
+                    (gen_sub_mvr_list
+                       (size G)
+                       (size V)))) a).
+replace 
+    (substctx
+       (compose (under (size V) (gen_sub_mvr (size G)))
+          (gen_sub_mvr_list (size G) (size V))) E ++
+       substctx (sh (1 + size V)) G ++ V ++ x :: D) with
+        (substctx
+           (compose (under (size V) (gen_sub_mvr (size G)))
+              (gen_sub_mvr_list (size G) (size V))) E ++
+         substctx (sh (size V).+1) G ++ rcons V x ++ D).
+apply X.
+rewrite - cats1. rewrite - (catA V [::x]). rewrite cat1s. auto.
+rewrite size_cat. rewrite - under_sum. rewrite - compose_under.
+rewrite size_substctx. auto. subst. 
+rewrite size_substctx. auto.
+rewrite size_substctx. auto.
+rewrite size_cat size_substctx. auto.
+rewrite - catA. rewrite cat_rcons. auto. Qed.
 (*why are there binders over E?*)
 apply (IHV m m'
        (subst
