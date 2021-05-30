@@ -1086,6 +1086,10 @@ replace (size E) with (size E').
  what G actually is m (sh1 G)
  *) rewrite - catA.
 apply IHV.
+repeat rewrite size_substctx. subst.
+simpsub. rewrite plusE.
+repeat rewrite size_substctx.
+(*why are there binders over E?*)
 apply (IHV m m'
        (subst
           (under (size (E ++ substctx (under 1 (sh (size (substctx sh1 G)))) V))
