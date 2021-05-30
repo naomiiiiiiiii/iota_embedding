@@ -1030,17 +1030,13 @@ ring.
 simpsub. rewrite plusE. Opaque addn.
 replace (g.+1 + 1 + i) with ((g+1 +i).+1).
 replace (g.+1 + 1 + 1 + i) with ((g+1 + 1 +i).+1).
-repeat rewrite mvr_works_n0_gt. simpsub. apply succ_inj.
-(g.+1) (g.+1 + 1 + i)).
-simpl.
+repeat rewrite mvr_works_n0_gt. simpsub. rewrite plusE.
+replace (1 + (g +1 + i).+1) with (g + 1 + 1 + i).+1. auto.
+ring. repeat rewrite addn1. apply ltn_addr.
+apply ltnSn. apply ltn_addr. rewrite addn1. apply ltnSn.
+ring. ring.
+Qed.
 
-  rewrite - ! (addn1 g). 
-  rewrite (addnC g 1). simpl.
-  rewrite - IHg.
-  Transparent compose. simpsub. simpl.
-  rewrite - addnE. 
-  simpsub. rewrite plusE. rewrite - addnE.
-  rewrite addnC. simpl. simpsub.
 
 Lemma mvr_shift : forall g,
     eqsub (compose (under 1 (sh g))
