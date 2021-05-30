@@ -844,10 +844,9 @@ intros. simpl. simpsub. simpl. auto. Qed.
                                            ).
   simpsub. simpl.*)
 
-Lemma substctx_eqsub :
-  forall (s: @sub False) s' t,
-    eqsub s s'
-    -> substctx s t = substctx s' t. Admitted.
+Lemma substctx_eqsub {s s': @sub False} {G: context}
+: eqsub s s'
+    -> substctx s G = substctx s' G. Admitted.
 
 (*Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
                        (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
@@ -1038,30 +1037,14 @@ ring. ring.
 Qed.
 
 
+
 Lemma mvr_shift : forall g,
     eqsub (compose (under 1 (sh g))
                    (gen_sub_mvr g)) (sh g).
   induction g.
   simpsub. simpl. simpsub. apply (eqsub_symm _ _ _
                                              (@eqsub_expand_id False)).
-
-  rewrite - {1 3}(addn1 g). simpsub.
-  simpl. rewrite plusE.
-  replace (g + 1 + 1) with (g + 2). simpsub.
-  rewrite - trunc_sum. simpsub.
-  replace (g + 1) with (1 + g).
-  rewrite - sh_sum. simpsub.
-
-  intros n t. simpsub. rewrite plusE.
-
-
-  simpl.
-
-  intros. induction g. simpsub.
-  Transparent gen_sub_mvr.
-  rewrite - {1 3}(addn1 g).
-  simpl. simpsub.
-  apply (eqsub_symm _ _ _ (@eqsub_expand_sh False 1)).
+Admitted.
 
 
 Lemma move_list_r: forall E V G D m m' a,
@@ -1092,7 +1075,23 @@ replace (size E + size V) with
 substctx (under 1 (sh (size G))) V
     )). apply move_var_r.
 rewrite substctx_app.
+rewrite - substctx_compose. rewrite (substctx_eqsub (mvr_shift (size G)) ).
+replace (size G) with (size (substctx sh1 G)).
+remember (substctx
+        (under (size (substctx (under 1 (sh (size (substctx sh1 G)))) V))
+           (gen_sub_mvr (size (substctx sh1 G)))) E) as E'. 
+replace (size E) with (size E').
+(*shift V by size sh1 G
+ under size (waht E) actually is m
+ what G actually is m (sh1 G)
+ *) rewrite - catA.
+apply IHV.
+apply (IHV m m'
+       (subst
+          (under (size (E ++ substctx (under 1 (sh (size (substctx sh1 G)))) V))
+                 (gen_sub_mvr (size (substctx sh1 G)))) a)
 
+     (substctx sh1 G) (x::D) E').
 
   rewrite - cats1.
 replace 
