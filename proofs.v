@@ -803,6 +803,30 @@ Lemma wworld_app: forall G D w1 l1,
   rewrite - subst_sh_shift. auto.
   rewrite - subst_sh_shift. auto. Qed.
 
+Opaque gen_sub_mvl_list.
+
+(*keep trying to massage the substitution you get into something reasonable
+ wrok on paper!!
+Lemma sub_help: forall s l,
+(dot (var 0)
+(compose s
+(dot (var 1)
+(dot (var 2) (dot (var 3) (dot (var 4) (dot (subst sh1 l)
+                                            (sh 6)))))))) =
+compose (@under False 1 s)
+(dot (var 0)
+(dot (var 1) (dot (var 2) (dot (var 3) (dot l
+                                            (sh 5)))))).
+  intros. simpsub. simpl. auto.
+Qed.*)
+
+
+(* looks like nothing can be done with this
+ try and figure if something can be doen with this
+Lemma checking: forall t, @subst False (dot (var 0)
+(dot (var 1) (dot (var 2) (dot (var 3) (dot nattp
+                                            (sh 6)))))) t = t.
+  intros. simpsub_big.*)
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
@@ -1250,6 +1274,25 @@ simpsub_big. auto. simpsub.
    apply trans_type_works; auto.
    simpsub. auto.
  - simpsub_big. simpl.
+   rewrite ! plusE.
+   remember 
+    [:: hyp_tm
+          (exist nzero preworld
+             (sigma nattp
+                (prod
+                   (prod (subseq (ppair (var 5) (var 4)) (ppair (var 1) (var 0)))
+                      (store (ppair (var 1) (var 0)))) (trans_type (var 1) (var 0) A)))),
+        hyp_tm (store (ppair (var 2) (var 1))),
+        hyp_tm
+          (subseq (ppair (subst (sh (size G).+2) w1) (subst (sh (size G + 2)) l1)) (ppair (var 1) (var 0))),
+        hyp_tm nattp, hyp_tm (subst1 (subst (sh (size G)) l1) preworld)
+                      & gamma_at G w1 l1 ++ D] as G'.
+   remember 
+       (laters
+          (exist nzero preworld
+             (sigma nattp
+                (prod (prod (subseq (ppair (var 6) (var 5)) (ppair (var 1) (var 0))) (store (ppair (var 1) (var 0))))
+                   (subst (dot (var 0) (dot (var 1) (sh 3))) (trans_type (var 1) (var 0) B)))))) as a'.
    replace 
        (make_bind
           (app
@@ -1293,8 +1336,21 @@ simpsub_big. auto. simpsub.
                 (ppair (ppi1 (var 0))
                    (ppair make_subseq
                           (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))) ).
-(*start here*)
-(*IDEA: do the move when there's only one variable to move: before 72*)
+   simpl.
+   replace (subst (sh (size G + 1 + 1).+4) l1)
+     with (subst sh1
+                 (subst (sh (size G + 1+ 1).+3) l1)
+          ).
+rewrite sub_help.
+subst. rewrite compose_under.
+simpl.
+(*trying to figure out what the substitution around
+ move gamma actually is*)
+   (*start here*)
+   (*IDEA: do the move when there's only one variable to move: before 72*)
+   subst.
+fold gen_sub_mvl_list.
+
    (*rule 72*)
    eapply (tr_exist_elim _ (subst (sh 1) nzero)
                          (subst (sh 1) preworld) 

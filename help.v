@@ -404,3 +404,8 @@ Lemma mg_bind_help: forall G m e s,
     subst s (move_gamma G m 1 e).
   intros. unfold move_gamma. induction G.
 simpl. simpsub. simpl.*)
+
+(*Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
+                       (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
+                            t.
+  intros. simpsub. ring.*)
