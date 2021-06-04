@@ -820,7 +820,7 @@ Lemma out_of_lam: forall s l,
   intros. simpsub. simpl. auto.
 Qed.
 
-Lemma leq1: forall n, n <= 1 -> ((n == 0) || (n == 1)). Admitted.
+Lemma lt1: forall n, n < 1 -> n = 0. Admitted.
 
 Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
   intros. induction g.
@@ -838,22 +838,51 @@ rewrite project_compose. rewrite project_under_geq. rewrite minusE.
 replace (g.+1 - g) with 1. simpsub. rewrite plusE. replace (g+ 0) with g.
 apply IHg. rewrite addn0. auto.
 rewrite subSnn. auto. apply/ leP. 
-rewrite leqnSn.  forall n : nat, n < n.+1
+apply leqnSn.  Qed.
 
-
-   Rewrite subst_var. auto. lia. simpl. auto. Qed.
 
 Lemma mvl_works_nz (g: nat) : forall (i: nat), (i < (S g) ->
-                                       project (gen_sub_mvr (S g)) i = (var (S i)))
+                                       project (gen_sub_mvl (S g)) i = (var (S i)))
                                       /\ ((i > (S g)) ->
-                                         project (gen_sub_mvr (S g)) i = (var i)).
+                                         project (gen_sub_mvl (S g)) i = (var i)).
   induction g; simpl; intros; split; intros. 
-  simpsub. move/leq1/orP : H => [Hb | Hb]; move/eqP: Hb => Hb; subst; simpsub; auto. 
+  simpsub. apply lt1 in H.  subst. simpsub. auto. rewrite project_dot_geq.
+  rewrite project_dot_geq. simpsub. simpl.
+  rewrite - subnDA. change (1 + 1) with 2.
+  rewrite - (addn2 (i - 2)).
+  Search ((_ - _) +_). rewrite - addnABC. change (2- 2) with 0.
+  rewrite addn0. auto. assumption. auto.
+ Search (0 < _ - _).
+ rewrite subn_gt0.  assumption. eapply (ltn_trans _ H).
+ Unshelve.
+ simpsub. move: (IHg (i.+1)) => [IH1 IH2].
 
 
-  Search (_ <= 1). auto.
-  simpsub. move: (IHg i) => [IH1 IH2].
-  destruct (i < g) eqn: Hbool.
+
+
+
+
+ replace
+(subst
+    (compose
+       (under g
+          (dot (var 1) (dot (var 0) (sh 2))))
+       (dot (var 0)
+          (compose
+             (under g
+                (dot (var 1) (dot (var 0) (sh 2))))
+             sh1))) (project (gen_sub_mvr g) i)) with
+     (subst
+(@compose False (under (g.+1) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl (g.+1)))
+(var i.+1)).
+
+ 2: {
+simpl.
+ }
+
+
+rewrite subst_compose. rewrite 
+ destruct (i < (g.+1)) eqn: Hbool.
   - rewrite IH1. rewrite subst_var. rewrite project_under_lt. auto.
     apply/ltP. rewrite Hbool; try constructor. constructor.
     suffices: i = g. intros. subst.
