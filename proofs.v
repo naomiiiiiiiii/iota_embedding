@@ -1,4 +1,4 @@
-Require Import Program.Equality Ring Lia.
+Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import source subst_src rules_src help subst_help trans basic_types.
 From istari Require Import Sigma Tactics
@@ -841,6 +841,9 @@ rewrite subSnn. auto. apply/ leP.
 apply leqnSn.  Qed.
 
 
+Lemma subSaddS (n : nat): n > 0 -> (n -1).+1 = n.
+  rewrite subn1. intros. rewrite prednK; auto. Qed.
+
 Lemma mvl_works_nz (g: nat) : forall (i: nat), (i < (S g) ->
                                        project (gen_sub_mvl (S g)) i = (var (S i)))
                                       /\ ((i > (S g)) ->
@@ -855,68 +858,81 @@ Lemma mvl_works_nz (g: nat) : forall (i: nat), (i < (S g) ->
  Search (0 < _ - _).
  rewrite subn_gt0.  assumption. eapply (ltn_trans _ H).
  Unshelve.
- simpsub. move: (IHg (i.+1)) => [IH1 IH2].
+ simpsub. move: (IHg i) => [IH1 IH2].
+replace (dot
+       (subst (gen_sub_mvl g)
+          (project
+             (under g (dot (var 1) (dot (var 0) (sh 2))))
+             0))
+       (compose
+          (under g (dot (var 1) (dot (var 0) (sh 2))))
+          (compose sh1
+             (compose
+                (under g
+                   (dot (var 1) (dot (var 0) (sh 2))))
+                (gen_sub_mvl g))))) with
+    (gen_sub_mvl (g.+2)).
+2: {
+  simpl. simpsub. simpl. auto.
 
-
-
-
-
-
- replace
-(subst
-    (compose
-       (under g
-          (dot (var 1) (dot (var 0) (sh 2))))
-       (dot (var 0)
-          (compose
-             (under g
-                (dot (var 1) (dot (var 0) (sh 2))))
-             sh1))) (project (gen_sub_mvr g) i)) with
-     (subst
-(@compose False (under (g.+1) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl (g.+1)))
-(var i.+1)).
-
- 2: {
-simpl.
- }
-
-
-rewrite subst_compose. rewrite 
- destruct (i < (g.+1)) eqn: Hbool.
-  - rewrite IH1. rewrite subst_var. rewrite project_under_lt. auto.
-    apply/ltP. rewrite Hbool; try constructor. constructor.
-    suffices: i = g. intros. subst.
-    rewrite IH2. rewrite subst_var. rewrite project_under_geq.
-    rewrite minusE. replace (g.+1 - g) with 1.
-    simpsub. rewrite plusE. rewrite addn0. auto.
-    rewrite subSnn. auto. auto. auto.
-apply anti_leq. apply/ andP. split.
-rewrite - ltnS. assumption. rewrite leqNgt.
-apply / negbT : Hbool.
-  - simpsub. move: (IHg i) => [IH1 IH2]. rewrite IH2. simpsub. rewrite project_under_geq.
-    rewrite - subst_var. rewrite minusE.
-    replace
-(subst (dot (var 1) (dot (var 0) (sh 2)))
-       (varx False (i.+1 - g))) with (@var False (i.+1 - g)). simpsub. 
-    rewrite plusE. simpl. rewrite subnKC. auto.
-    apply ltnW in H.
-    eapply (leq_trans H). auto. simpsub.
-    rewrite project_dot_geq.
-    replace (i.+1 - g - 1) with (i- g).
-    rewrite project_dot_geq. simpsub.
-    simpl. rewrite - 1! (addn2). simpl.
-    replace (i.+1 - g) with (i - g - 1 + 2). auto.
-    rewrite subn1. rewrite addn2. simpl. rewrite prednK.
-    rewrite - addn1. rewrite addnBAC. rewrite addn1. auto.
-    rewrite leq_eqVlt. apply/orP. right. assumption. rewrite subn_gt0.
-    assumption. rewrite subn_gt0.
-    assumption.
-    replace (i.+1 - g - 1) with (i.+1 - (g.+1)).
-    rewrite subSS. auto.
-    rewrite subn1. rewrite subSKn. rewrite subSS. auto.
-    rewrite subn_gt0. eapply (ltn_trans H). auto.
-    apply/ leP. apply leqW. rewrite leq_eqVlt. apply/ orP. right. assumption.
-rewrite leq_eqVlt. apply/ orP. right. assumption.
+}
+replace (gen_sub_mvl g.+2) with
+    (compose (under g.+1 (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl g.+1)). Opaque gen_sub_mvl. rewrite project_compose.
+destruct (i < (g.+1)) eqn: Hbool. rewrite project_under_lt.
+rewrite subst_var IH1; try constructor. apply/ltP: Hbool.
+assert (g.+1 = i) as Heq.
+apply anti_leq. apply/ andP. split. 
+rewrite ltnNge in Hbool. move/ negbT / negPn : Hbool.  apply.
+apply H. subst.
+rewrite project_under_eq. simpsub.
+move: (IHg (g.+2)) => [IHn IHy].
+rewrite plusE. replace (g.+1 + 1) with (g.+2).
+rewrite IHy. auto. auto.
+Search (_.+1 + _ = _ + (_.+1)). ring.
+Transparent gen_sub_mvl. simpl. auto.
+replace
+ (dot
+       (subst
+          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
+             (gen_sub_mvl g)) (varx False 0))
+       (compose
+          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
+             (sh 1))
+          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
+                   (gen_sub_mvl g)))) with
+    (gen_sub_mvl (g.+2)).
+replace (gen_sub_mvl g.+2) with
+    (compose (under g.+1 (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl g.+1)). Opaque gen_sub_mvl. rewrite project_compose.
+rewrite project_under_geq. rewrite minusE.
+replace ((project (dot (var 1) (dot (var 0) (sh 2)))) (i - g.+1))
+  with (@var False (i - g.+1)).
+2: {
+rewrite project_dot_geq.
+rewrite project_dot_geq. simpsub. rewrite plusE.
+replace (2 + (i - g.+1 -1 -1)) with (2 - 2 + (i - g.+1)).
+(*showing
+  var (i - g.+1) = var (2 - 2 + (i - g.+1))
+ *)
+auto. rewrite 2! subnAC.
+Search (_ + (_ - _) = (_ + _) - _).
+rewrite (addnBA 2).
+replace (i - 1 - 1) with (i - 2).
+Search ((_ + (_ - _)) =  ( _ - _ + _)).
+rewrite (@addnABC 2).  replace (2-2) with 0; auto. auto.
+eapply (ltn_trans _ H). rewrite subn2. rewrite 2! subn1. auto.
+rewrite 2! subn1 2! ltn_predRL. assumption.
+Search ((_ - _ - _) =  ( _ - (_ + _))).
+replace (i - g.+1 - 1) with (i - (g.+1 + 1)). 
+rewrite subn_gt0. rewrite addn1. assumption.
+rewrite addn1. rewrite subn1. rewrite subnS. auto.
+rewrite subn_gt0. eapply (ltn_trans _ H). Unshelve.
+rewrite ltnS. auto. auto. }
+simpsub. rewrite plusE.
+replace (g.+1 + (i - g.+1)) with i.
+move : (IHg i) => [IH1 IH2]. rewrite IH2. auto.
+eapply (ltn_trans _ H). rewrite subnKC; auto.
+apply/ leP. auto. simpl. auto. simpl. auto. auto.
+Unshelve. auto.
 Qed.
 
 Lemma et2_eqsub: forall g l1,
