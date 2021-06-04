@@ -56,12 +56,14 @@ Lemma shh_sum :
 Admitted.
 
 (*substitutions for moving variables around in context*)
+(*move old to new*)
 Fixpoint gen_sub_mvl G := match G with
                         0 => id
                           | n'.+1 =>
 @compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl n')
                                     end.
 
+(*move new to old*)
 Fixpoint gen_sub_mvr E := match E with
                         0 => id
     | n'.+1 => @compose False (gen_sub_mvr n')

@@ -1,4 +1,4 @@
-Require Import Program.Equality Ring.
+Require Import Program.Equality Ring Lia.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import source subst_src rules_src help subst_help trans basic_types.
 From istari Require Import Sigma Tactics
@@ -803,23 +803,48 @@ Lemma wworld_app: forall G D w1 l1,
   rewrite - subst_sh_shift. auto.
   rewrite - subst_sh_shift. auto. Qed.
 
-Opaque gen_sub_mvl_list.
 
 (*keep trying to massage the substitution you get into something reasonable
- wrok on paper!!
-Lemma sub_help: forall s l,
+ wrok on paper!!*)
+Lemma out_of_lam: forall s l,
 (dot (var 0)
 (compose s
 (dot (var 1)
 (dot (var 2) (dot (var 3) (dot (var 4) (dot (subst sh1 l)
                                             (sh 6)))))))) =
-compose (@under False 1 s)
+(@under False 1  
+(compose s
 (dot (var 0)
 (dot (var 1) (dot (var 2) (dot (var 3) (dot l
-                                            (sh 5)))))).
+                                            (sh 5)))))))).
   intros. simpsub. simpl. auto.
-Qed.*)
+Qed.
 
+Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
+  intros. induction g.
+  simpl. simpsub. auto.
+   replace (gen_sub_mvl g.+2) with
+       (compose (under (g.+1) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl (g.+1))).
+   rewrite project_compose. rewrite project_under_lt.
+   rewrite subst_var. auto. lia. simpl. auto. Qed.
+
+Lemma et2_eqsub: forall g l1,
+           (compose (gen_sub_mvl_list g 5)
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot (var 2)
+                                     (dot (var 3)
+                                        (dot (subst (sh (g + 5)) l1)
+                                             (sh 5))))))) =
+   (compose (under g (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3)
+                                                    (sh 5))))))
+           (compose (gen_sub_mvl_list g 6) (under 5 (dot (subst (sh g) l1) id)))).
+intros. simpl. simpsub. simpl. simpsub.
+induction g. simpl. simpsub. auto.
+simpsub. simpl. simpsub.
+simpl. simpsub.
+
+Opaque gen_sub_mvl_list.
 
 (* looks like nothing can be done with this
  try and figure if something can be doen with this
@@ -827,6 +852,14 @@ Lemma checking: forall t, @subst False (dot (var 0)
 (dot (var 1) (dot (var 2) (dot (var 3) (dot nattp
                                             (sh 6)))))) t = t.
   intros. simpsub_big.*)
+
+(*Lemma testing:
+  @subst False (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3) 
+                                                           (dot nattp (sh 5)
+                                                                     )
+           )))) (var 5) = (var 5).
+  simpsub.*)
+
 
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
@@ -891,7 +924,7 @@ eapply split_world1. apply Dw.
           (shift (size G) l1) (comp_m B))
        (trans_type (shift (size G) w1) 
                    (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
-    inversion Dtrans; subst.
+    inversion Dtrans; subst. simpl.
     suffices: (equiv 
        (app
           (lam
@@ -915,14 +948,16 @@ eapply split_world1. apply Dw.
                                      (app
 
                                         (app
-  (lam
-     (subst (under 1 (gen_sub_mvl_list (size G) 5))
-     (move_gamma G (make_subseq) 1 (*ignore x'*)
-                 (app Et2 (picomp1 (var (size G + 1)))
-                 )
-     ))
-  ) (picomp4 (var 0))
-)
+                                        (subst
+                                        (gen_sub_mvl_list
+                                        (size G) 5)
+                                        (lam
+                                        (move_gamma G
+                                        make_subseq 1
+                                        (app Et2
+                                        (picomp1
+                                        (var (size G + 1)))))))
+                                        (picomp4 (var 0)))
 
 
                                         (picomp1 (var 0)))
@@ -951,14 +986,16 @@ eapply split_world1. apply Dw.
                                      (app
 
                                         (app
-  (lam
-     (subst (under 1 (gen_sub_mvl_list (size G) 5))
-     (move_gamma G (make_subseq) 1 (*ignore x'*)
-                 (app Et2 (picomp1 (var (size G + 1)))
-                 )
-     ))
-  ) (picomp4 (var 0))
-)
+                                        (subst
+                                        (gen_sub_mvl_list
+                                        (size G) 5)
+                                        (lam
+                                        (move_gamma G
+                                        make_subseq 1
+                                        (app Et2
+                                        (picomp1
+                                        (var (size G + 1)))))))
+                                        (picomp4 (var 0)))
 
 
                                         (picomp1 (var 0)))
@@ -1341,8 +1378,27 @@ simpsub_big. auto. simpsub.
      with (subst sh1
                  (subst (sh (size G + 1+ 1).+3) l1)
           ).
-rewrite sub_help.
-subst. rewrite compose_under.
+   subst. rewrite out_of_lam.
+   rewrite - subst_lam.
+(*trying to replace with karl's substitution*)
+   assert (
+                         (compose
+                            (gen_sub_mvl_list (size G) 5)
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot (var 2)
+                                     (dot 
+                                       (var 3)
+                                       (dot
+                                       (subst
+                                       (sh
+                                       (size G + 1 + 1).+3)
+                                       l1) 
+                                       (sh 5)))))))
+     )
+
+
+   rewrite compose_under.
 simpl.
 (*trying to figure out what the substitution around
  move gamma actually is*)
