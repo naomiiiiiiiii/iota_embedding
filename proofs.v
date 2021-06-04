@@ -820,6 +820,8 @@ Lemma out_of_lam: forall s l,
   intros. simpsub. simpl. auto.
 Qed.
 
+Lemma leq1: forall n, n <= 1 -> ((n == 0) || (n == 1)). Admitted.
+
 Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
   intros. induction g.
   simpl. simpsub. auto.
@@ -827,6 +829,66 @@ Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
        (compose (under (g.+1) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl (g.+1))).
    rewrite project_compose. rewrite project_under_lt.
    rewrite subst_var. auto. lia. simpl. auto. Qed.
+
+Lemma mvl_worksg (g: nat): project (gen_sub_mvl g) g = (var 0).
+  intros. induction g.
+  simpl. simpsub. auto.
+simpl.
+rewrite project_compose. rewrite project_under_geq. rewrite minusE.
+replace (g.+1 - g) with 1. simpsub. rewrite plusE. replace (g+ 0) with g.
+apply IHg. rewrite addn0. auto.
+rewrite subSnn. auto. apply/ leP. 
+rewrite leqnSn.  forall n : nat, n < n.+1
+
+
+   Rewrite subst_var. auto. lia. simpl. auto. Qed.
+
+Lemma mvl_works_nz (g: nat) : forall (i: nat), (i < (S g) ->
+                                       project (gen_sub_mvr (S g)) i = (var (S i)))
+                                      /\ ((i > (S g)) ->
+                                         project (gen_sub_mvr (S g)) i = (var i)).
+  induction g; simpl; intros; split; intros. 
+  simpsub. move/leq1/orP : H => [Hb | Hb]; move/eqP: Hb => Hb; subst; simpsub; auto. 
+
+
+  Search (_ <= 1). auto.
+  simpsub. move: (IHg i) => [IH1 IH2].
+  destruct (i < g) eqn: Hbool.
+  - rewrite IH1. rewrite subst_var. rewrite project_under_lt. auto.
+    apply/ltP. rewrite Hbool; try constructor. constructor.
+    suffices: i = g. intros. subst.
+    rewrite IH2. rewrite subst_var. rewrite project_under_geq.
+    rewrite minusE. replace (g.+1 - g) with 1.
+    simpsub. rewrite plusE. rewrite addn0. auto.
+    rewrite subSnn. auto. auto. auto.
+apply anti_leq. apply/ andP. split.
+rewrite - ltnS. assumption. rewrite leqNgt.
+apply / negbT : Hbool.
+  - simpsub. move: (IHg i) => [IH1 IH2]. rewrite IH2. simpsub. rewrite project_under_geq.
+    rewrite - subst_var. rewrite minusE.
+    replace
+(subst (dot (var 1) (dot (var 0) (sh 2)))
+       (varx False (i.+1 - g))) with (@var False (i.+1 - g)). simpsub. 
+    rewrite plusE. simpl. rewrite subnKC. auto.
+    apply ltnW in H.
+    eapply (leq_trans H). auto. simpsub.
+    rewrite project_dot_geq.
+    replace (i.+1 - g - 1) with (i- g).
+    rewrite project_dot_geq. simpsub.
+    simpl. rewrite - 1! (addn2). simpl.
+    replace (i.+1 - g) with (i - g - 1 + 2). auto.
+    rewrite subn1. rewrite addn2. simpl. rewrite prednK.
+    rewrite - addn1. rewrite addnBAC. rewrite addn1. auto.
+    rewrite leq_eqVlt. apply/orP. right. assumption. rewrite subn_gt0.
+    assumption. rewrite subn_gt0.
+    assumption.
+    replace (i.+1 - g - 1) with (i.+1 - (g.+1)).
+    rewrite subSS. auto.
+    rewrite subn1. rewrite subSKn. rewrite subSS. auto.
+    rewrite subn_gt0. eapply (ltn_trans H). auto.
+    apply/ leP. apply leqW. rewrite leq_eqVlt. apply/ orP. right. assumption.
+rewrite leq_eqVlt. apply/ orP. right. assumption.
+Qed.
 
 Lemma et2_eqsub: forall g l1,
            eqsub (compose (gen_sub_mvl_list g 5)
