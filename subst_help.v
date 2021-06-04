@@ -9,7 +9,7 @@ From istari Require Import Sigma Tactics
 
 Lemma eqsub_project : forall s s',
   (forall i,
-      project s i = project s' i) ->
+      subst s (var i) = subst s' (var i)) ->
     @eqsub False s s'
 .
   Admitted. 

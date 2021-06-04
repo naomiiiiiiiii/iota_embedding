@@ -829,19 +829,33 @@ Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
    rewrite subst_var. auto. lia. simpl. auto. Qed.
 
 Lemma et2_eqsub: forall g l1,
-           (compose (gen_sub_mvl_list g 5)
+           eqsub (compose (gen_sub_mvl_list g 5)
                             (dot (var 0)
                                (dot (var 1)
                                   (dot (var 2)
                                      (dot (var 3)
                                         (dot (subst (sh (g + 5)) l1)
-                                             (sh 5))))))) =
+                                             (sh 5)))))))
    (compose (under g (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3)
                                                     (sh 5))))))
            (compose (gen_sub_mvl_list g 6) (under 5 (dot (subst (sh g) l1) id)))).
-intros. simpl. simpsub. simpl. simpsub.
+  intros.
+  apply eqsub_project. intros.
+induction g. simpl. simpsub. auto. (*so that I can use mvl_works0 in IS*)
+remember g.+1 as gs. simpl. simpsub. simpl.
+induction i.
+  - subst. repeat (repeat rewrite mvl_works0; simpsub). auto.
+    repeat rewrite mvl_works0. simpsub.
+  simpsub. simpl. simpsub. simpl.
+
+  rewrite mvl_works0.
 induction g. simpl. simpsub. auto.
+
+
+
 simpsub. simpl. simpsub.
+
+
 simpl. simpsub.
 
 Opaque gen_sub_mvl_list.
