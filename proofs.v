@@ -1,419 +1,32 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help subst_help trans basic_types.
+From istari Require Import lemmas0
+     source subst_src rules_src basic_types
+     help subst_help0 subst_help trans derived_rules embedded_lemmas.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
+(*crucial lemmas leading up to the final theorem (one) showing
+ well-typedness of the translation*)
 
-Ltac var_solv :=
-  try (apply tr_hyp_tm; repeat constructor).
-
-Lemma tr_arrow_elim: forall G a b m n p q, 
-    tr G (deqtype a a) ->
-    tr G (deqtype b b) ->
-      tr G (deq m n (arrow a b))
-      -> tr G (deq p q a) 
-      -> tr G (deq (app m p) (app n q) b).
-intros. 
-suffices: (subst1 p (subst sh1 b)) = b. move => Heq.
-rewrite - Heq.
-eapply (tr_pi_elim _ a); try assumption.
-eapply tr_eqtype_convert; try apply tr_arrow_pi_equal; assumption.
-simpsub. auto. Qed.
-
-Lemma tr_arrow_intro: forall G a b m n,
-    tr G (deqtype a a) ->
-      tr G (deqtype b b)
-      -> tr (cons (hyp_tm a) G) (deq m n (subst sh1 b))
-      -> tr G (deq (lam m) (lam n) (arrow a b) ).
-intros. eapply tr_eqtype_convert.
-apply tr_eqtype_symmetry. apply tr_arrow_pi_equal; try assumption.
-eapply tr_pi_intro; try assumption. Qed.
-
-Lemma tr_karrow_elim: forall G a b m n p q,
-    tr G (deqtype a a) ->
-    tr G (deqtype b b) ->
-      tr G (deq m n (karrow a b))
-      -> tr G (deq p q a) 
-      -> tr G (deq (app m p) (app n q) b).
-  intros. apply (tr_arrow_elim _ a); try assumption.
-  eapply tr_eqtype_convert. apply tr_eqtype_symmetry.
-  apply tr_arrow_karrow_equal; assumption.
-  assumption. Qed.
-
-Lemma kind_type: forall {G K i},
-    tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
-  intros. eapply tr_formation_weaken.
-  eapply tr_kuniv_weaken. apply X. Qed.
-
-Lemma nat_U0: forall G,
-    tr G (oof nattp U0). Admitted.
-Hint Resolve nat_U0. 
-
-Lemma nat_type: forall G,
-      tr G (deqtype nattp nattp). Admitted.
-Hint Resolve nat_type. 
-
-Lemma pw_kind: forall {G},
-    tr G (deq preworld preworld (kuniv nzero)).
-  intros. apply tr_rec_kind_formation.
-  apply tr_arrow_kind_formation.
-  auto. apply tr_karrow_kind_formation.
-  apply tr_fut_kind_formation.
-  simpl. rewrite - subst_kuniv.
-  apply tr_hyp_tm. repeat constructor.
-  auto.
-  apply tr_arrow_kind_formation. apply tr_fut_formation_univ.
-  rewrite subst_nzero. apply nat_U0. auto.
-  apply tr_univ_kind_formation; auto. apply zero_typed. Qed.
-Hint Resolve pw_kind. 
-
-Lemma pw_type: forall {G},
-    tr G (deqtype preworld preworld ).
-  intros. apply (kind_type pw_kind). Qed.
-
-Hint Resolve pw_type.
-
-Lemma pw_type2: forall {G}, tr G (deqtype (arrow (fut nattp) (univ nzero))
-                                   (arrow (fut nattp) (univ nzero))).
-  intros. apply tr_arrow_formation.
-  apply tr_fut_formation. auto.
-  apply tr_univ_formation. auto. Qed.
-
-Lemma pw_type1: forall {G}, tr G (deqtype
-       (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
-       (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
-  ).
-  intros. apply tr_karrow_formation.
-  apply tr_fut_formation. auto. apply pw_type2. Qed.
-
-
-
-Lemma unfold_pw: forall G,
-    tr G (deqtype preworld (arrow nattp
-          (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))). Admitted.
-
-Lemma split_world_elim2: forall W G,
-    tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
-Admitted.
-
-Lemma split_world_elim1: forall W G,
-    tr G (oof W world) -> tr G (oof (ppi1 W) preworld).
-Admitted.
-
-Lemma world_type: forall G,
-      tr G (deqtype world world). Admitted.
-Hint Resolve world_type. 
-
-    Lemma split_world1: forall w1 l1 G,
-tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
-                                                          conjunction here*)
-    Admitted.
-
-    Lemma split_world2: forall w1 l1 G,
-tr G (oof (ppair w1 l1) world) -> tr G (oof l1 nattp). (*ask karl can't put a
-                                                          conjunction here*)
-    Admitted.
-
-    Lemma nth_works: forall G w n,
-        tr G (oof w world) -> tr G (oof n nattp) -> tr G (oof (nth w n)
-                           (karrow (fut preworld) (arrow (fut nattp) U0))).
-      intros. unfold nth. apply (tr_arrow_elim _ nattp); auto.
-      do 2? constructor. auto.
-      constructor. auto.
-      apply tr_univ_formation. auto.
-      eapply tr_eqtype_convert. apply unfold_pw.
-      apply split_world_elim1. assumption.
-      Qed.
-
-
-Lemma subseq_U0: forall G w1 w2,
-    tr G (oof w1 world) -> tr G (oof w2 world) ->
-    tr G (oof (subseq w1 w2) (univ nzero)).
-  intros.
-  assert (forall V,
-tr [:: hyp_tm
-          (leq_t (var 0)
-             (subst (sh 3) (ppi2 (var 0)))),
-        hyp_tm nattp, hyp_tm (fut nattp),
-        hyp_tm (fut preworld), hyp_tm world,
-        hyp_tm world
-        & G] (oof V world) ->
-
-  tr
-    [:: hyp_tm
-          (leq_t (var 0)
-             (subst (sh 3) (ppi2 (var 0)))),
-        hyp_tm nattp, hyp_tm (fut nattp),
-        hyp_tm (fut preworld), hyp_tm world,
-        hyp_tm world
-      & G]
-    (oof
-       (app3 (ppi1 V) 
-          (var 1) (var 3) (var 2)) 
-     (univ nzero))
-         ) as Hworldapp.
-  intros V Hvw.
-
-  rewrite - (subst_nzero (dot (var 2) id)). (*start of the application proof,
-                                              make this general for any
-                                              (var 0) which gamma says is world*)
-  rewrite - subst_univ.
-  eapply (tr_pi_elim _ (fut nattp) ).
-   simpsub. simpl.
-  assert (forall s, pi (fut nattp) (univ nzero)
-                     =  @subst False s (pi (fut nattp) (univ nzero))
-         ) as sub1.
-  auto.
-  assert (forall s, @subst False s (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
-                     = (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
-         ) as sub2.
-  auto.
-  assert (forall s, arrow (fut nattp) (univ nzero)
-                     =  @subst False s (arrow (fut nattp) (univ nzero))
-         ) as sub3.
-  auto.
-  eapply tr_eqtype_convert.
-  rewrite - (subst_U0 (sh 1)).
-  eapply tr_arrow_pi_equal.
-  eapply tr_fut_formation. eapply nat_type.
-  eapply tr_univ_formation.
-  apply zero_typed.
-  rewrite (sub3 (dot (var 3) id)).
-  eapply (tr_pi_elim _ (fut preworld)).
-  eapply tr_eqtype_convert.
-  rewrite (sub3 sh1).
-  eapply tr_arrow_pi_equal.
-  eapply tr_fut_formation. eapply pw_type.
-  eapply pw_type2.
-  assert (forall s, (arrow (fut preworld)
-          (arrow (fut nattp) (univ nzero)))
-               =  @subst False s (arrow (fut preworld)
-          (arrow (fut nattp) (univ nzero)))
-)
-    as sub4.
-  auto.
-  eapply tr_eqtype_convert.
-  eapply tr_eqtype_symmetry.
-  eapply tr_arrow_karrow_equal.
-  eapply tr_fut_formation. eapply pw_type.
-  eapply pw_type2.
-  rewrite - (sub2 (dot (var 1) id)).
-  eapply (tr_pi_elim _ nattp).
-  eapply tr_eqtype_convert.
-  rewrite - (sub2 (sh1)).
-  eapply tr_arrow_pi_equal.
-  apply nat_type.
-  eapply pw_type1.
-  eapply tr_eqtype_convert.
-  apply unfold_pw.
-  eapply (tr_sigma_elim1 _ _ nattp).
-  (*assert (forall s, (arrow nattp
-             (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
-               =  @subst False s (arrow nattp
-             (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
-)
-    as sub5.
-  intros. auto.*)
-  apply Hvw.
-  (*assert (sigma preworld nattp = world) by auto. rewrite H.
-  rewrite - {3}(subst_world (sh 5)).
-  apply tr_hyp_tm. repeat constructor.*)
-  rewrite - {3}(subst_nat (sh 2)).
-  apply tr_hyp_tm. repeat constructor.
-  rewrite - {2}(subst_pw (sh 4)).
-  rewrite - subst_fut.
-  apply tr_hyp_tm. repeat constructor.
-  rewrite - {2}(subst_nat (sh 3)).
-  rewrite - subst_fut.
-  apply tr_hyp_tm. repeat constructor.
-  simpsub. simpl.
-
-
-unfold subseq.
-  rewrite - (subst_nzero (dot w2 id)).
-  rewrite - subst_univ.
-  eapply (tr_pi_elim _ world).
-  rewrite - (subst_nzero (under 1 (dot w1 id)) ).
-  rewrite - subst_univ.
-  rewrite - (subst_world (dot w1 id)).
-  rewrite - subst_pi.
-  eapply (tr_pi_elim _ world).
-  apply tr_pi_intro. apply world_type.
-  apply tr_pi_intro. apply world_type.
-  eapply tr_prod_formation_univ.
-  eapply leq_type.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 1)).
-  eapply tr_hyp_tm. constructor.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 2)).
-  eapply tr_hyp_tm. repeat constructor.
-  eapply tr_all_formation_univ.
-  eapply tr_fut_kind_formation.
-  apply pw_kind.
-  apply zero_typed.
-  eapply tr_pi_formation_univ.
-  eapply tr_fut_formation_univ.
-  apply nat_U0.
-  repeat rewrite subst_nzero. apply zero_typed.
-  repeat rewrite subst_nzero.
-  eapply tr_pi_formation_univ. apply nat_U0.
-  repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
-  apply leq_type.
-  rewrite - (subst_nat (sh 1)).
-  eapply tr_hyp_tm. repeat constructor.
-  rewrite subst_ppi2. simpsub. simpl.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 4)).
-  eapply tr_hyp_tm. repeat constructor.
-  repeat rewrite subst_nzero.
-  eapply tr_eqtype_formation_univ.
-apply Hworldapp. 
-  rewrite - {3}(subst_world (sh 5)).
-  apply tr_hyp_tm. repeat constructor.
-simpsub. simpl. apply Hworldapp. 
-  rewrite - {3}(subst_world (sh 6)).
-  apply tr_hyp_tm. repeat constructor.
-  auto.
-  repeat rewrite subst_nzero. apply leq_refl. auto.
-assumption. assumption.
-Qed.
-
-
-Lemma tr_weakening_appends: forall G1 G2 G3 J1 J2 t J1' J2' t',
-    tr G1 (deq J1 J2 t) ->
-    J1' = (shift (size G2) J1) ->
-    J2' = (shift (size G2) J2) ->
-    t' = (shift (size G2) t) ->
-    G3 = G2 ++ G1 ->
-      tr G3 (deq J1' J2' t').
- intros. move: G3 t t' J1' J2' J1 J2 H H0 H1 H2 X. induction G2; intros.
- -  simpl. subst. repeat rewrite - subst_sh_shift. simpsub. assumption.
- -
-  suffices: (tr (substctx sh1 [::] ++ cons a (G2 ++ G1))
-                (substj (under (length [::]) sh1)
-                        (substj (sh (size G2)) (deq J1 J2 t)))).
-  move => Hdone.
-  simpl in Hdone. subst.
-  rewrite (size_ncons 1).
-  rewrite - plusE. 
-  repeat rewrite subst_sh_shift.
-  repeat rewrite - shift_sum.
-  repeat rewrite subst_sh_shift in Hdone.
-  rewrite cat_cons.
- apply (Hdone False). 
- intros.
- eapply tr_weakening.
- simpl. repeat rewrite subst_sh_shift. eapply IHG2; try reflexivity. assumption.
-Qed.
-
- Lemma tr_weakening_append: forall (G1: context) G2 J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (G2 ++ G1) (
-                       (deq (shift (size G2) J1)
-                            (shift (size G2) J2)
-                            (shift (size G2) t))).
-   intros. eapply tr_weakening_appends; try apply X; try reflexivity.
-   Qed.
-
-Lemma store_type: forall W G,
-    (tr G (oof W world)) -> tr G (oof (store W) U0).
-Admitted.
-Hint Resolve store_type.
-
-Lemma laters_type: forall A G i,
-    (tr G (oof A (univ i))) -> tr G (oof (laters A) (univ i)).
-  Admitted.
-Hint Resolve laters_type.
-
-Lemma bind_type: forall G A B M0 M1,
-    tr G (oof M0 (laters A)) ->
-    tr G (oof M1 (arrow A (laters B))) ->
-    tr G (oof (make_bind M0 M1) (laters B)). Admitted.
-
-
-Lemma world_pair: forall w l G, tr G (oof w preworld) ->
-                           tr G (oof l nattp) ->
-    tr G (oof (ppair w l) world).
-intros.
-   (* eapply tr_eqtype_convert.
-    eapply tr_eqtype_symmetry.
-      eapply tr_prod_sigma_equal.*)
-    (*eapply tr_formation_weaken; eapply tr_kuniv_weaken.
-    eapply pw_kind. eapply nat_type.*)
-    eapply tr_sigma_intro; try assumption.     apply nat_type. Qed.
-
-Lemma hseq2: forall (T: Type) (x y: T)
-                  (L: seq T), [:: x; y] ++ L=
-                 [:: x, y & L].
-intros. auto. Qed.
-
-  Lemma hseq3: forall (T: Type) (x y z: T)
-                  (L: seq T), [:: x; y; z] ++ L=
-                 [:: x, y, z & L].
-intros. auto. Qed.
-
-Lemma hseq4: forall (T: Type) (x y z a: T)
-                  (L: seq T), [:: x; y; z; a] ++ L=
-                 [:: x, y, z, a & L].
-intros. auto. Qed.
-
-  Lemma uworld10: forall G,
-      (tr [:: hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 1) (var 0)) world)). intros.
-     apply world_pair. 
-        rewrite - (subst_pw (sh 2)).
-      apply tr_hyp_tm; repeat constructor.
-        rewrite - (subst_nat (sh 1)).
-        apply tr_hyp_tm; repeat constructor. Admitted.
-
-  Hint Resolve uworld10.
-
-Lemma uworld32: forall G x y,
-      (tr [:: x, y, hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 3) (var 2)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 4)). var_solv.
-  rewrite - (subst_nat (sh 3)). var_solv. Qed. 
-
-  Lemma uworld43: forall G x y z,
-      (tr [:: x, y, z, hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 4) (var 3)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 5)). var_solv.
-  rewrite - (subst_nat (sh 4)). var_solv. Qed. 
-
-Hint Resolve uworld32.
-
-Lemma uworld21: forall G x,
-      (tr [:: x, hyp_tm nattp, hyp_tm preworld & G]
-    (oof (ppair (var 2) (var 1)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 3)). var_solv.
-  rewrite - (subst_nat (sh 2)). var_solv. Qed. 
-
+(*no free variables in translation of types*)
 Lemma subst_trans_type : forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub; simpl; repeat rewrite subst_lt; repeat rewrite subst_nth; repeat rewrite subst_nat; repeat rewrite subst_pw;
-  repeat rewrite subst_subseq; repeat rewrite subst_nzero; repeat rewrite subst_store; repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
+  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl;
+ repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
  try rewrite subst_compose; try rewrite H. 
   - (*arrow*)
-    suffices:  (subst
+    suffices:  ((subst
                 (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1). move => Heq1.
-  suffices:  (subst
+                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1)) /\ ((subst
                 (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2). move => Heq2.
-  rewrite Heq1 Heq2. auto. 
-eapply IHA2. simpsub. auto. 
-eapply IHA1. simpsub. auto.
+                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2)). move => [Heq1 Heq2].
+    rewrite Heq1 Heq2. auto.
+    split; [eapply IHA1 | eapply IHA2]; simpsub; auto.
   - (*comp*)
  rewrite subst_ppair in H. inversion H. rewrite H1.
-repeat rewrite subst_ppair.
-repeat rewrite subst_compose.
-repeat rewrite H2. 
+rewrite !subst_ppair !subst_compose !H2.
 simpsub_big. simpl. suffices: (
             (subst
                             (dot (var 0)
@@ -440,28 +53,29 @@ simpsub_big. simpl. suffices: (
                                (var 0) A)
 
           ).
-move => Heq. rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
+move => Heq.
+rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
   - (*ref*)
-    rewrite - subst_ppair. rewrite subst_compose. rewrite H.
+    rewrite !subst_compose - !subst_ppair H.
     suffices: (subst
                       (dot (var 0)
                          (dot (var 1)
                             (dot (var 2) (compose s (sh 3)))))
                       (trans_type (var 1) (var 0) A)) =
               (trans_type (var 1) (var 0) A).
-    move => Heq. rewrite Heq. auto.
+    move => Heq. rewrite Heq. auto. simpsub_big.
 eapply IHA. simpsub. auto.
 Qed.
 
 
-
+(*start here automate these ugly cases*)
 Lemma sh_trans_type : forall w l A s,
     (subst (sh s) (trans_type w l A)) = (trans_type
                                            (subst (sh s) w)
                                            (subst (sh s) l) A).
   induction A; intros; simpl; auto; simpsub_big; repeat rewrite plusE;
 repeat rewrite - addnA;
-    simpl; replace (1 + 1) with 2;
+    simpl; change (1 + 1) with 2;
       replace (1 + 0) with 1; auto.
   - (*arrow*)
      repeat rewrite - subst_sh_shift.
@@ -475,9 +89,9 @@ repeat rewrite - addnA;
     repeat rewrite subst_trans_type; simpsub; auto.
     unfold subst1. simpsub1.
     repeat rewrite - subst_sh_shift. simpsub. auto.
-    rewrite subst_lt. simpsub. auto.
 Qed.
 
+(*subtypes of the computation type*)
 Lemma compm4_type: forall U A G,
     (tr G (oof U world)) ->
     (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
@@ -948,8 +562,36 @@ Lemma et2_eqsub: forall g l1,
            (compose (gen_sub_mvl_list g 6) (under 5 (dot (subst (sh g) l1) id)))).
   intros.
   apply eqsub_project. intros.
-induction g. simpl. simpsub. auto. (*so that I can use mvl_works0 in IS*)
-remember g.+1 as gs. simpl. simpsub. simpl.
+  induction g. simpl. simpsub. simpl.
+  simpsub.
+  suffices: (var i) = (@project False (dot (var 0) sh1) i). intros Hi.
+  rewrite - Hi subst_var. auto.
+  rewrite - subst_var.
+  replace (var i) with (@subst False id (var i)).
+  move: (eqsub_expand_id False 0). apply. simpsub. auto.
+  remember g.+1 as gs. simpl. simpsub. simpl. subst.
+  destruct (i < g.+1) eqn: Hi; remember Hi as Hi1; clear HeqHi1.
+  - apply mvl_works_nz in Hi. repeat (repeat rewrite Hi; simpl; simpsub).
+       change (dot (var 0)
+          (compose
+             (under g
+                (dot (var 0)
+                   (dot (var 1)
+                      (dot (var 2) (dot (var 3) (sh 5))))))
+             sh1)) with (@under False g.+1 (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3)
+                                                    (sh 5)))))).
+rewrite project_under_lt. repeat (simpsub; repeat rewrite Hi; simpl). auto.
+apply/leP. rewrite Hi1. constructor.
+  - apply negbT in Hi. rewrite - leqNgt in Hi. rewrite leq_eqVlt in Hi.
+    move/ orP : Hi => [H1 | H2].
+    + move/ eqP: H1 => H1. subst. repeat rewrite project_under_eq. simpsub.
+      rewrite plusE. replace (g.+1 + 0) with (g.+1). repeat rewrite mvl_worksg. simpsub. auto. ring.
+      repeat rewrite project_under_geq. simpsub.
+      apply mvl_works_nz in H2. repeat rewrite H2. simpsub.
+    simpl. simpsub. repeat rewrite Hi. simpsub. simpl.
+  - rewrite (mvl_works_nz g i Hi).
+
+
 induction i.
   - subst. repeat (repeat rewrite mvl_works0; simpsub). auto.
     repeat rewrite mvl_works0. simpsub.

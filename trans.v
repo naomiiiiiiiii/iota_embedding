@@ -1,6 +1,6 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help subst_help.
+From istari Require Import basic_types source subst_src rules_src help subst_help0 subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -31,7 +31,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                     ))
        | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
-            prod (ltpagetp i (subst sh1 l1))
+            prod (lt_t i (subst sh1 l1))
                  (all nzero preworld (*wl1:= 2, i := 1, v := 0*)
                       (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
                       (
