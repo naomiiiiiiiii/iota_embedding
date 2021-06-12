@@ -70,44 +70,44 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                       ))
       | _ => nattp end.
 
-(*proves the second part of the compm1 to be a type*)
-
-
   (*after this return to bind proof, use above for next goal,
    probably should save as hypothesis that W and U are worlds*)
 
 
-Fixpoint gamma_at (gamma: source.context) (w l: Syntax.term False) :=
-  map (fun t => hyp_tm (trans_type w l t)) gamma.
+(*makes a sigma out of a context *)
+ Fixpoint gamma_at (G: source.context) (w l: Syntax.term False) :=
+   match G with
+     nil => triv 
+   | A::xs => (sigma (trans_type w l A) (gamma_at xs w l)) end
+ .
 
-(*make trans_type a meta function
-%% can return whatever for terms that aren't types cuz induction on the derivation will
- take care of it
- write up the rest of the translations*)
+ (*making a sigma of one type out of a sigma of a different type
+  iterating over the sigma
+  but how far to go? use the list because they should be the same size *)
+ Fixpoint move_gamma (G: source.context) (m: term False) (gamma: term False) :=
+   match G with
+     nil => gamma
+   | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
+ (*not even doing substituions any more, completely differeent from old move gamma*)
+ Lemma move_gamma_works: forall D G w1 l1 w2 l2 m gamma,
+     tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
+     tr D (oof gamma (gamma_at G w1 l1)) ->
+     tr D (oof (move_gamma G m gamma) (gamma_at G w2 l1)).
+ Admitted.
 
-(*probably want to make the above a function also so that
- Gamma @ w can be calculated*)
-
-
-(*every time you put stuff under a lambda you probably have to shift it*)
-Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
+ Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 T1 T2, of_m G E1 (comp_m T1) ->
                                   of_m (cons T1 G) E2 (comp_m T2) ->
                                    trans G E1 Et1 ->
                                    trans (cons T1 G) E2 Et2 ->
                                    trans G (bind_m E1 E2)(
- lam ( lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
+ lam (lam ( lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
                            lam ( (*l1 := 3, l := 2, m := 1, s := 0*)
                                let l1 := (var 3) in
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-                               (*the free var 0 in Et1 is going to be captured
-should shift Et1 up by 3 to prevent capture.
-then put l1 in for the 3rd one.
-this is weird though to have open terms. you should be doing lambdas
-                                *)
 let btarg := app (app (app (app (shift 4 Et1) l1) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
@@ -128,8 +128,13 @@ that. you want to bind
  maybe plan is bring the subst outside the lamda so that you type check the lamda in the
  weakened context*)                                                      
 
-                               let btarg := app
-     (subst (gen_sub_mvl_list (size G) 5)
+                               let btarg :=
+                                   (*Et2 Gamma@V *)
+                                   app (app Et2
+                                            move_gamma G make_subseq (var 5)) (picomp1 z1)
+
+
+                                   app
   (lam
      (move_gamma G (make_subseq) 1 (*ignore x'*)
                  (app Et2 (picomp1 (var (size G + 1)))
@@ -151,7 +156,7 @@ that. you want to bind
           )
 
     ))
-                                         ))))
+                                         )))))
   | t_ref: forall G E Et T, 
          of_m G E T -> trans G E Et ->
          trans G (ref_m E)

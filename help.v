@@ -247,9 +247,7 @@ end.
        end
 ).
 
- (*n keeps track of starting index*)
- Fixpoint move_gamma (G: source.context) (m: term False) (n: nat) :=
-   subst (sub_4_moveG G m n).
+
 
 (*Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unittp.
   simpl. simpsub. unfold move_app. simpsub. rewrite subst_move. unfold move. simpl.
