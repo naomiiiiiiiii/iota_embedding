@@ -10,7 +10,7 @@ From istari Require Import Sigma Tactics
  well-typedness of the translation*)
 
 (*no free variables in translation of types*)
-Lemma subst_trans_type : forall w l A s,
+Lemma subst_trans_type :forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
   move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl;
