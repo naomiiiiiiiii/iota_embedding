@@ -108,7 +108,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-let btarg := app (app (app (app (shift 4 Et1) l1) l) m) s in
+let btarg := app (app (app (app (app (shift 4 Et1) (var 4)) l1) l) m) s in
 make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
               (
                                let z1 := (var 0) in (*basically added 5 vars to my context*)
@@ -129,21 +129,16 @@ that. you want to bind
  weakened context*)                                                      
 
                                let btarg :=
-                                   (*Et2 Gamma@V *)
-                                   app (app Et2
-                                            move_gamma G make_subseq (var 5)) (picomp1 z1)
-
-
-                                   app
-  (lam
-     (move_gamma G (make_subseq) 1 (*ignore x'*)
-                 (app Et2 (picomp1 (var (size G + 1)))
-                 )
-     ))
-  ) x'
+                                   (*Et2 Gamma@V lv*)
+                                   app (app (shift 5 Et2)
+                                            (ppair x' (move_gamma G make_subseq (var 5)))
+                                            )
+                                            (*5: gamma_at G w
+                                              move 5: gamma_at G v
+                                          <x, 5> : gamma_at T1::G v*)
+                                       lv
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
-                               (*start here*)
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
                                                     ret_t (ppair (picomp1 z2)
