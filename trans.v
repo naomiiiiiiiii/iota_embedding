@@ -5,7 +5,7 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
-(*movegamma almost definitely wrong because it assumes Gamma starts from beginning of
+(*moveGamma almost definitely wrong because it assumes Gamma starts from beginning of
  context (var 0) where as there's probably more stuff at the end
  probably need to pass in a starting index to move Gamma
  best to work this out when you can test in real time whether its working when you're
@@ -13,8 +13,6 @@ From istari Require Import Sigma Tactics
 
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
-
-
 
 
 Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)                                                                          
@@ -74,26 +72,44 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
    probably should save as hypothesis that W and U are worlds*)
 
 
-(*makes a sigma out of a context *)
- Fixpoint gamma_at (G: source.context) (w l: Syntax.term False) :=
+(*makes a sigma type out of a source context *)
+ Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
    match G with
-     nil => triv 
-   | A::xs => (sigma (trans_type w l A) (gamma_at xs w l)) end
+     nil => unittp 
+   | A::xs => (sigma (trans_type w l A) (Gamma_at xs w l)) end
  .
+
+ (*makes a target context out of a source context *)
+ Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False) :=
+   map (fun t => hyp_tm (trans_type w l t)) G.
+
+(*making a sigma value out of the variables in a source context*)
+ Fixpoint gamma_at_help (G: source.context) n :=
+   match G with
+     nil => triv
+   | A:: xs => (@ppair False (var n) (gamma_at_help xs (n+1)))
+   end .
+
+Definition gamma_at G := gamma_at_help G 0.
+
 
  (*making a sigma of one type out of a sigma of a different type
   iterating over the sigma
   but how far to go? use the list because they should be the same size *)
- Fixpoint move_gamma (G: source.context) (m: term False) (gamma: term False) :=
-   match G with
-     nil => gamma
-   | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
- (*not even doing substituions any more, completely differeent from old move gamma*)
- Lemma move_gamma_works: forall D G w1 l1 w2 l2 m gamma,
+ Definition move_app A (m : term False) (x: term False) :=
+   app (app (move A) m) x.
+
+Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (Gamma: Syntax.term False) :=
+   match G with
+     nil => Gamma
+   | A::xs => ppair (move_app A m (ppi1 Gamma)) (move_gamma xs m (ppi2 Gamma)) end.
+
+ (*not even doing substituions any more, completely differeent from old move Gamma*)
+ Lemma move_gamma_works: forall D G w1 l1 w2 l2 m Gamma,
      tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
-     tr D (oof gamma (gamma_at G w1 l1)) ->
-     tr D (oof (move_gamma G m gamma) (gamma_at G w2 l1)).
+     tr D (oof Gamma (Gamma_at G w1 l1)) ->
+     tr D (oof (move_gamma G m Gamma) (Gamma_at G w2 l1)).
  Admitted.
 
  Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
@@ -102,9 +118,9 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                    trans G E1 Et1 ->
                                    trans (cons T1 G) E2 Et2 ->
                                    trans G (bind_m E1 E2)(
- lam (lam ( lam ( (*l1 := 1, l :=0 *) lam ( (*l1 := 2, l := 1, m := 0*)
-                           lam ( (*l1 := 3, l := 2, m := 1, s := 0*)
-                               let l1 := (var 3) in
+ lam (lam ( lam ( (*l1 : = 2, g: Gamma_at G l1 = 1 l :=0 *) lam ( (*l1 := 3, l := 1, m := 0*)
+                           lam ( (*l1 := 4, l := 2, m := 1, s := 0*)
+                               let l1 := (var 4) in
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
@@ -133,9 +149,9 @@ that. you want to bind
                                    app (app (shift 5 Et2)
                                             (ppair x' (move_gamma G make_subseq (var 5)))
                                             )
-                                            (*5: gamma_at G w
-                                              move 5: gamma_at G v
-                                          <x, 5> : gamma_at T1::G v*)
+                                            (*5: Gamma_at G w
+                                              move 5: Gamma_at G v
+                                          <x, 5> : Gamma_at T1::G v*)
                                        lv
                                                  in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
@@ -213,5 +229,5 @@ l2: := 2
 
 (*Problem with below is that lv isn't from G and can't be shifted 5
 app (shift 5 (lam (*x' lam*) (
-                                                     move_gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
+                                                     move_Gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
 *)

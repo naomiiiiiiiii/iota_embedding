@@ -339,8 +339,8 @@ Qed.
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
  
-Lemma size_gamma_at: forall G w l,
-    size (gamma_at G w l) = size G. Admitted.
+(*Lemma size_Gamma_at: forall G w l,
+    size (Gamma_at G w l) = size G. Admitted.*)
 
 Theorem typed_hygiene: forall G M M' A,
     (tr G (deq M M' A)) -> (hygiene (ctxpred G) M).
@@ -367,7 +367,7 @@ Opaque nth.*)
 (*Theorem one_five: forall G D e T ebar w1 l1, 
     of_m G e T ->
     trans e ebar -> 
-         tr (gamma_at G ___? (oof ebar (all nzero preworld (pi nattp (trans_type
+         tr (Gamma_at G ___? (oof ebar (all nzero preworld (pi nattp (trans_type
                                                       (var 1) (var 0)
                                                     T )))).*)
 
@@ -549,7 +549,7 @@ apply/ leP. auto. simpl. auto. simpl. auto. auto.
 Unshelve. auto.
 Qed.
 
-Lemma et2_eqsub: forall g l1,
+(*Lemma et2_eqsub: forall g l1,
            eqsub (compose (gen_sub_mvl_list g 5)
                             (dot (var 0)
                                (dot (var 1)
@@ -605,7 +605,7 @@ induction g. simpl. simpsub. auto.
 simpsub. simpl. simpsub.
 
 
-simpl. simpsub.
+simpl. simpsub.*)
 
 Opaque gen_sub_mvl_list.
 
@@ -624,15 +624,19 @@ Lemma checking: forall t, @subst False (dot (var 0)
   simpsub.*)
 
 
+Theorem onef: forall G e T ebar w1 l1,
+    of_m G e T ->
+    tr [::] (oof (ppair w1 l1) world) ->
+    trans G e ebar -> 
+    tr (Gamma_at_ctx G w1 l1) (oof (app (app ebar l1) 
+              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
+
+
 Theorem one: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans G e ebar -> 
-         tr ((gamma_at G w1 l1) ++ D) (oof (app ebar (shift (size G) l1))
-                                                   (trans_type
-                                                      (shift (size G)
-                                                             w1) (shift (size G)
-                                                             l1)
-                                                    T )).
+    tr D (oof (app ebar l1)
+              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
   move => G D e T ebar w1 l1 De Dw Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
@@ -644,18 +648,18 @@ assert (size
            (ppair (subst (sh (size G + 2)) w1)
               (subst (sh (size G + 2)) l1))
            (ppair (var 1) (var 0))),
-     hyp_tm nattp, hyp_tm preworld & gamma_at G w1 l1]
+     hyp_tm nattp, hyp_tm preworld & Gamma_at G w1 l1]
 = (4 + size G)
-       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_gamma_at. auto.
+       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_Gamma_at. auto.
      remember (size ([:: hyp_tm nattp,
         hyp_tm preworld
-        & gamma_at G w1 l1])) as sizel.
+        & Gamma_at G w1 l1])) as sizel.
     assert (sizel = (2 + size G )) as Hsizel. subst.
     repeat rewrite size_cons. repeat rewrite addnA.
-    rewrite size_gamma_at. auto.
+    rewrite size_Gamma_at. auto.
    (*assert (tr
     [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
-      & gamma_at G w1 l1 ++ D]
+      & Gamma_at G w1 l1 ++ D]
     (oof (ppair (var 1) (var 0)) world) ) as Hu.
    apply world_pair.
         rewrite - (subst_pw (sh 2)).
@@ -664,7 +668,7 @@ assert (size
         apply tr_hyp_tm; repeat constructor.*)
 (*assert (tr
     [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
-      & gamma_at G w1 l1 ++ D]
+      & Gamma_at G w1 l1 ++ D]
     (oof (ppair (subst (sh (3 + (size G))) w1) (var 2)) world)) as Hwv2.
     apply world_pair. 
     (*rewrite subst_sh_shift. subst.
@@ -678,9 +682,9 @@ eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
       apply tr_hyp_tm; repeat constructor.*)
     (*actual proof*)
-    suffices: hygiene (ctxpred (gamma_at G w1 l1 ++ D)) (trans_type (shift (size G) w1)
+    suffices: hygiene (ctxpred (Gamma_at G w1 l1 ++ D)) (trans_type (shift (size G) w1)
                                                           (shift (size G) l1) (comp_m B)) /\
-              hygiene (ctxpred (gamma_at G w1 l1 ++ D)) (app ebar (shift (size G) l1)).
+              hygiene (ctxpred (Gamma_at G w1 l1 ++ D)) (app ebar (shift (size G) l1)).
     move => [Hh1 Hh2].
     suffices: equiv 
        (trans_type (shift (size G) w1) 
@@ -715,7 +719,7 @@ eapply split_world1. apply Dw.
                                         (gen_sub_mvl_list
                                         (size G) 5)
                                         (lam
-                                        (move_gamma G
+                                        (move_Gamma G
                                         make_subseq 1
                                         (app Et2
                                         (picomp1
@@ -753,7 +757,7 @@ eapply split_world1. apply Dw.
                                         (gen_sub_mvl_list
                                         (size G) 5)
                                         (lam
-                                        (move_gamma G
+                                        (move_Gamma G
                                         make_subseq 1
                                         (app Et2
                                         (picomp1
@@ -849,7 +853,7 @@ apply (tr_arrow_elim _
 eapply tr_formation_weaken. apply subseq_U0.
 rewrite - hseq4.
 do 2! rewrite - (sh_sum _ 4).
-apply wworld4. erewrite <- size_gamma_at. apply wworld_app; assumption.
+apply wworld4. erewrite <- size_Gamma_at. apply wworld_app; assumption.
 apply uworld32.
 eapply tr_formation_weaken; apply compm1_type. apply uworld32.
 apply trans_type_works. auto.
@@ -1035,7 +1039,7 @@ rewrite - (subst_pw (sh 4)). var_solv.
 (*repeat rewrite - (sh_sum (4 + size G) 2). *)
 eapply tr_formation_weaken; apply compm0_type.
 do 2! rewrite - (sh_sum _ 6).
-apply wworld6. erewrite <- size_gamma_at. apply wworld_app. assumption.
+apply wworld6. erewrite <- size_Gamma_at. apply wworld_app. assumption.
 apply trans_type_works. apply uworld10. 
 rewrite - (subst_nat (sh 3)). var_solv.
 rewrite - (addn2 (size G)).
@@ -1086,7 +1090,7 @@ simpsub_big. auto. simpsub.
         hyp_tm
           (subseq (ppair (subst (sh (size G).+2) w1) (subst (sh (size G + 2)) l1)) (ppair (var 1) (var 0))),
         hyp_tm nattp, hyp_tm (subst1 (subst (sh (size G)) l1) preworld)
-                      & gamma_at G w1 l1 ++ D] as G'.
+                      & Gamma_at G w1 l1 ++ D] as G'.
    remember 
        (laters
           (exist nzero preworld
@@ -1102,7 +1106,7 @@ simpsub_big. auto. simpsub.
                       (lam
                          (subst
                             (dot (var 0) (sh 6))
-                            (move_gamma G
+                            (move_Gamma G
                               make_subseq 1
                               (app Et2
                               (picomp1 (var 0))))))
@@ -1123,7 +1127,7 @@ simpsub_big. auto. simpsub.
                          (lam
                             (subst (dot (var 0) (sh 6))
                                
-                            (move_gamma G
+                            (move_Gamma G
                               make_subseq 1
                               (app Et2
                               (picomp1 (var 0))))))
@@ -1164,7 +1168,7 @@ simpsub_big. auto. simpsub.
    rewrite compose_under.
 simpl.
 (*trying to figure out what the substitution around
- move gamma actually is*)
+ move Gamma actually is*)
    (*start here*)
    (*IDEA: do the move when there's only one variable to move: before 72*)
    subst.
@@ -1584,7 +1588,7 @@ apply tr_weakening_append. assumption. assumption.
 
         (*do a suffices somehow*)
 suffices:
-          tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & gamma_at G w1 l1 ++ D]
+          tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & Gamma_at G w1 l1 ++ D]
     (oof
        (arrow (store (ppair (var 1) (var 0)))
           (laters

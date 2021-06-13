@@ -1,6 +1,6 @@
 (*Shallow embedding of simple constructs from the monadic language into the store-passing logic*)
-
 From Coq Require Import Lists.List.
+From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import Tactics Sequence source subst_src rules_src.
 From istari Require Import basic_types Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -230,8 +230,6 @@ lam ( lam (
      | unittp_m  => lam (lam (var 1))
      | _ => triv (*not a type operator, error case*)
 end.
- Definition move_app A m x :=
-   app (app (move A) m) x.
 
  Lemma subst_move: forall A s, (subst s (move A)) = move A.
    intros. induction A; simpsub; simpl; auto. Qed.
@@ -239,13 +237,13 @@ end.
  (*moving all variables specified by G to a future world*)
  (*n keeps track of index at which G starts*)
  (* for (var i): B in G, (sub_4_moveG G m n) substitutes
-(move_B m (var (i + n))) in for (var (i + n)) while leaving all other variables untouched *)
+(move_B m (var (i + n))) in for (var (i + n)) while leaving all other variables untouched 
  Fixpoint sub_4_moveG (G: source.context) (m: term False) (n: nat) :=
  under n (match G with
    nil => id
           | b :: bs => dot (move_app b m (var 0)) (sub_4_moveG bs m (n + 1))
        end
-).
+).*)
 
 
 
