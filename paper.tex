@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{packages}
 \usepackage{qtree}
+\usepackage{soul}
 
 \title{typing}
 
@@ -441,9 +442,12 @@ Then, invert on $\Gamma, R: ref(\tau) @ W_1 \vdash ref(\tau) : U_0$ to get
 \end{itemize}
 
 \subsection*{$move_{\Gamma} m$}
-For $\Gamma$ a context in the source language and $W_1, W_2$ where $\Delta \vdash W_1, W_2 : world$, if  $\Delta, \Gamma@W_1 \vdash m: W_1 \leq W_2$ and $\Delta, \Gamma@W_2 \vdash e : B$ and 
-$\Gamma \cap FV(B) = \emptyset$,
-then $\Delta, \Gamma @ W_1 \vdash move_{\Gamma} \:m \:e : B$.\\
+ \[\Gamma', v: pw, z:A'  \vdash move_\Gamma \: (\pi_2 \: z \circ m) \: g: \Gamma @ \langle v, (\pi_1 \: z) \rangle\]
+For $\Gamma$ a context in the source language and $W_1, W_2$ where $\Delta \vdash W_1, W_2 : world$, if  $\Delta \vdash m: W_1 \leq W_2$ and $\Delta \vdash g : \Gamma @ W_1$ 
+%and $\Gamma \cap FV(B) = \emptyset$,
+then $\Delta \vdash move_{\Gamma} \:m \:g : \Gamma @ W_2$.\\
+%start here, induction on Gamma probably
+\hl{bad}
 Recall first that \[move_{\Gamma} \:m \:e \equiv
 e[i := move_{\tau_i} \: m\: i]_{i: \tau_i \in \Gamma}
 \]
@@ -680,40 +684,28 @@ Applying the bind rule gives
         \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} (\pi_1 \: z)
 \langle \pi_4 \: z, move_{\Gamma} \: \pi_2 \: z \circ m \: g \rangle  : \bigcirc \tau_2 @ V\] 
     Apply rule 6 twice more to get
-    \begin{itemize}
-        \item 
-        \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} :\Pi(l_v: \N)\big(x::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
+        \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} :\Pi(l_v: \N)\big(x:(\tau_1 @ \langle v, l_v \rangle)::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
         add a forall
          \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} :
-         \forall(v: pw)\Pi(l_v: \N)\big(x::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
-        how to rewrite $(x::\Gamma @ \langle v, l_v \rangle$ as substituting in $v, l_v$?
-        could do the trans types in there as subst1s from the start. then prove by induction on g that you can bring the subst1 out of the product
-        \item 
+         \forall(v: pw)\Pi(l_v: \N)\big(x:(\tau_1 @ \langle v, l_v \rangle)::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
+       \hl{how to rewrite $(x:(\tau_1 @ \langle v, l_v \rangle)::\Gamma @ \langle v, l_v \rangle$ as substituting in $v, l_v$?
+        could do the trans types in there as subst1s from the start. then prove by induction on g that you can bring the subst1 out of the product.
+        or, to avoid breaking things, write another trans type function and then prove equivalence.}
+        Have that
+        $\Gamma, x:\tau_1  \vdash e_2 : \comp \tau_2$. By induction,
+        \[\cdot \vdash \overline{e}: \forall(v: pw)\Pi(l_v: \N)\big(x:(\tau_1 @ \langle v, l_v \rangle)::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
+     Desired result then follows by weakening
         \[\Gamma', v: pw, z:A'  \vdash (\pi_1 \: z) : \N\]
-        \item \[\Gamma', v: pw, z:A'  \vdash \langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle : 
- x::\Gamma @ \langle v, (\pi_1 \: z) \rangle
-        \]
-    \end{itemize}
-    
-    
-    
-    $\Gamma', v: pw, z:A'  \vdash \pi_4 \: z : \tau_1 @ V$ (easy by def $A'$) and
-    \[\Gamma', v: pw, z:A' \vdash \lambda x. move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2} \:V) :
-    \Pi(\_ : \tau_1 @ V \imp ).\bigcirc \tau_2 @ V
-    \] 
-    Apply rule 5 to get $\Gamma' \dots \vdash  \tau_1 @ V : type$ (done in types) and 
-    \[\Gamma', v: pw, z:A', x: \tau_1 @ V \vdash move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2} \:V) : \bigcirc \tau_2 @ V\]
-    By $move_{\Gamma}$ it suffices to show
-    \begin{itemize}
-        \item $\Delta, u: pw, l: \N, m: W_1 \leq U, v: pw, z:A' \vdash W_1, V: world$\\
         easy
-        \item $\Delta, u: pw, l: \N, m: W_1 \leq U, v: pw, z:A' \vdash \pi_2 \: z \circ m : W_1 \leq V$\\
-        transitivity of subseq
-        \item $\Delta, u: pw, l: \N, m: W_1 \leq U, v: pw, z:A', \Gamma @ V, x: \tau_1 @V \vdash \overline{e_2} \:V\bigcirc \tau_2 @ V$\\
-        I have that $\Gamma, x: \tau_1 \vdash e_2 : \bigcirc \tau_2$. IH on this gives exactly the result desired.
-    \end{itemize}
-    
-    \item $\Gamma', v: pw, z: A' \vdash \lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2] : C \imp \overline{B}$\\
+       \[\Gamma', v: pw, z:A'  \vdash \langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle : 
+ x:(\tau_1 @ \langle v, l_v \rangle)::\Gamma @ \langle v, (\pi_1 \: z) \rangle
+        \]
+        Unfold $\_ @ \_$, apply intro prod to get $\Gamma', v: pw, z:A'  \vdash \pi_4 \: z : \tau_1 @ \langle v, l_v \rangle$, which is easy, as well as
+ \[\Gamma', v: pw, z:A'  \vdash move_\Gamma \: (\pi_2 \: z \circ m) \: g: \Gamma @ \langle v, (\pi_1 \: z) \rangle\]
+ Follows quickly from $move_\Gamma$.
+    \item 
+    %this part should be unchanged as doesnt feature any translated terms
+    $\Gamma', v: pw, z: A' \vdash \lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big) : C \imp \overline{B}$\\
     Below, I denote $\Sigma(l_v' : \N)(\langle v, \pi_1 z\rangle \leq \langle v', l_v' \rangle \times store\langle v', l_v' \rangle \times \tau_2 @ \langle v', l_v' \rangle)$ as $C'$.\\
     Apply 5 to get 
     \[\Gamma', v: pw, z: A', z_2: C \vdash  \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2] \overline{B}\]
