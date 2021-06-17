@@ -73,13 +73,18 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
 
 
 (*makes a sigma type out of a source context *)
+(*this should be a product actually cuz the translated types never depend
+ on any other translated type
+ start here*)
  Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
    match G with
      nil => unittp 
    | A::xs => (sigma (trans_type w l A) (Gamma_at xs w l)) end
  .
 
- (*makes a target context out of a source context *)
+ (*makes a target context out of a source context
+  start here probably need to shift the w and the l by 1 for each hypothesis
+  added before them*)
  Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False) :=
    map (fun t => hyp_tm (trans_type w l t)) G.
 
