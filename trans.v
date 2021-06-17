@@ -147,13 +147,12 @@ that. you want to bind
                                let btarg :=
                                    (*Et2 Gamma@V lv*)
                                    app (app (shift 5 Et2)
-                                            (ppair x' (move_gamma G make_subseq (var 5)))
+                                           lv 
                                             )
                                             (*5: Gamma_at G w
                                               move 5: Gamma_at G v
                                           <x, 5> : Gamma_at T1::G v*)
-                                       lv
-                                                 in
+(ppair x' (move_gamma G make_subseq (var 5)))                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in

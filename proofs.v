@@ -624,24 +624,19 @@ Lemma checking: forall t, @subst False (dot (var 0)
   simpsub.*)
 
 
-Theorem onef: forall G e T ebar w1 l1,
-    of_m G e T ->
-    tr [::] (oof (ppair w1 l1) world) ->
-    trans G e ebar -> 
-    tr (Gamma_at_ctx G w1 l1) (oof (app (app ebar l1) 
-              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
 
 
-Theorem one: forall G D e T ebar w1 l1,
+Theorem two: forall G D e T ebar w1 l1,
     of_m G e T -> tr D (oof (ppair w1 l1) world) ->
     trans G e ebar -> 
     tr D (oof (app ebar l1)
               (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
+  (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G D e T ebar w1 l1 De Dw Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
     (*Useful facts that will help us later*)
-assert (size
+(*assert (size
          [:: hyp_tm (store (ppair (var 2) (var 1))),
       hyp_tm
         (subseq
@@ -656,7 +651,7 @@ assert (size
         & Gamma_at G w1 l1])) as sizel.
     assert (sizel = (2 + size G )) as Hsizel. subst.
     repeat rewrite size_cons. repeat rewrite addnA.
-    rewrite size_Gamma_at. auto.
+    rewrite size_Gamma_at. auto.*)
    (*assert (tr
     [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
       & Gamma_at G w1 l1 ++ D]
@@ -681,62 +676,21 @@ assert (size
 eapply split_world1. apply Dw.
       rewrite - (subst_nat (sh 3)).
       apply tr_hyp_tm; repeat constructor.*)
+
     (*actual proof*)
-    suffices: hygiene (ctxpred (Gamma_at G w1 l1 ++ D)) (trans_type (shift (size G) w1)
-                                                          (shift (size G) l1) (comp_m B)) /\
-              hygiene (ctxpred (Gamma_at G w1 l1 ++ D)) (app ebar (shift (size G) l1)).
+
+    (*pop off the Gamma*)
+    suffices: hygiene (ctxpred D) (trans_type w1 l1 (comp_m B)) /\
+              hygiene (ctxpred D) (app ebar l1).
     move => [Hh1 Hh2].
     suffices: equiv 
-       (trans_type (shift (size G) w1) 
-          (shift (size G) l1) (comp_m B))
-       (trans_type (shift (size G) w1) 
-                   (shift (size G) l1) (comp_m B)). move => Hequivt. simpl in Hequivt.
-    inversion Dtrans; subst. simpl.
+       (trans_type  w1 l1 (comp_m B))
+       (trans_type w1 l1 (comp_m B)). move => Hequivt. simpl in Hequivt.
+    inversion Dtrans. rename H5 into Hebar.
+    rewrite Hebar.
     suffices: (equiv 
-       (app
-          (lam
-             (lam
-                (lam
-                   (lam
-                      (make_bind
-                         (app
-                            (app
-                               (app
-                                  (app 
-                                     (shift 4 Et1) 
-                                     (var 3)) 
-                                  (var 2)) 
-                               (var 1)) 
-                            (var 0))
-                         (lam
-                            (make_bind
-                                  (app
-                                  (app
-                                     (app
-
-                                        (app
-                                        (subst
-                                        (gen_sub_mvl_list
-                                        (size G) 5)
-                                        (lam
-                                        (move_Gamma G
-                                        make_subseq 1
-                                        (app Et2
-                                        (picomp1
-                                        (var (size G + 1)))))))
-                                        (picomp4 (var 0)))
-
-
-                                        (picomp1 (var 0)))
-                                     make_subseq) 
-                                  (picomp3 (var 0)))
-                               (lam
-                                  (ret_t
-                                     (ppair (picomp1 (var 0))
-                                        (ppair make_subseq
-                                           (ppair (picomp3 (var 0)) (picomp4 (var 0))))))))))))))
-          (shift (size G) l1))
-          (subst1 (subst (sh (size G)) l1)
+                 (app ebar l1)
+                 (subst1 l1
              (lam
                 (lam
                    (lam
@@ -752,27 +706,22 @@ eapply split_world1. apply Dw.
                                   (app
                                      (app
 
-                                        (app
-                                        (subst
-                                        (gen_sub_mvl_list
-                                        (size G) 5)
-                                        (lam
-                                        (move_Gamma G
-                                        make_subseq 1
-                                        (app Et2
-                                        (picomp1
-                                        (var (size G + 1)))))))
-                                        (picomp4 (var 0)))
+                    (app (app (shift 5 Et2) (picomp1 (var 0)))
+                         (ppair (picomp4 (var 0)) (move_gamma G make_subseq (var 5)))
+                    )
 
-
-                                        (picomp1 (var 0)))
-                                     make_subseq) 
-                                  (picomp3 (var 0)))
+                    (picomp1 (var 0)))
+                    make_subseq)
+                    (picomp3 (var 0))
+                                  )
+                                  
                                (lam
                                   (ret_t
                                      (ppair (picomp1 (var 0))
-                                        (ppair make_subseq (ppair (picomp3 (var 0)) (picomp4 (var 0))))))))))))))).
+                                            (ppair make_subseq (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))
+                 )))))))).
     move => Hequiv.
+apply tr_arrow_intro.
 apply (tr_compute _ _ _ _ _ _ _ Hh1 Hh2 Hh2 Hequivt Hequiv Hequiv); try assumption.
 (*get the substitutions nice before i split
  things up*)
@@ -1640,3 +1589,10 @@ eapply tr_formation_weaken. apply Hdone.
     }*)
 
   }
+
+Theorem onef: forall G e T ebar w1 l1,
+    of_m G e T ->
+    tr [::] (oof (ppair w1 l1) world) ->
+    trans G e ebar -> 
+    tr (Gamma_at_ctx G w1 l1) (oof (app (app ebar l1) 
+              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
