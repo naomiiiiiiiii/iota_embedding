@@ -623,16 +623,15 @@ Lemma checking: forall t, @subst False (dot (var 0)
            )))) (var 5) = (var 5).
   simpsub.*)
 
-
-
-
-Theorem two: forall G D e T ebar w1 l1,
-    of_m G e T -> tr D (oof (ppair w1 l1) world) ->
+Theorem two: forall G e T ebar,
+    of_m G e T ->
     trans G e ebar -> 
-    tr D (oof (app ebar l1)
-              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
+    tr [::] (oof ebar
+                (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
+                                                     (trans_type (var 1) (var 0) T))))
+           ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
-  move => G D e T ebar w1 l1 De Dw Dtrans.
+  move => G e T ebar De Dtrans.
   move : D w1 l1 ebar Dw Dtrans. induction De; intros.
   10 : {
     (*Useful facts that will help us later*)
