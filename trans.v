@@ -79,36 +79,38 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
  Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
    match G with
      nil => unittp 
-   | A::xs => (sigma (trans_type w l A) (Gamma_at xs w l)) end
+   | A::xs => (prod (trans_type w l A) (Gamma_at xs w l)) end
  .
 
- (*makes a target context out of a source context
-  start here probably need to shift the w and the l by 1 for each hypothesis
-  added before them*)
- Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False) :=
-   map (fun t => hyp_tm (trans_type w l t)) G.
+ Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
+   let enumerated := iota 0 (size L) in
+  map f (zip enumerated L).
 
-(*making a sigma value out of the variables in a source context*)
- Fixpoint gamma_at_help (G: source.context) n :=
-   match G with
-     nil => triv
-   | A:: xs => (@ppair False (var n) (gamma_at_help xs (n+1)))
-   end .
+ Definition foldri {A B: Type} (f: (nat * A) -> B -> B) (acc: B) (L: seq A) :=
+   let enumerated := iota 0 (size L) in
+  foldr f acc (zip enumerated L).
 
-Definition gamma_at G := gamma_at_help G 0.
+ Fixpoint Gamma_at_ctx_help (G: source.context) (w l: Syntax.term False):=
+   mapi (fun pair =>
+           match pair with (i, A) => 
+           hyp_tm (trans_type (shift i w) (shift i l) A) end) G.
 
+(*making a sigma value out of the variables in a source context
+ assume to start at 0*)
+ Definition gamma_at (G: source.context ):= foldri (fun pair => fun acc => match pair with (i, A) =>
+                                                                   @ppair False (var i) acc end) triv G.
 
- (*making a sigma of one type out of a sigma of a different type
-  iterating over the sigma
-  but how far to go? use the list because they should be the same size *)
 
  Definition move_app A (m : term False) (x: term False) :=
    app (app (move A) m) x.
+ (*making a pair of one type out of a pair of a different type
+  iterating over the pair
+  but how far to go? use the list because it should be the same size as the pair*)
 
-Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (Gamma: Syntax.term False) :=
+Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.term False) :=
    match G with
-     nil => Gamma
-   | A::xs => ppair (move_app A m (ppi1 Gamma)) (move_gamma xs m (ppi2 Gamma)) end.
+     nil => gamma
+   | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
  (*not even doing substituions any more, completely differeent from old move Gamma*)
  Lemma move_gamma_works: forall D G w1 l1 w2 l2 m Gamma,
