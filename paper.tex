@@ -608,7 +608,7 @@ Let
 \]
 
 \[\overline{e_2}' := \overline{e_2} (\pi_1 \: z)
-\langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle
+\langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle (\pi_1 z) \: refl_{v, \pi_1 z} \: \pi_3 z
 \]
 I am showing
 %start here can move these around if necessary
@@ -636,12 +636,12 @@ Apply the bind rule to get
      which is to say
       \[\Gamma' \vdash \overline{e_1} \: l_1 \: g :
       (\bigcirc \tau_1) @ W_1\]
-        I have by induction on $\Gamma \vdash e_1 : \bigcirc \tau_1$ that $\cdot \vdash \overline{e_1} : \forall(w_1: pw)\Pi(l_1: \N)(\Gamma @ \langle w_1, l_1 \rangle \imp (\bigcirc \tau_1) @ W_1)$. The desired result follows by weakening typing rule for application, removing the forall first, and weakening.
-    \item \[\Gamma' \vdash \lambda \:z_1.\Big( bind_{target} \; \overline{e_2}'
-\; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2]\big) \Big) [z:= z_1] : A \imp \rhd \rhd B\]
+        I have by induction on $\Gamma \vdash e_1 : \bigcirc \tau_1$ that $\cdot \vdash \overline{e_1} : \forall(w_1: pw)\Pi(l_1: \N)(\Gamma @ \langle w_1, l_1 \rangle \imp (\bigcirc \tau_1) @ W_1)$. The desired result follows from the typing rule for application, removing the forall first, and weakening.
+    \item \[\Gamma' \vdash \lambda \:z_1. bind_{target} \; \overline{e_2}'
+\; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)\big) : A \imp \rhd \rhd B\]
 Apply 5 to get (amongst goals solved before)
-\[\Gamma', z_1: A  \vdash \Big( bind_{target} \; \overline{e_2}'
-\; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2]\big) \Big) [z:= z_1] : \rhd \rhd B\]
+\[\Gamma', z_1: A  \vdash bind_{target} \; \overline{e_2}'
+\; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)\big) : \rhd \rhd B\]
 Apply 72 to get
 \begin{itemize}
     \item $\Gamma', z_1: A \vdash z_1 : A$\\
@@ -653,12 +653,13 @@ done
  $\Sigma(l_v : \N)U \leq \langle v, l_v\rangle \times store\langle v, l_v\rangle \times \tau_1@\langle v, l_v\rangle$ as $A'$.
  \end{itemize}
 as well as \[\Gamma', v: pw, z:A'  \vdash  bind_{target} \; \overline{e_2}'
-\; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2]\big) : \rhd \rhd B\]
+\; \lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big) : \rhd \rhd B\]
 Applying the bind rule gives 
 \begin{itemize}
     \item $\Gamma', v: pw, z:A'  \vdash \overline{e_2}' : \overline{C}$\\
     Recalling the definition of $\overline{e_2}'$, I am showing that 
-    \[\Gamma', v: pw, z:A'  \vdash  \lambda x. \big(move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2}\langle v,  \pi_1 z \rangle) \big) (\pi_4 z) \; \pi_1 z \; refl_{v, \: \pi_1 \: z} \; \pi_3 z : \overline{C}\]
+    \[\Gamma', v: pw, z:A'  \vdash   \overline{e_2} (\pi_1 \: z)
+\langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle (\pi_1 z) \: refl_{v, \pi_1 z} \: \pi_3 z : \overline{C}\]
     Applying 6 and (108 with 11) to this multiple times gives the following goals 
     \begin{itemize}
         \item $\Gamma', v: pw, z:A'  \vdash \pi_3 z : store(\langle v, \pi_1 z \rangle)$\\
@@ -668,14 +669,35 @@ Applying the bind rule gives
         \item $\Gamma', v: pw, z:A'  \vdash \pi_1 \: z : \N $\\
         see above bullet
     \end{itemize}
-    as well as, with $V_{mid}$ abbreviating $\langle v, l_{mid} \rangle$ and $V$ abbreviating $\langle v, \pi_1 \: z \rangle$
+    as well as
+    %with $V_{mid}$ abbreviating $\langle v, l_{mid} \rangle$ and $V$ abbreviating $\langle v, \pi_1 \: z \rangle$
     %and $V$ abbreviating $\langle v, \pi_1 z\rangle$
-    \[\Gamma', v: pw, z:A'  \vdash \lambda x. \big(move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2}\langle v,  \pi_1 z \rangle) \big) (\pi_4 \: z) :\] 
+    \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} (\pi_1 \: z)
+\langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle :\] 
     \[\Pi(l_{mid} : \N) V \leq V_{mid} \imp store(V_{mid}) \imp \rhd \rhd 
     \exists(v': pw)\Sigma(l_v' : \N)(V_{mid} \leq \langle v', l_v' \rangle \times store\langle v', l_v' \rangle \times \tau_2 @ \langle v, l_v' \rangle)\]
     Apply rule 68 to get (amongst goals solved before)
-        \[\Gamma', v: pw, z:A'  \vdash \lambda x. \big(move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2}\langle v,  \pi_1 z \rangle) \big) (\pi_4 \: z) : \bigcirc \tau_2 @ V\] 
-    Apply rule 6 to get  $\Gamma', v: pw, z:A'  \vdash \pi_4 \: z : \tau_1 @ V$ (easy by def $A'$) and
+        \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} (\pi_1 \: z)
+\langle \pi_4 \: z, move_{\Gamma} \: \pi_2 \: z \circ m \: g \rangle  : \bigcirc \tau_2 @ V\] 
+    Apply rule 6 twice more to get
+    \begin{itemize}
+        \item 
+        \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} :\Pi(l_v: \N)\big(x::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
+        add a forall
+         \[\Gamma', v: pw, z:A'  \vdash \overline{e_2} :
+         \forall(v: pw)\Pi(l_v: \N)\big(x::\Gamma @ \langle v, l_v \rangle \imp \bigcirc \tau_2 @ V\big)\]
+        how to rewrite $(x::\Gamma @ \langle v, l_v \rangle$ as substituting in $v, l_v$?
+        could do the trans types in there as subst1s from the start. then prove by induction on g that you can bring the subst1 out of the product
+        \item 
+        \[\Gamma', v: pw, z:A'  \vdash (\pi_1 \: z) : \N\]
+        \item \[\Gamma', v: pw, z:A'  \vdash \langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle : 
+ x::\Gamma @ \langle v, (\pi_1 \: z) \rangle
+        \]
+    \end{itemize}
+    
+    
+    
+    $\Gamma', v: pw, z:A'  \vdash \pi_4 \: z : \tau_1 @ V$ (easy by def $A'$) and
     \[\Gamma', v: pw, z:A' \vdash \lambda x. move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2} \:V) :
     \Pi(\_ : \tau_1 @ V \imp ).\bigcirc \tau_2 @ V
     \] 
