@@ -1,0 +1,55 @@
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{ upgreek }
+\RequirePackage{geometry}
+\RequirePackage{ dsfont }
+\RequirePackage{enumitem}
+\RequirePackage{minted}
+\RequirePackage{mathtools}
+\RequirePackage{natbib}
+\RequirePackage{graphicx}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{fullpage}
+\RequirePackage{etoolbox}
+\RequirePackage{setspace}
+ \RequirePackage{pgffor}
+\newcommand{\spc}[1]{\\ \-\hspace{.5 \dimexpr#1 cm}} 
+\newcommand{\st}{\: : \:}
+\newcommand{\dis }{\: \mathbb{\vee} \:}
+\newcommand{\conj}{\: \mathbb{\wedge} \: }
+\newcommand{\imp}{\rightarrow }
+\newcommand{\range}{\text{range}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+%\newcommand{\p}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\f}[2]{\frac{#1}{#2}}
+\newcommand{\case}[5]{\text{case}_{#1}\: #2 \: \text{of } \{#3 \Rightarrow #4[#3].#5[#3]\}}
+\newcommand{\e}{\epsilon}
+\newcommand{\dd}{\delta}
+\newcommand{\D}{\Delta}
+\newcommand{\x}[1]{\text{#1}}
+\newcommand{\p}{\partial}
+\AtBeginEnvironment{align}{\setcounter{equation}{0}}
+\newcommand{\cal}[1]{\mathcal{#1}}
+\newcommand{\obj}[1]{\text{Obj}(#1)}
+\newcommand{\mor}[1]{\text{Mor}(#1)}
+\newcommand{\term}{\textbf{ tm }}
+\newcommand{\size}{\textbf{ size}}
+\newcommand{\var}{\textbf{ var }}
+\newcommand{\subst}{\textbf{ subst}}
+\newcommand{\aequiv}{\equiv_\alpha}
+\newcommand{\bequiv}{\equiv_\beta}
+\newcommand{\val}{\text{ val}}
+\newcommand{\inj}{\text{ inj}}
+\newcommand{\iso}{\cong}
+\newcommand{\cross}{\times}
+\newcommand{\xor}{\text{\textasciicircum}}
+\newcommand{\start}{\text{ start}}
+\newcommand{\ed}{\text{ end}}
+\newcommand{\mem}{\text{Mem}}
+\newcommand{\preim}{\text{preim}}
+\newcommand{\im}{\text{im}}
+\newcommand{\colim}{\text{colim}}
+\endinput

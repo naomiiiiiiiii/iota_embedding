@@ -469,8 +469,8 @@ I apply rule 121 $|\Delta, \Gamma|$ times to get
 
 \section*{translation}
 When I write $\lambda (W_1: world)$, it is an abuse. I really mean $\lambda (l_1: \N)$ (the function really only takes the nat part of the world). I include the preworld part just to keep track. The same goes for $f \: W_1$. I really mean $f \: l_1$ but pass in the $W_1$ to keep track.\\
-Showing that for any $\Gamma \vdash e : \tau$ in the source language and $\Delta \vdash  \langle w_1, l_1 \rangle : world$ in the target language,
-$\Delta, \Gamma @ W_1 \vdash \bar{e}\: W_1 : \tau @ W_1$. I proceed by induction on $\Gamma \vdash e : \tau$.\\
+Showing that for any $\Gamma \vdash e : \tau$ in the source language, 
+\[\cdot \vdash \overline{e}: \forall(w_1: pw)\Pi(l_1: \N)(\Gamma @ \langle w_1, l_1 \rangle \imp \tau @ W_1)\]. I proceed by induction on $\Gamma \vdash e : \tau$.\\
 
 \subsection{ap}
 Have: $\Gamma \vdash e_1 \: e_2 : \tau_2$. \\
@@ -607,30 +607,36 @@ Let
 \[C :=\exists(v': pw)\Sigma(l_v' : \N)(\langle v, \pi_1 z \rangle \leq \langle v', l_v' \rangle \times store\langle v', l_v' \rangle \times \tau_2 @ \langle v', l_v' \rangle)
 \]
 
-\[\overline{e_2}' := \lambda x. \big(move_{\Gamma} \: (\pi_2 z \circ m) \: (\overline{e_2}\langle v,  \pi_1 z \rangle) \big) (\pi_4 \: z) \: \pi_1 z \: refl_{v, \: \pi_1 \: z} \: \pi_3 z\]
+\[\overline{e_2}' := \overline{e_2} (\pi_1 \: z)
+\langle \pi_4 \: z, move_\Gamma \: \pi_2 \: z \circ m \: g \rangle
+\]
 I am showing
-\[\Delta,\Gamma@W_1 \vdash \lambda l. \lambda m . \lambda s. bind_{target}\;(\overline{e_1}\: W_1 \: l \: m \: s) \; \lambda (z_1 : A). \Big( bind_{target} \; \overline{e_2}'
+%start here can move these around if necessary
+\[\cdot \vdash \lambda l_1.  \lambda g. \lambda l. \lambda m . \lambda s. bind_{target}\;(\overline{e_1}\: l_1 \:g \: l \: m \: s) \; \lambda (z_1 : A). \Big( bind_{target} \; \overline{e_2}'
 \; 
-\big( \dots \big) \Big) [z:= z_1]
-: (\bigcirc \tau_2) @ W_1\]
-Apply 67, then (5 and (108 with 11)) repeatedly to get
+\big( \dots \big) \Big)
+: \forall(w_1: pw)\Pi(l_1: \N)(\Gamma @ \langle w_1, l_1 \rangle \imp (\bigcirc \tau_2) @ W_1\]
+Apply 67, then (5 and (108 with 11)) repeatedly, then 67 to get
 \begin{itemize}
-    \item $\Delta,\Gamma@W_1, u: pw, l: \N \vdash W_1 \leq U: type$\\
+    \item $w_1: pw, l_1 : \N,  g: \Gamma@\langle  \vdash W_1 \leq U, u: pw, l: \N \vdash W_1 \leq U: type$\\
     subseq, similar to ret proof
-    \item $\Delta,\Gamma@W_1, u: pw, l: \N, m: W_1 \leq U \vdash store(U): type$\\
+    \item $w_1: pw, l_1 : \N,  g: \Gamma@\langle  \vdash W_1 \leq U, u: pw, l: \N, m: W_1 \leq U \vdash store(U): type$\\
     store
-    \item I denote $\Delta,\Gamma@W_1, u: pw, l: \N, m: W_1 \leq U, s: store(U)$ as $\Gamma'$. I need show
-    \[\Gamma' \vdash bind_{target}\;(\overline{e_1}\: W_1 \: l \: m \: s) \; \lambda (z_1 : \exists v \dots ).\Big( bind_{target} \; \overline{e_2}'
+    \item I denote $w_1: pw, l_1 : \N,  g: \Gamma@\langle  \vdash W_1 \leq U, u: pw, l: \N, m: W_1 \leq U, s: store(U)$ as $\Gamma'$. I need show
+    \[\Gamma' \vdash bind_{target}\;(\overline{e_1}\: l_1 \:g \: l \: m \: s) \; \lambda (z_1 : \exists v \dots ).\Big( bind_{target} \; \overline{e_2}'
 \; 
 \big( \dots \big) \Big) [z:= z_1] : \rhd \rhd B\]
 Apply the bind rule to get
 \begin{itemize}
-    \item $\Gamma' \vdash \overline{e_1}\: W_1 \: l \: m \: s : \rhd \rhd A $\\
+    \item $\Gamma' \vdash \overline{e_1}\: l_1 \:g \: l \: m \: s : \rhd \rhd A $\\
     Apply 6 and (108 with 11) multiple times to get
-    \[\Gamma' \vdash \overline{e_1} \: W_1 : \Pi(l: \N). W_1 \leq U \imp store(U) \imp \rhd \rhd A\]
+    \[\Gamma' \vdash \overline{e_1} \: l_1 \: g : \Pi(l: \N). W_1 \leq U \imp store(U) \imp \rhd \rhd A\]
     Apply 68 to get (amongst goals solved before)
-     \[\Gamma' \vdash \overline{e_1} \: W_1 : \forall(u: pw)\Pi(l: \N). W_1 \leq U \imp store(U) \imp \rhd \rhd A\]
-    I have by induction on $\Gamma \vdash e_1 : \bigcirc \tau_1$ that $\Delta, \Gamma \vdash \overline{e_1} \: W_1 : (\bigcirc \tau_1) @ W_1$. The desired result follows by weakening. 
+     \[\Gamma' \vdash \overline{e_1} \: l_1 \: g : \forall(u: pw)\Pi(l: \N). W_1 \leq U \imp store(U) \imp \rhd \rhd A\]
+     which is to say
+      \[\Gamma' \vdash \overline{e_1} \: l_1 \: g :
+      (\bigcirc \tau_1) @ W_1\]
+        I have by induction on $\Gamma \vdash e_1 : \bigcirc \tau_1$ that $\cdot \vdash \overline{e_1} : \forall(w_1: pw)\Pi(l_1: \N)(\Gamma @ \langle w_1, l_1 \rangle \imp (\bigcirc \tau_1) @ W_1)$. The desired result follows by weakening typing rule for application, removing the forall first, and weakening.
     \item \[\Gamma' \vdash \lambda \:z_1.\Big( bind_{target} \; \overline{e_2}'
 \; \big(\lambda z_2. \big(return_{target}\langle \pi_1 z', \langle \pi_2 z' \circ \pi_2 z, \pi_3 z', \pi_4 z' \rangle \rangle \big)[z' := z_2]\big) \Big) [z:= z_1] : A \imp \rhd \rhd B\]
 Apply 5 to get (amongst goals solved before)
