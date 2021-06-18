@@ -78,7 +78,19 @@ repeat rewrite - addnA;
       replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
 Qed.
 
-(*subtypes of the computation type*)
+Lemma subst1_trans_type : forall w l A s,
+    (subst1 s (trans_type w l A)) = (trans_type
+                                            (subst1 s w)
+                                         (subst1 s l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+Qed.
+
+
+
+
+
+(*subterms of the computation type*)
 Lemma compm4_type: forall U A G,
     (tr G (oof U world)) ->
     (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
