@@ -134,13 +134,14 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
  lam (lam ( lam ( (*l1 : = 2, g: Gamma_at G l1 = 1 l :=0 *) lam ( (*l1 := 3, l := 1, m := 0*)
                            lam ( (*l1 := 4, l := 2, m := 1, s := 0*)
                                let l1 := (var 4) in
+                               let g := (var 3) in
                                let l := (var 2) in
                                let m := (var 1) in
                                let s := (var 0) in
-let btarg := app (app (app (app (app (shift 4 Et1) (var 4)) l1) l) m) s in
-make_bind btarg ( lam (*l1 := 4, l := 3, m := 2, s := 1, z1 := 0*)
+let btarg := app (app (app (app (app (shift 5 Et1) l1) g) l) m) s in
+make_bind btarg ( lam (*l1 := 5, l := 3, m := 2, s := 1, z1 := 0*)
               (
-                               let z1 := (var 0) in (*basically added 5 vars to my context*)
+                               let z1 := (var 0) in (*basically added 6 vars to my context*)
                                let lv := (picomp1 z1) in
                                let mv := (picomp2 z1) in
                                let sv := (picomp3 z1) in
@@ -159,7 +160,7 @@ that. you want to bind
 
                                let btarg :=
                                    (*Et2 Gamma@V lv*)
-                                   app (app (shift 5 Et2)
+                                   app (app (shift 6 Et2)
                                            lv 
                                             )
                                             (*5: Gamma_at G w

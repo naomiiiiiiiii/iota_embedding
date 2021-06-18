@@ -659,129 +659,15 @@ eapply tr_formation_weaken.
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
                                                     prod (prod (subseq U V) (store V))
                                                      (trans_type v lv A))))
-                                 ).
-    simpsub.
-(*at make_bind*)
+           ).
+    (*at make_bind*)
     eapply (tr_arrow_elim _  (store (ppair (var 3)
                                                    (var 2)
-           ))).
-
-
-
-simpsub1. unfold subst1. simpsub1. simpsub_big.
-rewrite - subst_sh_shift. simpsub_big. simpl.
-    rewrite Hebar.
-
-    suffices: hygiene (ctxpred D) (trans_type w1 l1 (comp_m B)) /\
-              hygiene (ctxpred D) (app ebar l1).
-    move => [Hh1 Hh2].
-    suffices: equiv 
-       (trans_type  w1 l1 (comp_m B))
-       (trans_type w1 l1 (comp_m B)). move => Hequivt. simpl in Hequivt.
-    inversion Dtrans. rename H5 into Hebar.
-    rewrite Hebar.
-    suffices: (equiv 
-                 (app ebar l1)
-                 (subst1 l1
-             (lam
-                (lam
-                   (lam
-                      (make_bind
-                         (app
-                            (app
-                               (app (app (subst (sh 4) Et1) (var 3))
-                                  (var 2)) (var 1)) 
-                            (var 0))
-                         (lam
-                            (make_bind
-                                  (app
-                                  (app
-                                     (app
-
-                    (app (app (shift 5 Et2) (picomp1 (var 0)))
-                         (ppair (picomp4 (var 0)) (move_gamma G make_subseq (var 5)))
-                    )
-
-                    (picomp1 (var 0)))
-                    make_subseq)
-                    (picomp3 (var 0))
-                                  )
-                                  
-                               (lam
-                                  (ret_t
-                                     (ppair (picomp1 (var 0))
-                                            (ppair make_subseq (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))
-                 )))))))).
-    move => Hequiv.
-apply tr_arrow_intro.
-apply (tr_compute _ _ _ _ _ _ _ Hh1 Hh2 Hh2 Hequivt Hequiv Hequiv); try assumption.
-(*get the substitutions nice before i split
- things up*)
-simpsub. simpl.
-repeat rewrite - subst_sh_shift. simpsub_big.
-rewrite subst_trans_type. simpl.
-    repeat rewrite plusE. rewrite - trunc_sum. simpsub. simpl.
-    rewrite trunc_sh.
-(*put the arith assert in here if you need it*) 
-     apply tr_all_intro.
-    apply pw_kind.
-    simpsub_big. simpl.
-    apply tr_pi_intro.  apply nat_type. 
-    apply tr_arrow_intro.
-    eapply tr_formation_weaken. 
-    apply subseq_U0. (*to show subseqs
-                        are the same type,
- need to show that the variables are both of type world*)
-   + repeat rewrite plusE.
-     rewrite - hseq2. rewrite catA.
-     rewrite - addn2.
-      rewrite - subst_ppair.
-      rewrite - (subst_world (sh (2 + size G))).
-  repeat rewrite subst_sh_shift.
-      repeat rewrite addnC - Hsizel.
-      eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
-  + apply uworld10.
-  +
-    eapply tr_formation_weaken.
-    eapply compm1_type. apply uworld10.
-    apply trans_type_works. apply uworld10. 
-  (*back to main proof*)
--  simpsub_big. simpl.
-  apply tr_arrow_intro.
-  + 
-    eapply tr_formation_weaken. 
-    apply store_U0.  apply uworld21.
-    assert (@ppair False (var 4) (var 3) = subst (sh 2) (ppair (var 2) (var 1))) as Hppair. simpsub. auto. rewrite Hppair. eapply tr_formation_weaken.
-  apply compm2_type. apply uworld21. rewrite subst_trans_type. apply trans_type_works. auto.
-simpsub. auto.
-    rewrite subst_bind. simpsub_big. simpl. rewrite subst_trans_type.
-    repeat rewrite plusE. rewrite - trunc_sum. simpsub. simpl.
-    rewrite trunc_sh.
-    eapply (bind_type _
-                      (exist nzero preworld (
-                                          sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
-                                          (let u := Syntax.var 5 in
-                                              let l := Syntax.var 4 in
-                                              let v := Syntax.var 1 in
-                                              let lv := Syntax.var 0 in
-                                              let U := ppair u l in
-                                              let V := ppair v lv in
-                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
-                                                    prod (prod (subseq U V) (store V))
-                                                     (trans_type v lv A))))
-                                 ).
-    simpsub.
-(*at make_bind*)
-    eapply (tr_arrow_elim _  (store (ppair (var 3)
-                                                   (var 2)
-           ))).
+           ))); auto.
 - 
- eapply tr_formation_weaken. apply store_U0.
-  apply world_pair. rewrite - (subst_pw (sh 4)). var_solv.
-  rewrite - (subst_nat (sh 3)). var_solv.
-  eapply tr_formation_weaken.
-  assert (@ppair False (var 5) (var 4) = subst (sh 2) (ppair (var 3) (var 2))) as Hppair. simpsub. auto. rewrite Hppair.
-  apply compm2_type. apply uworld32. apply trans_type_works.
+  eapply tr_formation_weaken. simpl.
+  replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto. 
+  apply compm2_type; auto. apply trans_type_works; auto.
   apply uworld10.
   (*Et1 nonsense
    *)
