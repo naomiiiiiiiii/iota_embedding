@@ -286,8 +286,14 @@ Lemma uworld32: forall G x y,
    apply world_pair.
   rewrite - (subst_pw (sh 5)). var_solv.
   rewrite - (subst_nat (sh 4)). var_solv. Qed. 
+Lemma uworld65: forall G x y z a b,
+      (tr [:: x, y, z, a, b, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 6) (var 5)) world)). intros.
+   apply world_pair.
+  rewrite - (subst_pw (sh 7)). var_solv.
+  rewrite - (subst_nat (sh 6)). var_solv. Qed. 
 
-  Hint Resolve uworld10 uworld32 uworld21 uworld43.
+  Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65.
 
   Lemma store_U0: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
@@ -302,3 +308,4 @@ Lemma subseq_type: forall G w1 w2,
     tr G (deqtype (subseq w1 w2) (subseq w1 w2)).
 Admitted.
 Hint Resolve store_type subseq_type.
+
