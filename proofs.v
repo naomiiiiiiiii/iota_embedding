@@ -13,8 +13,7 @@ From istari Require Import Sigma Tactics
 Lemma subst_trans_type :forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
     (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl;
- repeat rewrite - subst_sh_shift; simpsub; try rewrite - subst_ppair;
+  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl; try rewrite - subst_ppair;
  try rewrite subst_compose; try rewrite H. 
   - (*arrow*)
     suffices:  ((subst
@@ -76,19 +75,7 @@ Lemma sh_trans_type : forall w l A s,
   induction A; intros; simpl; auto; simpsub_big; repeat rewrite plusE;
 repeat rewrite - addnA;
     simpl; change (1 + 1) with 2;
-      replace (1 + 0) with 1; auto.
-  - (*arrow*)
-     repeat rewrite - subst_sh_shift.
-     simpsub. rewrite plusE.
-    repeat rewrite subst_trans_type; auto.
-  - (*comp*)
-    repeat rewrite subst_trans_type; simpsub; auto.
-    unfold subst1. simpsub1.
-    repeat rewrite - subst_sh_shift. simpsub. auto.
-  - (*ref*)
-    repeat rewrite subst_trans_type; simpsub; auto.
-    unfold subst1. simpsub1.
-    repeat rewrite - subst_sh_shift. simpsub. auto.
+      replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
 Qed.
 
 (*subtypes of the computation type*)
@@ -112,7 +99,7 @@ Lemma compm4_type: forall U A G,
 assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
     rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
 eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
-    auto. unfold nzero. simpsub. apply store_type. auto.
+    auto. unfold nzero. simpsub. apply store_U0. auto.
     rewrite subst_nzero. apply X0. Qed. 
 
 Lemma compm3_type: forall U A G,
@@ -163,7 +150,7 @@ Lemma compm2_type: forall U A G,
          )) U0). (*A should be substed by 2 here start here fix this in trans also*)
   move => U A G U_t A_t.
   eapply tr_arrow_formation_univ.
-  apply store_type. assumption. apply compm2_type; assumption.
+  apply store_U0. assumption. apply compm2_type; assumption.
   Qed.
 
 
@@ -293,7 +280,6 @@ Lemma compm2_type: forall U A G,
         eapply tr_pi_elim.
         eapply tr_pi_intro. apply nat_type.*)
         apply tr_all_formation_univ. auto.
-        rewrite - subst_sh_shift. simpsub.
         apply compm0_type; try assumption.
         rewrite - subst_ppair.
         eapply (tr_weakening_appends _
@@ -632,53 +618,60 @@ Theorem two: forall G e T ebar,
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G e T ebar De Dtrans.
-  move : D w1 l1 ebar Dw Dtrans. induction De; intros.
+  move : ebar Dtrans. induction De; intros.
   10 : {
-    (*Useful facts that will help us later*)
-(*assert (size
-         [:: hyp_tm (store (ppair (var 2) (var 1))),
-      hyp_tm
-        (subseq
-           (ppair (subst (sh (size G + 2)) w1)
-              (subst (sh (size G + 2)) l1))
-           (ppair (var 1) (var 0))),
-     hyp_tm nattp, hyp_tm preworld & Gamma_at G w1 l1]
-= (4 + size G)
-       ) as Hsize. intros. repeat rewrite size_cons. rewrite size_Gamma_at. auto.
-     remember (size ([:: hyp_tm nattp,
-        hyp_tm preworld
-        & Gamma_at G w1 l1])) as sizel.
-    assert (sizel = (2 + size G )) as Hsizel. subst.
-    repeat rewrite size_cons. repeat rewrite addnA.
-    rewrite size_Gamma_at. auto.*)
-   (*assert (tr
-    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
-      & Gamma_at G w1 l1 ++ D]
-    (oof (ppair (var 1) (var 0)) world) ) as Hu.
-   apply world_pair.
-        rewrite - (subst_pw (sh 2)).
-      apply tr_hyp_tm; repeat constructor.
-        rewrite - (subst_nat (sh 1)).
-        apply tr_hyp_tm; repeat constructor.*)
-(*assert (tr
-    [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp
-      & Gamma_at G w1 l1 ++ D]
-    (oof (ppair (subst (sh (3 + (size G))) w1) (var 2)) world)) as Hwv2.
-    apply world_pair. 
-    (*rewrite subst_sh_shift. subst.
-    repeat rewrite - Hseq.*)
-    rewrite - {2}(subst_pw (sh (3 + size G))).
-    repeat rewrite subst_sh_shift. repeat rewrite plusE.
-    repeat rewrite - Hsizel.
-    repeat rewrite - cat_cons. subst.
-    apply tr_weakening_append; auto.
-eapply split_world1. apply Dw.
-      rewrite - (subst_nat (sh 3)).
-      apply tr_hyp_tm; repeat constructor.*)
+(*pop them all off*)
+constructor; auto. 
+inversion Dtrans. rename H5 into Hebar.
+simpsub_big. simpl. apply tr_pi_intro; auto.
+apply tr_arrow_intro; auto.
+apply Gamma_at_type; auto;
+  [rewrite - {2}(subst_pw (sh 2)) |
+   rewrite - {2} (subst_nat (sh 1))]; var_solv.
+eapply tr_formation_weaken.
+match goal with |- tr ?G (deq ?A ?A ?T) =>
+               (change A with
+(trans_type (var 1) (var 0) (comp_m B))) end; auto.
+eapply trans_type_works; auto. (*have popped off G*)
+simpsub_big. simpl. constructor; auto; simpsub_big; simpl.
+constructor; auto.
+apply tr_arrow_intro; auto.
+eapply tr_formation_weaken.
+    eapply compm1_type; auto. rewrite subst_trans_type; auto.
+    apply trans_type_works; auto.
+    (*pop off the store*)
+   simpsub_big. simpl. apply tr_arrow_intro; auto.
+    eapply tr_formation_weaken. 
+    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
+    apply compm2_type; auto.
+    rewrite subst_trans_type. apply trans_type_works. auto.
+    simpsub. auto. rewrite subst_bind.
+    simpsub_big.
+    eapply (bind_type _
+                      (exist nzero preworld (
+                                          sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
+                                          (let u := Syntax.var 5 in
+                                              let l := Syntax.var 4 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
+                                                    prod (prod (subseq U V) (store V))
+                                                     (trans_type v lv A))))
+                                 ).
+    simpsub.
+(*at make_bind*)
+    eapply (tr_arrow_elim _  (store (ppair (var 3)
+                                                   (var 2)
+           ))).
 
-    (*actual proof*)
 
-    (*pop off the Gamma*)
+
+simpsub1. unfold subst1. simpsub1. simpsub_big.
+rewrite - subst_sh_shift. simpsub_big. simpl.
+    rewrite Hebar.
+
     suffices: hygiene (ctxpred D) (trans_type w1 l1 (comp_m B)) /\
               hygiene (ctxpred D) (app ebar l1).
     move => [Hh1 Hh2].
@@ -757,7 +750,7 @@ rewrite subst_trans_type. simpl.
   apply tr_arrow_intro.
   + 
     eapply tr_formation_weaken. 
-    apply store_type.  apply uworld21.
+    apply store_U0.  apply uworld21.
     assert (@ppair False (var 4) (var 3) = subst (sh 2) (ppair (var 2) (var 1))) as Hppair. simpsub. auto. rewrite Hppair. eapply tr_formation_weaken.
   apply compm2_type. apply uworld21. rewrite subst_trans_type. apply trans_type_works. auto.
 simpsub. auto.
@@ -783,7 +776,7 @@ simpsub. auto.
                                                    (var 2)
            ))).
 - 
- eapply tr_formation_weaken. apply store_type.
+ eapply tr_formation_weaken. apply store_U0.
   apply world_pair. rewrite - (subst_pw (sh 4)). var_solv.
   rewrite - (subst_nat (sh 3)). var_solv.
   eapply tr_formation_weaken.
@@ -1163,7 +1156,7 @@ fold gen_sub_mvl_list.
                                  ).
     (*et2*)
     apply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))) )).
- - eapply tr_formation_weaken; eapply store_type.
+ - eapply tr_formation_weaken; eapply store_U0.
    apply world_pair. rewrite - (subst_pw (sh 2)). var_solv. eapply picomp1_works.
  - simpl.
    replace (ppair (var 3) (picomp1 (var 2))) with
@@ -1530,7 +1523,7 @@ apply world_pair.
     rewrite - (subst_world (sh 2)).
     rewrite - Hsize. rewrite - Hseq. repeat rewrite subst_sh_shift.
 apply tr_weakening_append. assumption. assumption.
-    auto. unfold nzero. simpsub. apply store_type. auto.
+    auto. unfold nzero. simpsub. apply store_U0. auto.
     rewrite subst_nzero. apply A_t.
     auto. apply leq_refl. auto.
 

@@ -119,6 +119,12 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
      tr D (oof (move_gamma G m Gamma) (Gamma_at G w2 l1)).
  Admitted.
 
+ Lemma Gamma_at_type {D G w l}:
+   tr D (oof w preworld) -> tr D (oof l nattp) ->
+ tr D
+    (deqtype (Gamma_at G w l)
+       (Gamma_at G w l)). Admitted.
+
  Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 T1 T2, of_m G E1 (comp_m T1) ->
                                   of_m (cons T1 G) E2 (comp_m T2) ->

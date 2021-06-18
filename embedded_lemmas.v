@@ -287,9 +287,18 @@ Lemma uworld32: forall G x y,
   rewrite - (subst_pw (sh 5)). var_solv.
   rewrite - (subst_nat (sh 4)). var_solv. Qed. 
 
-  Hint Resolve uworld10 uworld32 uworld21.
+  Hint Resolve uworld10 uworld32 uworld21 uworld43.
 
-  Lemma store_type: forall W G,
+  Lemma store_U0: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
 Admitted.
-Hint Resolve store_type.
+
+  Lemma store_type: forall W G,
+    (tr G (oof W world)) -> tr G (deqtype (store W) (store W)).
+Admitted.
+
+Lemma subseq_type: forall G w1 w2,
+    tr G (oof w1 world) -> tr G (oof w2 world) ->
+    tr G (deqtype (subseq w1 w2) (subseq w1 w2)).
+Admitted.
+Hint Resolve store_type subseq_type.

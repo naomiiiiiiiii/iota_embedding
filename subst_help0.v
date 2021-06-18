@@ -108,5 +108,10 @@ Hint Rewrite subst_U0 subst_ret subst_ret_t subst_subseq subst_leq subst_leqtp
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw
   subst_world subst_nth subst_store subst_laters subst_picomp1 subst_picomp2 subst_picomp4 subst_picomp3 subst_make_subseq: subst1.
 
+Hint Rewrite <- subst_sh_shift: subst1.
+
+Hint Unfold subst1: subst1.
+
 Ltac simpsub1 :=
+autounfold with subst1;
   autorewrite with subst1.
