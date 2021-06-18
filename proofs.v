@@ -779,9 +779,39 @@ match goal with |- tr ?G (deqtype ?T ?T) =>
 (*start here replace the replaces with match*)
 eapply tr_formation_weaken; apply (trans_type_works (var 6) (var 5)); auto. simpl. simpsub_big. simpl.
 simpsub. simpl. rewrite subst_trans_type; auto.
-(*start here NEARLY THERE*)
-
-
+(*need a lemma about how substitutions behave over gamma*)
+replace (arrow (Gamma_at G (var 6) (var 5))
+          (all nzero preworld
+             (pi nattp
+                (arrow
+                   (subseq (ppair (var 8) (var 7)) (ppair (var 1) (var 0)))
+                   (arrow (store (ppair (var 1) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq (ppair (var 3) (var 2))
+                                        (ppair (var 1) (var 0)))
+                                     (store (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A)))))))))) with
+    (subst1 (var 6)
+arrow (Gamma_at G (var 0) (var 5))
+          (all nzero preworld
+             (pi nattp
+                (arrow
+                   (subseq (ppair (var 8) (var 7)) (ppair (var 1) (var 0)))
+                   (arrow (store (ppair (var 1) (var 0)))
+                      (laters
+                         (exist nzero preworld
+                            (sigma nattp
+                               (prod
+                                  (prod
+                                     (subseq (ppair (var 3) (var 2))
+                                        (ppair (var 1) (var 0)))
+                                     (store (ppair (var 1) (var 0))))
+                                  (trans_type (var 1) (var 0) A)))))))))
+)
 comptype. apply compm0_type.
 
     auto. unfold subst1. simpsub1. rewrite - addnA.
