@@ -66,6 +66,8 @@ rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
 eapply IHA. simpsub. auto.
 Qed.
 
+Ltac simpsub_type := simpl; simpsub_big; simpl; rewrite subst_trans_type; simpl.
+
 
 (*start here automate these ugly cases*)
 Lemma sh_trans_type : forall w l A s,
@@ -294,7 +296,7 @@ Lemma compm2_type: forall U A G,
        hyp_tm preworld, y, z, a,
        hyp_tm nattp, hyp_tm preworld
                      & G] (oof (ppair (var 1) (picomp1 (var 0))) world).
-   intros. apply world_pair. rewrite - (subst_pw (sh 2)). var_solv. eapply picomp1_works. Qed. 
+   intros. apply world_pair. var_solv. eapply picomp1_works. Qed. 
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
@@ -361,12 +363,23 @@ Lemma compm2_type: forall U A G,
       eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       rewrite - (subst_nat (sh 3) ).
       var_solv. apply tr_fut_intro.
-      rewrite - (subst_pw (sh 2)). var_solv.
+      var_solv.
       apply tr_fut_intro.
-      rewrite - (subst_nat (sh 1)). var_solv.
+      var_solv.
       apply tr_fut_formation_univ; auto. apply IHA; auto. apply uworld10.
       auto. apply leq_refl. auto. apply tr_unittp_formation.
 Qed.
+
+Lemma trans_type_works2: forall w A G D,
+      (tr D (oof w preworld)) ->
+  tr D (deqtype (pi nattp
+          (arrow (Gamma_at G (shift 1 w)  (var 0))
+                 (trans_type (shift 1 w) (var 0) A)))
+          (pi nattp
+          (arrow (Gamma_at G (shift 1 w) (var 0))
+             (trans_type (shift 1 w) (var 0) A)))).
+Admitted.
+
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
@@ -450,8 +463,6 @@ Lemma wworld_app: forall G D w1 l1,
   rewrite - subst_sh_shift. auto. Qed.
 
 
-(*keep trying to massage the substitution you get into something reasonable
- wrok on paper!!*)
 Lemma out_of_lam: forall s l,
 (dot (var 0)
 (compose s
@@ -766,7 +777,7 @@ replace
                             (store (ppair (var 1) (var 0))))
                          (trans_type (var 1) (var 0) A)))))))).
 2: {
-simpsub_big. simpl. rewrite subst_trans_type; auto.
+ simpsub_type; auto.
 }
 eapply (tr_pi_elim _ nattp).
 (*add the forall*)
@@ -812,7 +823,7 @@ eapply (tr_pi_elim _ nattp).
                                (store (ppair (var 1) (var 0))))
                             (trans_type (var 1) (var 0) A))))))))).
   2: {
-    simpsub_big. simpl. rewrite subst_trans_type; auto. }
+     simpsub_type; auto. }
   eapply (tr_all_elim _ nzero preworld).
   (*put the g back on*)
 match goal with |- tr ?G (deq ?M ?M ?T) =>
@@ -857,7 +868,7 @@ replace (arrow (Gamma_at G (var 6) (var 5))
                                      (store (ppair (var 1) (var 0))))
                                   (trans_type (var 1) (var 0) A)))))))))
     )).
-2: { simpsub_big. simpl. rewrite subst_trans_type; auto. rewrite subst1_Gamma_at; auto. }
+2: {  simpsub_type; auto. rewrite subst1_Gamma_at; auto. }
 apply (tr_pi_elim _ nattp).
 match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
     (subst1 (var 6)
@@ -882,7 +893,7 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                                      (trans_type 
                                         (var 1) 
                                         (var 0) A)))))))))))) end.
-2: { simpsub_big. simpl. rewrite subst_trans_type; auto.
+2: {  simpsub_type; auto.
      change (dot (var 0) (dot (var 7) sh1)) with
 (@under False 1 (dot (var 6) id)). rewrite subst1_under_Gamma_at. auto.
 }
@@ -890,7 +901,7 @@ eapply (tr_all_elim _ nzero preworld).
 match goal with |- tr ?G (deq ?M ?M ?T) =>
                (replace T with
                     (shift 7 T)) end.
-2: { simpsub_big. simpl. rewrite subst_trans_type; auto. 
+2: {  simpsub_type; auto. 
 change (dot (var 0)
             (dot (var 1) (sh 9))) with (@under False 2 (sh 7)).
 rewrite sh_under_Gamma_at. simpsub. auto. }
@@ -899,9 +910,46 @@ with (@sh False (size G')); rewrite ! subst_sh_shift
 end. apply tr_weakening_append.
 match goal with |- tr ?G (deq ?M ?M (all _ _ (pi _ (arrow _ ?T)))
                         ) =>
+                replace T with (trans_type (var 1) (var 0) (comp_m A)) end.
+eapply IHDe1; try assumption. simpsub_type; auto.
+eapply split_world1; auto.
+match goal with |- tr ?G (deqtype (pi _ (arrow _ ?T)) ?J
+                        ) =>
                 replace T with
     (trans_type (var 1) (var 0) (comp_m A)) end.
-eapply IHDe1.
+change (var 1) with (@shift False 1 (var 0)).
+apply trans_type_works2; auto.
+var_solv.
+simpsub_type; auto.
+var_solv. replace (Gamma_at G (var 6) (var 5)) with
+              (shift 5 (Gamma_at G (var 1) (var 0))). rewrite - subst_sh_shift.
+try (apply tr_hyp_tm; repeat constructor).
+rewrite - subst_sh_shift. change (sh 5) with (@under False 0 (sh 5)).
+rewrite sh_under_Gamma_at. auto.
+simpsub_type; auto. var_solv. eapply tr_formation_weaken; apply compm0_type.
+apply world_pair; var_solv. apply trans_type_works; auto. var_solv.
+replace (subseq (ppair (var 6) (var 5))
+                (ppair (var 3) (var 2))) with (subst (sh 2)
+(subseq (ppair (var 4) (var 3)) (ppair (var 1) (var 0)))); auto.
+apply tr_hyp_tm; repeat constructor.
+replace (store (ppair (var 3) (var 2)))
+  with (subst (sh 1) (store (ppair (var 2) (var 1)))); auto.
+apply tr_hyp_tm; repeat constructor.
+(*done with et1, ramping up to et2*)
+
+simpl.
+rewrite (sh_under_Gamma_at _ _ _ _ 0)
+eapply IHDe1; try assumption. simpsub_type; auto.
+
+
+eapply split_world2; auto.
+auto.
+| eapply split_world1 | eapply split_world2].
+
+try apply uworld65.
+simpl.  simpsub_type; auto. 
+try ((eapply split_world1 || eapply split_world2); apply uworld65).
+
 change (sh 7) with (sh (si))
 
 
@@ -1016,14 +1064,14 @@ rewrite - sh_trans_type. rewrite - subst_app.
 unfold subst1. rewrite subst_pw. rewrite - hseq4.
 repeat rewrite subst_sh_shift. apply tr_weakening_append.
 eapply IHDe1; try assumption.
-rewrite - (subst_pw (sh 4)). var_solv.
+var_solv.
 (*replace 6 with (2 + 4). rewrite - addnA.*)
 (*repeat rewrite - (sh_sum (4 + size G) 2). *)
 eapply tr_formation_weaken; apply compm0_type.
 do 2! rewrite - (sh_sum _ 6).
 apply wworld6. erewrite <- size_Gamma_at. apply wworld_app. assumption.
 apply trans_type_works. apply uworld10. 
-rewrite - (subst_nat (sh 3)). var_solv.
+var_solv.
 rewrite - (addn2 (size G)).
 replace ( subseq
           (ppair (subst (sh (4 + size G)) w1)
@@ -1198,7 +1246,7 @@ fold gen_sub_mvl_list.
     (*et2*)
     apply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))) )).
  - eapply tr_formation_weaken; eapply store_U0.
-   apply world_pair. rewrite - (subst_pw (sh 2)). var_solv. eapply picomp1_works.
+   apply world_pair. var_solv. eapply picomp1_works.
  - simpl.
    replace (ppair (var 3) (picomp1 (var 2))) with
        (subst (sh 2) (ppair (var 1) (picomp1 (var 0)))). 
@@ -1554,8 +1602,8 @@ repeat rewrite subst_store. simpsub.
 eapply tr_pi_elim.
 
 apply world_pair.
-  rewrite - (subst_pw (sh 4)). var_solv.
-  rewrite - (subst_nat (sh 3)). var_solv. apply trans_type_works.
+  var_solv.
+  var_solv. apply trans_type_works.
 
 
 

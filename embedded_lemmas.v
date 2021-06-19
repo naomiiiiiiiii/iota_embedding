@@ -7,8 +7,9 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 (*useful properties of the embedding*)
 
-Ltac var_solv :=
-  try (apply tr_hyp_tm; repeat constructor).
+Ltac var_solv := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) => try
+                                 rewrite - (subst_nat (sh (n.+1))); try rewrite - (subst_pw (sh (n.+1)));
+                 try (apply tr_hyp_tm; repeat constructor) end.
 
 (*quick facts about worlds*)
 
@@ -260,38 +261,28 @@ Lemma world_pair: forall w l G, tr G (oof w preworld) ->
 Lemma uworld10: forall G,
       (tr [:: hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 1) (var 0)) world)). intros.
-     apply world_pair. 
-        rewrite - (subst_pw (sh 2)).
-      apply tr_hyp_tm; repeat constructor.
-        rewrite - (subst_nat (sh 1)).
-        apply tr_hyp_tm; repeat constructor. Admitted.
+                                          apply world_pair; var_solv.
+Qed.
 
 Lemma uworld21: forall G x,
       (tr [:: x, hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 2) (var 1)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 3)). var_solv.
-  rewrite - (subst_nat (sh 2)). var_solv. Qed. 
+   apply world_pair; var_solv. Qed. 
 
 Lemma uworld32: forall G x y,
       (tr [:: x, y, hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 3) (var 2)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 4)). var_solv.
-  rewrite - (subst_nat (sh 3)). var_solv. Qed. 
+   apply world_pair; var_solv. Qed. 
 
   Lemma uworld43: forall G x y z,
       (tr [:: x, y, z, hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 4) (var 3)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 5)). var_solv.
-  rewrite - (subst_nat (sh 4)). var_solv. Qed. 
-Lemma uworld65: forall G x y z a b,
+   apply world_pair; var_solv. Qed. 
+
+  Lemma uworld65: forall G x y z a b,
       (tr [:: x, y, z, a, b, hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 6) (var 5)) world)). intros.
-   apply world_pair.
-  rewrite - (subst_pw (sh 7)). var_solv.
-  rewrite - (subst_nat (sh 6)). var_solv. Qed. 
+   apply world_pair; var_solv. Qed. 
 
   Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65.
 
