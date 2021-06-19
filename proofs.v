@@ -78,7 +78,22 @@ repeat rewrite - addnA;
       replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
 Qed.
 
+Lemma sh_under_trans_type : forall w l A s n ,
+    (subst (under n (sh s)) (trans_type w l A)) = (trans_type
+                                            (subst (under n (sh s)) w)
+                                         (subst (under n (sh s)) l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
 
+
+ Lemma sh_under_Gamma_at: forall G w l s n, 
+    (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
+                                                (subst (under n (sh s)) l)).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite sh_under_trans_type IHG. auto. Qed.
+
+ (*start here write ltac for these two*)
  Lemma subst1_trans_type : forall w l A s,
     (subst1 s (trans_type w l A)) = (trans_type
                                             (subst1 s w)
@@ -87,11 +102,27 @@ Qed.
                    (simpl; rewrite ! subst_trans_type; auto).
  Qed.
 
- Lemma subst1_gamma_at: forall G w l s, (subst1 s (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
+ Lemma subst1_under_trans_type : forall w l A s n ,
+    (subst (under n (dot s id)) (trans_type w l A)) = (trans_type
+                                            (subst (under n (dot s id)) w)
+                                         (subst (under n (dot s id)) l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
+
+ Lemma subst1_Gamma_at: forall G w l s, 
+    (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
                                                                 (subst1 s l)).
-intros. induction G; auto. simpl. simpsub. rewrite subst1_trans_type IHG. auto. Qed.
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite subst1_trans_type IHG. auto. Qed.
 
-
+Lemma subst1_under_Gamma_at: forall G w l s n, 
+     (subst (under n (dot s id)) (Gamma_at G w l)) =
+     (Gamma_at G (subst (under n (dot s id) ) w)
+               (subst (under n (dot s id) ) l)).
+  intros. induction G. simpl; auto.
+  simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
+Qed.
 
 (*subterms of the computation type*)
 Lemma compm4_type: forall U A G,
@@ -694,8 +725,6 @@ try apply trans_type_works; auto.
                      (ppair (var 6) (var 5))
                      (ppair (var 3) (var 2))); auto. simpl.
   comptype. simpl. 
-(*have to get type in the form subst1 lv type
- for the pi elim rule*)
 replace 
        (arrow
           (subseq (ppair (var 6) (var 5))
@@ -786,16 +815,16 @@ eapply (tr_pi_elim _ nattp).
     simpsub_big. simpl. rewrite subst_trans_type; auto. }
   eapply (tr_all_elim _ nzero preworld).
   (*put the g back on*)
-eapply tr_arrow_elim. apply (@Gamma_at_type _ G); [eapply split_world1 |
-                                                   eapply split_world2]; apply uworld65.
-match goal with |- tr ?G (deqtype ?T ?T) =>
+match goal with |- tr ?G (deq ?M ?M ?T) =>
                 replace T with
     (trans_type (var 6) (var 5) (comp_m A)) end.
+eapply tr_arrow_elim. apply (@Gamma_at_type _ G); [eapply split_world1 |
+                                                   eapply split_world2]; apply uworld65.
 (*start here replace the replaces with match*)
 eapply tr_formation_weaken; apply (trans_type_works (var 6) (var 5)); auto. simpl. simpsub_big. simpl.
 simpsub. simpl. rewrite subst_trans_type; auto.
-(*need a lemma about how substitutions behave over gamma in order to get a pi here
- subst1 var 5 in for var 5*)
+(*have to get type in the form subst1 lv type
+ for the pi elim rule*)
 replace (arrow (Gamma_at G (var 6) (var 5))
           (all nzero preworld
              (pi nattp
@@ -811,12 +840,12 @@ replace (arrow (Gamma_at G (var 6) (var 5))
                                         (ppair (var 1) (var 0)))
                                      (store (ppair (var 1) (var 0))))
                                   (trans_type (var 1) (var 0) A)))))))))) with
-    (subst1 (var 6)
-arrow (Gamma_at G (var 0) (var 5))
+    (subst1 (var 5)
+(arrow (Gamma_at G (var 7) (var 0))
           (all nzero preworld
              (pi nattp
                 (arrow
-                   (subseq (ppair (var 8) (var 7)) (ppair (var 1) (var 0)))
+                   (subseq (ppair (var 9) (var 2)) (ppair (var 1) (var 0)))
                    (arrow (store (ppair (var 1) (var 0)))
                       (laters
                          (exist nzero preworld
@@ -827,7 +856,59 @@ arrow (Gamma_at G (var 0) (var 5))
                                         (ppair (var 1) (var 0)))
                                      (store (ppair (var 1) (var 0))))
                                   (trans_type (var 1) (var 0) A)))))))))
-)
+    )).
+2: { simpsub_big. simpl. rewrite subst_trans_type; auto. rewrite subst1_Gamma_at; auto. }
+apply (tr_pi_elim _ nattp).
+match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+    (subst1 (var 6)
+       (pi nattp
+          (arrow (Gamma_at G (var 1) (var 0))
+             (all nzero preworld
+                (pi nattp
+                   (arrow
+                      (subseq (ppair (var 3) (var 2))
+                         (ppair (var 1) (var 0)))
+                      (arrow (store (ppair (var 1) (var 0)))
+                         (laters
+                            (exist nzero preworld
+                               (sigma nattp
+                                  (prod
+                                     (prod
+                                        (subseq
+                                         (ppair (var 3) (var 2))
+                                         (ppair (var 1) (var 0)))
+                                        (store
+                                         (ppair (var 1) (var 0))))
+                                     (trans_type 
+                                        (var 1) 
+                                        (var 0) A)))))))))))) end.
+2: { simpsub_big. simpl. rewrite subst_trans_type; auto.
+     change (dot (var 0) (dot (var 7) sh1)) with
+(@under False 1 (dot (var 6) id)). rewrite subst1_under_Gamma_at. auto.
+}
+eapply (tr_all_elim _ nzero preworld). 
+match goal with |- tr ?G (deq ?M ?M ?T) =>
+               (replace T with
+                    (shift 7 T)) end.
+2: { simpsub_big. simpl. rewrite subst_trans_type; auto. 
+change (dot (var 0)
+            (dot (var 1) (sh 9))) with (@under False 2 (sh 7)).
+rewrite sh_under_Gamma_at. simpsub. auto. }
+match goal with |- tr ?G' ?J => rewrite - (cats0 G'); change (sh 7)
+with (@sh False (size G')); rewrite ! subst_sh_shift
+end. apply tr_weakening_append.
+match goal with |- tr ?G (deq ?M ?M (all _ _ (pi _ (arrow _ ?T)))
+                        ) =>
+                replace T with
+    (trans_type (var 1) (var 0) (comp_m A)) end.
+eapply IHDe1.
+change (sh 7) with (sh (si))
+
+
+eapply trans_type_works; auto. (*have popped off G*)
+simpsub_big. simpl. constructor; auto; simpsub_big; simpl.
+constructor; auto.
+
 comptype. apply compm0_type.
 
     auto. unfold subst1. simpsub1. rewrite - addnA.
