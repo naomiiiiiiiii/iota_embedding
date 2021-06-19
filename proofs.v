@@ -78,15 +78,18 @@ repeat rewrite - addnA;
       replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
 Qed.
 
-Lemma subst1_trans_type : forall w l A s,
+
+ Lemma subst1_trans_type : forall w l A s,
     (subst1 s (trans_type w l A)) = (trans_type
                                             (subst1 s w)
                                          (subst1 s l) A).
   induction A; intros; simpl; auto; simpsub_big; auto; try
                    (simpl; rewrite ! subst_trans_type; auto).
-Qed.
+ Qed.
 
-
+ Lemma subst1_gamma_at: forall G w l s, (subst1 s (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
+                                                                (subst1 s l)).
+intros. induction G; auto. simpl. simpsub. rewrite subst1_trans_type IHG. auto. Qed.
 
 
 
@@ -791,7 +794,8 @@ match goal with |- tr ?G (deqtype ?T ?T) =>
 (*start here replace the replaces with match*)
 eapply tr_formation_weaken; apply (trans_type_works (var 6) (var 5)); auto. simpl. simpsub_big. simpl.
 simpsub. simpl. rewrite subst_trans_type; auto.
-(*need a lemma about how substitutions behave over gamma*)
+(*need a lemma about how substitutions behave over gamma in order to get a pi here
+ subst1 var 5 in for var 5*)
 replace (arrow (Gamma_at G (var 6) (var 5))
           (all nzero preworld
              (pi nattp

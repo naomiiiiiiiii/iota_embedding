@@ -82,6 +82,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
    | A::xs => (prod (trans_type w l A) (Gamma_at xs w l)) end
  .
 
+
  Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
    let enumerated := iota 0 (size L) in
   map f (zip enumerated L).
