@@ -723,8 +723,9 @@ eapply tr_formation_weaken.
                                                    (var 2)
            ))); auto.
 - 
-   simpl.
-  Ltac comptype := replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto; eapply tr_formation_weaken;
+  simpl.
+  (*start here can this be shorter with some sort of mapping*)
+  Ltac comptype := replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto; eapply tr_formation_weaken; try apply compm4_type; try apply compm3_type;
                    try apply compm2_type;
                    try apply compm1_type; try apply compm0_type; auto;
 try apply trans_type_works; auto.
@@ -936,197 +937,30 @@ replace (store (ppair (var 3) (var 2)))
   with (subst (sh 1) (store (ppair (var 2) (var 1)))); auto.
 apply tr_hyp_tm; repeat constructor.
 (*done with et1, ramping up to et2*)
-
-simpl.
-rewrite (sh_under_Gamma_at _ _ _ _ 0)
-eapply IHDe1; try assumption. simpsub_type; auto.
-
-
-eapply split_world2; auto.
-auto.
-| eapply split_world1 | eapply split_world2].
-
-try apply uworld65.
-simpl.  simpsub_type; auto. 
-try ((eapply split_world1 || eapply split_world2); apply uworld65).
-
-change (sh 7) with (sh (si))
-
-
-eapply trans_type_works; auto. (*have popped off G*)
-simpsub_big. simpl. constructor; auto; simpsub_big; simpl.
-constructor; auto.
-
-comptype. apply compm0_type.
-
-    auto. unfold subst1. simpsub1. rewrite - addnA.
-    rewrite subst_trans_type. rewrite addnC. auto. simpsub. auto.
-    rewrite Hsub2.
-    eapply (tr_all_elim _ nzero preworld).
-    (*strange goal comes from here
-     get this out of comp type
-     get w to have the shift in front from the start*)
-    clear Hsub Hsub2.
-assert 
-       (all nzero preworld
-          (pi nattp
-             (arrow
-                (subseq
-                   (ppair
-                      (subst (sh (6 + size G))
-                         w1)
-                      (subst (sh (6 + size G))
-                         l1))
-                   (ppair (var 1) (var 0)))
-                (arrow
-                   (store
-                      (ppair (var 1) (var 0)))
-                   (laters
-                      (exist nzero preworld
-                         (sigma nattp
-                            (prod
-                              (prod
-                              (subseq
-                              (ppair 
-                              (var 3) 
-                              (var 2))
-                              (ppair 
-                              (var 1) 
-                              (var 0)))
-                              (store
-                              (ppair 
-                              (var 1) 
-                              (var 0))))
-                              (trans_type
-                              (var 1) 
-                              (var 0) A))))))))
-= subst1 (subst (sh (4 + size G)) l1)
-       (all nzero preworld
-          (pi nattp
-             (arrow
-                (subseq
-                   (ppair (shift 3(subst (sh (4 + size G)) w1))
-                          (var 2))
-                   (ppair (var 1) (var 0)))
-                (arrow (store (ppair (var 1) (var 0)))
-                   (laters
-                      (exist nzero preworld
-                         (sigma nattp
-                            (prod
-                               (prod
-                                  (subseq
-                                     (ppair (var 3) (var 2))
-                                     (ppair (var 1) (var 0)))
-                                  (store
-                                     (ppair (var 1) (var 0))))
-                               (trans_type (var 1) (var 0) A))))))))))
-      as Hsub3.
-rewrite - subst_sh_shift.
-simpsub. simpl. unfold subst1. simpsub1. simpsub_big. simpl.
-repeat rewrite plusE.
-rewrite subst_trans_type. repeat rewrite - addnA.
-replace (3 + 2) with 5; auto.
-replace (1 + 1) with 2; auto.
-repeat rewrite - (addn1 (size G + 5)).
-repeat rewrite - (addn4 (size G + 2)).
-rewrite addnC. auto. repeat rewrite - addnA.
-replace (5 + 1) with 6; auto.
-replace (2 + 4) with 6; auto.
-(*ask karl: a mess!!*)
-rewrite Hsub3.
-clear Hsub3.
-assert( 
-       (subst1 (subst (sh (4 + size G)) l1)
-          (all nzero preworld
-             (pi nattp
-                (arrow
-                   (subseq
-                      (ppair (shift 3 (subst (sh (4 + size G)) w1))
-                         (var 2)) (ppair (var 1) (var 0)))
-                   (arrow (store (ppair (var 1) (var 0)))
-                      (laters
-                         (exist nzero preworld
-                            (sigma nattp
-                               (prod
-                                  (prod
-                                     (subseq (ppair (var 3) (var 2))
-                                        (ppair (var 1) (var 0)))
-                                     (store (ppair (var 1) (var 0))))
-                                  (trans_type (var 1) (var 0) A)))))))))) =
-trans_type (subst (sh (4 + size G)) w1) (subst (sh (4 + size G)) l1) (comp_m A) ) as Hsub4.
-simpl. auto.
-rewrite Hsub4.
-clear Hsub4.
-rewrite - (addn2 (size G)).
-repeat rewrite plusE.
-repeat rewrite - (sh_sum (size G) 4).
-rewrite - sh_trans_type. rewrite - subst_app.
-unfold subst1. rewrite subst_pw. rewrite - hseq4.
-repeat rewrite subst_sh_shift. apply tr_weakening_append.
-eapply IHDe1; try assumption.
-var_solv.
-(*replace 6 with (2 + 4). rewrite - addnA.*)
-(*repeat rewrite - (sh_sum (4 + size G) 2). *)
-eapply tr_formation_weaken; apply compm0_type.
-do 2! rewrite - (sh_sum _ 6).
-apply wworld6. erewrite <- size_Gamma_at. apply wworld_app. assumption.
-apply trans_type_works. apply uworld10. 
-var_solv.
-rewrite - (addn2 (size G)).
-replace ( subseq
-          (ppair (subst (sh (4 + size G)) w1)
-             (subst (sh (4 + size G)) l1))
-          (ppair (var 3) (var 2)))
-  with (subst (sh 2)
-          (subseq
-             (ppair (subst (sh (size G + 2)) w1)
-                (subst (sh (size G + 2)) l1)) (ppair (var 1) (var 0))
-       )). var_solv. simpsub_big. auto. rewrite plusE.
-replace (size G + 2 + 2) with (4 + size G); auto.
-rewrite addnC. rewrite - addnA. auto.
-replace (store (ppair (var 3) (var 2)))
-with (subst (sh 1) (store (ppair (var 2) (var 1)))). var_solv.
-simpsub_big. auto. simpsub.
-(*e2bar*)
+- simpl.
  rewrite subst_bind.
- simpsub_big. simpl. simpsub.
- apply tr_arrow_intro.
- - 
-   replace (ppair (var 5) (var 4)) with
+ simpsub_big. rewrite subst_trans_type; auto. 
+ apply tr_arrow_intro; try (replace (ppair (var 5) (var 4)) with
        (@subst False (sh 2)
               (ppair (var 3) (var 2))
-       ).
-   eapply tr_formation_weaken; eapply compm3_type; auto.
-   apply trans_type_works; auto.
-   simpsub. auto.
- -
-   replace (ppair (var 5) (var 4)) with
-       (@subst False (sh 2)
-              (ppair (var 3) (var 2))
-       ).
-   eapply tr_formation_weaken; eapply compm2_type; auto.
-   apply trans_type_works; auto.
-   simpsub. auto.
- - simpsub_big. simpl.
-   rewrite ! plusE.
-   remember 
-    [:: hyp_tm
-          (exist nzero preworld
-             (sigma nattp
-                (prod
-                   (prod (subseq (ppair (var 5) (var 4)) (ppair (var 1) (var 0)))
-                      (store (ppair (var 1) (var 0)))) (trans_type (var 1) (var 0) A)))),
-        hyp_tm (store (ppair (var 2) (var 1))),
-        hyp_tm
-          (subseq (ppair (subst (sh (size G).+2) w1) (subst (sh (size G + 2)) l1)) (ppair (var 1) (var 0))),
-        hyp_tm nattp, hyp_tm (subst1 (subst (sh (size G)) l1) preworld)
-                      & Gamma_at G w1 l1 ++ D] as G'.
-   remember 
-       (laters
-          (exist nzero preworld
-             (sigma nattp
-                (prod (prod (subseq (ppair (var 6) (var 5)) (ppair (var 1) (var 0))) (store (ppair (var 1) (var 0))))
-                   (subst (dot (var 0) (dot (var 1) (sh 3))) (trans_type (var 1) (var 0) B)))))) as a'.
+       ); auto; comptype).
+ (*need a subst_trans_Type for move gamma*)
+ eapply bind_type ( _
+                      (exist nzero preworld (
+                                          sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
+                                          (let u := Syntax.var 5 in
+                                              let l := Syntax.var 4 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
+                                                    prod (prod (subseq U V) (store V))
+                                                     (trans_type v lv A))))
+           ).
+
+
+        )
    replace 
        (make_bind
           (app
@@ -1219,7 +1053,7 @@ fold gen_sub_mvl_list.
    replace (ppair (var 6) (var 5)) with
        (@subst False (sh 2)
               (ppair (var 4) (var 3))
-       ).
+       ). comptype.
    eapply tr_formation_weaken; apply compm4_type.
    clear Hequiv Hequivt.
    eapply uworld43.
