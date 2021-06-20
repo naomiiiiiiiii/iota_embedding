@@ -456,10 +456,21 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
 eapply (tr_all_elim _ nzero preworld).
 match goal with |- tr ?G' ?J => rewrite - (cats0 G'); change (sh 10)
 with (@sh False (size G')); rewrite ! subst_sh_shift
-end. apply tr_weakening_append.
+end.
+match goal with |- tr ?G (deq ?M ?M ?T) =>
+                replace T with (shift 10 T) end.
+2: {
+simpsub_type; auto. rewrite subst_Gamma_at; auto. simpsub_type; auto.
+}
+apply tr_weakening_append.
 match goal with |- tr ?G (deq ?M ?M (all _ _ (pi _ (arrow _ ?T)))
-                        ) =>
-                replace T with (trans_type (var 1) (var 0) (comp_m A)) end.
+                        ) => replace T with (trans_type (var 1) (var 0) (comp_m B)) end.
+2: {
+simpsub_type; auto. 
+}
+eapply IHDe2; try assumption.
+
+
 eapply IHDe1; try assumption. simpsub_type; auto.
 
 
