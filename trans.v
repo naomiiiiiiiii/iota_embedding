@@ -132,7 +132,7 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
                                    trans G E1 Et1 ->
                                    trans (cons T1 G) E2 Et2 ->
                                    trans G (bind_m E1 E2)(
- lam (lam ( lam ( (*l1 : = 2, g: Gamma_at G l1 = 1 l :=0 *) lam ( (*l1 := 3, l := 1, m := 0*)
+ lam (lam ( lam ( (*l1 : = 2, g: Gamma_at G = 1 l :=0 *) lam ( (*l1 := 3, l := 1, m := 0*)
                            lam ( (*l1 := 4, l := 2, m := 1, s := 0*)
                                let l1 := (var 4) in
                                let g := (var 3) in
@@ -167,7 +167,7 @@ that. you want to bind
                                             (*5: Gamma_at G w
                                               move 5: Gamma_at G v
                                           <x, 5> : Gamma_at T1::G v*)
-(ppair x' (move_gamma G make_subseq (var 5)))                                                 in
+(ppair x' (move_gamma G make_subseq (var 4)))                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
