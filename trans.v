@@ -126,12 +126,11 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
     (deqtype (Gamma_at G w l)
        (Gamma_at G w l)). Admitted.
 
- Inductive trans: source.context -> source.term -> (Syntax.term False) -> Type :=
-  t_bind: forall G E1 Et1 E2 Et2 T1 T2, of_m G E1 (comp_m T1) ->
-                                  of_m (cons T1 G) E2 (comp_m T2) ->
-                                   trans G E1 Et1 ->
-                                   trans (cons T1 G) E2 Et2 ->
-                                   trans G (bind_m E1 E2)(
+ Inductive trans: source.context -> source.term -> source.term -> (Syntax.term False) -> Type :=
+  t_bind: forall G E1 Et1 E2 Et2 A B (He3: of_m G (bind_m E1 E2) (comp_m B)),
+                                   trans G E1 (comp_m A) Et1 ->
+                                   trans (A::G) E2 (comp_m B) Et2 ->
+                                   trans G (bind_m E1 E2) (comp_m B) (
  lam (lam ( lam ( (*l1 : = 2, g: Gamma_at G = 1 l :=0 *) lam ( (*l1 := 3, l := 1, m := 0*)
                            lam ( (*l1 := 4, l := 2, m := 1, s := 0*)
                                let l1 := (var 4) in
@@ -148,7 +147,7 @@ make_bind btarg ( lam (*l1 := 5, l := 3, m := 2, s := 1, z1 := 0*)
                                let sv := (picomp3 z1) in
                                let x' := (picomp4 z1) in
                                                                         (*
-in the context (T1 :: G) Et2 is a function which wants a length
+in the context (A :: G) Et2 is a function which wants a length
 in the context G, Et2 has var 0 free. In context G, (lam Et2) is a function which wants an
 x, then a length
 make the lambda first before you introduce other variables and it's still the first var
@@ -166,7 +165,7 @@ that. you want to bind
                                             )
                                             (*5: Gamma_at G w
                                               move 5: Gamma_at G v
-                                          <x, 5> : Gamma_at T1::G v*)
+                                          <x, 5> : Gamma_at A::G v*)
 (ppair x' (move_gamma G make_subseq (var 4)))                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                make_bind e2bar' (lam (
@@ -182,9 +181,9 @@ that. you want to bind
 
     ))
                                          )))))
-  | t_ref: forall G E Et T, 
-         of_m G E T -> trans G E Et ->
-         trans G (ref_m E)
+  | t_ref: forall G E Et A, 
+         of_m G (ref_m E) (reftp_m A) -> trans G E A Et ->
+         trans G (ref_m E) (reftp_m A)
                (lam ( (*l1  := 0*) lam (*l1 := 1, l := 0*)
                     ( lam (*l1 := 2, l := 1, m := 0*)
                        (  lam (*l1 := 3, l := 2, m := 1, s := 0*)
@@ -228,7 +227,7 @@ l2: := 2
                let m02 := make_subseq in (*compose_sub m12 m *)
                              bite (lt_b i l)
                                (app (app (app s l2) m12) i) (*store u2*)
-                               (next (move_app T m02 x)) (*|> tau @ u3*) 
+                               (next (move_app A m02 x)) (*|> tau @ u3*) 
                                                ))
                                                ))
                                          

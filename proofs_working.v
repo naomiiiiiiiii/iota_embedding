@@ -10,19 +10,15 @@ From istari Require Import Sigma Tactics
  well-typedness of the translation*)
 
 Theorem two: forall G e T ebar,
-    of_m G e T ->
-    trans G e ebar -> 
+    trans G e T ebar -> 
     tr [::] (oof ebar
                 (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
                                                      (trans_type (var 1) (var 0) T))))
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
-  move => G e T ebar De Dtrans.
-  move : ebar Dtrans. induction De; intros.
-  10 : {
+  move => G e T ebar Dtrans. induction Dtrans; intros.
 (*pop them all off*)
 constructor; auto. 
-inversion Dtrans. rename H5 into Hebar.
 simpsub_big. simpl. apply tr_pi_intro; auto.
 apply tr_arrow_intro; auto.
 apply Gamma_at_type; auto;
