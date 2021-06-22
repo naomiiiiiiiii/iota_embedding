@@ -250,7 +250,7 @@ end. apply tr_weakening_append.
 match goal with |- tr ?G (deq ?M ?M (all _ _ (pi _ (arrow _ ?T)))
                         ) =>
                 replace T with (trans_type (var 1) (var 0) (comp_m A)) end.
-eapply IHDe1; try assumption. simpsub_type; auto.
+eapply IHDtrans1; try assumption. simpsub_type; auto.
 eapply split_world1; auto.
 match goal with |- tr ?G (deqtype (pi _ (arrow _ ?T)) ?J
                         ) =>
@@ -464,10 +464,45 @@ match goal with |- tr ?G (deq ?M ?M (all _ _ (pi _ (arrow _ ?T)))
 2: {
 simpsub_type; auto. 
 }
-eapply IHDe2; try assumption.
-
-
-eapply IHDe1; try assumption. simpsub_type; auto.
+eapply IHDtrans2; try assumption; try var_solv; auto.
+var_solv.
+match goal with |- tr ?G (deqtype (pi _ (arrow _ ?T))
+                                 ?T')
+                         => replace T with (trans_type (var 1) (var 0) (comp_m B)) end.
+2: {
+simpsub_type; auto. 
+}
+change (var 1) with (@shift False 1 (var 0)).
+apply trans_typed1; auto. var_solv. auto.
+simpl. apply Gamma_at_intro; auto.
+eapply (move_gamma_works _ _ (var 9) (var 8)).
+eapply (compose_sub_works (picomp2 (var 0)) (var 4)
+                          _ (ppair (var 6) (var 5))); auto.
+match goal with |- tr ?G' (oof ?M ?T) =>
+                replace T with
+    (subst (sh 5) (subseq (ppair (var 4) (var 3))
+                    (ppair (var 1) (var 0))
+            )) end.
+2: {simpsub_big. auto. }
+var_solv0.
+match goal with |- tr ?G' (oof ?M ?T) =>
+                (replace T with
+    (subst (sh 8) (Gamma_at G (var 1) (var 0))
+                )) end.
+2: { change (sh 8) with (@under False 0 (sh 8)).
+     rewrite sh_under_Gamma_at. auto. }
+var_solv0. simpsub_type; auto. apply picomp4_works.
+var_solv. eapply tr_formation_weaken; apply compm0_type.
+(* ask arthur if there's any way to do the as
+match goal with |- tr ?L ?J as tr ((?y::(?x::?G')) (oof ?M world) =>
+           (change M with
+                (@subst
+                   False (sh 2) (ppair (var 1) (ppi1 (var 0)))
+           ))end.
+*)
+rewrite - (subst_world (sh 2)). var_solv0.
+apply world_pair; auto; try var_solv.
+eapply IHDe1; try assumption . simpsub_type; auto.
 
 
 

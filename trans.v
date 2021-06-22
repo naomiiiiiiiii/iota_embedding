@@ -91,7 +91,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
    let enumerated := iota 0 (size L) in
   foldr f acc (zip enumerated L).
 
- Fixpoint Gamma_at_ctx_help (G: source.context) (w l: Syntax.term False):=
+ Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False):=
    mapi (fun pair =>
            match pair with (i, A) => 
            hyp_tm (trans_type (shift i w) (shift i l) A) end) G.
@@ -117,8 +117,13 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
  Lemma move_gamma_works: forall D G w1 l1 w2 l2 m Gamma,
      tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
      tr D (oof Gamma (Gamma_at G w1 l1)) ->
-     tr D (oof (move_gamma G m Gamma) (Gamma_at G w2 l1)).
+     tr D (oof (move_gamma G m Gamma) (Gamma_at G w2 l2)).
  Admitted.
+Lemma Gamma_at_intro: forall D G A w l x P, 
+ tr D (oof (ppair w l) world) ->
+ tr D (oof P (Gamma_at G w l)) ->
+tr D (oof x (trans_type w l A)) ->
+ tr D (oof (ppair x P) (Gamma_at (A::G) w l)). Admitted.
 
  Lemma Gamma_at_type {D G w l}:
    tr D (oof w preworld) -> tr D (oof l nattp) ->
@@ -244,3 +249,17 @@ l2: := 2
 app (shift 5 (lam (*x' lam*) (
                                                      move_Gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
 *)
+
+ Lemma trans_typed1 {D G w A}:
+   tr D (oof w preworld) -> 
+ tr D
+    (deqtype (pi nattp
+                 (arrow (Gamma_at G (shift 1 w) (var 0))
+                        (trans_type (shift 1 w) (var 0) A)
+             ) )
+(pi nattp
+                 (arrow (Gamma_at G (shift 1 w) (var 0))
+                        (trans_type (shift 1 w) (var 0) A)
+    ) )).
+   Admitted.
+

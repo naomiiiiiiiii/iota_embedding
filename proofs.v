@@ -278,7 +278,7 @@ Lemma compm2_type: forall U A G,
    rewrite - (subst_nat (sh 1)). rewrite - subst_sigma.
    var_solv. Qed.
 
-  Lemma picomp2_works: forall G x y z a A,
+  Lemma picomp2_works: forall G y z a A,
   tr
     [:: hyp_tm
           (sigma nattp
@@ -288,13 +288,29 @@ Lemma compm2_type: forall U A G,
                       (ppair (var 1) (var 0)))
                    (store (ppair (var 1) (var 0))))
                 A)),
-       x, y, z, a,
+       hyp_tm preworld, y, z, a,
        hyp_tm nattp, hyp_tm preworld
       & G]
     (oof (picomp2 (var 0))
                    (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
+                      (ppair (var 1) (picomp1 (var 0))))
     ).
+  Admitted.
+
+  Lemma picomp4_works: forall G y z a A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                (trans_type (var 1) (var 0) A))),
+       hyp_tm preworld, y, z, a,
+       hyp_tm nattp, hyp_tm preworld
+      & G]
+    (oof (picomp4 (var 0)) (trans_type (var 1) (picomp1 (var 0)) A)).
   Admitted.
 
   Lemma picomp_world: forall G y z a A,
