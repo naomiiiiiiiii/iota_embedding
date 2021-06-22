@@ -297,6 +297,22 @@ Lemma compm2_type: forall U A G,
     ).
   Admitted.
 
+  Lemma picomp3_works: forall G y z a A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (ppair (var 6) (var 5))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                (trans_type (var 1) (var 0) A))),
+       hyp_tm preworld, y, z, a,
+       hyp_tm nattp, hyp_tm preworld
+      & G]
+    (oof (picomp3 (var 0)) (store (ppair (var 1) (picomp1 (var 0))))).
+  Admitted.
+
   Lemma picomp4_works: forall G y z a A,
   tr
     [:: hyp_tm

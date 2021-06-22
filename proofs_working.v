@@ -9,7 +9,13 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
-Theorem two: forall G e T ebar,
+ Lemma sub_refl: forall ( U: term False) (G: context),
+                         tr G (oof U world)
+                         ->tr G (oof make_subseq 
+                                    (subseq U U)).
+ Admitted.
+
+ Theorem two: forall G e T ebar,
     trans G e T ebar -> 
     tr [::] (oof ebar
                 (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
@@ -493,14 +499,18 @@ match goal with |- tr ?G' (oof ?M ?T) =>
      rewrite sh_under_Gamma_at. auto. }
 var_solv0. simpsub_type; auto. apply picomp4_works.
 var_solv. eapply tr_formation_weaken; apply compm0_type.
-(* ask arthur if there's any way to do the as
-match goal with |- tr ?L ?J as tr ((?y::(?x::?G')) (oof ?M world) =>
+match goal with |- tr (?y::(?x::?G')) (oof ?M world) =>                 
            (change M with
                 (@subst
                    False (sh 2) (ppair (var 1) (ppi1 (var 0)))
-           ))end.
-*)
-rewrite - (subst_world (sh 2)). var_solv0.
+           ); change (y::x::G') with ([:: y; x] ++ G'))
+end.
+rewrite - (subst_world (sh 2)) ! subst_sh_shift. apply tr_weakening_append; auto.
+apply trans_type_works; auto. auto.
+apply sub_refl; auto.
+var_solv0.
+simpsub_type; auto. apply picomp3_works.
+
 apply world_pair; auto; try var_solv.
 eapply IHDe1; try assumption . simpsub_type; auto.
 
