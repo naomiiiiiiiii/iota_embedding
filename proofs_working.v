@@ -510,7 +510,17 @@ apply trans_type_works; auto. auto.
 apply sub_refl; auto.
 var_solv0.
 simpsub_type; auto. apply picomp3_works.
+- apply tr_arrow_intro; auto.
+  simpl. change (ppair (var 3) (ppi1 (var 2))) with
+             (@subst False (sh 2) (ppair (var 1) (ppi1 (var 0)))).
+comptype.
+rewrite ! subst_trans_type; auto.
+change (ppair (var 8) (var 7)) with
+             (@subst False (sh 2) (ppair (var 6) (var 5))).
+comptype.
 
+  eapply tr_formation_weaken; apply compm3_type; auto.
+  apply trans_type_works; auto.
 apply world_pair; auto; try var_solv.
 eapply IHDe1; try assumption . simpsub_type; auto.
 
