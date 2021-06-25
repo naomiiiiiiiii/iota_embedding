@@ -176,8 +176,8 @@ that. you want to bind
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
                                                     ret_a (ppair (picomp1 z2)
-                                                                   (ppair make_subseq (*z2 \circ z1*)
-                                                        (ppair (picomp3 z2) (picomp4 z2))                         
+                                                                   (ppair (ppair make_subseq (*z2 \circ z1*)
+                                                      (picomp3 z2)) (picomp4 z2))                         
                                                         )
                                                ))
               )
@@ -185,7 +185,7 @@ that. you want to bind
           )
 
     ))
-                                         )))))
+                                         ))))
   | t_ref: forall G E Et A, 
          of_m G (ref_m E) (reftp_m A) -> trans G E A Et ->
          trans G (ref_m E) (reftp_m A)

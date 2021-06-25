@@ -309,11 +309,11 @@ apply tr_hyp_tm; repeat constructor.
                 (ppi1 (var 0))) make_subseq)
           (picomp3 (var 0)))
           (lam
-             (ret_a
-                (ppair (ppi1 (var 0))
-                   (ppair make_subseq
-                      (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))
-     )) end.
+               (ret_a (ppair (picomp1 (var 0))
+                      (ppair (ppair make_subseq (*z2 \circ z1*)
+                       (picomp3 (var 0))) (picomp4 (var 0)))                         
+                                                        ))
+     ))) end.
  2 : {
 unfold subst1. rewrite subst_bind. simpsub_big. auto. 
  }
@@ -528,15 +528,16 @@ rewrite ! subst_trans_type; auto.
 change (ppair (var 8) (var 7)) with
              (@subst False (sh 2) (ppair (var 6) (var 5))).
 comptype.
-  + simpsub_big. simpl. apply ret_type.
+  + simpsub_type; auto. apply ret_type.
     match goal with |- (tr ?G' (oof ?M ?T)) => change M with
         (subst1 (var 0)
-          (ppair (ppi1 (var 0))
+       (ppair (ppi1 (var 0))
+          (ppair
              (ppair make_subseq
-                (ppair (picomp3 (var 0))
-                   (picomp4 (var 0))))))
+                (picomp3 (var 0)))
+             (picomp4 (var 0)))))
         end.
-(*split up the most recent existential hypothesis*)
+    (*split up the most recent existential hypothesis*)
  eapply (tr_exist_elim _ (subst (sh 1) nzero)
                          (subst (sh 1) preworld)
              (subst (under 1 (sh 1)) (sigma nattp
@@ -557,17 +558,19 @@ match goal with |- tr (?x::?G') (oof ?M world) =>
            ); change (x::G') with ([:: x] ++ G'))
 end.
 rewrite - (subst_world (sh 1)) ! subst_sh_shift. apply tr_weakening_append; auto. rewrite ! subst_trans_type; auto. apply trans_type_works; auto.
-simpsub_big. simpl. rewrite ! subst_trans_type; auto.
-      change (ppair (var 4)
-                    (ppi1 (var 3))) with
-          (@shift False 1 (ppair (var 3) (ppi1 (var 2)))).
-change (var 1) at 1 2 with (@shift False 1 (var 0)).
+simpsub_type; auto. rewrite ! subst_trans_type; auto.
 apply (tr_exist_intro _ _ _ _ (var 1)); auto.
     * var_solv.
-      simpsubg.
-      simpsub_type; auto.
+      simpsub_big; auto. simpl.
+      change (dot (var 0) (dot (var 2) sh1))  with (@under False 1 (dot (var 1) id)). rewrite ! subst1_under_trans_type; auto. simpsub. simpl.
       apply tr_sigma_intro; auto.
-      - apply picomp1_works.
+- simpsub_big. simpl. apply tr_prod_intro.
+  * constructor. apply subseq_type; auto. apply store_type; auto.
+    fold (@subst1 False (ppi1 (var 0))).
+    rewrite subst1_trans_type. simpsub_big. simpl.
+    eapply tr_formation_weaken. apply trans_type_works. auto.
+    + apply tr_prod_intro. apply subseq_type; auto. apply store_type; auto.
+
         match goal with |- tr (?y::(?x::?G')) (oof ?M ?T) =>
                         change (y::x::G') with ([:: y; x] ++ G');
            (change M with

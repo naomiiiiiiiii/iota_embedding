@@ -264,61 +264,43 @@ Lemma compm2_type: forall U A G,
    rewrite - (subst_nat (sh 1)). rewrite - subst_sigma.
    var_solv. Qed.
 
-  Lemma picomp2_works: forall G T1 T2 T3,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   T1
-                  T2)
-                T3)),
-hyp_tm preworld
-      & G]
-    (oof (picomp2 (var 0)) (subst1 (ppi1 (var 0)) T1)).
-    intros. unfold picomp2.
-    match goal with |- tr ((hyp_tm ?A)::?G') (oof ?M ?T) =>
-                    (assert (tr ((hyp_tm A) :: G') (oof (var 0) (@subst False (sh 1) A))
-                              )
-                    ) end.
-    * var_solv.
-    * simpsubin X. simpl in X.
-      eapply (tr_prod_elim1 _ _
-                    (subst1 (ppi1 (var 0)) 
-                       (subst (dot 
-                         (var 0) 
-                         (sh 2)) T2))).
-.
-    rewrite - subst_prod.
-    eapply (tr_prod_elim1 _ _ (subst1 (ppi1 (var 0)) T3)).
-    rewrite - subst_prod.
-    apply (tr_sigma_elim2 _ nattp).
-
-
-  Lemma picomp3_works: forall G W u A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq W
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                A)), hyp_tm preworld
-      & G]
-    (oof (picomp3 (var 0)) (store (ppair (shift 1 u) (picomp1 (var 0))))).
-  Admitted.
-
-  Lemma picomp4_works: forall G W u A,
-  tr G (oof W world) -> tr G (oof u preworld) ->
+  Lemma picomp2_works: forall G W u A,
   tr
     [:: hyp_tm
           (sigma nattp
              (prod
                 (prod
                    (subseq (shift 1 W)
-                      (ppair (shift 1 u) (var 0)))
-                   (store (ppair (shift 1 u) (var 0))))
+                      (ppair (var 1) (var 0)))
+                   (store (ppair (var 1) (var 0))))
+                A)),
+hyp_tm preworld
+      & G]
+    (oof (picomp2 (var 0))
+                   (subseq (shift 1 W) 
+                      (ppair (shift 1 u) (picomp1 (var 0))))
+    ).
+  Admitted.
+
+  Lemma picomp3_works: forall G T1 T2,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   T1
+                   (store (ppair (var 1) (var 0))))
+                T2)), hyp_tm preworld
+      & G]
+    (oof (picomp3 (var 0)) (store (ppair (var 1) (picomp1 (var 0))))).
+  Admitted.
+
+  Lemma picomp4_works: forall G T1 T2 A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod T1 T2)
                 (trans_type (var 1) (var 0) A))), hyp_tm preworld
       & G]
     (oof (picomp4 (var 0)) (trans_type (var 1) (picomp1 (var 0)) A)).
@@ -436,7 +418,7 @@ Admitted.*)
        hyp_tm nattp, hyp_tm preworld
       & G]
     (oof (picomp3 (var 0)) (store (ppair (var 1) (picomp1 (var 0))))).
-      Admitted.*)
+      Admitted.
 
  Lemma picomp4_works1: forall G y z a A,
   tr
@@ -444,19 +426,18 @@ Admitted.*)
           (sigma nattp
              (prod
                 (prod
-                   (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
+                   T1
                    (store (ppair (var 1) (var 0))))
                 (trans_type (var 1) (var 0) A))),
        hyp_tm preworld, y, z, a,
        hyp_tm nattp, hyp_tm preworld
       & G]
     (oof (picomp4 (var 0)) (trans_type (var 1) (picomp1 (var 0)) A)).
- Admitted.
+ Admitted.*)
 
 
-    Hint Resolve picomp2_works1 picomp1_works1 picomp3_works1 picomp4_works1
-      picomp_world1 picomp2_works picomp1_works.
+    Hint Resolve picomp1_works picomp2_works1 picomp2_works2 picomp3_works picomp4_works
+      picomp_world.
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
