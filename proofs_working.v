@@ -9,7 +9,17 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
- Lemma sub_refl: forall ( U: term False) (G: context),
+
+
+Ltac simpsubg :=
+  match goal with |- (tr ?G (deq ?M ?M ?T)) =>
+autounfold with subst1 in M;
+autounfold with subst1 in T;
+autorewrite with subst1 in M;
+autorewrite with subst1 in T
+  end.
+
+Lemma sub_refl: forall ( U: term False) (G: context),
                          tr G (oof U world)
                          ->tr G (oof make_subseq 
                                     (subseq U U)).
@@ -299,7 +309,7 @@ apply tr_hyp_tm; repeat constructor.
                 (ppi1 (var 0))) make_subseq)
           (picomp3 (var 0)))
           (lam
-             (ret_t
+             (ret_a
                 (ppair (ppi1 (var 0))
                    (ppair make_subseq
                       (ppair (picomp3 (var 0)) (picomp4 (var 0)))))))
@@ -497,7 +507,7 @@ match goal with |- tr ?G' (oof ?M ?T) =>
                 )) end.
 2: { change (sh 8) with (@under False 0 (sh 8)).
      rewrite sh_under_Gamma_at. auto. }
-var_solv0. simpsub_type; auto. apply picomp4_works.
+var_solv0. simpsub_type; auto. 
 var_solv. eapply tr_formation_weaken; apply compm0_type.
 match goal with |- tr (?y::(?x::?G')) (oof ?M world) =>                 
            (change M with
@@ -509,16 +519,80 @@ rewrite - (subst_world (sh 2)) ! subst_sh_shift. apply tr_weakening_append; auto
 apply trans_type_works; auto. auto.
 apply sub_refl; auto.
 var_solv0.
-simpsub_type; auto. apply picomp3_works.
+simpsub_type; auto. 
 - apply tr_arrow_intro; auto.
-  simpl. change (ppair (var 3) (ppi1 (var 2))) with
+  + simpl. change (ppair (var 3) (ppi1 (var 2))) with
              (@subst False (sh 2) (ppair (var 1) (ppi1 (var 0)))).
 comptype.
 rewrite ! subst_trans_type; auto.
 change (ppair (var 8) (var 7)) with
              (@subst False (sh 2) (ppair (var 6) (var 5))).
 comptype.
+  + simpsub_big. simpl. apply ret_type.
+    match goal with |- (tr ?G' (oof ?M ?T)) => change M with
+        (subst1 (var 0)
+          (ppair (ppi1 (var 0))
+             (ppair make_subseq
+                (ppair (picomp3 (var 0))
+                   (picomp4 (var 0))))))
+        end.
+(*split up the most recent existential hypothesis*)
+ eapply (tr_exist_elim _ (subst (sh 1) nzero)
+                         (subst (sh 1) preworld)
+             (subst (under 1 (sh 1)) (sigma nattp
+                (prod
+                   (prod
+                      (subseq (ppair (var 3) (ppi1 (var 2)))
+                         (ppair (var 1) (var 0)))
+                      (store (ppair (var 1) (var 0))))
+                   (trans_type (var 1) (var 0) B)))) ); auto.
+ rewrite - subst_exist. var_solv0.
+    * simpsub_big. simpl.
+ change (ppair (var 4) (ppi1 (var 3))) with
+     (@subst False (sh 2) (ppair (var 2) (ppi1 (var 1)))). comptype.
+match goal with |- tr (?x::?G') (oof ?M world) =>                 
+           (change M with
+                (@subst
+                   False (sh 1) (ppair (var 1) (ppi1 (var 0)))
+           ); change (x::G') with ([:: x] ++ G'))
+end.
+rewrite - (subst_world (sh 1)) ! subst_sh_shift. apply tr_weakening_append; auto. rewrite ! subst_trans_type; auto. apply trans_type_works; auto.
+simpsub_big. simpl. rewrite ! subst_trans_type; auto.
+      change (ppair (var 4)
+                    (ppi1 (var 3))) with
+          (@shift False 1 (ppair (var 3) (ppi1 (var 2)))).
+change (var 1) at 1 2 with (@shift False 1 (var 0)).
+apply (tr_exist_intro _ _ _ _ (var 1)); auto.
+    * var_solv.
+      simpsubg.
+      simpsub_type; auto.
+      apply tr_sigma_intro; auto.
+      - apply picomp1_works.
+        match goal with |- tr (?y::(?x::?G')) (oof ?M ?T) =>
+                        change (y::x::G') with ([:: y; x] ++ G');
+           (change M with
+                (@shift False 2 (ppair (var 1) (ppi1 (var 0))))
+           ); change (y::x::G') with ([:: y; x] ++ G'); change T with
+(@shift False 2 T)
+end.
+apply tr_weakening_append; auto. var_solv.
+simpsub_big. simpl. (*get rid of the subst1 trans type here if it becomes
+                     annoying*)
+change (ppair (var 4) (ppi1 (var 3))) with
+    (@shift False 1 (ppair (var 3) (ppi1 (var 2))))
+apply tr_prod_intro; constructor.
+        * apply subseq_type; auto.
+          apply picopm_world.
+      - change (ppair (var 3) (ppi1 (var 2))) with
+            (@shift False 2 (ppair (var 1) (ppi1 (var 0)))).
+        rewrite - (subst_world (sh 2)) subst_sh_shift.
+      rewrite subst1_trans_type. simpl.
 
+      rewrite ! subst_trans_type; auto.
+simpsub_type.
+
+
+        eapply tr_exist_intro.
   eapply tr_formation_weaken; apply compm3_type; auto.
   apply trans_type_works; auto.
 apply world_pair; auto; try var_solv.
@@ -544,7 +618,7 @@ eapply IHDe1; try assumption . simpsub_type; auto.
                    (ppi1 (var 0))) make_subseq)
              (picomp3 (var 0)))
           (lam
-             (ret_t
+             (ret_a
                 (ppair (ppi1 (var 0))
                    (ppair make_subseq
                       (ppair (picomp3 (var 0))

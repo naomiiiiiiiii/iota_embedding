@@ -175,7 +175,7 @@ that. you want to bind
                                let e2bar' := app (app (app btarg lv) make_subseq) sv in
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
-                                                    ret_t (ppair (picomp1 z2)
+                                                    ret_a (ppair (picomp1 z2)
                                                                    (ppair make_subseq (*z2 \circ z1*)
                                                         (ppair (picomp3 z2) (picomp4 z2))                         
                                                         )
@@ -237,7 +237,7 @@ l2: := 2
                                                ))
                                          
                                     in
-                             ret_t (ppair (nsucc l)
+                             ret_a (ppair (nsucc l)
                                           (ppair p1
                                           (ppair l (ppair triv (lam triv)) (*ref*)
                                         )

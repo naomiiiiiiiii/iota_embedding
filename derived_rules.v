@@ -45,6 +45,22 @@ Lemma kind_type: forall {G K i},
   intros. eapply tr_formation_weaken.
   eapply tr_kuniv_weaken. apply X. Qed.
 
+Lemma tr_prod_intro: forall G a b x1 x2 y1 y2,
+    tr G (deqtype a a) ->
+      tr G (deqtype b b)
+      -> tr G (deq x1 x2 a)
+      -> tr G (deq y1 y2 b)
+      -> tr G (deq (ppair x1 y1) (ppair x2 y2) (prod a b) ).
+intros. eapply tr_eqtype_convert.
+apply tr_eqtype_symmetry. apply tr_prod_sigma_equal; try assumption.
+eapply tr_sigma_intro; try assumption. simpsub. assumption.
+match goal with |- tr ?G' ?J => change J with (substj (under 0 sh1)
+                                                    (deqtype b b));
+                                rewrite - 1! (cat0s G') end.
+change [::] with (@substctx False sh1 [::]).
+ apply tr_weakening. assumption.
+Qed.
+
 Lemma nat_U0: forall G,
     tr G (oof nattp U0). Admitted.
 Hint Resolve nat_U0. 

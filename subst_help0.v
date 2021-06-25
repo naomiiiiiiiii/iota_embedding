@@ -79,8 +79,8 @@ Qed.
 Lemma subst_ret: forall s, subst s ret = ret.
   intros. unfold ret. unfold inl. simpsub. auto. Qed.
 
-Lemma subst_ret_t: forall s m, subst s (ret_t m) = ret_t (subst s m).
-  intros. unfold ret_t. unfold ret. unfold inl. simpsub. auto. Qed.
+Lemma subst_ret_a: forall s m, subst s (ret_a m) = ret_a (subst s m).
+  intros. unfold ret_a. unfold ret. unfold inl. simpsub. auto. Qed.
 
 Lemma subst_laters: forall s A, (subst s (laters A)) = (laters (subst s A)).
   intros. unfold laters. unfold plus. rewrite subst_rec. rewrite subst_sigma.
@@ -104,7 +104,7 @@ Lemma subst_picomp3: forall s m, (subst s (picomp3 m)) = picomp3 (subst s m).
 Lemma subst_picomp4: forall s m, (subst s (picomp4 m)) = picomp4 (subst s m).
   intros. unfold picomp4. simpsub. auto. Qed.
 
-Hint Rewrite subst_U0 subst_ret subst_ret_t subst_subseq subst_leq subst_leqtp
+Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leqtp
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw
   subst_world subst_nth subst_store subst_laters subst_picomp1 subst_picomp2 subst_picomp4 subst_picomp3 subst_make_subseq: subst1.
 

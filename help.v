@@ -58,7 +58,7 @@ Definition Yc: (term False) := lam ((*f := 0*)
 (*Computation monad*)
 Definition ret: term False := lam (inl (var 0)).
 
-Definition ret_t x := app ret x.
+Definition ret_a x := app ret x.
 
 Definition bind : term False := app Yc
    (lam   ( (*f := 0*)

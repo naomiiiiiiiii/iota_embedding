@@ -5,6 +5,9 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
+
+
+
 Definition oof M A: (@Syntax.judgement False) := deq M M A.
 
 Definition oof_t M: (@Syntax.judgement False) := deqtype M M.

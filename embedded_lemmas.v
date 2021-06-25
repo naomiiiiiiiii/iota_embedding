@@ -250,6 +250,10 @@ Lemma bind_type: forall G A B M0 M1,
     tr G (oof M1 (arrow A (laters B))) ->
     tr G (oof (make_bind M0 M1) (laters B)). Admitted.
 
+Lemma ret_type: forall G A M0,
+    tr G (oof M0 A) ->
+    tr G (oof (ret_a M0) (laters A)). Admitted.
+
 (*repeated patterns of proofs.v*)
 
 Lemma world_pair: forall w l G, tr G (oof w preworld) ->
@@ -284,7 +288,12 @@ Lemma uworld32: forall G x y,
     (oof (ppair (var 6) (var 5)) world)). intros.
    apply world_pair; var_solv. Qed. 
 
-  Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65.
+  Lemma uworld98: forall G x y z a b c d e,
+                     (tr [:: x, y, z, a, b, c, d, e, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 9) (var 8)) world)). intros.
+   apply world_pair; var_solv. Qed. 
+
+Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld98.
 
   Lemma store_U0: forall W G,
     (tr G (oof W world)) -> tr G (oof (store W) U0).
