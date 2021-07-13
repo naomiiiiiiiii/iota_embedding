@@ -570,13 +570,32 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
     rewrite subst1_trans_type. simpsub_big. simpl.
     eapply tr_formation_weaken. apply trans_type_works. auto.
     + apply tr_prod_intro. apply subseq_type; auto. apply store_type; auto.
-
-        match goal with |- tr (?y::(?x::?G')) (oof ?M ?T) =>
-                        change (y::x::G') with ([:: y; x] ++ G');
-           (change M with
-                (@shift False 2 (ppair (var 1) (ppi1 (var 0))))
-           ); change (y::x::G') with ([:: y; x] ++ G'); change T with
-(@shift False 2 T)
+eapply (compose_sub_works (picomp2 (var 0)) (picomp2 (var 3))
+                          _ (ppair (var 4) (
+                                     ppi1 (var 3)))); auto.
+Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
+                          true => let var_shed := eval compute in (var_num - sh_amt) in
+                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
+                                                               sh_var_help sh_amt cap var_num.+1
+                        | false => auto
+                          (*change (@var False 9) with
+                              (shift sh_amt (@var False 6))*)
+                                       end.
+Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
+sh_var 3 9.
+rewrite - ! subst_sh_shift.
+rewrite - ! subst_picomp2 - ! subst_ppi1 - ! subst_ppair - !
+                                                             subst_subseq ! subst_sh_shift.
+match goal with |- tr (?x::?y::?z::?G') ?J =>                 
+         change (?x::?y::?z::G') with ([:: x; y; z] ++ G')
+end.
+apply tr_weakening_append; auto.
+rewrite - subst_ppair.
+subst_subseq.
+(change (var 3) with (shift 3 (var 0));
+change (var 9) with (shift 3 (var 6))
+                (@shift False 3 (picomp2 (var 0));
+                 change T with (@shift False 2 )
 end.
 apply tr_weakening_append; auto. var_solv.
 simpsub_big. simpl. (*get rid of the subst1 trans type here if it becomes
