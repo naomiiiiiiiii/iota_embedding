@@ -590,6 +590,39 @@ match goal with |- tr (?x::?y::?z::?G') ?J =>
          change (?x::?y::?z::G') with ([:: x; y; z] ++ G')
 end.
 apply tr_weakening_append; auto.
+auto. repeat fold (@subst1 False).
+suffices: forall m1 m2, (subst (dot m1 id) m2) = subst1 m1 m2.
+(*start here bring that guy out*)
+intros fold_subst1. rewrite fold_subst1 subst1_trans_type.
+simpsub_big. simpl. apply picomp4_works.
+intros. auto.
+(*start here bring this guy out
+prove a picomp5
+ *)
+suffices:
+  forall T U W G,
+    tr G (oof W world) ->
+    tr G (oof U world) ->
+    (tr G (oof T U0)) ->
+    tr G (oof  (prod (prod (subseq W U) (store U)) T) U0).
+intros compm5_type. eapply tr_formation_weaken; apply compm5_type; auto; try apply trans_type_works; try (apply world_pair; var_solv).
+intros.
+repeat (eapply tr_prod_formation_univ).
+apply subseq_U0; auto.
+apply store_U0; auto. apply X1.
+comptype.
+sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
+apply compm4_type; auto. apply trans_type_works; auto.
+comptype.
+picomp.
+auto.
+    eapply tr_prod_formation_univ. unfold nzero. simpl.
+
+
+
+
+rewrite subst1_trans_type.
+
 rewrite - subst_ppair.
 subst_subseq.
 (change (var 3) with (shift 3 (var 0));
