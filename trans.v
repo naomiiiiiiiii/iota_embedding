@@ -27,7 +27,8 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                         let U := ppair u l in
                                         arrow (subseq (shift 2 W) U) (arrow (trans_type u l A) (trans_type u l B))
                                     ))
-       | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
+                          (*does NOT send the refs to comp ref*)
+      | reftp_m tau' => sigma nattp (let l1 := (ppi2 W) in (* i := 0*)
            let i := (var 0) in
             prod (lt_t i (subst sh1 l1))
                  (all nzero preworld (*wl1:= 2, i := 1, v := 0*)

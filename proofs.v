@@ -311,7 +311,8 @@ hyp_tm preworld
     [:: hyp_tm
           (sigma nattp T), hyp_tm preworld & G] (oof (ppair (var 1) (picomp1 (var 0))) world).
     intros. apply world_pair. var_solv. eapply picomp1_works.
-Qed.
+  Qed.
+
 
   (*  Lemma picomp_world1: forall G y z a A,
       tr 

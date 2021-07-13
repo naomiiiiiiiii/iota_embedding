@@ -9,7 +9,7 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
-
+(*test new path*)
 
 Ltac simpsubg :=
   match goal with |- (tr ?G (deq ?M ?M ?T)) =>
