@@ -9,6 +9,16 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
+Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
+                          true => let var_shed := eval compute in (var_num - sh_amt) in
+                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
+                                                               sh_var_help sh_amt cap var_num.+1
+                        | false => auto
+                          (*change (@var False 9) with
+                              (shift sh_amt (@var False 6))*)
+                                       end.
+Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
+
 (*no free variables in translation of types*)
 Lemma subst_trans_type :forall w l A s,
     (subst s (ppair w l)) = (ppair w l) ->
@@ -141,6 +151,18 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
 Qed.
 
 (*subterms of the computation type*)
+Lemma compm5_type: 
+  forall T U W G,
+    tr G (oof W world) ->
+    tr G (oof U world) ->
+    (tr G (oof T U0)) ->
+    tr G (oof  (prod (prod (subseq W U) (store U)) T) U0).
+intros. repeat (eapply tr_prod_formation_univ).
+apply subseq_U0; auto.
+apply store_U0; auto. apply X1.
+Qed.
+
+(*start here fix this one to use compm5*)
 Lemma compm4_type: forall U A G,
     (tr G (oof U world)) ->
     (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
@@ -250,6 +272,7 @@ Lemma compm2_type: forall U A G,
         apply subseq_U0. assumption.
         apply uworld10.
         apply compm1_type; auto. Qed. 
+
 
   (*ppicomps*)
   Lemma picomp1_works: forall G T,
@@ -445,7 +468,7 @@ Admitted.*)
       tr G (oof (trans_type w l A) U0).
     move => w l A G Du.
   move : w l G Du.
-    induction A; intros; simpl; try apply nat_U0.
+    induction A; intros; simpl; try apply tr_unittp_formation; try apply nat_U0.
     + (*arrow*)
         apply tr_all_formation_univ.
       apply pw_kind.
@@ -509,9 +532,10 @@ Admitted.*)
       apply tr_fut_intro.
       var_solv.
       apply tr_fut_formation_univ; auto. apply IHA; auto. apply uworld10.
-      auto. apply leq_refl. auto. apply tr_unittp_formation.
+      auto. apply leq_refl. auto. 
 Qed.
 
+  (*start here this is duplicated with trans_typed1 in trans*)
 Lemma trans_type_works2: forall w A G D,
       (tr D (oof w preworld)) ->
   tr D (deqtype (pi nattp
@@ -522,6 +546,11 @@ Lemma trans_type_works2: forall w A G D,
              (trans_type (shift 1 w) (var 0) A)))).
 Admitted.
 
+  (*start here can this be shorter with some sort of mapping*)
+  Ltac comptype := replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto; eapply tr_formation_weaken; try apply compm4_type; try apply compm3_type;
+                   try apply compm2_type;
+                   try apply compm1_type; try apply compm0_type; auto;
+try apply trans_type_works; auto.
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.

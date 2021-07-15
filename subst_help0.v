@@ -6,6 +6,8 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 
 (*Trivial lemmas to simplify substitutions*)
+Lemma fold_subst1:  forall m1 m2, (@subst False (dot m1 id) m2) = subst1 m1 m2.
+intros. auto. Qed.
 
 Lemma subst_pw: forall s,
     subst s preworld = preworld.

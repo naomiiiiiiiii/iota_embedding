@@ -19,6 +19,47 @@ autorewrite with subst1 in M;
 autorewrite with subst1 in T
   end.
 
+Lemma Gamma_at_intro: forall D G A w l x P,
+ tr D (oof (ppair w l) world) ->
+ tr D (oof P (Gamma_at G w l)) ->
+tr D (oof x (trans_type w l A)) ->
+ tr D (oof (ppair x P) (Gamma_at (A::G) w l)). Admitted.
+
+ Lemma Gamma_at_type {D G w l}:
+   tr D (oof w preworld) -> tr D (oof l nattp) ->
+ tr D
+    (deqtype (Gamma_at G w l)
+       (Gamma_at G w l)). Admitted.
+
+Ltac trans_type := eapply tr_formation_weaken; apply trans_type_works; auto.
+
+Lemma move_gamma_works: forall D G w1 l1 w2 l2 m gamma,
+    tr D (oof (ppair w1 l1) world) ->
+    tr D (oof (ppair w2 l2) world) ->
+     tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
+     tr D (oof gamma (Gamma_at G w1 l1)) ->
+     tr D (oof (move_gamma G m gamma) (Gamma_at G w2 l2)).
+  move => D G. move: D. induction G; simpl; move => D w1 l1 w2 l2 m gamma
+                                                  Hw1 Hw2 Hsub Hg; auto.
+  (*IS*)
+   apply tr_prod_intro.
+  - (*pi1*)
+    eapply tr_formation_weaken; apply trans_type_works; auto.
+    apply Gamma_at_type; auto; [eapply split_world1 | eapply split_world2]; apply Hw2.
+    unfold move_app.
+    (apply (tr_arrow_elim _ (trans_type w1 l1 a))); try trans_type.
+    apply (tr_arrow_elim _ (subseq (ppair w1 l1)
+                                   (ppair w2 l2)
+                           )
+          ).
+    apply subseq_type; auto.
+    apply tr_arrow_formation; try trans_type.
+    apply move_works; auto. auto.
+    eapply tr_prod_elim1. apply Hg.
+    eapply IHG. apply Hw1. apply Hw2. auto.
+    eapply tr_prod_elim2. apply Hg.
+    Qed.
+
 Lemma sub_refl: forall ( U: term False) (G: context),
                          tr G (oof U world)
                          ->tr G (oof make_subseq 
@@ -79,11 +120,6 @@ eapply tr_formation_weaken.
            ))); auto.
 - 
   simpl.
-  (*start here can this be shorter with some sort of mapping*)
-  Ltac comptype := replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto; eapply tr_formation_weaken; try apply compm4_type; try apply compm3_type;
-                   try apply compm2_type;
-                   try apply compm1_type; try apply compm0_type; auto;
-try apply trans_type_works; auto.
   comptype. 
   (*engage Et1 *)
   eapply tr_arrow_elim.
@@ -573,15 +609,6 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
 eapply (compose_sub_works (picomp2 (var 0)) (picomp2 (var 3))
                           _ (ppair (var 4) (
                                      ppi1 (var 3)))); auto.
-Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
-                          true => let var_shed := eval compute in (var_num - sh_amt) in
-                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
-                                                               sh_var_help sh_amt cap var_num.+1
-                        | false => auto
-                          (*change (@var False 9) with
-                              (shift sh_amt (@var False 6))*)
-                                       end.
-Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
 sh_var 3 9.
 rewrite - ! subst_sh_shift.
 rewrite - ! subst_picomp2 - ! subst_ppi1 - ! subst_ppair - !
@@ -591,26 +618,14 @@ match goal with |- tr (?x::?y::?z::?G') ?J =>
 end.
 apply tr_weakening_append; auto.
 auto. repeat fold (@subst1 False).
-suffices: forall m1 m2, (subst (dot m1 id) m2) = subst1 m1 m2.
 (*start here bring that guy out*)
 intros fold_subst1. rewrite fold_subst1 subst1_trans_type.
 simpsub_big. simpl. apply picomp4_works.
-intros. auto.
 (*start here bring this guy out
 prove a picomp5
  *)
-suffices:
-  forall T U W G,
-    tr G (oof W world) ->
-    tr G (oof U world) ->
-    (tr G (oof T U0)) ->
-    tr G (oof  (prod (prod (subseq W U) (store U)) T) U0).
 intros compm5_type. eapply tr_formation_weaken; apply compm5_type; auto; try apply trans_type_works; try (apply world_pair; var_solv).
 intros.
-repeat (eapply tr_prod_formation_univ).
-apply subseq_U0; auto.
-apply store_U0; auto. apply X1.
-comptype.
 sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
 apply compm4_type; auto. apply trans_type_works; auto.
 comptype.

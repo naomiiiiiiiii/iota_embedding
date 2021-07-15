@@ -1,6 +1,6 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help subst_help trans basic_types.
+From istari Require Import source subst_src rules_src help subst_help basic_types.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -104,3 +104,35 @@ Qed.
                             (shift (size G2) t))).
    intros. eapply tr_weakening_appends; try apply X; try reflexivity.
    Qed.
+
+ Lemma tr_weakening_append1: forall G1 x J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::G1) (
+                       (deq (shift 1 J1)
+                            (shift 1 J2)
+                            (shift 1 t))).
+Admitted.
+
+ Lemma tr_weakening_append2: forall G1 x y J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::G1) (
+                       (deq (shift 2 J1)
+                            (shift 2 J2)
+                            (shift 2 t))).
+Admitted.
+
+ Lemma tr_weakening_append3: forall G1 x y z J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::G1) (
+                       (deq (shift 3 J1)
+                            (shift 3 J2)
+                            (shift 3 t))).
+Admitted.
+
+Lemma tr_weakening_append4: forall G1 x y z a J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::a::G1) (
+                       (deq (shift 4 J1)
+                            (shift 4 J2)
+                            (shift 4 t))).
+Admitted.

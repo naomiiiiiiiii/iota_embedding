@@ -200,7 +200,7 @@ Definition cons_w x w1 :=
  (*start here get rid of vacuous cases w program module*)
  Definition move (A: source.term): term False :=
    match A with
-     nattp_m => lam (lam (var 1))
+     nattp_m => lam (lam (var 0))
    | arrow_m _ _ =>
 lam ( (*m0 := 0*)
 lam ( lam (
@@ -210,7 +210,7 @@ lam ( lam (
                let f := var 3 in
                let l := var 2 in
              let x := var 0 in
-                           app (app (app f l) make_subseq) x (*compose_sub m m0*)
+                           app (app (app f l) make_subseq) x (*m o m0*)
   )))))
      | comp_m _ => lam (lam (* m0= 1, c:= 0,*) ( lam (
                            lam (*m0 = 3, c:= 2, l = 1, m := 0*)
@@ -228,55 +228,12 @@ lam ( lam (
                            ppair i (ppair triv (lam triv))
                           ))
      | unittp_m  => lam (lam (var 1))
-     | _ => triv (*not a type operator, error case*)
+     | _ => lam (lam triv) (*not a type operator, error case*)
 end.
 
  Lemma subst_move: forall A s, (subst s (move A)) = move A.
    intros. induction A; simpsub; simpl; auto. Qed.
 
- (*moving all variables specified by G to a future world*)
- (*n keeps track of index at which G starts*)
- (* for (var i): B in G, (sub_4_moveG G m n) substitutes
-(move_B m (var (i + n))) in for (var (i + n)) while leaving all other variables untouched 
- Fixpoint sub_4_moveG (G: source.context) (m: term False) (n: nat) :=
- under n (match G with
-   nil => id
-          | b :: bs => dot (move_app b m (var 0)) (sub_4_moveG bs m (n + 1))
-       end
-).*)
-
-
-
-(*Lemma aaa: (move_gamma (cons nattp_m (cons unittp_m nil)) triv 1) (var 1) = unittp.
-  simpl. simpsub. unfold move_app. simpsub. rewrite subst_move. unfold move. simpl.
-  simpsub. simpl.
-  (*want one that replaces var 0 but leaves the other vars the same*)
-  Admitted.
-
-
-(*problems with this:
- always substs in for var 0
- *)
-  Lemma test: (@subst False (dot nattp sh1) (ppair (var 0) (var 1) )) = unittp.
-    unfold sh1. simpsub. simpl. (*seems to work*)
-    Admitted.
-
-  Lemma test1: (@subst False (dot nattp sh1) (ppair (var 0) (var 14) )) = unittp.
-    unfold sh1. simpsub. simpl.
-    (*found*)
-    Admitted.
-*)
-(* p sure this is wrong
-Lemma mg_bind_help: forall G m e s,
-    subst (dot (var 0) s) (move_gamma G m 1 e) =
-    subst s (move_gamma G m 1 e).
-  intros. unfold move_gamma. induction G.
-simpl. simpsub. simpl.*)
-
-(*Lemma test1: forall (t: term False), subst (dot (var 1) (dot (var 0) (sh 2)))
-                       (subst (under 1 (dot (var 1) (dot (var 0) (sh 2)))) t) =
-                            t.
-  intros. simpsub. ring.*)
 
 
 Opaque laters preworld U0 subseq leqtp nzero nattp world nth.

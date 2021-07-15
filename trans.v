@@ -1,9 +1,17 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import basic_types source subst_src rules_src help subst_help0 subst_help.
+From istari Require Import basic_types source subst_src rules_src derived_rules help subst_help0 subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
+
+Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
+   let enumerated := iota 0 (size L) in
+  map f (zip enumerated L).
+
+ Definition foldri {A B: Type} (f: (nat * A) -> B -> B) (acc: B) (L: seq A) :=
+   let enumerated := iota 0 (size L) in
+  foldr f acc (zip enumerated L).
 
 (*moveGamma almost definitely wrong because it assumes Gamma starts from beginning of
  context (var 0) where as there's probably more stuff at the end
@@ -14,6 +22,8 @@ From istari Require Import Sigma Tactics
 (*functions which take in the world and give you the type*)
 (*make_ref: tau in source -> (translation of ref tau into target)*)
 
+
+Coercion var: nat >-> term.
 
 Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)                                                                          
   :=
@@ -67,73 +77,72 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                     )
                        ))
                       ))
-      | _ => nattp end.
-
-  (*after this return to bind proof, use above for next goal,
-   probably should save as hypothesis that W and U are worlds*)
+      | _ => unittp end.
 
 
-(*makes a sigma type out of a source context *)
-(*this should be a product actually cuz the translated types never depend
- on any other translated type
- start here*)
+(*translation of source contexts to target contexts (at a given world)*)
+ Lemma move_works: forall G w1 l1 w2 l2 T,
+     tr G (oof (ppair w1 l1) world) ->
+     tr G (oof (ppair w2 l2) world) ->
+     tr G (oof (move T) (arrow (subseq (ppair w1 l1) (ppair w2 l2))
+                               (arrow
+                                  (trans_type w1 l1 T)
+                                  (trans_type w2 l2 T)
+                               )
+                        )
+          ).
+   Admitted.
+
+(*makes a product type at a world out of a source context *)
  Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
    match G with
      nil => unittp 
    | A::xs => (prod (trans_type w l A) (Gamma_at xs w l)) end
  .
 
-
- Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
-   let enumerated := iota 0 (size L) in
-  map f (zip enumerated L).
-
- Definition foldri {A B: Type} (f: (nat * A) -> B -> B) (acc: B) (L: seq A) :=
-   let enumerated := iota 0 (size L) in
-  foldr f acc (zip enumerated L).
-
+(*make a target context out of a source context*)
  Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False):=
    mapi (fun pair =>
            match pair with (i, A) => 
            hyp_tm (trans_type (shift i w) (shift i l) A) end) G.
 
-(*making a sigma value out of the variables in a source context
- assume to start at 0*)
+(*making a product value out of the variables in a source context
+ assume vars to start at 0*)
  Definition gamma_at (G: source.context ):= foldri (fun pair => fun acc => match pair with (i, A) =>
                                                                    @ppair False (var i) acc end) triv G.
 
 
  Definition move_app A (m : term False) (x: term False) :=
    app (app (move A) m) x.
- (*making a pair of one type out of a pair of a different type
-  iterating over the pair
-  but how far to go? use the list because it should be the same size as the pair*)
 
+ (*making a pair of type (a big product at U) out of a pair of (a big product at W)
+  iterating over the pair
+ but how far to go? use the list because it should be the same size as the pair*)
 Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.term False) :=
    match G with
      nil => gamma
    | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
  (*not even doing substituions any more, completely differeent from old move Gamma*)
- Lemma move_gamma_works: forall D G w1 l1 w2 l2 m Gamma,
-     tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
-     tr D (oof Gamma (Gamma_at G w1 l1)) ->
-     tr D (oof (move_gamma G m Gamma) (Gamma_at G w2 l2)).
- Admitted.
-Lemma Gamma_at_intro: forall D G A w l x P, 
- tr D (oof (ppair w l) world) ->
- tr D (oof P (Gamma_at G w l)) ->
-tr D (oof x (trans_type w l A)) ->
- tr D (oof (ppair x P) (Gamma_at (A::G) w l)). Admitted.
 
- Lemma Gamma_at_type {D G w l}:
-   tr D (oof w preworld) -> tr D (oof l nattp) ->
+
+
+ (*the actual type of translated terms*)
+ Lemma trans_typed1 {D G w A}:
+   tr D (oof w preworld) -> 
  tr D
-    (deqtype (Gamma_at G w l)
-       (Gamma_at G w l)). Admitted.
+    (deqtype (pi nattp
+                 (arrow (Gamma_at G (shift 1 w) (var 0))
+                        (trans_type (shift 1 w) (var 0) A)
+             ) )
+(pi nattp
+                 (arrow (Gamma_at G (shift 1 w) (var 0))
+                        (trans_type (shift 1 w) (var 0) A)
+    ) )).
+   Admitted.
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term False) -> Type :=
-  t_bind: forall G E1 Et1 E2 Et2 A B (He3: of_m G (bind_m E1 E2) (comp_m B)),
+  t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
                                    trans G E1 (comp_m A) Et1 ->
                                    trans (A::G) E2 (comp_m B) Et2 ->
                                    trans G (bind_m E1 E2) (comp_m B) (
@@ -189,78 +198,31 @@ that. you want to bind
                                          ))))
   | t_ref: forall G E Et A, 
          of_m G (ref_m E) (reftp_m A) -> trans G E A Et ->
-         trans G (ref_m E) (reftp_m A)
-               (lam ( (*l1  := 0*) lam (*l1 := 1, l := 0*)
-                    ( lam (*l1 := 2, l := 1, m := 0*)
-                       (  lam (*l1 := 3, l := 2, m := 1, s := 0*)
-                            ( let l1 := var 3 in
-                              let l := var 2 in
-                             let x := app Et l1 in (*all of Et is @ u1 including vars in Gamma*)
-                             let m1 := make_subseq (*u <= u1*) in
-                             let p1 := ppair m1 (*store u1*)
-                                               (lam (*l2*) 
- (*
-l1 := 4
-l := 3
-m: w <= u := 2
-s: store u, l := 1
-l2: := 0*)                                                
-                             (lam (*m2*)     
- (*
-l1 := 5
-l := 4
-m: w <= u := 3
-s: store u, l := 2
-l2: := 1
-  m2: u1 <= u2 := 0*)                                                
-               ( lam (*i*)
- (*
-l1 := 6
-l := 5
-m: w <= u := 4
-s: store u, l := 3
-l2: := 2
-  m2: u1 <= u2 := 1
-  i := 0*)                                                
-                 (let l1 := var 6 in
-                 let l := var 5 in
-                 let s := var 3 in
-                 let l2 := var 2 in
-                 let i := var 0 in
-                 let x := app Et l1 in (*all of Et is @ u1 including vars in Gamma*)
-               let m1 := make_subseq (*u <= u1*) in
-               let m12 := make_subseq in (*compose_sub m2 m1 *)
-               let m02 := make_subseq in (*compose_sub m12 m *)
-                             bite (lt_b i l)
-                               (app (app (app s l2) m12) i) (*store u2*)
-                               (next (move_app A m02 x)) (*|> tau @ u3*) 
+         trans G (ref_m E) (reftp_m A) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
+         let l := var 2 in                                                        
+         let m1 := make_subseq in (*u <= u1)*)
+         let p1 := (ppair m1
+                         (lam (lam ( lam ( (*making a value of type store U1, lambdas go l2, m2, i*)
+                                         let l1 := var 7 in
+                                         let g := var 6 in
+                                         let l := var 5 in
+                                         let s := var 3 in
+                                         let l2 := var 2 in
+                                         let i := var 0 in
+                                         let x := app (app (shift 8 Et) l1) g in
+                                         let m12 := make_subseq in (*m2 o m1 : U <= U2*)
+                                         let m02 := make_subseq in (*m12 o m : W <= U2*)
+                                         bite (lt_b i l)
+                                              (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
+                                              (next (move_app A m02 x)) (*move x to be : |> A @ U2*)
                                                ))
-                                               ))
-                                         
-                                    in
-                             ret_a (ppair (nsucc l)
-                                          (ppair p1
-                                          (ppair l (ppair triv (lam triv)) (*ref*)
-                                        )
-                            )
-                    ))))
-                      ) ).
+                         ))
+         ) in
+             ret_a (ppair (nsucc l) (*length of new world*)
+                          (ppair p1 (*new word is accessible from current world, *)
+                                 (ppair l (ppair triv (lam triv)) (*ref A @ new world*)
+                                 ) 
+                          )
+                   ))))))).
 
-(*Problem with below is that lv isn't from G and can't be shifted 5
-app (shift 5 (lam (*x' lam*) (
-                                                     move_Gamma G (make_subseq)                                                           1 (*ignore x'*) (app Et2 lv))))
-*)
-
- Lemma trans_typed1 {D G w A}:
-   tr D (oof w preworld) -> 
- tr D
-    (deqtype (pi nattp
-                 (arrow (Gamma_at G (shift 1 w) (var 0))
-                        (trans_type (shift 1 w) (var 0) A)
-             ) )
-(pi nattp
-                 (arrow (Gamma_at G (shift 1 w) (var 0))
-                        (trans_type (shift 1 w) (var 0) A)
-    ) )).
-   Admitted.
 
