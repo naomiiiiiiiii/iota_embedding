@@ -45,7 +45,29 @@ Lemma sub_refl: forall ( U: term False) (G: context),
                          tr G (oof U world)
                          ->tr G (oof make_subseq 
                                     (subseq U U)).
- Admitted.
+Admitted.
+
+Lemma bind_front G D tau M: tr
+                            (hyp_tm Gamma_at G)
+                            (hyp_tm preworld)
+                            (hyp_tm nattp)::
+                            (hyp_tm (subseq (var 1) (var 0)))::
+                            (hyp_tm (store (var 3) (var 2)))::D (oof M
+                         (laters (exist nzero preworld ((* l1 = 3, u := 2, l:= 1, v = 0*)
+                                          sigma nattp (*l1 = 4 u := 3, l := 2, v= 1, lv := 0*)
+                                          (let u := Syntax.var 3 in
+                                              let l := Syntax.var 2 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
+                                                    prod (prod (subseq U V) (store V))
+                                                     (trans_type v lv tau'))))
+                                    )
+                       ))
+                      ))
+                               )
 
  Theorem two: forall G e T ebar,
     trans G e T ebar -> 
@@ -604,10 +626,56 @@ sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
 weaken compm4_type; auto. apply trans_type_works; auto.
 }
   1: {
-    constructor; auto.
+    constructor; auto. unfold move_app. unfold nsucc.
 simpsub_bigs. simpl. apply tr_pi_intro; auto.
 apply tr_arrow_intro; auto.
-apply Gamma_at_type; auto. 
+    - (*show arrow type is well formed*)
+      apply Gamma_at_type; auto.
+     match goal with |- tr ?G' (deqtype ?T ?T) => change T with (trans_type (var 1) (var 0) (comp_m (reftp_m A))) end.
+trans_type; auto.
+    - (*show the translated term has type comp ref A*)
+      simpsub_bigs. simpsub_type; auto.
+      constructor; auto. simpsub_bigs.
+      constructor; auto.
+      apply tr_arrow_intro; auto.
+      weaken compm1_type; auto.
+      match goal with |- tr ?G' (oof ?T ?U) => change T with (trans_type (var 1) (var 0) (reftp_m A)) end.
+      apply trans_type_works; auto.
+      (*start here should bring out this part as its exactly
+       same as front of bind case*)
+   simpsub_big. simpl. apply tr_arrow_intro; auto.
+   eapply tr_formation_weaken.
+    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
+    apply compm2_type; auto.
+ rewrite subst_trans_type; auto.
+    apply trans_type_works; auto.
+    (*pop off the store*)
+   simpsub_big. simpl. apply tr_arrow_intro; auto.
+    eapply tr_formation_weaken. 
+    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
+    apply compm2_type; auto.
+      rewrite subst_move.
+      simpsub_bigs.
+      simpl.
+(*need a subst_move?*)
+
+suffices: forall U A G,
+    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+    tr G (oof (arrow (store U)
+                     (*split the theorem up so that this
+                      laters part stands alone*)
+                         (laters (exist nzero preworld (
+                                          sigma nattp 
+                                          ( let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let V := ppair v lv in
+                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                                   A
+                                                    ))
+                                    )
+         )) U0). (*A should be substed by 2 here start here fix this in trans also*)
+
+
 match goal with |- tr ?G (deqtype ?A ?A) =>
                (change A with
 (trans_type (var 1) (var 0) (comp_m B))) end; auto.

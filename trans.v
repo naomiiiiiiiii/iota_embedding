@@ -169,8 +169,8 @@ that. you want to bind
     ))
                                          ))))
   | t_ref: forall G E Et A, 
-         of_m G (ref_m E) (reftp_m A) -> trans G E A Et ->
-         trans G (ref_m E) (reftp_m A) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
+         of_m G (ref_m E) (comp_m (reftp_m A)) -> trans G E A Et ->
+         trans G (ref_m E) (comp_m (reftp_m A)) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
          let l := var 2 in                                                        
          let m1 := make_subseq in (*u <= u1)*)
          let p1 := (ppair m1

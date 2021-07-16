@@ -96,6 +96,7 @@ Definition minusbc: (term False) := lam
                                                   ))).
  Definition minus: (term False) := app theta minusbc.
 
+
  Definition plusbc: (term False) := lam
                          (
                            (*f := 0*)
@@ -234,6 +235,7 @@ end.
  Lemma subst_move: forall A s, (subst s (move A)) = move A.
    intros. induction A; simpsub; simpl; auto. Qed.
 
+Hint Rewrite subst_move: subst1.
 
 
 Opaque laters preworld U0 subseq leqtp nzero nattp world nth.

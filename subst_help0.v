@@ -23,8 +23,19 @@ Lemma subst_U0: forall s,
 Lemma subst_store: forall W s, subst s (store W) = store (subst s W).
   intros. unfold store. auto. Qed.
 
-Lemma subst_ltb: forall s m n, subst s (ltb m n) = ltb (subst s m) (subst s n).
-  intros. auto. Qed.
+Lemma subst_theta s : @subst False s theta = theta. 
+  unfold theta. simpsub. auto. Qed.
+Hint Rewrite subst_theta.
+
+Lemma subst_minus s: subst s minus = minus.
+  auto. Qed.
+Hint Rewrite subst_minus.
+
+Lemma subst_ltb s m n : subst s (lt_b m n) = lt_b (subst s m) (subst s n).
+  intros. unfold lt_b. simpsub. rewrite subst_minus.
+  unfold nsucc. simpsub. auto.
+Qed.
+Hint Rewrite subst_ltb.
 
 Lemma subst_world: forall s,
     subst s world = world.
@@ -109,8 +120,9 @@ Lemma subst_picomp4: forall s m, (subst s (picomp4 m)) = picomp4 (subst s m).
   intros. unfold picomp4. simpsub. auto. Qed.
 
 Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leqtp
-     subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw
-  subst_world subst_nth subst_store subst_laters subst_picomp1 subst_picomp2 subst_picomp4 subst_picomp3 subst_make_subseq: subst1.
+     subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
+     subst_nth subst_store subst_laters subst_picomp1 subst_picomp2 subst_picomp4
+     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb: subst1.
 
 Hint Rewrite <- subst_sh_shift: subst1.
 
