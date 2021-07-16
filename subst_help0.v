@@ -20,9 +20,11 @@ Lemma subst_U0: forall s,
 
 (*Opaque store.*)
 
-Lemma subst_store: forall W s, (subst s (store W)) = store (subst s W).
+Lemma subst_store: forall W s, subst s (store W) = store (subst s W).
   intros. unfold store. auto. Qed.
 
+Lemma subst_ltb: forall s m n, subst s (ltb m n) = ltb (subst s m) (subst s n).
+  intros. auto. Qed.
 
 Lemma subst_world: forall s,
     subst s world = world.

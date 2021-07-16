@@ -81,17 +81,6 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
 
 
 (*translation of source contexts to target contexts (at a given world)*)
- Lemma move_works: forall G w1 l1 w2 l2 T,
-     tr G (oof (ppair w1 l1) world) ->
-     tr G (oof (ppair w2 l2) world) ->
-     tr G (oof (move T) (arrow (subseq (ppair w1 l1) (ppair w2 l2))
-                               (arrow
-                                  (trans_type w1 l1 T)
-                                  (trans_type w2 l2 T)
-                               )
-                        )
-          ).
-   Admitted.
 
 (*makes a product type at a world out of a source context *)
  Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
@@ -123,23 +112,6 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.te
      nil => gamma
    | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
- (*not even doing substituions any more, completely differeent from old move Gamma*)
-
-
-
- (*the actual type of translated terms*)
- Lemma trans_typed1 {D G w A}:
-   tr D (oof w preworld) -> 
- tr D
-    (deqtype (pi nattp
-                 (arrow (Gamma_at G (shift 1 w) (var 0))
-                        (trans_type (shift 1 w) (var 0) A)
-             ) )
-(pi nattp
-                 (arrow (Gamma_at G (shift 1 w) (var 0))
-                        (trans_type (shift 1 w) (var 0) A)
-    ) )).
-   Admitted.
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term False) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->

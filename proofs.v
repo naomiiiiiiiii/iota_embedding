@@ -16,8 +16,20 @@ Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap))
                         | false => auto
                           (*change (@var False 9) with
                               (shift sh_amt (@var False 6))*)
+
                                        end.
+(*sh_var amt cap rewrites (Var i) as (shift sh_amt (var (i - sh_amt)))
+ for any i <= cap*)
 Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
+
+Ltac simpsub_bigs := simpsub_big; simpl.
+Ltac simpsubss := simpsub; simpl.
+
+Ltac weaken H := eapply tr_formation_weaken; apply H.
+
+
+
+(*proofs about type translation *)
 
 (*no free variables in translation of types*)
 Lemma subst_trans_type :forall w l A s,
@@ -75,23 +87,7 @@ rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
     move => Heq. rewrite Heq. auto. simpsub_big.
 eapply IHA. simpsub. auto.
 Qed.
-
 Ltac simpsub_type := simpl; simpsub_big; simpl; rewrite subst_trans_type; simpl.
-
-
-Lemma subst_Gamma_at :forall w l s G,
-    (subst s (ppair w l)) = (ppair w l) ->
-    (subst s (Gamma_at G w l)) = (Gamma_at G w l).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite IHG subst_trans_type; auto. Qed.
-
-Lemma subst_move_gamma :forall g m s G,
-    (subst s (move_gamma G m g)) = move_gamma G (subst s m) (subst s g).
-  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
-  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
-  auto. Qed.
-
-Hint Rewrite subst_move_gamma: subst1.
 
   (*start here automate these ugly cases*)
 Lemma sh_trans_type : forall w l A s,
@@ -104,22 +100,7 @@ repeat rewrite - addnA;
       replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
 Qed.
 
-Lemma sh_under_trans_type : forall w l A s n ,
-    (subst (under n (sh s)) (trans_type w l A)) = (trans_type
-                                            (subst (under n (sh s)) w)
-                                         (subst (under n (sh s)) l) A).
-  induction A; intros; simpl; auto; simpsub_big; auto; try
-                   (simpl; rewrite ! subst_trans_type; auto).
- Qed.
-
-
- Lemma sh_under_Gamma_at: forall G w l s n, 
-    (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
-                                                (subst (under n (sh s)) l)).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite sh_under_trans_type IHG. auto. Qed.
-
- (*start here write ltac for these two*)
+(*start here write ltac for these two*)
  Lemma subst1_trans_type : forall w l A s,
     (subst1 s (trans_type w l A)) = (trans_type
                                             (subst1 s w)
@@ -136,21 +117,15 @@ Lemma sh_under_trans_type : forall w l A s n ,
                    (simpl; rewrite ! subst_trans_type; auto).
  Qed.
 
- Lemma subst1_Gamma_at: forall G w l s, 
-    (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
-                                                                (subst1 s l)).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite subst1_trans_type IHG. auto. Qed.
+Lemma sh_under_trans_type : forall w l A s n ,
+    (subst (under n (sh s)) (trans_type w l A)) = (trans_type
+                                            (subst (under n (sh s)) w)
+                                         (subst (under n (sh s)) l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
 
-Lemma subst1_under_Gamma_at: forall G w l s n, 
-     (subst (under n (dot s id)) (Gamma_at G w l)) =
-     (Gamma_at G (subst (under n (dot s id) ) w)
-               (subst (under n (dot s id) ) l)).
-  intros. induction G. simpl; auto.
-  simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
-Qed.
-
-(*subterms of the computation type*)
+(*subterms of the computation type's translation*)
 Lemma compm5_type: 
   forall T U W G,
     tr G (oof W world) ->
@@ -337,56 +312,6 @@ hyp_tm preworld
   Qed.
 
 
-  (*  Lemma picomp_world1: forall G y z a A,
-      tr 
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                A)),
-       hyp_tm preworld, y, z, a,
-       hyp_tm nattp, hyp_tm preworld
-                     & G] (oof (ppair (var 1) (picomp1 (var 0))) world).
-Admitted. 
-
-    Lemma picomp_world2: forall G y z a A,
-      tr 
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq
-                      (ppair (var 4) (ppi1 (var 3)))
-                      (ppair (var 1)
-                         (var 0)))
-                   (store
-                      (ppair (var 1)
-                         (var 0))))
-                A)), hyp_tm preworld, y, z,
-       hyp_tm preworld
-                     & G] (oof (ppair (var 1) (picomp1 (var 0))) world).
-    Admitted.
-
-  Lemma picomp1_works1: forall G x y z a A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                A)),
-       x, y, z, a,
-       hyp_tm nattp, hyp_tm preworld
-                     & G]
-   (oof (picomp1 (var 0)) nattp).
-Admitted.*)
-
-
      Lemma picomp2_works1: forall G y z a A,
   tr
     [:: hyp_tm
@@ -427,38 +352,6 @@ Admitted.*)
                       (ppair (var 1) (picomp1 (var 0))))
     ).
   Admitted.
-
-    (*  Lemma picomp3_works1: forall G y z a A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (ppair (var 6) (var 5))
-                      (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
-                (trans_type (var 1) (var 0) A))),
-       hyp_tm preworld, y, z, a,
-       hyp_tm nattp, hyp_tm preworld
-      & G]
-    (oof (picomp3 (var 0)) (store (ppair (var 1) (picomp1 (var 0))))).
-      Admitted.
-
- Lemma picomp4_works1: forall G y z a A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   T1
-                   (store (ppair (var 1) (var 0))))
-                (trans_type (var 1) (var 0) A))),
-       hyp_tm preworld, y, z, a,
-       hyp_tm nattp, hyp_tm preworld
-      & G]
-    (oof (picomp4 (var 0)) (trans_type (var 1) (picomp1 (var 0)) A)).
- Admitted.*)
-
 
     Hint Resolve picomp1_works picomp2_works1 picomp2_works2 picomp3_works picomp4_works
       picomp_world.
@@ -535,7 +428,7 @@ Admitted.*)
       auto. apply leq_refl. auto. 
 Qed.
 
-  (*start here this is duplicated with trans_typed1 in trans*)
+ (*the actual type of translated terms*)
 Lemma trans_type_works2: forall w A G D,
       (tr D (oof w preworld)) ->
   tr D (deqtype (pi nattp
@@ -569,272 +462,77 @@ Theorem typed_hygiene: forall G M M' A,
     (*apply extensionality.*)
     Admitted.
 
+(**************proofs about translation of contexts*****************)
+Lemma subst_Gamma_at :forall w l s G,
+    (subst s (ppair w l)) = (ppair w l) ->
+    (subst s (Gamma_at G w l)) = (Gamma_at G w l).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite IHG subst_trans_type; auto. Qed.
 
-(*Opaque laters.
-Opaque preworld.
-Opaque U0.
-Opaque subseq.
-Opaque leqtp.
-Opaque nzero.
-Opaque nattp.
-Opaque world.
-Opaque nth.*)
+Lemma subst_move_gamma :forall g m s G,
+    (subst s (move_gamma G m g)) = move_gamma G (subst s m) (subst s g).
+  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
+  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
+  auto. Qed.
 
-(*Theorem one_five: forall G D e T ebar w1 l1, 
-    of_m G e T ->
-    trans e ebar -> 
-         tr (Gamma_at G ___? (oof ebar (all nzero preworld (pi nattp (trans_type
-                                                      (var 1) (var 0)
-                                                    T )))).*)
+Hint Rewrite subst_move_gamma: subst1.
 
-Lemma wworld4: forall G x y z a w1 l1,
-    tr G (oof (ppair w1 l1) world) ->
-tr
-    [:: x, y, z, a & G]
-    (oof
-       (ppair (subst (sh 4) w1)
-          (subst (sh 4 ) l1)) world).
-  intros. rewrite - (subst_world (sh 4)).
-  repeat rewrite (subst_sh_shift _ ).
-rewrite - hseq4. eapply tr_weakening_appends; try apply X; try reflexivity; auto. Qed.
 
-Lemma wworld5: forall G x y z a b w1 l1,
-    tr G (oof (ppair w1 l1) world) ->
-tr
-    [:: x, y, z, a, b & G]
-    (oof
-       (ppair (subst (sh 5) w1)
-          (subst (sh 5) l1)) world).
-  intros. rewrite - (subst_world (sh 5)).
-  repeat rewrite (subst_sh_shift _ ).
-  eapply (tr_weakening_appends _
-                               [:: x; y; z; a; b]); try apply X; try reflexivity; auto.
+(*an expression in one world can be moved to any accessible world
+ should move this to embedded lemmas probably*)
+ Lemma move_works: forall G w1 l1 w2 l2 T,
+     tr G (oof (ppair w1 l1) world) ->
+     tr G (oof (ppair w2 l2) world) ->
+     tr G (oof (move T) (arrow (subseq (ppair w1 l1) (ppair w2 l2))
+                               (arrow
+                                  (trans_type w1 l1 T)
+                                  (trans_type w2 l2 T)
+                               )
+                        )
+          ).
+   Admitted.
+
+
+ Lemma Gamma_at_type {D G w l}:
+   tr D (oof (ppair w l) world) ->
+ tr D
+    (deqtype (Gamma_at G w l)
+             (Gamma_at G w l)).
+   induction G; move => Hw ; simpl.
+   - weaken tr_unittp_formation.
+   - constructor. weaken trans_type_works; auto. apply IHG; auto.
+ Qed.
+
+Lemma Gamma_at_intro {D G A w l x P}: 
+ tr D (oof (ppair w l) world) ->
+ tr D (oof P (Gamma_at G w l)) ->
+tr D (oof x (trans_type w l A)) ->
+tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
+  move => Hw Hpair H1. simpl. apply tr_prod_intro; auto.
+  (*show that the product type is wellformed *)
+    weaken trans_type_works; auto. apply Gamma_at_type; auto. 
 Qed.
 
-Lemma wworld6: forall G x y z a b c w1 l1,
-    tr G (oof (ppair w1 l1) world) ->
-tr
-    [:: x, y, z, a, b, c & G]
-    (oof
-       (ppair (subst (sh 6) w1)
-          (subst (sh 6) l1)) world).
-  intros. rewrite - (subst_world (sh 6)).
-  repeat rewrite (subst_sh_shift _ ).
-  eapply (tr_weakening_appends _
-                               [:: x; y; z; a; b; c]); try apply X; try reflexivity; auto.
+
+
+ Lemma sh_under_Gamma_at: forall G w l s n, 
+    (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
+                                                (subst (under n (sh s)) l)).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite sh_under_trans_type IHG. auto. Qed.
+
+
+ Lemma subst1_Gamma_at: forall G w l s, 
+    (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
+                                                                (subst1 s l)).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite subst1_trans_type IHG. auto. Qed.
+
+Lemma subst1_under_Gamma_at: forall G w l s n, 
+     (subst (under n (dot s id)) (Gamma_at G w l)) =
+     (Gamma_at G (subst (under n (dot s id) ) w)
+               (subst (under n (dot s id) ) l)).
+  intros. induction G. simpl; auto.
+  simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
-Lemma wworld_app: forall G D w1 l1,
-    tr D (oof (ppair w1 l1) world) ->
-    tr (G ++ D) (oof
-                   (subst (sh (size G)) (ppair w1 l1)) world
-                ).
-  intros. eapply tr_weakening_appends; try apply X; try reflexivity; auto.
-  rewrite - subst_sh_shift. auto.
-  rewrite - subst_sh_shift. auto. Qed.
-
-
-Lemma out_of_lam: forall s l,
-(dot (var 0)
-(compose s
-(dot (var 1)
-(dot (var 2) (dot (var 3) (dot (var 4) (dot (subst sh1 l)
-                                            (sh 6)))))))) =
-(@under False 1  
-(compose s
-(dot (var 0)
-(dot (var 1) (dot (var 2) (dot (var 3) (dot l
-                                            (sh 5)))))))).
-  intros. simpsub. simpl. auto.
-Qed.
-
-Lemma lt1: forall n, n < 1 -> n = 0. Admitted.
-
-Lemma mvl_works0: forall (g: nat), project (gen_sub_mvl (g.+1)) 0 = (var 1).
-  intros. induction g.
-  simpl. simpsub. auto.
-   replace (gen_sub_mvl g.+2) with
-       (compose (under (g.+1) (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl (g.+1))).
-   rewrite project_compose. rewrite project_under_lt.
-   rewrite subst_var. auto. lia. simpl. auto. Qed.
-
-Lemma mvl_worksg (g: nat): project (gen_sub_mvl g) g = (var 0).
-  intros. induction g.
-  simpl. simpsub. auto.
-simpl.
-rewrite project_compose. rewrite project_under_geq. rewrite minusE.
-replace (g.+1 - g) with 1. simpsub. rewrite plusE. replace (g+ 0) with g.
-apply IHg. rewrite addn0. auto.
-rewrite subSnn. auto. apply/ leP. 
-apply leqnSn.  Qed.
-
-
-Lemma subSaddS (n : nat): n > 0 -> (n -1).+1 = n.
-  rewrite subn1. intros. rewrite prednK; auto. Qed.
-
-(*Lemma mvl_works_nz (g: nat) : forall (i: nat), (i < (S g) ->
-                                       project (gen_sub_mvl (S g)) i = (var (S i)))
-                                      /\ ((i > (S g)) ->
-                                         project (gen_sub_mvl (S g)) i = (var i)).
-  induction g; simpl; intros; split; intros. 
-  simpsub. apply lt1 in H.  subst. simpsub. auto. rewrite project_dot_geq.
-  rewrite project_dot_geq. simpsub. simpl.
-  rewrite - subnDA. change (1 + 1) with 2.
-  rewrite - (addn2 (i - 2)).
-  Search ((_ - _) +_). rewrite - addnABC. change (2- 2) with 0.
-  rewrite addn0. auto. assumption. auto.
- Search (0 < _ - _).
- rewrite subn_gt0.  assumption. eapply (ltn_trans _ H).
- Unshelve.
- simpsub. move: (IHg i) => [IH1 IH2].
-replace (dot
-       (subst (gen_sub_mvl g)
-          (project
-             (under g (dot (var 1) (dot (var 0) (sh 2))))
-             0))
-       (compose
-          (under g (dot (var 1) (dot (var 0) (sh 2))))
-          (compose sh1
-             (compose
-                (under g
-                   (dot (var 1) (dot (var 0) (sh 2))))
-                (gen_sub_mvl g))))) with
-    (gen_sub_mvl (g.+2)).
-2: {
-  simpl. simpsub. simpl. auto.
-
-}
-replace (gen_sub_mvl g.+2) with
-    (compose (under g.+1 (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl g.+1)). Opaque gen_sub_mvl. rewrite project_compose.
-destruct (i < (g.+1)) eqn: Hbool. rewrite project_under_lt.
-rewrite subst_var IH1; try constructor. apply/ltP: Hbool.
-assert (g.+1 = i) as Heq.
-apply anti_leq. apply/ andP. split. 
-rewrite ltnNge in Hbool. move/ negbT / negPn : Hbool.  apply.
-apply H. subst.
-rewrite project_under_eq. simpsub.
-move: (IHg (g.+2)) => [IHn IHy].
-rewrite plusE. replace (g.+1 + 1) with (g.+2).
-rewrite IHy. auto. auto.
-Search (_.+1 + _ = _ + (_.+1)). ring.
-Transparent gen_sub_mvl. simpl. auto.
-replace
- (dot
-       (subst
-          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
-             (gen_sub_mvl g)) (varx False 0))
-       (compose
-          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
-             (sh 1))
-          (compose (under g (dot (var 1) (dot (var 0) (sh 2))))
-                   (gen_sub_mvl g)))) with
-    (gen_sub_mvl (g.+2)).
-replace (gen_sub_mvl g.+2) with
-    (compose (under g.+1 (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl g.+1)). Opaque gen_sub_mvl. rewrite project_compose.
-rewrite project_under_geq. rewrite minusE.
-replace ((project (dot (var 1) (dot (var 0) (sh 2)))) (i - g.+1))
-  with (@var False (i - g.+1)).
-2: {
-rewrite project_dot_geq.
-rewrite project_dot_geq. simpsub. rewrite plusE.
-replace (2 + (i - g.+1 -1 -1)) with (2 - 2 + (i - g.+1)).
-(*showing
-  var (i - g.+1) = var (2 - 2 + (i - g.+1))
- *)
-auto. rewrite 2! subnAC.
-Search (_ + (_ - _) = (_ + _) - _).
-rewrite (addnBA 2).
-replace (i - 1 - 1) with (i - 2).
-Search ((_ + (_ - _)) =  ( _ - _ + _)).
-rewrite (@addnABC 2).  replace (2-2) with 0; auto. auto.
-eapply (ltn_trans _ H). rewrite subn2. rewrite 2! subn1. auto.
-rewrite 2! subn1 2! ltn_predRL. assumption.
-Search ((_ - _ - _) =  ( _ - (_ + _))).
-replace (i - g.+1 - 1) with (i - (g.+1 + 1)). 
-rewrite subn_gt0. rewrite addn1. assumption.
-rewrite addn1. rewrite subn1. rewrite subnS. auto.
-rewrite subn_gt0. eapply (ltn_trans _ H). Unshelve.
-rewrite ltnS. auto. auto. }
-simpsub. rewrite plusE.
-replace (g.+1 + (i - g.+1)) with i.
-move : (IHg i) => [IH1 IH2]. rewrite IH2. auto.
-eapply (ltn_trans _ H). rewrite subnKC; auto.
-apply/ leP. auto. simpl. auto. simpl. auto. auto.
-Unshelve. auto.
-Qed.
-
-(*Lemma et2_eqsub: forall g l1,
-           eqsub (compose (gen_sub_mvl_list g 5)
-                            (dot (var 0)
-                               (dot (var 1)
-                                  (dot (var 2)
-                                     (dot (var 3)
-                                        (dot (subst (sh (g + 5)) l1)
-                                             (sh 5)))))))
-   (compose (under g (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3)
-                                                    (sh 5))))))
-           (compose (gen_sub_mvl_list g 6) (under 5 (dot (subst (sh g) l1) id)))).
-  intros.
-  apply eqsub_project. intros.
-  induction g. simpl. simpsub. simpl.
-  simpsub.
-  suffices: (var i) = (@project False (dot (var 0) sh1) i). intros Hi.
-  rewrite - Hi subst_var. auto.
-  rewrite - subst_var.
-  replace (var i) with (@subst False id (var i)).
-  move: (eqsub_expand_id False 0). apply. simpsub. auto.
-  remember g.+1 as gs. simpl. simpsub. simpl. subst.
-  destruct (i < g.+1) eqn: Hi; remember Hi as Hi1; clear HeqHi1.
-  - apply mvl_works_nz in Hi. repeat (repeat rewrite Hi; simpl; simpsub).
-       change (dot (var 0)
-          (compose
-             (under g
-                (dot (var 0)
-                   (dot (var 1)
-                      (dot (var 2) (dot (var 3) (sh 5))))))
-             sh1)) with (@under False g.+1 (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3)
-                                                    (sh 5)))))).
-rewrite project_under_lt. repeat (simpsub; repeat rewrite Hi; simpl). auto.
-apply/leP. rewrite Hi1. constructor.
-  - apply negbT in Hi. rewrite - leqNgt in Hi. rewrite leq_eqVlt in Hi.
-    move/ orP : Hi => [H1 | H2].
-    + move/ eqP: H1 => H1. subst. repeat rewrite project_under_eq. simpsub.
-      rewrite plusE. replace (g.+1 + 0) with (g.+1). repeat rewrite mvl_worksg. simpsub. auto. ring.
-      repeat rewrite project_under_geq. simpsub.
-      apply mvl_works_nz in H2. repeat rewrite H2. simpsub.
-    simpl. simpsub. repeat rewrite Hi. simpsub. simpl.
-  - rewrite (mvl_works_nz g i Hi).
-
-
-induction i.
-  - subst. repeat (repeat rewrite mvl_works0; simpsub). auto.
-    repeat rewrite mvl_works0. simpsub.
-  simpsub. simpl. simpsub. simpl.
-
-  rewrite mvl_works0.
-induction g. simpl. simpsub. auto.
-
-
-
-simpsub. simpl. simpsub.
-
-
-simpl. simpsub.*)
-
-Opaque gen_sub_mvl_list.
-
-(* looks like nothing can be done with this
- try and figure if something can be doen with this
-Lemma checking: forall t, @subst False (dot (var 0)
-(dot (var 1) (dot (var 2) (dot (var 3) (dot nattp
-                                            (sh 6)))))) t = t.
-  intros. simpsub_big.*)
-
-(*Lemma testing:
-  @subst False (dot (var 0) (dot (var 1) (dot (var 2) (dot (var 3) 
-                                                           (dot nattp (sh 5)
-                                                                     )
-           )))) (var 5) = (var 5).
-  simpsub.*)
-
-*)
