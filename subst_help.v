@@ -37,7 +37,6 @@ Lemma substctx_eqsub {s s': @sub False} {G: context}
 : eqsub s s'
     -> substctx s G = substctx s' G. Admitted.
 
-Ltac simpsub_big := repeat (simpsub; simpsub1).
 Lemma project_dot_geq :
   forall t s i, i > 0 ->
            project (dot t s) i = @project False s (i - 1).

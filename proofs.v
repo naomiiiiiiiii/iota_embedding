@@ -127,11 +127,11 @@ Lemma sh_under_trans_type : forall w l A s n ,
 
 (*subterms of the computation type's translation*)
 Lemma compm5_type: 
-  forall T U W G,
-    tr G (oof W world) ->
-    tr G (oof U world) ->
+  forall T u lu w lw G,
+    tr G (oof (ppair w lw) world) ->
+    tr G (oof (ppair u lu) world) ->
     (tr G (oof T U0)) ->
-    tr G (oof  (prod (prod (subseq W U) (store U)) T) U0).
+    tr G (oof  (prod (prod (subseq (ppair w lw) (ppair u lu)) (store u lu)) T) U0).
 intros. repeat (eapply tr_prod_formation_univ).
 apply subseq_U0; auto.
 apply store_U0; auto. apply X1.
@@ -144,7 +144,7 @@ Lemma compm4_type: forall U A G,
    tr [:: hyp_tm preworld & G] (oof (sigma nattp ( let v := Syntax.var 1 in
                   let lv := Syntax.var 0 in
                   let V := ppair v lv in
-                  prod (prod (subseq (subst (sh 2) U) V) (store V))
+                  prod (prod (subseq (subst (sh 2) U) V) (store v lv))
                                                    A))
                                                     
              U0). intros.
@@ -168,7 +168,7 @@ Lemma compm3_type: forall U A G,
                                           ( let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                              prod (prod (subseq (subst (sh 2) U) V) (store v lv))
                                                    A
                                                     ))
                                ) U0).
@@ -184,7 +184,7 @@ Lemma compm2_type: forall U A G,
                                           ( let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                              prod (prod (subseq (subst (sh 2) U) V) (store v lv))
                                                    A
                                                     ))
                                )) U0).
@@ -192,9 +192,9 @@ Lemma compm2_type: forall U A G,
 
 
 
-  Lemma compm1_type : forall U A G,
-    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-    tr G (oof (arrow (store U)
+  Lemma compm1_type : forall u lu A G,
+    (tr G (oof (ppair u lu) world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+    tr G (oof (arrow (store u lu)
                      (*split the theorem up so that this
                       laters part stands alone*)
                          (laters (exist nzero preworld (
@@ -202,12 +202,13 @@ Lemma compm2_type: forall U A G,
                                           ( let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
+                                              let U := ppair u lu in
+                                              prod (prod (subseq (subst (sh 2) U) V) (store v lv))
                                                    A
                                                     ))
                                     )
          )) U0). (*A should be substed by 2 here start here fix this in trans also*)
-  move => U A G U_t A_t.
+  move => u lu A G U_t A_t.
   eapply tr_arrow_formation_univ.
   apply store_U0. assumption. apply compm2_type; assumption.
   Qed.
@@ -222,7 +223,7 @@ Lemma compm2_type: forall U A G,
              (subseq
                 (ppair w1 l1)
                 (ppair (var 1) (var 0)))
-             (arrow (store (ppair (var 1) (var 0)))
+             (arrow (store (var 1) (var 0))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
@@ -236,9 +237,8 @@ Lemma compm2_type: forall U A G,
                                    (var 1) 
                                    (var 0)))
                                (store
-                                  (ppair 
                                    (var 1) 
-                                   (var 0))))
+                                   (var 0)))
                             A))))))) U0
           ).
          intros. 
@@ -270,7 +270,7 @@ Lemma compm2_type: forall U A G,
                 (prod
                    (subseq (shift 1 W)
                       (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
+                   (store (var 1) (var 0)))
                 A)),
 hyp_tm preworld
       & G]
@@ -287,10 +287,10 @@ hyp_tm preworld
              (prod
                 (prod
                    T1
-                   (store (ppair (var 1) (var 0))))
+                   (store (var 1) (var 0)))
                 T2)), hyp_tm preworld
       & G]
-    (oof (picomp3 (var 0)) (store (ppair (var 1) (picomp1 (var 0))))).
+    (oof (picomp3 (var 0)) (store (var 1) (picomp1 (var 0)))).
   Admitted.
 
   Lemma picomp4_works: forall G T1 T2 A,
@@ -320,7 +320,7 @@ hyp_tm preworld
                 (prod
                    (subseq (ppair (var 6) (var 5))
                       (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
+                   (store (var 1) (var 0)))
                 A)),
        hyp_tm preworld, y, z, a,
        hyp_tm nattp, hyp_tm preworld
@@ -341,7 +341,7 @@ hyp_tm preworld
                          (ppair (var 4)
                             (ppi1 (var 3)))
                       (ppair (var 1) (var 0)))
-                   (store (ppair (var 1) (var 0))))
+                   (store (var 1) (var 0)))
                 A)),
      hyp_tm preworld, x,
         hyp_tm

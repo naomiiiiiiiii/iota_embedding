@@ -5,6 +5,9 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
+Ltac simpsub1 :=
+autounfold with subst1; autorewrite with subst1.
+
 (*Trivial lemmas to simplify substitutions*)
 Lemma fold_subst1:  forall m1 m2, (@subst False (dot m1 id) m2) = subst1 m1 m2.
 intros. auto. Qed.
@@ -12,46 +15,43 @@ intros. auto. Qed.
 Lemma subst_pw: forall s,
     subst s preworld = preworld.
 intros. unfold preworld. unfold nattp. auto. Qed.
-Hint Rewrite subst_pw.
+Hint Rewrite subst_pw : core subst1.
 
 Lemma subst_U0: forall s,
     (@subst False s (univ nzero)) = univ nzero.
   auto. Qed.
 
-(*Opaque store.*)
 
-Lemma subst_store: forall W s, subst s (store W) = store (subst s W).
-  intros. unfold store. auto. Qed.
 
 Lemma subst_theta s : @subst False s theta = theta. 
   unfold theta. simpsub. auto. Qed.
-Hint Rewrite subst_theta.
+Hint Rewrite subst_theta: core subst1.
 
 Lemma subst_minus s: subst s minus = minus.
   auto. Qed.
-Hint Rewrite subst_minus.
+Hint Rewrite subst_minus: core subst1.
 
 Lemma subst_ltb s m n : subst s (lt_b m n) = lt_b (subst s m) (subst s n).
-  intros. unfold lt_b. simpsub. rewrite subst_minus.
+  intros. unfold lt_b. simpsub. auto. rewrite subst_minus.
   unfold nsucc. simpsub. auto.
 Qed.
-Hint Rewrite subst_ltb.
+Hint Rewrite subst_ltb: core subst1.
 
 Lemma subst_world: forall s,
     subst s world = world.
 intros. unfold world. unfold preworld. unfold nattp. auto. Qed.  
-Hint Rewrite subst_world.
+Hint Rewrite subst_world: core subst1.
 
 Lemma subst_nat: forall s,
     @subst False s nattp = nattp.
   intros. unfold nattp. auto. Qed.
 
-Hint Rewrite subst_nat.
+Hint Rewrite subst_nat: core subst1.
 
 Lemma subst_nzero: forall s,
     @subst False s nzero = nzero.
   intros. unfold nzero. auto. Qed.
-Hint Rewrite subst_nzero.
+Hint Rewrite subst_nzero: core subst1.
 
 Lemma subst_leqtp: forall s,
     @subst False s (leqtp) = leqtp.
@@ -60,7 +60,7 @@ Lemma subst_leqtp: forall s,
   repeat rewrite subst_lam. simpsub. simpl.
   repeat rewrite project_dot_succ.
   rewrite project_dot_zero. auto. Qed.
-Hint Rewrite subst_leqtp.
+Hint Rewrite subst_leqtp: core subst1.
 
 Lemma subst_bind: forall s m1 m2,
     @subst False s (make_bind m1 m2) = make_bind (@subst False s m1) (@subst False s m2).
@@ -72,7 +72,7 @@ Lemma subst_lttp: forall s,
   intros. unfold lttp.
   simpsub. rewrite subst_leqtp. unfold nsucc. simpsub. simpl.
   rewrite subst_leqtp. auto. Qed.
-Hint Rewrite subst_leqtp.
+Hint Rewrite subst_leqtp: core subst1.
 
 Lemma subst_leq: forall s n1 n2,
     @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
@@ -89,6 +89,7 @@ Lemma subst_subseq: forall W1 W2 s,
                                        (subst s W2).
   intros. unfold subseq. repeat rewrite subst_app. auto.
 Qed.
+
 
 
 Lemma subst_ret: forall s, subst s ret = ret.
@@ -119,15 +120,18 @@ Lemma subst_picomp3: forall s m, (subst s (picomp3 m)) = picomp3 (subst s m).
 Lemma subst_picomp4: forall s m, (subst s (picomp4 m)) = picomp4 (subst s m).
   intros. unfold picomp4. simpsub. auto. Qed.
 
-Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leqtp
+Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
-     subst_nth subst_store subst_laters subst_picomp1 subst_picomp2 subst_picomp4
-     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb: subst1.
+     subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
+     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb: core subst1.
 
-Hint Rewrite <- subst_sh_shift: subst1.
+Hint Rewrite <- subst_sh_shift: ore subst1.
 
 Hint Unfold subst1: subst1.
 
-Ltac simpsub1 :=
-autounfold with subst1;
-  autorewrite with subst1.
+Ltac simpsub_big := repeat (simpsub; simpsub1).
+
+Lemma subst_store: forall w l s, subst s (store w l) = store (subst s w) (subst s l).
+  intros. unfold store. unfold gettype. simpsub_big. auto. Qed.
+
+Hint Rewrite subst_store: core subst1.

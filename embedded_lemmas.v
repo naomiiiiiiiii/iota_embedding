@@ -295,12 +295,12 @@ Lemma uworld32: forall G x y,
 
 Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld98.
 
-  Lemma store_U0: forall W G,
-    (tr G (oof W world)) -> tr G (oof (store W) U0).
+  Lemma store_U0: forall w l G,
+    (tr G (oof (ppair w l) world)) -> tr G (oof (store w l) U0).
 Admitted.
 
-  Lemma store_type: forall W G,
-    (tr G (oof W world)) -> tr G (deqtype (store W) (store W)).
+  Lemma store_type: forall w l G,
+    (tr G (oof (ppair w l) world)) -> tr G (deqtype (store w l) (store w l)).
 Admitted.
 
 Lemma subseq_type: forall G w1 w2,

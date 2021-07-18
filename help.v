@@ -179,19 +179,19 @@ Definition cons_w x w1 :=
 
  (*memory store*)
 
- Definition getstore w v: (term False) := pi nattp ((*i = 0*)
+ (*gettype w v is a function which, when given an index i, gives the type
+  at index i in w *)
+ Definition gettype w v: (term False) := pi nattp ((*i = 0*)
                                            let i := var 0 in
                                            (app (app (shift 1 w) i) (next (shift 1 v)))
                                          ).
 
- Definition store: (term False) -> (term False) := fun W => app (lam (
-                                            let w := ppi1 (var 0) in
-                                            let n := ppi2 (var 0) in
-                                            all nzero preworld ( (*u := var 0*)
-                                                  pi 
-                                                    (subseq (var 1) (ppair (var 0) (shift 1 n) ))
-                                                    (*u :=  var 1, m := var 0*)
-                                                     (getstore (shift 2 w) (var 1))))) W.
+ (*the type of the store at world <w, l>*)
+ Definition store w l := all nzero preworld (pi nattp (*v = 1, l v= 0*) 
+                                                     ( let W := (shift 2 (ppair w l)) in
+                                                       let V := (ppair (var 1) (var 0)) in
+                                                       (arrow (subseq W V) (gettype W V)))
+                                                ).
 
 
 (********************************************)

@@ -47,27 +47,66 @@ Lemma sub_refl: forall ( U: term False) (G: context),
                                     (subseq U U)).
 Admitted.
 
+(*don't do this because figuring out the substitutions for the term will be weird
+ and hard*)
 Lemma bind_front G D tau M: tr
-                            (hyp_tm Gamma_at G)
-                            (hyp_tm preworld)
+                            ((hyp_tm (store (var 2) (var 1)))::
+                             (hyp_tm (subseq (ppair (var 4) (var 3))
+                                             (ppair (var 1) (var 0))
+                                     ))::
                             (hyp_tm nattp)::
-                            (hyp_tm (subseq (var 1) (var 0)))::
-                            (hyp_tm (store (var 3) (var 2)))::D (oof M
-                         (laters (exist nzero preworld ((* l1 = 3, u := 2, l:= 1, v = 0*)
+                            (hyp_tm preworld)::
+                            (hyp_tm (Gamma_at G (var 1) (var 0)))::
+                            (hyp_tm nattp)::
+                            (hyp_tm preworld)::D)
+                            (oof
+                               (subst (under 3 (sh 1)) (subst (under 5 (sh 1)) M))
+                               (laters (exist nzero preworld ((* l1 = 3, u := 2, l:= 1, v = 0*)
                                           sigma nattp (*l1 = 4 u := 3, l := 2, v= 1, lv := 0*)
-                                          (let u := Syntax.var 3 in
-                                              let l := Syntax.var 2 in
+                                          (let u := Syntax.var 5 in
+                                              let l := Syntax.var 4 in
                                               let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
-                                                    prod (prod (subseq U V) (store V))
-                                                     (trans_type v lv tau'))))
+                                                    prod (prod (subseq U V) (store v lv))
+                                                     (trans_type v lv tau))))
                                     )
-                       ))
-                      ))
-                               )
+                                 )
+                             ->
+                            tr D (oof (lam (lam (lam (lam (lam M)))))
+                                      (all nzero preworld (pi nattp
+                                                               (arrow (Gamma_at G (var 1)  (var 0))
+                                                                      (trans_type (var 1) (var 0)
+                                                                                  (comp_m tau))
+                                                               )
+                                                          )
+                                      )
+                                 ).
+intros Ht.
+simpl. constructor; auto. unfold move_app. unfold nsucc.
+simpsub_bigs. simpl. apply tr_pi_intro; auto.
+apply tr_arrow_intro; auto.
+    - (*show arrow type is well formed*)
+      apply Gamma_at_type; auto. simpsub_type; auto.
+     match goal with |- tr ?G' (deqtype ?T ?T) => replace T with (trans_type (var 1) (var 0) (comp_m tau)); auto end. trans_type; auto. simpsub_type; auto.
+    - (*show the translated term has type comp ref A*)
+      simpsub_bigs. simpsub_type; auto.
+      constructor; auto. simpsub_bigs.
+      constructor; auto.
+      apply tr_arrow_intro; auto.
+      weaken compm1_type; auto.
+      apply trans_type_works; auto.
+      (*start here should bring out this part as its exactly
+       same as front of bind case*)
+      simpsub_big. simpl. apply tr_arrow_intro; auto.
+    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
+    weaken compm2_type; auto.
+ rewrite subst_trans_type; auto.
+ apply trans_type_works; auto.
+ move: Ht. simpsub_type; auto.
+Qed.
 
  Theorem two: forall G e T ebar,
     trans G e T ebar -> 
@@ -77,30 +116,13 @@ Lemma bind_front G D tau M: tr
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G e T ebar Dtrans. induction Dtrans; intros.
+(*ref case*)
+  2: { apply bind_front.
+  }
 (*pop them all off*)
-  1: {
-    constructor; auto.
-simpsub_big. simpl. apply tr_pi_intro; auto.
-apply tr_arrow_intro; auto.
-apply Gamma_at_type; auto. 
-match goal with |- tr ?G (deqtype ?A ?A) =>
-               (change A with
-(trans_type (var 1) (var 0) (comp_m B))) end; auto.
-weaken trans_type_works; auto. (*have popped off G*)
-simpsub_big. simpl. constructor; auto; simpsub_big; simpl.
-constructor; auto.
-apply tr_arrow_intro; auto.
-weaken compm1_type; auto.
- rewrite subst_trans_type; auto.
-    apply trans_type_works; auto.
-    (*pop off the store*)
-   simpsub_big. simpl. apply tr_arrow_intro; auto.
-    eapply tr_formation_weaken. 
-    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
-    apply compm2_type; auto.
-    rewrite subst_trans_type. apply trans_type_works. auto.
-    simpsub. auto. rewrite subst_bind.
-    simpsub_big.
+  1: { apply bind_front.
+    simpsub. rewrite subst_bind.
+    simpsub_big. simpl.
     eapply (bind_type _
                       (exist nzero preworld (
                                           sigma nattp (*l1 = 6 u := 5, l := 4, v= 1, lv := 0*)
@@ -111,14 +133,12 @@ weaken compm1_type; auto.
                                               let U := ppair u l in
                                               let V := ppair v lv in
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
-                                                    prod (prod (subseq U V) (store V))
+                                                    prod (prod (subseq U V) (store v lv))
                                                      (trans_type v lv A))))
            ).
     (*at make_bind*)
   replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto. 
-    eapply (tr_arrow_elim _  (store (ppair (var 3)
-                                                   (var 2)
-           ))); auto.
+    eapply (tr_arrow_elim _  (store (var 3) (var 2))); auto.
 - 
   simpl.
   comptype. 
@@ -133,7 +153,7 @@ replace
           (subseq (ppair (var 6) (var 5))
              (ppair (var 3) (var 2)))
           (arrow
-             (store (ppair (var 3) (var 2)))
+             (store (var 3) (var 2))
              (laters
                 (exist nzero preworld
                    (sigma nattp
@@ -147,9 +167,8 @@ replace
                               (var 1) 
                               (var 0)))
                             (store
-                              (ppair 
                               (var 1) 
-                              (var 0))))
+                              (var 0)))
                          (trans_type 
                             (var 1) 
                             (var 0) A)))))))
@@ -158,7 +177,7 @@ replace
        (arrow
           (subseq (ppair (var 7) (var 6))
              (ppair (var 4) (var 0)))
-          (arrow (store (ppair (var 4) (var 0)))
+          (arrow (store (var 4) (var 0))
              (laters
                 (exist nzero preworld
                    (sigma nattp
@@ -166,7 +185,7 @@ replace
                          (prod
                             (subseq (ppair (var 6) (var 2))
                                (ppair (var 1) (var 0)))
-                            (store (ppair (var 1) (var 0))))
+                            (store (var 1) (var 0)))
                          (trans_type (var 1) (var 0) A)))))))).
 2: {
  simpsub_type; auto.
@@ -179,7 +198,7 @@ eapply (tr_pi_elim _ nattp).
              (subseq (ppair (var 7) (var 6))
                 (ppair (var 4) (var 0)))
              (arrow
-                (store (ppair (var 4) (var 0)))
+                (store (var 4) (var 0))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
@@ -193,9 +212,8 @@ eapply (tr_pi_elim _ nattp).
                                 (var 1) 
                                 (var 0)))
                                (store
-                                (ppair 
                                 (var 1) 
-                                (var 0))))
+                                (var 0)))
                             (trans_type 
                                (var 1) 
                                (var 0) A))))))))
@@ -204,7 +222,7 @@ eapply (tr_pi_elim _ nattp).
           (arrow
              (subseq (ppair (var 8) (var 7))
                 (ppair (var 1) (var 0)))
-             (arrow (store (ppair (var 1) (var 0)))
+             (arrow (store (var 1) (var 0))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
@@ -212,7 +230,7 @@ eapply (tr_pi_elim _ nattp).
                             (prod
                                (subseq (ppair (var 3) (var 2))
                                   (ppair (var 1) (var 0)))
-                               (store (ppair (var 1) (var 0))))
+                               (store (var 1) (var 0)))
                             (trans_type (var 1) (var 0) A))))))))).
   2: {
      simpsub_type; auto. }
@@ -231,7 +249,7 @@ replace (arrow (Gamma_at G (var 6) (var 5))
              (pi nattp
                 (arrow
                    (subseq (ppair (var 8) (var 7)) (ppair (var 1) (var 0)))
-                   (arrow (store (ppair (var 1) (var 0)))
+                   (arrow (store (var 1) (var 0))
                       (laters
                          (exist nzero preworld
                             (sigma nattp
@@ -239,7 +257,7 @@ replace (arrow (Gamma_at G (var 6) (var 5))
                                   (prod
                                      (subseq (ppair (var 3) (var 2))
                                         (ppair (var 1) (var 0)))
-                                     (store (ppair (var 1) (var 0))))
+                                     (store (var 1) (var 0)))
                                   (trans_type (var 1) (var 0) A)))))))))) with
     (subst1 (var 5)
 (arrow (Gamma_at G (var 7) (var 0))
@@ -247,7 +265,7 @@ replace (arrow (Gamma_at G (var 6) (var 5))
              (pi nattp
                 (arrow
                    (subseq (ppair (var 9) (var 2)) (ppair (var 1) (var 0)))
-                   (arrow (store (ppair (var 1) (var 0)))
+                   (arrow (store (var 1) (var 0))
                       (laters
                          (exist nzero preworld
                             (sigma nattp
@@ -255,7 +273,7 @@ replace (arrow (Gamma_at G (var 6) (var 5))
                                   (prod
                                      (subseq (ppair (var 3) (var 2))
                                         (ppair (var 1) (var 0)))
-                                     (store (ppair (var 1) (var 0))))
+                                     (store (var 1) (var 0)))
                                   (trans_type (var 1) (var 0) A)))))))))
     )).
 2: {  simpsub_type; auto. rewrite subst1_Gamma_at; auto. }
@@ -269,7 +287,7 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                    (arrow
                       (subseq (ppair (var 3) (var 2))
                          (ppair (var 1) (var 0)))
-                      (arrow (store (ppair (var 1) (var 0)))
+                      (arrow (store (var 1) (var 0))
                          (laters
                             (exist nzero preworld
                                (sigma nattp
@@ -278,8 +296,7 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                                         (subseq
                                          (ppair (var 3) (var 2))
                                          (ppair (var 1) (var 0)))
-                                        (store
-                                         (ppair (var 1) (var 0))))
+                                        (store (var 1) (var 0)))
                                      (trans_type 
                                         (var 1) 
                                         (var 0) A)))))))))))) end.
@@ -322,13 +339,13 @@ replace (subseq (ppair (var 6) (var 5))
                 (ppair (var 3) (var 2))) with (subst (sh 2)
 (subseq (ppair (var 4) (var 3)) (ppair (var 1) (var 0)))); auto.
 apply tr_hyp_tm; repeat constructor.
-replace (store (ppair (var 3) (var 2)))
-  with (subst (sh 1) (store (ppair (var 2) (var 1)))); auto.
+replace (store (var 3) (var 2))
+  with (subst (sh 1) (store (var 2) (var 1))); auto.
 apply tr_hyp_tm; repeat constructor.
 (*done with et1, ramping up to et2*)
 - simpl.
  rewrite subst_bind.
- simpsub_big. rewrite subst_trans_type; auto. unfold make_subseq. simpsub. fold make_subseq.
+ simpsub_big.  
  apply tr_arrow_intro; try comptype. simpsub_big. simpl.
  (*type of Et2 depends on v so need to get v out before applying bind_type*)
  match goal with |- tr ?G' (deq ?M ?M ?T) => replace M with
@@ -361,7 +378,7 @@ unfold subst1. rewrite subst_bind. simpsub_big. auto.
                    (prod
                       (subseq (ppair (var 5) (var 4))
                          (ppair (var 1) (var 0)))
-                      (store (ppair (var 1) (var 0))))
+                      (store (var 1) (var 0)))
                    (trans_type (var 1) (var 0) A)))) ).
  rewrite - subst_exist; auto.
  - var_solv0. simpsub; apply pw_type.
@@ -377,12 +394,12 @@ unfold subst1. rewrite subst_bind. simpsub_big. auto.
                                               let lv1 := Syntax.var 0 in
                                               let V := ppair v lv in
                                               let V1 := ppair v1 lv1 in
-                                      prod (prod (subseq V V1) (store V1))
+                                      prod (prod (subseq V V1) (store v1 lv1))
                                                      (trans_type v1 lv1 B))))
         ) .
 (*engage Et2*)
  (*pop the store off*)
-eapply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))))); simpl; auto.
+eapply (tr_arrow_elim _ (store (var 1) (picomp1 (var 0)))); simpl; auto.
 - replace (ppair (var 3) (ppi1 (var 2))) with
     (@subst False (sh 2) (ppair (var 1) (ppi1 (var 0)))); auto. comptype.
 -
@@ -398,7 +415,7 @@ eapply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))))); simpl; auto.
           (subseq (ppair (var 2) (ppi1 (var 1)))
              (ppair (var 2) (var 0)))
           (arrow
-             (store (ppair (var 2) (var 0)))
+             (store (var 2) (var 0))
              (laters
                 (exist nzero preworld
                    (sigma nattp
@@ -409,8 +426,7 @@ eapply (tr_arrow_elim _ (store (ppair (var 1) (picomp1 (var 0))))); simpl; auto.
                                   (var 4) 
                                    (var 2))
                                (ppair (var 1) (var 0)))
-                            (store
-                               (ppair (var 1) (var 0))))
+                            (store (var 1) (var 0)))
                          (trans_type (var 1) (var 0) B)))))))) end.
         2: {
 simpsub_type; auto. }
@@ -422,7 +438,7 @@ apply (tr_pi_elim _ nattp).
           (arrow
              (subseq (ppair (var 3) (ppi1 (var 2)))
                 (ppair (var 1) (var 0)))
-             (arrow (store (ppair (var 1) (var 0)))
+             (arrow (store (var 1) (var 0))
                 (laters
                    (exist nzero preworld
                       (sigma nattp
@@ -431,8 +447,7 @@ apply (tr_pi_elim _ nattp).
                                (subseq
                                   (ppair (var 3) (var 2))
                                   (ppair (var 1) (var 0)))
-                               (store
-                                  (ppair (var 1) (var 0))))
+                               (store (var 1) (var 0)))
                             (trans_type (var 1) (var 0) B))))))))) end.
         2: { simpsub_type; auto.
         }
@@ -458,7 +473,7 @@ match goal with |- (tr ?G' (deq ?M ?M ?T)) =>
                 (arrow
                    (subseq (ppair (var 4) (var 2))
                            (ppair (var 1) (var 0)))
-                   (arrow (store (ppair (var 1) (var 0)))
+                   (arrow (store (var 1) (var 0))
                       (laters
                          (exist nzero preworld
                             (sigma nattp
@@ -466,7 +481,7 @@ match goal with |- (tr ?G' (deq ?M ?M ?T)) =>
                                   (prod
                                      (subseq (ppair (var 3) (var 2))
                                         (ppair (var 1) (var 0)))
-                                     (store (ppair (var 1) (var 0))))
+                                     (store (var 1) (var 0)))
                                   (trans_type (var 1) (var 0) B)))))))))
     )) end.
 2: { simpsub_big. 
@@ -482,7 +497,7 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                    (arrow
                       (subseq (ppair (var 3) (var 2))
                          (ppair (var 1) (var 0)))
-                      (arrow (store (ppair (var 1) (var 0)))
+                      (arrow (store (var 1) (var 0))
                          (laters
                             (exist nzero preworld
                                (sigma nattp
@@ -491,9 +506,7 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                                         (subseq
                                          (ppair (var 3) (var 2))
                                          (ppair (var 1) (var 0)))
-                                        (store
-                                         (ppair (var 1) (var 0))))
-                                     (trans_type 
+                                        (store (var 1) (var 0)))                                     (trans_type 
                                         (var 1) 
                                         (var 0) B)))))))))))) end.
 2: {  simpsub_big; auto.
@@ -580,7 +593,7 @@ comptype.
                    (prod
                       (subseq (ppair (var 3) (ppi1 (var 2)))
                          (ppair (var 1) (var 0)))
-                      (store (ppair (var 1) (var 0))))
+                      (store (var 1) (var 0)))
                    (trans_type (var 1) (var 0) B)))) ); auto.
  rewrite - subst_exist. var_solv0.
     * simpsub_big. simpl.
@@ -625,65 +638,6 @@ intros.
 sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
 weaken compm4_type; auto. apply trans_type_works; auto.
 }
-  1: {
-    constructor; auto. unfold move_app. unfold nsucc.
-simpsub_bigs. simpl. apply tr_pi_intro; auto.
-apply tr_arrow_intro; auto.
-    - (*show arrow type is well formed*)
-      apply Gamma_at_type; auto.
-     match goal with |- tr ?G' (deqtype ?T ?T) => change T with (trans_type (var 1) (var 0) (comp_m (reftp_m A))) end.
-trans_type; auto.
-    - (*show the translated term has type comp ref A*)
-      simpsub_bigs. simpsub_type; auto.
-      constructor; auto. simpsub_bigs.
-      constructor; auto.
-      apply tr_arrow_intro; auto.
-      weaken compm1_type; auto.
-      match goal with |- tr ?G' (oof ?T ?U) => change T with (trans_type (var 1) (var 0) (reftp_m A)) end.
-      apply trans_type_works; auto.
-      (*start here should bring out this part as its exactly
-       same as front of bind case*)
-   simpsub_big. simpl. apply tr_arrow_intro; auto.
-   eapply tr_formation_weaken.
-    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
-    apply compm2_type; auto.
- rewrite subst_trans_type; auto.
-    apply trans_type_works; auto.
-    (*pop off the store*)
-   simpsub_big. simpl. apply tr_arrow_intro; auto.
-    eapply tr_formation_weaken. 
-    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
-    apply compm2_type; auto.
-      rewrite subst_move.
-      simpsub_bigs.
-      simpl.
-(*need a subst_move?*)
-
-suffices: forall U A G,
-    (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
-    tr G (oof (arrow (store U)
-                     (*split the theorem up so that this
-                      laters part stands alone*)
-                         (laters (exist nzero preworld (
-                                          sigma nattp 
-                                          ( let v := Syntax.var 1 in
-                                              let lv := Syntax.var 0 in
-                                              let V := ppair v lv in
-                                              prod (prod (subseq (subst (sh 2) U) V) (store V))
-                                                   A
-                                                    ))
-                                    )
-         )) U0). (*A should be substed by 2 here start here fix this in trans also*)
-
-
-match goal with |- tr ?G (deqtype ?A ?A) =>
-               (change A with
-(trans_type (var 1) (var 0) (comp_m B))) end; auto.
-weaken trans_type_works; auto. (*have popped off G*)
-simpsub_big. simpl. constructor; auto; simpsub_big; simpl.
-constructor; auto.
-apply tr_arrow_intro; auto.
-  }
 
 
 Theorem onef: forall G e T ebar w1 l1,
