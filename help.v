@@ -124,15 +124,6 @@ Definition len w: (term False) := ppi2 w.
 
 Definition nth w n: term False := app (ppi1 w) n.
 
-(*default value after s(len w1) is x*)
-Definition cons_w x w1 :=
-  ppair (lam ( (*n := 0*)
-             let n := var 0 in
-             bite (lt_b n (len w1))
-                  (app (ppi1 w1) n)
-                  x
-        ))
-        (nsucc (len w1)).
 
  Definition subseq: (term False) -> (term False) -> (term False) :=
    fun W1 => fun W2 =>
@@ -232,6 +223,9 @@ lam ( lam (
      | _ => lam (lam triv) (*not a type operator, error case*)
 end.
 
+ Definition move_app A (m : term False) (x: term False) :=
+   app (app (move A) m) x.
+
  Lemma subst_move: forall A s, (subst s (move A)) = move A.
    intros. induction A; simpsub; simpl; auto. Qed.
 
@@ -239,3 +233,7 @@ Hint Rewrite subst_move: subst1.
 
 
 Opaque laters preworld U0 subseq leqtp nzero nattp world nth.
+
+(*cons_b w l x is a preworld equal to <w, l> only with x consed onto the back*)
+
+

@@ -8,6 +8,33 @@ From istari Require Import Sigma Tactics
 Ltac simpsub1 :=
 autounfold with subst1; autorewrite with subst1.
 
+Ltac simpsubin1 H :=
+autounfold with subst1 in H; autorewrite with subst1 in H.
+
+Ltac simpsub_big := repeat (simpsub; simpsub1).
+
+Ltac simpsubin_big H := repeat (simpsubin H; simpsubin1 H).
+
+Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
+                          true => let var_shed := eval compute in (var_num - sh_amt) in
+                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
+                                                               sh_var_help sh_amt cap var_num.+1
+                        | false => auto
+                          (*change (@var False 9) with
+                              (shift sh_amt (@var False 6))*)
+
+                                       end.
+(*sh_var amt cap rewrites (Var i) as (shift sh_amt (var (i - sh_amt)))
+ for any i <= cap*)
+Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
+
+Ltac simpsub_bigs := simpsub_big; simpl.
+Ltac simpsubin_bigs H := simpsubin_big H; simpl.
+Ltac simpsubss H := simpsubin H; simpl.
+
+Ltac weaken H := eapply tr_formation_weaken; apply H.
+
+
 (*Trivial lemmas to simplify substitutions*)
 Lemma fold_subst1:  forall m1 m2, (@subst False (dot m1 id) m2) = subst1 m1 m2.
 intros. auto. Qed.
@@ -125,13 +152,22 @@ Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
      subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
      subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb: core subst1.
 
-Hint Rewrite <- subst_sh_shift: ore subst1.
+Hint Rewrite <- subst_sh_shift: core subst1.
 
 Hint Unfold subst1: subst1.
 
-Ltac simpsub_big := repeat (simpsub; simpsub1).
 
 Lemma subst_store: forall w l s, subst s (store w l) = store (subst s w) (subst s l).
   intros. unfold store. unfold gettype. simpsub_big. auto. Qed.
 
 Hint Rewrite subst_store: core subst1.
+
+
+Lemma subst_nsucc s n : (subst s (nsucc n)) = @nsucc False (subst s n).
+  unfold nsucc. simpsub. auto. Qed.
+
+Lemma subst_moveapp s A m1 m2 : (subst s (move_app A m1 m2)) =
+                              move_app A (subst s m1) (subst s m2).
+   unfold move_app. simpsub_big. auto. Qed.
+
+Hint Rewrite subst_nsucc subst_moveapp: core subst1.

@@ -101,8 +101,6 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
                                                                    @ppair False (var i) acc end) triv G.
 
 
- Definition move_app A (m : term False) (x: term False) :=
-   app (app (move A) m) x.
 
  (*making a pair of type (a big product at U) out of a pair of (a big product at W)
   iterating over the pair

@@ -309,3 +309,18 @@ Lemma subseq_type: forall G w1 w2,
 Admitted.
 Hint Resolve store_type subseq_type.
 
+
+Lemma tr_karrow_intro: forall G a b m n,
+    tr G (deqtype a a) ->
+      tr G (deqtype b b)
+      -> tr (cons (hyp_tm a) G) (deq m n (subst sh1 b))
+      -> tr G (deq (lam m) (lam n) (karrow a b) ).
+intros. eapply tr_eqtype_convert.
+apply tr_arrow_karrow_equal; try assumption.
+eapply tr_arrow_intro; try assumption. Qed.
+
+Lemma pw_type3: forall {G}, tr G (deqtype (fut preworld)  (fut preworld)).
+  Admitted.
+
+Hint Resolve pw_type3 pw_type2 pw_type1: core.
+Hint Resolve tr_fut_formation tr_fut_formation_univ: core.

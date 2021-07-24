@@ -9,23 +9,6 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
-Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
-                          true => let var_shed := eval compute in (var_num - sh_amt) in
-                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
-                                                               sh_var_help sh_amt cap var_num.+1
-                        | false => auto
-                          (*change (@var False 9) with
-                              (shift sh_amt (@var False 6))*)
-
-                                       end.
-(*sh_var amt cap rewrites (Var i) as (shift sh_amt (var (i - sh_amt)))
- for any i <= cap*)
-Ltac sh_var sh_amt cap := sh_var_help sh_amt cap sh_amt.
-
-Ltac simpsub_bigs := simpsub_big; simpl.
-Ltac simpsubss := simpsub; simpl.
-
-Ltac weaken H := eapply tr_formation_weaken; apply H.
 
 
 
@@ -439,8 +422,7 @@ Lemma trans_type_works2: forall w A G D,
              (trans_type (shift 1 w) (var 0) A)))).
 Admitted.
 
-  (*start here can this be shorter with some sort of mapping*)
-  Ltac comptype := replace (@ppair False (var 5) (var 4)) with (@subst False (sh 2) (ppair (var 3) (var 2))); auto; eapply tr_formation_weaken; try apply compm4_type; try apply compm3_type;
+  Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply compm4_type; try apply compm3_type;
                    try apply compm2_type;
                    try apply compm1_type; try apply compm0_type; auto;
 try apply trans_type_works; auto.
@@ -536,3 +518,103 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
+
+
+Lemma sub_refl: forall ( U: term False) (G: context),
+                         tr G (oof U world)
+                         ->tr G (oof make_subseq 
+                                    (subseq U U)).
+Admitted.
+
+(*don't do this because figuring out the substitutions for the term will be weird
+ and hard*)
+
+
+Ltac trans_type := weaken trans_type_works; auto.
+ Lemma move_gamma_works: forall D G w1 l1 w2 l2 m gamma,
+    tr D (oof (ppair w1 l1) world) ->
+    tr D (oof (ppair w2 l2) world) ->
+     tr D (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
+     tr D (oof gamma (Gamma_at G w1 l1)) ->
+     tr D (oof (move_gamma G m gamma) (Gamma_at G w2 l2)).
+  move => D G. move: D. induction G; simpl; move => D w1 l1 w2 l2 m gamma
+                                                  Hw1 Hw2 Hsub Hg; auto.
+  (*IS*)
+   apply tr_prod_intro.
+  - (*show product type is well formed*)
+    weaken trans_type_works; auto.
+    apply Gamma_at_type; auto.
+  - (*pi1*)
+    unfold move_app.
+    (apply (tr_arrow_elim _ (trans_type w1 l1 a))); try trans_type.
+    apply (tr_arrow_elim _ (subseq (ppair w1 l1)
+                                   (ppair w2 l2)
+                           )
+          ).
+    apply subseq_type; auto.
+    apply tr_arrow_formation; try trans_type.
+    apply move_works; auto. auto.
+    eapply tr_prod_elim1. apply Hg.
+  - (*pi2*)
+    eapply IHG. apply Hw1. apply Hw2. auto.
+    eapply tr_prod_elim2. apply Hg.
+    Qed.
+
+ Lemma comp_front G D tau M: tr
+                            ((hyp_tm (store (var 2) (var 1)))::
+                             (hyp_tm (subseq (ppair (var 4) (var 3))
+                                             (ppair (var 1) (var 0))
+                                     ))::
+                            (hyp_tm nattp)::
+                            (hyp_tm preworld)::
+                            (hyp_tm (Gamma_at G (var 1) (var 0)))::
+                            (hyp_tm nattp)::
+                            (hyp_tm preworld)::D)
+                            (oof
+                               (subst (under 3 (sh 1)) (subst (under 5 (sh 1)) M))
+                               (laters (exist nzero preworld ((* l1 = 3, u := 2, l:= 1, v = 0*)
+                                          sigma nattp (*l1 = 4 u := 3, l := 2, v= 1, lv := 0*)
+                                          (let u := Syntax.var 5 in
+                                              let l := Syntax.var 4 in
+                                              let v := Syntax.var 1 in
+                                              let lv := Syntax.var 0 in
+                                              let U := ppair u l in
+                                              let V := ppair v lv in
+                                              (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
+                                                    prod (prod (subseq U V) (store v lv))
+                                                     (trans_type v lv tau))))
+                                    )
+                                 )
+                             ->
+                            tr D (oof (lam (lam (lam (lam (lam M)))))
+                                      (all nzero preworld (pi nattp
+                                                               (arrow (Gamma_at G (var 1)  (var 0))
+                                                                      (trans_type (var 1) (var 0)
+                                                                                  (comp_m tau))
+                                                               )
+                                                          )
+                                      )
+                                 ).
+intros Ht.
+simpl. constructor; auto. unfold move_app. unfold nsucc.
+simpsub_bigs. simpl. apply tr_pi_intro; auto.
+apply tr_arrow_intro; auto.
+    - (*show arrow type is well formed*)
+      apply Gamma_at_type; auto. simpsub_type; auto.
+     match goal with |- tr ?G' (deqtype ?T ?T) => replace T with (trans_type (var 1) (var 0) (comp_m tau)); auto end. trans_type; auto. simpsub_type; auto.
+    - (*show the translated term has type comp ref A*)
+      simpsub_bigs. simpsub_type; auto.
+      constructor; auto. simpsub_bigs.
+      constructor; auto.
+      apply tr_arrow_intro; auto.
+      weaken compm1_type; auto.
+      apply trans_type_works; auto.
+      (*start here should bring out this part as its exactly
+       same as front of bind case*)
+      simpsub_big. simpl. apply tr_arrow_intro; auto.
+    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
+    weaken compm2_type; auto.
+ rewrite subst_trans_type; auto.
+ apply trans_type_works; auto.
+ move: Ht. simpsub_type; auto.
+Qed.
