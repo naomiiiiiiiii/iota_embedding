@@ -5,7 +5,7 @@ From istari Require Import lemmas0
      help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Rules Defined.
+     ContextHygiene Equivalence Equivalences Rules Defined.
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
@@ -68,6 +68,10 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                                               (ppair (cons_b w' l' x) (nsucc l'))
                                       )).
 Admitted.
+
+Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
+                                hygiene (ctxpred G) A /\ hygiene (ctxpred G) A'.
+  Admitted.
 
 
  Theorem two: forall G e T ebar,
@@ -132,15 +136,35 @@ Admitted.
       apply world_pair. u1_pw2. apply nsucc_nat; var_solv.
       (*start here move this out*)
       suffices: forall G w v lv, tr G (oof w preworld) -> tr G (oof (ppair v lv) world) -> tr G (deqtype (gettype w v lv) (gettype w v lv)). move => gettype_typed. apply gettype_typed; auto. u1_pw2. 
-      2: { unfold gettype. match goal with |- tr ?G' (deq ?M ?M ?T) =>
+      2: { unfold gettype. simpsub_bigs. apply tr_pi_intro; auto.
+           unfold cons_b.
+           (*need to beta reduce the innermost lam*)
+           match goal with |- tr ?G' (deq ?M ?M ?T) =>
                                            suffices: (hygiene (ctxpred G') M) /\
                                            (hygiene (ctxpred G') T) end.
            move => [HctxM HctxT].
-           simpsub_bigs. apply tr_pi_intro; auto.
-           unfold cons_b.
-(*need to beta reduce the innermost lam*)
+           match goal with |- tr ?G' (deq ?M ?M ?T)
+                           => suffices: (equiv T  (app (app (bite (lt_b  (var 0) (var 6))
+                                                                     (app (var 7) (var 0))
+                                                                     (shift 4 x)
+                                                           ) (next (var 3))) (var 2))) end.
+           move => HeqT.
+           (*show that the type does reduce to what I claim it reduces to*)
+           2: { do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv. simpsub_bigs.
+                replace (bite
+       (lt_b (var 0) (var 6))
+       (app (var 7) (var 0))
+       (subst (sh 4) x)) with (subst1 (var 0) (bite
+       (lt_b (var 0) (var 7))
+       (app (var 8) (var 0))
+       (subst (sh 5) x))). apply reduce_app_beta; try apply reduce_id. subst x.
+       simpsub_bigs. auto. 
+           }
+        eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT); try (apply equiv_refl).
 
-(*plan out how to use hygiene*)
+
+
+                                                                     (*plan out how to use hygiene*)
       }
 
 

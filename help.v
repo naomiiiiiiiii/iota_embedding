@@ -174,7 +174,7 @@ Definition nth w n: term False := app (ppi1 w) n.
   at index i in w *)
  Definition gettype w v lv: (term False) := pi nattp ((*i = 0*)
                                            let i := var 0 in
-                                           app (app (app (shift 1 w) i) (next (shift 1 v))) (shift 1 lv)
+                                           app (app (app (shift 1 w) i) (next (shift 1 v))) (next (shift 1 lv))
                                          ).
 
 
