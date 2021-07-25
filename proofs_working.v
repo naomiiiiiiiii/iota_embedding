@@ -69,7 +69,8 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                       )).
 Admitted.
 
-Theorem two: forall G e T ebar,
+
+ Theorem two: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
                 (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
@@ -127,11 +128,20 @@ Theorem two: forall G e T ebar,
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
       (*ltac for showing (sh 2 U1) to be a world in context grown by 2*)
       Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
-      Ltac U1_world2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_world (sh 2)) ! subst_sh_shift; apply tr_weakening_append; try assumption.
-      U1_world2.
+      Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append; try assumption.
+      apply world_pair. u1_pw2. apply nsucc_nat; var_solv.
       (*start here move this out*)
-      suffices: forall G W V, tr G (oof W world) -> tr G (oof V world) -> tr G (deqtype (gettype W V) (gettype W V)). move => gettype_typed. apply gettype_typed; auto. U1_world2.
+      suffices: forall G w v lv, tr G (oof w preworld) -> tr G (oof (ppair v lv) world) -> tr G (deqtype (gettype w v lv) (gettype w v lv)). move => gettype_typed. apply gettype_typed; auto. u1_pw2. 
+      2: { unfold gettype. match goal with |- tr ?G' (deq ?M ?M ?T) =>
+                                           suffices: (hygiene (ctxpred G') M) /\
+                                           (hygiene (ctxpred G') T) end.
+           move => [HctxM HctxT].
+           simpsub_bigs. apply tr_pi_intro; auto.
+           unfold cons_b.
+(*need to beta reduce the innermost lam*)
 
+(*plan out how to use hygiene*)
+      }
 
 
          comptype;
