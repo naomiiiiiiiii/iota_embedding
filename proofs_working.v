@@ -9,7 +9,39 @@ From istari Require Import Sigma Tactics
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
-Ltac simpsubs := simpsub; simpl.
+Lemma tr_booltp_eta_hyp0 :
+    forall G m n p q a,
+      tr G (deq m n (subst1 btrue a))
+      -> tr G (deq p q (subst1 bfalse a))
+      -> tr ((hyp_tm booltp)::G) (deq 
+              (bite (var 0) 
+                 (subst sh1 m)
+                 (subst sh1 p))
+              (bite (var 0)
+                 (subst sh1 n) 
+                 (subst sh1 q) )
+              a).
+  intros. rewrite - (cat0s ((hyp_tm booltp)::G)).
+  change (sh1) with (@under False 0 sh1).
+  change 0 with (size ([::]: @context False)).
+  apply tr_booltp_eta_hyp; simpl; assumption.
+Qed. (*start here move this to derived_rules*)
+
+(*Start here ask karl
+ path induction? 
+Goal forall (e: 5 = 3 + 2), etrans e e = e.
+  intros. Set Printing All. replace (3 + 2) with 5. rewrite e.
+  change (3 + 2) with 5.*)
+Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
+                               (substj (dot x id) (@deq False M1 M2 T)).
+Admitted.
+
+Definition ltb_app m n := app (app lt_b m) n.
+
+Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (ltb_app m n) booltp). Admitted.
+
+  Ltac simpsubs := simpsub; simpl.
 
 Ltac simpsub_big_T := match goal with |- tr ?G (deq ?M ?M' ?T) =>
                                     let T' := fresh "T" in
@@ -25,7 +57,7 @@ try apply trans_type_works; auto.
 
 (*default value after s(len w1) is x*)
 Definition cons_b w l x :=lam (let i := (var 0) in
-                              bite (lt_b i (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
+                              bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
 
 Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                 tr D (oof l nattp) ->
@@ -72,6 +104,9 @@ Admitted.
 Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
                                 hygiene (ctxpred G) A /\ hygiene (ctxpred G) A'.
   Admitted.
+
+
+
 
 
  Theorem two: forall G e T ebar,
@@ -144,24 +179,95 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
                                            (hygiene (ctxpred G') T) end.
            move => [HctxM HctxT].
            match goal with |- tr ?G' (deq ?M ?M ?T)
-                           => suffices: (equiv T  (app (app (bite (lt_b  (var 0) (var 6))
+                           => suffices: (equiv T  (app (app (bite (ltb_app (var 0) (var 6))
                                                                      (app (var 7) (var 0))
                                                                      (shift 4 x)
-                                                           ) (next (var 3))) (var 2))) end.
+                                                           ) (next (var 3))) (next (var 2)))) end.
            move => HeqT.
            (*show that the type does reduce to what I claim it reduces to*)
            2: { do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv. simpsub_bigs.
                 replace (bite
-       (lt_b (var 0) (var 6))
+       (ltb_app (var 0) (var 6))
        (app (var 7) (var 0))
        (subst (sh 4) x)) with (subst1 (var 0) (bite
-       (lt_b (var 0) (var 7))
+       (ltb_app (var 0) (var 7))
        (app (var 8) (var 0))
        (subst (sh 5) x))). apply reduce_app_beta; try apply reduce_id. subst x.
        simpsub_bigs. auto. 
            }
-        eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT); try (apply equiv_refl).
+           eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT); try (apply equiv_refl).
+(*match goal with |- tr ?G' (@deq False ?M ?M ?T) => change M with M end.
+  literally what
+ *)
+(*case on whether index is < l = size u*)
+match goal with |- tr ?G' (@deq False ?M ?M ?T) => replace M with 
+       (subst1 (ltb_app (var 0) (var 6)) (bite (var 0)
+          (app
+             (app (app (var 5) (var 3))
+                make_subseq) 
+             (var 1))
+          (next
+             (move_app A make_subseq
+                (app
+                   (app (subst (sh 12) Et)
+                      (var 10)) 
+                   (var 9)))))); replace T with
+(subst1 (ltb_app (var 0) (var 6))
+       (app
+          (app
+             (bite
+               (var 0) 
+                (app (var 8) (var 1))
+                (shift 5 x))
+             (next (var 4)))
+          (next (var 3))))
+end.
+2, 4: (simpsub_bigs; auto). rewrite fold_substj.
+eapply (tr_generalize _ booltp).
+(*start here make this its own lemma about lt_b*)
+apply ltapp_typed; try var_solv.
+change (app (app (app (var 5) (var 3)) make_subseq) (var 1)) with
+    (subst sh1 (app (app (app (var 4) (var 2)) make_subseq) (var 0))).
+change (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (var 9)))) with.
 
+
+unfold make_subseq. sh_var 1 5. inv_subst.
+apply tr_booltp_eta_hyp0.
+eapply tr_arrow_elim.
+
+
+assert (forall G A B T, tr G (deq A B T)).
+  intros. match goal with |- tr ?G' (deq ?M ?M ?T') => change M with M end.
+           change (@var var 0) with (@var var 0).
+           match goal with |- tr ?G' (@deq False ?X ?X ?Y) => change (@var var 0) with
+               (var 0) end.
+                           subst1 .
+Check (@nattp False). Check (@deq False).
+
+
+(bite (ltb_app (var 0) (var 6))
+          (app
+             (app (app (var 4) (var 2))
+                make_subseq) (var 0))
+          (next
+             (move_app A make_subseq
+                (app
+                   (app (subst (sh 11) Et)
+                      (var 9)) 
+                   (var 8)))))
+ end.
+
+    (subst1 (ltb_app (var 0) (var 6))
+       (bite (var 0) 
+          (app
+             (app (app (var 5) (var 3))
+                make_subseq) (var 1))
+          (next
+             (move_app A make_subseq
+                (app
+                   (app (subst (sh 12) Et)
+                      (var 10)) 
+                   (var 9)))))) end.
 
 
                                                                      (*plan out how to use hygiene*)

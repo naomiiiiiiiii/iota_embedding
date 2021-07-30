@@ -58,10 +58,8 @@ Lemma subst_minus s: subst s minus = minus.
   auto. Qed.
 Hint Rewrite subst_minus: core subst1.
 
-Lemma subst_ltb s m n : subst s (lt_b m n) = lt_b (subst s m) (subst s n).
-  intros. unfold lt_b. simpsub. auto. rewrite subst_minus.
-  unfold nsucc. simpsub. auto.
-Qed.
+Lemma subst_ltb s : subst s lt_b = lt_b.
+  intros. unfold lt_b. simpsub. auto. Qed.
 Hint Rewrite subst_ltb: core subst1.
 
 Lemma subst_world: forall s,

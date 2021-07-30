@@ -89,7 +89,7 @@ Definition minusbc: (term False) := lam
                                    let n := (var 1) in
                                    let m := (var 0) in
                                                   bite (if_z n)
-                                                  (m)
+                                                  (n)
                                                   (bite (if_z m)
                                                      (n)
                                                     (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
@@ -111,7 +111,15 @@ Definition minusbc: (term False) := lam
                                                   ))).
 Definition plus_n: (term False) := app theta plusbc.
 
-Definition lt_b m n := if_z (app (app minus m) (nsucc n)).
+Definition lt_b := lam ( lam (if_z (app (app minus (var 0)) (nsucc (var 1)))
+                       )).
+
+Lemma minus_typed {G}: tr G (oof minus (arrow nattp (arrow nattp nattp))).
+Admitted.
+
+Lemma plus_typed {G}: tr G (oof plus_n (arrow nattp (arrow nattp nattp))).
+Admitted.
+
 
 (*worlds*)
 
