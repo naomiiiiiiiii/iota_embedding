@@ -1,13 +1,24 @@
 Require Import Program.Equality Ring Lia Omega.
-From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
+From Coq Require Import ssreflect ssrfun ssrbool.
+From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types
      help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences Rules Defined.
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+
+(*Lemma silly: forall n m, (n + 1) = m \/ (n + 1) = 2.
+ move=> + m. ask arthur why doesn't this work
+            + doesnt work either*)
+
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
+
 
 Lemma tr_booltp_eta_hyp0 :
     forall G m n p q a,
@@ -176,13 +187,15 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
            (*need to beta reduce the innermost lam*)
            match goal with |- tr ?G' (deq ?M ?M ?T) =>
                                            suffices: (hygiene (ctxpred G') M) /\
-                                           (hygiene (ctxpred G') T) end.
-           move => [HctxM HctxT].
+                                                     (hygiene (ctxpred G') T) end.
+           (*=> [HctxT HeqT] ask arthur why cant i put this here*)
+           move =>  [HctxM HctxT ].
            match goal with |- tr ?G' (deq ?M ?M ?T)
                            => suffices: (equiv T  (app (app (bite (ltb_app (var 0) (var 6))
                                                                      (app (var 7) (var 0))
                                                                      (shift 4 x)
-                                                           ) (next (var 3))) (next (var 2)))) end.
+                                                           ) (next (var 3))) (next (var 2))))
+           end.
            move => HeqT.
            (*show that the type does reduce to what I claim it reduces to*)
            2: { do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv. simpsub_bigs.
@@ -196,6 +209,7 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
        simpsub_bigs. auto. 
            }
            eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT); try (apply equiv_refl).
+           clear HctxM HctxT HeqT.
 (*match goal with |- tr ?G' (@deq False ?M ?M ?T) => change M with M end.
   literally what
  *)
@@ -228,12 +242,27 @@ eapply (tr_generalize _ booltp).
 apply ltapp_typed; try var_solv.
 change (app (app (app (var 5) (var 3)) make_subseq) (var 1)) with
     (subst sh1 (app (app (app (var 4) (var 2)) make_subseq) (var 0))).
-change (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (var 9)))) with.
+replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (var 9)))) with
+    (subst sh1 (next (move_app A make_subseq (app (app (subst (sh 11) Et) (var 9)) (var 8))))).
+2: { simpsub_bigs. auto. }
+     apply tr_booltp_eta_hyp0.
+           - (*case: i < l*)
+             simpsub_bigs. (*beta reduce the type*)
+             match goal with |- (tr ?G' (deq ?M ?M ?T)) => assert (equiv T
+                                                                       (app (app (app (var 7) (var 0)) (next (var 3))) (next (var 2)))) as HeqT end.
+             + do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv.
+               apply reduce_bite_beta1; apply reduce_id.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: (hygiene (ctxpred G') M) /\
+                                                    (hygiene (ctxpred G') T) end.
+             move => [HctxM HctxT].
+             eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
+               try (apply equiv_refl).
 
 
-unfold make_subseq. sh_var 1 5. inv_subst.
-apply tr_booltp_eta_hyp0.
-eapply tr_arrow_elim.
+         match goal with |- (tr ?G' (deq ?M ?M ?T)) => assert  
+
+
+
 
 
 assert (forall G A B T, tr G (deq A B T)).
