@@ -27,6 +27,9 @@ Goal forall (e: 5 = 3 + 2), etrans e e = e.
   intros. Set Printing All. replace (3 + 2) with 5. rewrite e.
   change (3 + 2) with 5.*)
 
+Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
+  apply equiv_trans. Qed.
+
 Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
                                                 ( let W := (shift 1 (ppair w l)) in
                                                   let V := (ppair (var 1) (var 0)) in
@@ -105,6 +108,12 @@ Admitted.
 
 Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
                                 hygiene (ctxpred G) A /\ hygiene (ctxpred G) A'.
+  Admitted.
+
+
+Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
+                                       equiv (trans_type w l A)
+                                             (trans_type w' l' A).
   Admitted.
 
 
@@ -311,6 +320,8 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              + (*beta reduce the type*)
                remember (app (app (subst (sh 4) x) (next (var 3))) (next (var 2))) as T0.
                remember (app (subst1 (next (var 3)) (lam (fut (trans_type (prev (var 1)) (prev (var 0)) A)))) (next (var 2))) as T1.
+               remember (subst1 (next (var 2))
+                         (fut (trans_type (prev (next (var 4))) (prev (var 0)) A))) as T2.
                match goal with |- (tr ?G' (deq ?M ?M ?T)) => assert (equiv T T0) as Heq0 end.
              subst. do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv.
              apply reduce_bite_beta2; apply reduce_id.
@@ -319,14 +330,21 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              apply reduce_equiv. apply reduce_app_beta;
                [unfold subst1; rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type;
                do 2 simpsubs; rewrite subst_trans_type; auto | ..]; apply reduce_id.
-               rewrite ! subst_trans_type; auto.
+             unfold subst1 in HeqT1.
+             rewrite subst_lam subst_fut subst1_under_trans_type in HeqT1.
+             simpsubin_bigs HeqT1.
+             assert (equiv T1 T2) as Heq2.
+             subst. apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+             assert (equiv T2 (fut (trans_type (var 3) (var 2) A))) as Heq3.
+             subst. simpsub. rewrite subst1_trans_type. do 2 simpsubs. apply equiv_fut.
+             apply trans_type_equiv; apply reduce_equiv; constructor; apply reduce_id.
+             move : (equiv_trans (equiv_trans (equiv_trans Heq0 Heq1) Heq2) Heq3) => HeqT.
              match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: (hygiene (ctxpred G') M) /\
                                                     (hygiene (ctxpred G') T) end.
              move => [HctxM HctxT].
              eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
                try (apply equiv_refl).
-             (*start here automate this part as it agrees with first -*)
-             clear HctxT HctxM HeqT.
+             clear T1 T2 HctxT HctxM HeqT.
              subst.
              (*start here reduce forther in HeqT*)
 
