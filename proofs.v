@@ -139,7 +139,7 @@ Lemma compm4_type: forall U A G,
     apply subseq_U0.
     rewrite - (subst_world (sh 2)).
 assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
-    rewrite - Hsize. rewrite - hseq2. repeat rewrite subst_sh_shift.
+    rewrite - Hsize. rewrite make_app2. repeat rewrite subst_sh_shift.
 eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
     auto. unfold nzero. simpsub. apply store_U0. auto.
     rewrite subst_nzero. apply X0. Qed. 
@@ -355,7 +355,7 @@ hyp_tm preworld
       apply subseq_U0.
     - (*showing w, l world*)
       rewrite - (subst_world (sh 2)).
-      rewrite subst_sh_shift. rewrite - hseq2.
+      rewrite subst_sh_shift. rewrite make_app2.
       eapply tr_weakening_appends; try apply Du; try reflexivity; auto. 
       apply uworld10.
         apply tr_arrow_formation_univ; try auto.
@@ -400,7 +400,7 @@ hyp_tm preworld
       apply tr_arrow_formation. constructor; auto.
       apply tr_univ_formation. auto. 
       eapply nth_works.
-      rewrite - hseq3. rewrite - (subst_world (sh 3) ). rewrite subst_sh_shift.
+      rewrite make_app3. rewrite - (subst_world (sh 3) ). rewrite subst_sh_shift.
       eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       rewrite - (subst_nat (sh 3) ).
       var_solv. apply tr_fut_intro.

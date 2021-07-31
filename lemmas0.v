@@ -1,17 +1,21 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-(*trivial small lemmas*)
-Lemma hseq2: forall (T: Type) (x y: T)
-                  (L: seq T), [:: x; y] ++ L=
-                 [:: x, y & L].
-intros. auto. Qed.
+(*very basic things*)
 
-  Lemma hseq3: forall (T: Type) (x y z: T)
-                  (L: seq T), [:: x; y; z] ++ L=
-                 [:: x, y, z & L].
-intros. auto. Qed.
+Lemma make_app1 T (L: seq T) x: (x::L) = [::x] ++ L.
+  auto. Qed.
 
-Lemma hseq4: forall (T: Type) (x y z a: T)
-                  (L: seq T), [:: x; y; z; a] ++ L=
-                 [:: x, y, z, a & L].
-intros. auto. Qed.
+Lemma make_app2 T (L: seq T) x y: (x::y::L) = [::x; y] ++ L.
+  auto. Qed.
+
+Lemma make_app3 T (L: seq T) x y z: (x::y::z::L) = [::x; y; z] ++ L.
+  auto. Qed.
+
+Lemma make_app4 T (L: seq T) x y z a: (x::y::z::a::L) = [::x; y; z; a] ++ L.
+  auto. Qed.
+
+Lemma make_app5 T (L: seq T) x y z a b: (x::y::z::a::b::L) = [::x; y; z; a; b] ++ L.
+  auto. Qed.
+
+Lemma make_app6 T (L: seq T) x y z a b c: (x::y::z::a::b::c::L) = [::x; y; z; a; b; c] ++ L.
+  auto. Qed.

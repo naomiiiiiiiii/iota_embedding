@@ -294,8 +294,26 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              var_solv0. var_solv.
              sh_var 1 10. inv_subst. rewrite ! subst_sh_shift. apply store_type1; auto. var_solv.
              (*showing U <= U2*)
+             + simpsub_bigs. eapply (subseq_trans (var 1) make_subseq _
+                                                  (ppair ((cons_b (var 7) (var 6) (shift 4 x)))
+                                                   (nsucc (var 6)))).
+               * (*U1 <= U2*)
+                 replace (shift 4 x) with (shift 2 (shift 2 x)). sh_var 2 7.
+               inv_subst. var_solv0. unfold cons_b. simpsub_big. apply Sequence.index_0. simpsub_big. auto.
+               * (*U<= U1*) 
+                 sh_var 4 7. inv_subst. rewrite make_app4.
+                 rewrite - (subst_make_subseq (sh 4)) ! subst_sh_shift.
+                 apply tr_weakening_append. assumption.
+                 var_solv.
+                 assert (forall T (L: seq T) x y, x::y::L = [:: x; y] ++ L).
+                 intros.
 
-             apply uworld76.
+
+
+                 rewrite subst_sh_shift.
+
+                 apply tr_weakening_append.
+               apply uworld76.
 
              suffices: forall G w l,
                  (tr G (oof (ppair w l) world)) -> tr G (deqtype (pi nattp (*v = 1, l v= 0*)
