@@ -20,30 +20,21 @@ Unset Printing Implicit Defensive.
  well-typedness of the translation*)
 
 
-Lemma tr_booltp_eta_hyp0 :
-    forall G m n p q a,
-      tr G (deq m n (subst1 btrue a))
-      -> tr G (deq p q (subst1 bfalse a))
-      -> tr ((hyp_tm booltp)::G) (deq 
-              (bite (var 0) 
-                 (subst sh1 m)
-                 (subst sh1 p))
-              (bite (var 0)
-                 (subst sh1 n) 
-                 (subst sh1 q) )
-              a).
-  intros. rewrite - (cat0s ((hyp_tm booltp)::G)).
-  change (sh1) with (@under False 0 sh1).
-  change 0 with (size ([::]: @context False)).
-  apply tr_booltp_eta_hyp; simpl; assumption.
-Qed. (*start here move this to derived_rules*)
 
 (*Start here ask karl
  path induction? 
 Goal forall (e: 5 = 3 + 2), etrans e e = e.
   intros. Set Printing All. replace (3 + 2) with 5. rewrite e.
   change (3 + 2) with 5.*)
-Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
+
+Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
+                                                ( let W := (shift 1 (ppair w l)) in
+                                                  let V := (ppair (var 1) (var 0)) in
+                                                  (arrow (subseq W V) (gettype (shift 1 w) (var 1) (var 0)))))
+                                                                       ).
+Admitted.
+
+             Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
                                (substj (dot x id) (@deq False M1 M2 T)).
 Admitted.
 
@@ -117,9 +108,6 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
   Admitted.
 
 
-
-
-
  Theorem two: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -165,14 +153,19 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
          (*split up nat from pair*)
          apply tr_sigma_intro. apply nsucc_nat. var_solv.
          (*<p1, <l, <*, \_:nat.*>>>: <u, l> <= <u1, l1> x storeU1 x ref(A)@U1) *)
-       simpsub_bigs.
+         simpsub_bigs.
+         (*showing U <= U1*)
+         + assert (tr [:: hyp_tm (store (var 2) (var 1)); hyp_tm (subseq (ppair (var 4) (var 3)) (ppair (var 1) (var 0))); hyp_tm nattp; hyp_tm preworld; hyp_tm (Gamma_at G (var 1) (var 0)); hyp_tm nattp; hyp_tm preworld]
+                    (deq make_subseq make_subseq
+                         (subseq (ppair (var 3) (var 2)) (ppair u1 (nsucc (var 2))))))
+             as HUsubU1.
+           subst. apply consb_subseq; try assumption; try var_solv.
          repeat (apply tr_prod_intro); try (apply tr_prod_formation); try ((apply subseq_type || apply store_type);
                                          try assumption; auto).
          + (*showing ref(A)@U1 is a type*)
            match goal with |- tr ?G' (deqtype ?T ?T) =>
                            replace T with (trans_type u1 (nsucc (var 2)) (reftp_m A)) end.
-           trans_type; auto. simpl. simpsub_type; auto.
-           subst. apply consb_subseq; try assumption; try var_solv.
+           trans_type; auto. simpl. simpsub_type; auto. assumption.
       (*showing the new store is a store at U1*)
       subst u1. unfold store. apply tr_all_intro; auto. simpsub_bigs.
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
@@ -256,7 +249,78 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                                                     (hygiene (ctxpred G') T) end.
              move => [HctxM HctxT].
              eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
-               try (apply equiv_refl).
+               try (apply equiv_refl). clear HctxT HctxM HeqT.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => change T with
+                 (@subst1 False (var 0) (app (app (app (var 8) (var 0)) (next (var 4)))
+                                     (next (var 3)))) end.
+             apply (tr_pi_elim _ nattp); auto.
+             (*showing 4: store(U)*)
+             apply (tr_arrow_elim _ (subseq (ppair (var 7) (var 6)) (ppair (var 3) (var 2)))).
+             apply subseq_type; auto.
+             apply tr_pi_formation; auto.
+             apply pw_app_typed; try apply tr_fut_intro; try var_solv.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => change T with
+                 (@subst1 False (var 2) (arrow (subseq (ppair (var 8) (var 7)) (ppair (var 4) (var 0)))
+                                           (pi nattp
+                                               (app (app (app (var 9) (var 0)) (next (var 5)))
+                                                    (next (var 1)))))) end.
+             apply (tr_pi_elim _ nattp); auto.
+             match goal with |- tr ?G' (deq ?M ?M ?T) =>
+                             change T with
+                 (subst1 (var 3) (pi nattp (arrow
+                                              (subseq
+                                                 (ppair (var 9) (var 8))
+                                                 (ppair (var 1) (var 0)))
+                                              (pi nattp (app (app (app (var 10)
+                                                                       (var 0))
+                                                                  (next (var 2)))
+                                                             (next (var 1))))))
+                 ) end.
+             eapply (tr_all_elim _ nzero preworld).
+             match goal with |- tr ?G' (deq ?M ?M ?T) =>
+                             change T with
+       (subst (sh 5) (all nzero preworld
+          (pi nattp
+             (arrow
+                (subseq
+                   (ppair (var 4) (var 3))
+                   (ppair (var 1) (var 0)))
+                (pi nattp
+                   (app
+                      (app
+                         (app (var 5) (var 0))
+                         (next (var 2)))
+                      (next (var 1)))))))) end.
+             var_solv0. var_solv.
+             sh_var 1 10. inv_subst. rewrite ! subst_sh_shift. apply store_type1; auto. var_solv.
+             (*showing U <= U2*)
+
+             apply uworld76.
+
+             suffices: forall G w l,
+                 (tr G (oof (ppair w l) world)) -> tr G (deqtype (pi nattp (*v = 1, l v= 0*)
+                                                ( let W := (shift 2 (ppair w l)) in
+                                                  let V := (ppair (var 1) (var 0)) in
+                                                  (arrow (subseq W V) (gettype (shift 2 w) (var 1) (var 0)))))
+                                                                (pi nattp (*v = 1, l v= 0*)
+                                                ( let W := (shift 2 (ppair w l)) in
+                                                  let V := (ppair (var 1) (var 0)) in
+                                                  (arrow (subseq W V) (gettype (shift 2 w) (var 1) (var 0)))))
+
+                                                                       ).
+move => store_type01. apply store_type01.
+             1: 
+             simpl.
+             apply (tr_arrow_elim _ (fut nattp)); auto.
+
+
+
+             apply tr_fut_intro.
+
+
+
+
+             var_solv.
 
 
          match goal with |- (tr ?G' (deq ?M ?M ?T)) => assert  
@@ -741,7 +805,7 @@ change (var 1) with (@shift (var 1) (var 0)).
 apply trans_type_works2; auto. var_solv. auto.
 simpl. apply Gamma_at_intro; auto.
 eapply (move_gamma_works _ _ (var 9) (var 8)); auto.
-eapply (compose_sub_works (picomp2 (var 0)) (var 4)
+eapply (subseq_trans (picomp2 (var 0)) (var 4)
                           _ (ppair (var 6) (var 5))); auto.
 match goal with |- tr ?G' (oof ?M ?T) =>
                 replace T with
@@ -819,7 +883,7 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
     rewrite subst1_trans_type. simpsub_big. simpl.
     eapply tr_formation_weaken. apply trans_type_works. auto.
     + apply tr_prod_intro. apply subseq_type; auto. apply store_type; auto.
-eapply (compose_sub_works (picomp2 (var 0)) (picomp2 (var 3))
+eapply (subseq_trans (picomp2 (var 0)) (picomp2 (var 3))
                           _ (ppair (var 4) (
                                      ppi1 (var 3)))); auto.
 sh_var 3 9.

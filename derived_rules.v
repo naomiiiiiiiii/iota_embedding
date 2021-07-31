@@ -61,6 +61,24 @@ change [::] with (@substctx False sh1 [::]).
  apply tr_weakening. assumption.
 Qed.
 
+Lemma tr_booltp_eta_hyp0 :
+    forall G m n p q a,
+      tr G (deq m n (subst1 btrue a))
+      -> tr G (deq p q (subst1 bfalse a))
+      -> tr ((hyp_tm booltp)::G) (deq 
+              (bite (var 0) 
+                 (subst sh1 m)
+                 (subst sh1 p))
+              (bite (var 0)
+                 (subst sh1 n) 
+                 (subst sh1 q) )
+              a).
+  intros. rewrite - (cat0s ((hyp_tm booltp)::G)).
+  change (sh1) with (@under False 0 sh1).
+  change 0 with (size ([::]: @context False)).
+  apply tr_booltp_eta_hyp; simpl; assumption.
+Qed. 
+
 Lemma nat_U0: forall G,
     tr G (oof nattp U0). Admitted.
 Hint Resolve nat_U0. 

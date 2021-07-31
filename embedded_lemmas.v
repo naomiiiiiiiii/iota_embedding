@@ -7,6 +7,8 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 (*useful properties of the embedding*)
 
+Hint Resolve tr_fut_intro: core.
+
 Ltac var_solv0 := try (apply tr_hyp_tm; repeat constructor).
 Ltac var_solv := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) => try
                                  rewrite - (subst_nat (sh (n.+1))); try rewrite - (subst_pw (sh (n.+1))); var_solv0 end.
@@ -47,6 +49,25 @@ Lemma pw_type1: forall {G}, tr G (deqtype
   intros. apply tr_karrow_formation.
   apply tr_fut_formation. auto. apply pw_type2. Qed.
 
+Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
+                                    tr G (oof l nattp) ->
+                                    tr G (deqtype (app u l)
+                                                  (app u l)).
+  Admitted.
+
+Lemma pw_app_typed1 G u l v: tr G (oof u preworld) ->
+                                    tr G (oof l nattp) ->
+                                    tr G (oof v (fut preworld)) ->
+                                    tr G (deqtype (app (app u l) v)
+                                                       (app (app u l) v)).
+  Admitted.
+Lemma pw_app_typed G u l v i: tr G (oof u preworld) ->
+                                    tr G (oof l nattp) ->
+                                    tr G (oof v (fut preworld)) ->
+                                    tr G (oof i (fut nattp)) ->
+                                    tr G (deqtype (app (app (app u l) v) i)
+                                                  (app (app (app u l) v) i)).
+  Admitted.
 
 Lemma unfold_pw: forall G,
     tr G (deqtype preworld (arrow nattp
@@ -288,12 +309,24 @@ Lemma uworld32: forall G x y,
     (oof (ppair (var 6) (var 5)) world)). intros.
    apply world_pair; var_solv. Qed. 
 
+  Lemma uworld76: forall G x y z a b c,
+      (tr [:: x, y, z, a, b, c, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 7) (var 6)) world)). intros.
+   apply world_pair; var_solv. Qed. 
+
+Lemma uworld87: forall G x y z a b c d,
+      (tr [:: x, y, z, a, b, c, d, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 8) (var 7)) world)). intros.
+   apply world_pair; var_solv. Qed. 
+
   Lemma uworld98: forall G x y z a b c d e,
                      (tr [:: x, y, z, a, b, c, d, e, hyp_tm nattp, hyp_tm preworld & G]
     (oof (ppair (var 9) (var 8)) world)). intros.
    apply world_pair; var_solv. Qed. 
 
-Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld98.
+
+
+Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld76 uworld87 uworld98.
 
   Lemma store_U0: forall w l G,
     (tr G (oof (ppair w l) world)) -> tr G (oof (store w l) U0).
