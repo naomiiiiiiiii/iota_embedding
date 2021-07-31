@@ -305,7 +305,32 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                  rewrite - (subst_make_subseq (sh 4)) ! subst_sh_shift.
                  apply tr_weakening_append. assumption.
                  var_solv.
-                 assert (forall T (L: seq T) x y, x::y::L = [:: x; y] ++ L).
+                 shelve.
+           - (*i >= l*)
+             simpsub_bigs.
+             + (*beta reduce the type*)
+               remember (app (app (subst (sh 4) x) (next (var 3))) (next (var 2))) as T0.
+               remember (app (subst1 (next (var 3)) (lam (fut (trans_type (prev (var 1)) (prev (var 0)) A)))) (next (var 2))) as T1.
+               match goal with |- (tr ?G' (deq ?M ?M ?T)) => assert (equiv T T0) as Heq0 end.
+             subst. do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv.
+             apply reduce_bite_beta2; apply reduce_id.
+             assert (equiv T0 T1) as Heq1.
+             subst. rewrite ! subst_lam. apply equiv_app; try apply equiv_refl.
+             apply reduce_equiv. apply reduce_app_beta;
+               [unfold subst1; rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type;
+               do 2 simpsubs; rewrite subst_trans_type; auto | ..]; apply reduce_id.
+               rewrite ! subst_trans_type; auto.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: (hygiene (ctxpred G') M) /\
+                                                    (hygiene (ctxpred G') T) end.
+             move => [HctxM HctxT].
+             eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
+               try (apply equiv_refl).
+             (*start here automate this part as it agrees with first -*)
+             clear HctxT HctxM HeqT.
+             subst.
+             (*start here reduce forther in HeqT*)
+
+             assert (forall T (L: seq T) x y, x::y::L = [:: x; y] ++ L).
                  intros.
 
 
