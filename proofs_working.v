@@ -83,9 +83,15 @@ Lemma subst_consb w l x s: @subst False s (cons_b w l x) =
                            cons_b (subst s w) (subst s l) (subst s x).
   unfold cons_b. simpsub_big. auto. Qed.
 
-Hint Rewrite subst_consb: subst1 core.
+Lemma sh_Gamma_at: forall G w l s,
+    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
+                                                (subst (sh s) l)). intros.
+  change (sh s) with (@under False 0 (sh s)). apply sh_under_Gamma_at.
+Qed.
 
-Hint Rewrite <- subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
+Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
+
+Hint Rewrite <- sh_Gamma_at subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
      subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
      subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
@@ -131,6 +137,7 @@ Lemma moveapp_works {T}: forall G w1 l1 w2 l2 m v,
                                           ask karl*)
      tr G (oof (move_app T m v) (trans_type w2 l2 T)).
 Admitted.
+
 
 
 
@@ -432,8 +439,9 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                    simpsub_bigs. auto.
                }
                rewrite ! subst_sh_shift. apply tr_weakening_append.
-               apply IHDtrans.
-
+               apply IHDtrans. change (var 1) with (@shift False 1 (var 0)).
+               apply trans_type_works2; var_solv. var_solv.
+               sh_var 9 10. inv_subst. var_solv0. 
                apply world_pair; auto.
              var_solv
              apply tr_weakening_append.

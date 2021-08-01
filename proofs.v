@@ -411,7 +411,7 @@ hyp_tm preworld
       auto. apply leq_refl. auto. 
 Qed.
 
- (*the actual type of translated terms*)
+ (*the actual type of translated terms (without the forall)*)
 Lemma trans_type_works2: forall w A G D,
       (tr D (oof w preworld)) ->
   tr D (deqtype (pi nattp
