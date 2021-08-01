@@ -460,19 +460,6 @@ Lemma subst_move_gamma :forall g m s G,
 Hint Rewrite subst_move_gamma: subst1.
 
 
-(*an expression in one world can be moved to any accessible world
- should move this to embedded lemmas probably*)
- Lemma move_works: forall G w1 l1 w2 l2 T,
-     tr G (oof (ppair w1 l1) world) ->
-     tr G (oof (ppair w2 l2) world) ->
-     tr G (oof (move T) (arrow (subseq (ppair w1 l1) (ppair w2 l2))
-                               (arrow
-                                  (trans_type w1 l1 T)
-                                  (trans_type w2 l2 T)
-                               )
-                        )
-          ).
-   Admitted.
 
 
  Lemma Gamma_at_type {D G w l}:

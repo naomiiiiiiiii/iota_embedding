@@ -116,6 +116,21 @@ Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
                                              (trans_type w' l' A).
   Admitted.
 
+Lemma moveapp_works: forall (T: source.term) G w1 l1 w2 l2 m v,
+     tr G (oof (ppair w1 l1) world) ->
+     tr G (oof (ppair w2 l2) world) ->
+     tr G (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
+     tr G (oof v (trans_type w1 l1 T)) -> (*it's the occurence of T in this line?!*)
+     tr G (oof (move_app T m v) (trans_type w2 l2 T)).
+Admitted.
+
+
+Check (moveapp_works unittp_m).
+
+Check (trans_type_equiv unittp_m).
+Check moveapp_works.
+Check trans_type_equiv.
+
 
  Theorem two: forall G e T ebar,
     trans G e T ebar ->
@@ -344,9 +359,18 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              move => [HctxM HctxT].
              eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
                try (apply equiv_refl).
-             clear T1 T2 HctxT HctxM HeqT.
-             subst.
-             (*start here reduce forther in HeqT*)
+             clear T0 T1 T2 HeqT0 HeqT1 HeqT2 Heq0 Heq1 Heq2 Heq3 HctxT HctxM HeqT.
+             apply tr_fut_intro. simpl.
+             apply (moveapp_works _ (var 10) (var 9) (var 3) (var 2)).
+
+
+Definition enum {A B: Type} (L: seq A) :=
+  let enumerated := iota 0 (size L) in (zip enumerated L).
+Show (enum G).
+
+match goal with |- tr ?G' ?J => Compute (enum G) end.
+
+             apply (moveapp_works ).
 
              assert (forall T (L: seq T) x y, x::y::L = [:: x; y] ++ L).
                  intros.

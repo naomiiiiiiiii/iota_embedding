@@ -357,3 +357,19 @@ Lemma pw_type3: forall {G}, tr G (deqtype (fut preworld)  (fut preworld)).
 
 Hint Resolve pw_type3 pw_type2 pw_type1: core.
 Hint Resolve tr_fut_formation tr_fut_formation_univ: core.
+
+(*an expression in one world can be moved to any accessible world
+ should move this to embedded lemmas probably*)
+ Lemma move_works: forall G w1 l1 w2 l2 T,
+     tr G (oof (ppair w1 l1) world) ->
+     tr G (oof (ppair w2 l2) world) ->
+     tr G (oof (move T) (arrow (subseq (ppair w1 l1) (ppair w2 l2))
+                               (arrow
+                                  (trans_type w1 l1 T)
+                                  (trans_type w2 l2 T)
+                               )
+                        )
+          ).
+ Admitted.
+
+
