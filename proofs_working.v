@@ -27,7 +27,14 @@ Goal forall (e: 5 = 3 + 2), etrans e e = e.
   intros. Set Printing All. replace (3 + 2) with 5. rewrite e.
   change (3 + 2) with 5.*)
 
-Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
+ Lemma subseq_trans M M' U1 U2 U3 G:
+                         tr G (oof M (subseq U2 U3))
+                         -> tr G (oof M' (subseq U1 U2))
+                         ->tr G (oof make_subseq 
+                                    (subseq U1 U3)).
+ Admitted.
+
+ Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
   apply equiv_trans. Qed.
 
 Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
@@ -116,20 +123,15 @@ Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
                                              (trans_type w' l' A).
   Admitted.
 
-Lemma moveapp_works: forall (T: source.term) G w1 l1 w2 l2 m v,
+Lemma moveapp_works {T}: forall G w1 l1 w2 l2 m v,
      tr G (oof (ppair w1 l1) world) ->
      tr G (oof (ppair w2 l2) world) ->
      tr G (oof m (subseq (ppair w1 l1) (ppair w2 l2))) ->
-     tr G (oof v (trans_type w1 l1 T)) -> (*it's the occurence of T in this line?!*)
+     tr G (oof v (trans_type w1 l1 T)) -> (*it's the occurence of T in this line?!
+                                          ask karl*)
      tr G (oof (move_app T m v) (trans_type w2 l2 T)).
 Admitted.
 
-
-Check (moveapp_works unittp_m).
-
-Check (trans_type_equiv unittp_m).
-Check moveapp_works.
-Check trans_type_equiv.
 
 
  Theorem two: forall G e T ebar,
@@ -228,7 +230,7 @@ Check trans_type_equiv.
            eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT); try (apply equiv_refl).
            clear HctxM HctxT HeqT.
 (*match goal with |- tr ?G' (@deq False ?M ?M ?T) => change M with M end.
-  literally what
+  literally what ask karl
  *)
 (*case on whether index is < l = size u*)
 match goal with |- tr ?G' (@deq False ?M ?M ?T) => replace M with 
@@ -318,7 +320,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              var_solv0. var_solv.
              sh_var 1 10. inv_subst. rewrite ! subst_sh_shift. apply store_type1; auto. var_solv.
              (*showing U <= U2*)
-             + simpsub_bigs. eapply (subseq_trans (var 1) make_subseq _
+             + simpsub_bigs. eapply (@subseq_trans (var 1) make_subseq _
                                                   (ppair ((cons_b (var 7) (var 6) (shift 4 x)))
                                                    (nsucc (var 6)))).
                * (*U1 <= U2*)
@@ -361,7 +363,67 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                try (apply equiv_refl).
              clear T0 T1 T2 HeqT0 HeqT1 HeqT2 Heq0 Heq1 Heq2 Heq3 HctxT HctxM HeqT.
              apply tr_fut_intro. simpl.
-             apply (moveapp_works _ (var 10) (var 9) (var 3) (var 2)).
+             - (*showing next(move A (m2 o m1 o m) (e @W)) : |>(T @ U2) *)
+               apply (@moveapp_works _ _ (var 10) (var 9) (var 3) (var 2)); try (apply world_pair; var_solv).
+             assert (forall w l x, cons_b w l x = lam (let i := (var 0) in
+                                                  bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x))) as fold_consb. auto.
+             remember (cons_b (var 3) (var 2) x) as u1.
+             replace (lam (bite (app (app lt_b (var 0)) (var 5))
+                                 (app (var 6) (var 0))
+                                 (subst (sh 3) x))) with (shift 2 u1);
+               last by subst; unfold cons_b; simpsub_bigs; auto.
+             Open Scope type_scope.
+             (*showing m2 o m1 o m : W <= U2*)
+             match goal with |- tr ?G' ?J =>
+                             suffices: (Datatypes.prod (tr G' (oof make_subseq
+                                                   (subseq (ppair (var 10) (var 9))
+                                                           (ppair (shift 4 u1) (nsucc (var 6)))
+                                       )))
+                                       (tr G' (oof (var 1)
+                                                   (subseq (ppair (shift 4 u1) (nsucc (var 6)))
+                                                           (ppair (var 3) (var 2)))
+                                       ))) end.
+             move => [Hsub1 Hsub2]. apply (subseq_trans Hsub2 Hsub1). split.
+             (*showing m1 o m : W <= U1*)
+             match goal with |- tr ?G' ?J =>
+                             suffices: (Datatypes.prod (tr G' (oof (var 5)
+                                                   (subseq (ppair (var 10) (var 9))
+                                                           (ppair (var 7) (var 6)))
+                                       ))
+                                       (tr G' (oof make_subseq
+                                                   (subseq (ppair (var 7) (var 6))
+                                                           (ppair (shift 4 u1) (nsucc (var 6)))
+                                       )))) end.
+             move => [Hsub11 Hsub12]. apply (subseq_trans Hsub12 Hsub11). split.
+             (*showing m: W <= U*)
+             sh_var 5 10. inv_subst. rewrite ! subst_sh_shift make_app5.
+             apply tr_weakening_append. sh_var 1 5. inv_subst. var_solv.
+             (*showing m1: U <= U1*)
+             simpl. rewrite - (subst_sh_shift _ 4). sh_var 4 7. inv_subst. rewrite make_app4.
+             rewrite - (subst_make_subseq (sh 4)) ! subst_sh_shift.
+             apply tr_weakening_append. assumption.
+             (*showing m2: U1 <= U2*)
+             replace (shift 4 u1) with (shift 2 (shift 2 u1)); last by
+             simpsub_bigs; auto. sh_var 2 6.
+             inv_subst. rewrite make_app2. var_solv.
+             - (*showing Et l G : A@W*)
+               apply (tr_arrow_elim _ (Gamma_at G (var 10) (var 9))); auto.
+               apply Gamma_at_type; auto. trans_type.
+               match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+                   (subst1 (var 9) (arrow (Gamma_at G (var 11) (var 0))
+                                          (trans_type (var 11) (var 0) A))) end.
+               2: { simpsub. unfold subst1 at 1.
+                    rewrite subst1_Gamma_at subst1_trans_type. simpsub. auto.
+               }
+
+               apply world_pair; auto.
+             var_solv
+             apply tr_weakening_append.
+             var_solv.
+             auto.
+             rewrite - fold_consb.
+
+             sh_var 4 7. inv_subst.
 
 
 Definition enum {A B: Type} (L: seq A) :=

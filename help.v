@@ -161,12 +161,6 @@ Definition nth w n: term False := app (ppi1 w) n.
 
  (*transitivity of subseq*)
 
- Lemma subseq_trans : forall (M M' U1 U2 U3: term False) (G: context),
-                         tr G (oof M (subseq U2 U3))
-                         -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof make_subseq 
-                                    (subseq U1 U3)).
- Admitted.
 
  (*need to do refl*)
 

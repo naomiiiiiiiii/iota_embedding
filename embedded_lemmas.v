@@ -324,9 +324,14 @@ Lemma uworld87: forall G x y z a b c d,
     (oof (ppair (var 9) (var 8)) world)). intros.
    apply world_pair; var_solv. Qed. 
 
+  Lemma uworld109: forall G x y z a b c d e f,
+                     (tr [:: x, y, z, a, b, c, d, e, f, hyp_tm nattp, hyp_tm preworld & G]
+    (oof (ppair (var 10) (var 9)) world)). intros.
+   apply world_pair; var_solv. Qed. 
 
 
-Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld76 uworld87 uworld98.
+  Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld76 uworld87 uworld98
+  uworld109.
 
   Lemma store_U0: forall w l G,
     (tr G (oof (ppair w l) world)) -> tr G (oof (store w l) U0).
