@@ -415,6 +415,24 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                2: { simpsub. unfold subst1 at 1.
                     rewrite subst1_Gamma_at subst1_trans_type. simpsub. auto.
                }
+               apply (tr_pi_elim _ nattp).
+               match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+                   (subst1 (var 10) (pi nattp (arrow (Gamma_at G (var 1) (var 0))
+                                          (trans_type (var 1) (var 0) A)))) end.
+               2: { unfold subst1. rewrite subst_pi subst_arrow. 
+                    rewrite subst1_under_Gamma_at subst1_under_trans_type.
+                    simpsub_bigs. auto.
+               }
+               apply (tr_all_elim _ nzero preworld); try var_solv.
+               match goal with |- tr ?G' (deq ?M ?M ?T) =>
+                               rewrite - (cats0 G'); replace T with
+                                                         (subst (sh 11) T) end.
+               2: {rewrite subst_all subst_pi subst_arrow.
+                   rewrite under_sum sh_under_Gamma_at sh_under_trans_type.
+                   simpsub_bigs. auto.
+               }
+               rewrite ! subst_sh_shift. apply tr_weakening_append.
+               apply IHDtrans.
 
                apply world_pair; auto.
              var_solv
