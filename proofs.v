@@ -412,7 +412,7 @@ hyp_tm preworld
 Qed.
 
  (*the actual type of translated terms (without the forall)*)
-Lemma trans_type_works2: forall w A G D,
+Lemma trans_type_works1: forall w A G D,
       (tr D (oof w preworld)) ->
   tr D (deqtype (pi nattp
           (arrow (Gamma_at G (shift 1 w)  (var 0))

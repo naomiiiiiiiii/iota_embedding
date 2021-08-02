@@ -441,7 +441,9 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                rewrite ! subst_sh_shift. apply tr_weakening_append.
                apply IHDtrans. change (var 1) with (@shift False 1 (var 0)).
                apply trans_type_works2; var_solv. var_solv.
-               sh_var 9 10. inv_subst. var_solv0. 
+               sh_var 9 10. inv_subst. var_solv0.
++ (*hygiene!*)
+
                apply world_pair; auto.
              var_solv
              apply tr_weakening_append.

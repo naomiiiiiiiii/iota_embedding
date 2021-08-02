@@ -19,3 +19,14 @@ Lemma make_app5 T (L: seq T) x y z a b: (x::y::z::a::b::L) = [::x; y; z; a; b] +
 
 Lemma make_app6 T (L: seq T) x y z a b c: (x::y::z::a::b::c::L) = [::x; y; z; a; b; c] ++ L.
   auto. Qed.
+
+Lemma geq0c n: (n >= 0)%coq_nat.
+  apply not_lt. intros contra. move/ltP : contra. auto.
+  Qed.
+
+
+Hint Rewrite minus_n_O : core natlib.
+
+Hint Resolve geq0c: core natlib.
+
+Ltac nat_lib := auto with natlib; autorewrite with natlib.
