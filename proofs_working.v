@@ -11,21 +11,25 @@ From istari Require Import Sigma Tactics
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+(*
+Lemma silly: forall n m, (n + 1) = m \/ (n + 1) = 2.
+ move=> + m.*)
 
-(*Lemma silly: forall n m, (n + 1) = m \/ (n + 1) = 2.
- move=> + m. ask arthur why doesn't this work
-            + doesnt work either*)
+Require Import Setoid.
 
 (*crucial lemmas leading up to the final theorem (one) showing
- well-typedness of the translation*)
-
-
-
-(*Start here ask karl
- path induction? 
+ well-typedness of the translation
+ FIGURE THIS OUT*)
+(*
 Goal forall (e: 5 = 3 + 2), etrans e e = e.
-  intros. Set Printing All. replace (3 + 2) with 5. rewrite e.
-  change (3 + 2) with 5.*)
+  intros. Set Printing All.
+  change (3 + 2) with 5.
+  rewrite e.
+  setoid_replace 5 with (3 + 2). rewrite e.
+
+
+Lemma *)
+
 
  Lemma subseq_trans M M' U1 U2 U3 G:
                          tr G (oof M (subseq U2 U3))
