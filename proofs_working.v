@@ -3,10 +3,10 @@ From Coq Require Import ssreflect ssrfun ssrbool.
 From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types
-     help subst_help0 subst_help trans derived_rules embedded_lemmas proofs hygiene_help.
+     help subst_help0 subst_help trans hygiene_help derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Equivalences Rules Defined.
+     ContextHygiene Equivalence Equivalences Rules Defined DefsEquiv.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -27,106 +27,45 @@ Goal forall (e: 5 = 3 + 2), etrans e e = e.
 
 
 Lemma *)
-Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
-                                       equiv (trans_type w l A)
-                                             (trans_type w' l' A).
-  Admitted.
+Ltac var_nf_help cap var_num := match (eval compute in (leq var_num cap)) with
+                          true => (change (@var False var_num) with (subst (sh var_num) (@var False 0)));
+                                                              var_nf_help cap var_num.+1
+                        | false => auto
+                          (*change (@var False 9) with
+                              (shift sh_amt (@var False 6))*)
+
+                                       end.
+(*sh_var amt cap rewrites (Var i) as (shift sh_amt (var (i - sh_amt)))
+ for any i <= cap*)
+Ltac var_nf cap := var_nf_help cap 1.
 
 
- Lemma subseq_trans M M' U1 U2 U3 G:
-                         tr G (oof M (subseq U2 U3))
-                         -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof make_subseq 
-                                    (subseq U1 U3)).
- Admitted.
 
-Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
-                                                ( let W := (shift 1 (ppair w l)) in
-                                                  let V := (ppair (var 1) (var 0)) in
-                                                  (arrow (subseq W V) (gettype (shift 1 w) (var 1) (var 0)))))
-                                                                       ).
+Lemma types_hygienic: forall G A, tr G (deqtype A A) ->
+                                hygiene (ctxpred G) A.
 Admitted.
 
-             Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
-                               (substj (dot x id) (@deq False M1 M2 T)).
+
+Lemma trans_hygenic G E A Et: trans G E A Et -> (hctx [::]) Et.
 Admitted.
 
-Definition ltb_app m n := app (app lt_b m) n.
-
-Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (ltb_app m n) booltp). Admitted.
-
-  Ltac simpsubs := simpsub; simpl.
-
-Ltac simpsub_big_T := match goal with |- tr ?G (deq ?M ?M' ?T) =>
-                                    let T' := fresh "T" in
-                                    let Ht := fresh "Ht" in
-                                    remember T as T' eqn:Ht;
-                                   simpsubin_big Ht; rewrite Ht
-                    end.
-
-Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply compm4_type; try apply compm3_type;
-                   try apply compm2_type;
-                   try apply compm1_type; try apply compm0_type; auto;
-try apply trans_type_works; auto.
-
-(*default value after s(len w1) is x*)
-Definition cons_b w l x :=lam (let i := (var 0) in
-                              bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
-
-Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
-                                tr D (oof l nattp) ->
-                                tr D (oof x (karrow (fut preworld)
-                                                    (arrow (fut nattp) U0)
-                                     )) ->
-                                tr D (oof (cons_b w l x) preworld).
+Lemma trans_types_hygienic G w l A: (hctx G w) -> (hctx G l) ->
+    (hctx G) (trans_type w l A).
 Admitted.
 
-Lemma subst_consb w l x s: @subst False s (cons_b w l x) =
-                           cons_b (subst s w) (subst s l) (subst s x).
-  unfold cons_b. simpsub_big. auto. Qed.
+Hint Resolve trans_hygenic trans_types_hygienic: hygiene_hint.
 
-Lemma sh_Gamma_at: forall G w l s,
-    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
-                                                (subst (sh s) l)). intros.
-  change (sh s) with (@under False 0 (sh s)). apply sh_under_Gamma_at.
-Qed.
+Lemma sh_succ m n: @subst False (sh n.+1) m = (subst sh1 (subst (sh n) m)).
+simpsub. rewrite plusE. rewrite addn1. auto. Qed.
 
-Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
-
-Hint Rewrite <- sh_Gamma_at subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
-     subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
-     subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
-     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
-
-Ltac inv_subst :=
-autounfold with subst1; autorewrite with inv_subst.
+Lemma sh0 m: @subst False (sh 0) m = m.
+  simpsub. auto. Qed.
+Hint Rewrite sh_succ sh0: hygiene_hint.
 
 
-Lemma nsucc_nat G n: tr G (oof n nattp) ->
-                    tr G (oof (nsucc n) nattp).
-  Admitted. (*start here move this to basic types*)
 
-Hint Resolve nsucc_nat.
-
-(*start here move to subst_help0*)
-
-(*for any W, W <= x:: W, start here move this out of here*)
-Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
-                                    tr G' (oof l' nattp) ->
-                                tr G' (oof x (karrow (fut preworld)
-                                                    (arrow (fut nattp) U0)
-                                     )) ->
-                                tr G' (oof make_subseq (subseq (ppair w' l')
-                                                              (ppair (cons_b w' l' x) (nsucc l'))
-                                      )).
-Admitted.
-
-Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
-                                hygiene (ctxpred G) A /\ hygiene (ctxpred G) A'.
-  Admitted.
-
-
+Goal (@var False 10) = (var 0).
+  var_nf 10. autorewrite with hygiene_hint. Abort.
 
 Lemma moveapp_works {T}: forall G w1 l1 w2 l2 m v,
      tr G (oof (ppair w1 l1) world) ->
@@ -141,8 +80,14 @@ Admitted.
  Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
   apply equiv_trans. Qed.
 
+Ltac hyg_solv_big := var_nf 15; autorewrite with hygiene_hint; hyg_solv.
 
- Theorem two: forall G e T ebar,
+(*
+Goal (@subst1 False nattp (var 0)) = nattp.
+  unfold subst1. simpl (subst (dot ?x1 ?s) ?x2). cbn - [ nattp].
+  cbn [traverse]. *)
+
+Theorem two: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
                 (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
@@ -213,8 +158,8 @@ Admitted.
            unfold cons_b.
            (*need to beta reduce the innermost lam*)
            match goal with |- tr ?G' (deq ?M ?M ?T) =>
-                                           suffices: (hygiene (ctxpred G') M) /\
-                                                     (hygiene (ctxpred G') T) end.
+                                           suffices: (hctx G') M /\
+                                                     (hctx G') T end.
            (*=> [HctxT HeqT] ask arthur why cant i put this here*)
            move =>  [HctxM HctxT ].
            match goal with |- tr ?G' (deq ?M ?M ?T)
@@ -280,8 +225,8 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                                                                        (app (app (app (var 7) (var 0)) (next (var 3))) (next (var 2)))) as HeqT end.
              + do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv.
                apply reduce_bite_beta1; apply reduce_id.
-             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: (hygiene (ctxpred G') M) /\
-                                                    (hygiene (ctxpred G') T) end.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: ((hctx G') M) /\
+                                                    ((hctx G') T) end.
              move => [HctxM HctxT].
              eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
                try (apply equiv_refl). clear HctxT HctxM HeqT.
@@ -365,8 +310,8 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              subst. simpsub. rewrite subst1_trans_type. do 2 simpsubs. apply equiv_fut.
              apply trans_type_equiv; apply reduce_equiv; constructor; apply reduce_id.
              move : (equiv_trans (equiv_trans (equiv_trans Heq0 Heq1) Heq2) Heq3) => HeqT.
-             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: (hygiene (ctxpred G') M) /\
-                                                    (hygiene (ctxpred G') T) end.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => suffices: ((hctx G') M) /\
+                                                    ((hctx G') T) end.
              move => [HctxM HctxT].
              eapply (tr_compute _ _ _ _ _ _ _ HctxT HctxM HctxM HeqT);
                try (apply equiv_refl).
@@ -392,7 +337,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                                                    (subseq (ppair (shift 4 u1) (nsucc (var 6)))
                                                            (ppair (var 3) (var 2)))
                                        ))) end.
-             move => [Hsub1 Hsub2]. apply (subseq_trans Hsub2 Hsub1). split.
+             move => [Hsub1 Hsub2]. apply (subseq_trans _ _ _ _ _ _ Hsub2 Hsub1). split.
              (*showing m1 o m : W <= U1*)
              match goal with |- tr ?G' ?J =>
                              suffices: (Datatypes.prod (tr G' (oof (var 5)
@@ -403,7 +348,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                                                    (subseq (ppair (var 7) (var 6))
                                                            (ppair (shift 4 u1) (nsucc (var 6)))
                                        )))) end.
-             move => [Hsub11 Hsub12]. apply (subseq_trans Hsub12 Hsub11). split.
+             move => [Hsub11 Hsub12]. apply (subseq_trans _ _ _ _ _ _ Hsub12 Hsub11). split.
              (*showing m: W <= U*)
              sh_var 5 10. inv_subst. rewrite ! subst_sh_shift make_app5.
              apply tr_weakening_append. sh_var 1 5. inv_subst. var_solv.
@@ -444,7 +389,23 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                apply IHDtrans. change (var 1) with (@shift False 1 (var 0)).
                apply trans_type_works1; var_solv. var_solv.
                sh_var 9 10. inv_subst. var_solv0.
-+ (*hygiene!*)
+               Hint Resolve hygiene_moveapp: hygiene_hint.
+               + (*hygiene!*) split. hyg_solv_big.
+                 subst. unfold subst1. rewrite ! subst_lam ! subst_fut ! under_sum
+                                               ! fold_subst1 ! subst1_trans_type
+                ! sh_under_trans_type. do 2 simpsubs.
+                 hyg_solv_big. repeat (apply hygiene_app; hyg_solv).
+                 apply hygiene_bite; hyg_solv. repeat (apply hygiene_sh1).
+
+                 hyg_solv_big.
+                 autorewrite with hygiene_hint. hyg_solv_big.
+                 unfold move_app. unfold make_subseq.
+
+                 (*need hygiene move*)
+                 Ltac prov_hyg := 
+
+
+                 prove_the_hygiene.
 
                apply world_pair; auto.
              var_solv

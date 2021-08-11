@@ -115,9 +115,9 @@ Lemma compm5_type:
     tr G (oof (ppair u lu) world) ->
     (tr G (oof T U0)) ->
     tr G (oof  (prod (prod (subseq (ppair w lw) (ppair u lu)) (store u lu)) T) U0).
-intros. repeat (eapply tr_prod_formation_univ).
+move =>> H1 H2. repeat (eapply tr_prod_formation_univ).
 apply subseq_U0; auto.
-apply store_U0; auto. apply X1.
+apply store_U0; auto. 
 Qed.
 
 (*start here fix this one to use compm5*)
@@ -130,7 +130,7 @@ Lemma compm4_type: forall U A G,
                   prod (prod (subseq (subst (sh 2) U) V) (store v lv))
                                                    A))
                                                     
-             U0). intros.
+             U0). move =>> H1 H2.
   eapply tr_sigma_formation_univ.
   unfold nzero. simpsub. apply nat_U0.
   simpl.
@@ -140,9 +140,10 @@ Lemma compm4_type: forall U A G,
     rewrite - (subst_world (sh 2)).
 assert (size [:: hyp_tm nattp; hyp_tm preworld] = 2) as Hsize. by auto. 
     rewrite - Hsize. rewrite make_app2. repeat rewrite subst_sh_shift.
-eapply tr_weakening_append; try apply X; try reflexivity. apply uworld10. 
+    eapply tr_weakening_append; try apply H1; try reflexivity.
+    apply uworld10.
     auto. unfold nzero. simpsub. apply store_U0. auto.
-    rewrite subst_nzero. apply X0. Qed. 
+    rewrite subst_nzero. apply H2. Qed. 
 
 Lemma compm3_type: forall U A G,
     (tr G (oof U world)) -> (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
@@ -155,7 +156,7 @@ Lemma compm3_type: forall U A G,
                                                    A
                                                     ))
                                ) U0).
-  intros. apply tr_exist_formation_univ.
+  move =>> H1 H2. apply tr_exist_formation_univ.
   apply pw_kind. eapply compm4_type; try assumption; auto. auto.
  apply leq_refl. auto. Qed.
 
@@ -422,10 +423,6 @@ Lemma trans_type_works1: forall w A G D,
              (trans_type (shift 1 w) (var 0) A)))).
 Admitted.
 
-  Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply compm4_type; try apply compm3_type;
-                   try apply compm2_type;
-                   try apply compm1_type; try apply compm0_type; auto;
-try apply trans_type_works; auto.
 
 Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
     size (a:: L) = 1 + (size L). Admitted.
@@ -433,16 +430,6 @@ Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
 (*Lemma size_Gamma_at: forall G w l,
     size (Gamma_at G w l) = size G. Admitted.*)
 
-Theorem typed_hygiene: forall G M M' A,
-    (tr G (deq M M' A)) -> (hygiene (ctxpred G) M).
-  intros. dependent induction X; auto; try repeat constructor.
-  - rewrite ctxpred_length. eapply Sequence.index_length. apply i0.
-  - suffices:  (fun j : nat =>
-     (j < 0)%coq_nat \/
-     (j >= 0)%coq_nat /\ ctxpred G (j - 0)%coq_nat) = (ctxpred G).
-    intros Heq. rewrite Heq. eapply IHX1; try reflexivity.
-    (*apply extensionality.*)
-    Admitted.
 
 (**************proofs about translation of contexts*****************)
 Lemma subst_Gamma_at :forall w l s G,
@@ -605,3 +592,97 @@ apply tr_arrow_intro; auto.
  apply trans_type_works; auto.
  move: Ht. simpsub_type; auto.
 Qed.
+
+Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
+                                       equiv (trans_type w l A)
+                                             (trans_type w' l' A).
+  Admitted.
+
+
+ Lemma subseq_trans M M' U1 U2 U3 G:
+                         tr G (oof M (subseq U2 U3))
+                         -> tr G (oof M' (subseq U1 U2))
+                         ->tr G (oof make_subseq 
+                                    (subseq U1 U3)).
+ Admitted.
+
+Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
+                                                ( let W := (shift 1 (ppair w l)) in
+                                                  let V := (ppair (var 1) (var 0)) in
+                                                  (arrow (subseq W V) (gettype (shift 1 w) (var 1) (var 0)))))
+                                                                       ).
+Admitted.
+
+             Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
+                               (substj (dot x id) (@deq False M1 M2 T)).
+Admitted.
+
+Definition ltb_app m n := app (app lt_b m) n.
+
+Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (ltb_app m n) booltp). Admitted.
+
+  Ltac simpsubs := simpsub; simpl.
+
+Ltac simpsub_big_T := match goal with |- tr ?G (deq ?M ?M' ?T) =>
+                                    let T' := fresh "T" in
+                                    let Ht := fresh "Ht" in
+                                    remember T as T' eqn:Ht;
+                                   simpsubin_big Ht; rewrite Ht
+                    end.
+
+Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply compm4_type; try apply compm3_type;
+                   try apply compm2_type;
+                   try apply compm1_type; try apply compm0_type; auto;
+try apply trans_type_works; auto.
+(*default value after s(len w1) is x*)
+Definition cons_b w l x :=lam (let i := (var 0) in
+                              bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
+
+Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
+                                tr D (oof l nattp) ->
+                                tr D (oof x (karrow (fut preworld)
+                                                    (arrow (fut nattp) U0)
+                                     )) ->
+                                tr D (oof (cons_b w l x) preworld).
+Admitted.
+
+Lemma subst_consb w l x s: @subst False s (cons_b w l x) =
+                           cons_b (subst s w) (subst s l) (subst s x).
+  unfold cons_b. simpsub_big. auto. Qed.
+
+Lemma sh_Gamma_at: forall G w l s,
+    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
+                                                (subst (sh s) l)). intros.
+  change (sh s) with (@under False 0 (sh s)). apply sh_under_Gamma_at.
+Qed.
+
+Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
+
+Hint Rewrite <- sh_Gamma_at subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
+     subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
+     subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
+     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
+
+Ltac inv_subst :=
+autounfold with subst1; autorewrite with inv_subst.
+
+
+Lemma nsucc_nat G n: tr G (oof n nattp) ->
+                    tr G (oof (nsucc n) nattp).
+  Admitted. (*start here move this to basic types*)
+
+Hint Resolve nsucc_nat.
+
+(*start here move to subst_help0*)
+
+(*for any W, W <= x:: W, start here move this out of here*)
+Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
+                                    tr G' (oof l' nattp) ->
+                                tr G' (oof x (karrow (fut preworld)
+                                                    (arrow (fut nattp) U0)
+                                     )) ->
+                                tr G' (oof make_subseq (subseq (ppair w' l')
+                                                              (ppair (cons_b w' l' x) (nsucc l'))
+                                      )).
+Admitted.

@@ -42,8 +42,8 @@ Lemma tr_karrow_elim: forall G a b m n p q,
 
 Lemma kind_type: forall {G K i},
     tr G (deq K K (kuniv i)) -> tr G (deqtype K K).
-  intros. eapply tr_formation_weaken.
-  eapply tr_kuniv_weaken. apply X. Qed.
+  move => G K i H. eapply tr_formation_weaken.
+  eapply tr_kuniv_weaken. apply H. Qed.
 
 Lemma tr_prod_intro: forall G a b x1 x2 y1 y2,
     tr G (deqtype a a) ->
@@ -94,7 +94,7 @@ Lemma tr_weakening_appends: forall G1 G2 G3 J1 J2 t J1' J2' t',
     t' = (shift (size G2) t) ->
     G3 = G2 ++ G1 ->
       tr G3 (deq J1' J2' t').
- intros. move: G3 t t' J1' J2' J1 J2 H H0 H1 H2 X. induction G2; intros.
+ move => G1 G2.  induction G2; intros.
  -  simpl. subst. repeat rewrite - subst_sh_shift. simpsub. assumption.
  -
   suffices: (tr (substctx sh1 [::] ++ cons a (G2 ++ G1))
@@ -120,7 +120,7 @@ Qed.
                        (deq (shift (size G2) J1)
                             (shift (size G2) J2)
                             (shift (size G2) t))).
-   intros. eapply tr_weakening_appends; try apply X; try reflexivity.
+   move =>> H. eapply tr_weakening_appends; try apply H; try reflexivity.
    Qed.
 
  Lemma tr_weakening_append1: forall G1 x J1 J2 t,
