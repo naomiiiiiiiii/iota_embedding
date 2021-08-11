@@ -1,9 +1,9 @@
-Require Import Program.Equality Ring Lia Omega.
+Require Import Program Equality Ring Lia Omega.
 From Coq Require Import ssreflect ssrfun ssrbool.
 From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types
-     help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
+     help subst_help0 subst_help trans derived_rules embedded_lemmas proofs hygiene_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences Rules Defined.
@@ -14,8 +14,6 @@ Unset Printing Implicit Defensive.
 (*
 Lemma silly: forall n m, (n + 1) = m \/ (n + 1) = 2.
  move=> + m.*)
-
-Require Import Setoid.
 
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation
@@ -29,6 +27,10 @@ Goal forall (e: 5 = 3 + 2), etrans e e = e.
 
 
 Lemma *)
+Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
+                                       equiv (trans_type w l A)
+                                             (trans_type w' l' A).
+  Admitted.
 
 
  Lemma subseq_trans M M' U1 U2 U3 G:
@@ -37,9 +39,6 @@ Lemma *)
                          ->tr G (oof make_subseq 
                                     (subseq U1 U3)).
  Admitted.
-
- Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
-  apply equiv_trans. Qed.
 
 Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
                                                 ( let W := (shift 1 (ppair w l)) in
@@ -128,10 +127,6 @@ Lemma types_hygienic: forall G A A', tr G (deqtype A A') ->
   Admitted.
 
 
-Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
-                                       equiv (trans_type w l A)
-                                             (trans_type w' l' A).
-  Admitted.
 
 Lemma moveapp_works {T}: forall G w1 l1 w2 l2 m v,
      tr G (oof (ppair w1 l1) world) ->
@@ -143,6 +138,8 @@ Lemma moveapp_works {T}: forall G w1 l1 w2 l2 m v,
 Admitted.
 
 
+ Lemma equiv_trans {m1 m2 m3} : @equiv False m1 m2 -> equiv m2 m3 -> equiv m1 m3.
+  apply equiv_trans. Qed.
 
 
  Theorem two: forall G e T ebar,
@@ -228,7 +225,8 @@ Admitted.
            end.
            move => HeqT.
            (*show that the type does reduce to what I claim it reduces to*)
-           2: { do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv. simpsub_bigs.
+           2: { do 2 (apply equiv_app; try apply equiv_refl).
+              apply reduce_equiv. simpsub_bigs.
                 replace (bite
        (ltb_app (var 0) (var 6))
        (app (var 7) (var 0))
@@ -444,7 +442,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                }
                rewrite ! subst_sh_shift. apply tr_weakening_append.
                apply IHDtrans. change (var 1) with (@shift False 1 (var 0)).
-               apply trans_type_works2; var_solv. var_solv.
+               apply trans_type_works1; var_solv. var_solv.
                sh_var 9 10. inv_subst. var_solv0.
 + (*hygiene!*)
 
