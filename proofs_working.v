@@ -394,7 +394,15 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                  subst. unfold subst1. rewrite ! subst_lam ! subst_fut ! under_sum
                                                ! fold_subst1 ! subst1_trans_type
                 ! sh_under_trans_type. do 2 simpsubs.
-                 hyg_solv_big. repeat (apply hygiene_app; hyg_solv).
+                 hyg_solv_big.
+                 simpsub_bigs. auto.
+                 Hint Rewrite <- subst_sh_shift : hygiene_hint.
+                 subst. unfold subst1.
+                 rewrite - ! subst_sh_shift ! subst_lam ! subst_fut ! under_sum
+                             ! fold_subst1 ! subst1_trans_type
+                 ! sh_under_trans_type. do 2 simpsubs.
+                 split; hyg_solv_big.
+                 repeat (apply hygiene_app; hyg_solv).
                  apply hygiene_bite; hyg_solv. repeat (apply hygiene_sh1).
 
                  hyg_solv_big.
