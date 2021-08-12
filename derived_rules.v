@@ -123,6 +123,12 @@ Qed.
    move =>> H. eapply tr_weakening_appends; try apply H; try reflexivity.
    Qed.
 
+ Lemma tr_weakening_appendt: forall (G1: context) G2 J1 J2,
+      tr G1 (deqtype J1 J2) ->
+      tr (G2 ++ G1) (deqtype (shift (size G2) J1)
+                            (shift (size G2) J2)).
+Admitted.
+
  Lemma tr_weakening_append1: forall G1 x J1 J2 t,
       tr G1 (deq J1 J2 t) ->
       tr (x::G1) (

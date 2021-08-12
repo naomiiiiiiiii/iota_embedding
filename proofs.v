@@ -60,7 +60,8 @@ simpsub_big. simpl. suffices: (
 move => Heq.
 rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
   - (*ref*)
-    rewrite !subst_compose - !subst_ppair H.
+    rewrite !subst_compose.
+    simpsubin H. inversion H. rewrite ! H1 ! H2.
     suffices: (subst
                       (dot (var 0)
                          (dot (var 1)
@@ -340,6 +341,7 @@ hyp_tm preworld
     Hint Resolve picomp1_works picomp2_works1 picomp2_works2 picomp3_works picomp4_works
       picomp_world.
 
+
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
@@ -386,9 +388,9 @@ hyp_tm preworld
       eapply tr_sigma_formation_univ; auto.
       eapply tr_prod_formation_univ. apply lt_type.
       rewrite - (subst_nat sh1). var_solv.
-      rewrite subst_ppi2. apply split_world_elim2.
+    apply (split_world2 (subst sh1 w)).
       rewrite - (subst_world sh1).
-      rewrite - cat1s. repeat rewrite subst_sh_shift.
+      rewrite - cat1s - subst_ppair. repeat rewrite subst_sh_shift.
       eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       apply tr_all_formation_univ. apply pw_kind.
       apply tr_pi_formation_univ; auto.
@@ -399,9 +401,11 @@ hyp_tm preworld
       apply (tr_karrow_elim _ (fut preworld)).
       eapply kind_type. apply tr_fut_kind_formation. apply pw_kind. auto.
       apply tr_arrow_formation. constructor; auto.
-      apply tr_univ_formation. auto. 
-      eapply nth_works.
-      rewrite make_app3. rewrite - (subst_world (sh 3) ). rewrite subst_sh_shift.
+      apply tr_univ_formation. auto. apply (tr_arrow_elim _ nattp); auto.
+      eapply tr_eqtype_convert; try apply unfold_pw.
+    apply (split_world1 _ (shift 3 l)).
+    rewrite - (subst_world (sh 3) ) - ! subst_sh_shift - subst_ppair
+    ! subst_sh_shift make_app3. 
       eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       rewrite - (subst_nat (sh 3) ).
       var_solv. apply tr_fut_intro.
