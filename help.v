@@ -8,28 +8,28 @@ From istari Require Import basic_types Syntax Subst SimpSub Promote Hygiene
 
 
 (*small abbreviations that will help us later*)
-Definition app3 w i u l : term False :=
+Definition app3 w i u l : term obj :=
  app (app (app w i) u) l.
 
 (*quickly access the nth element of the big tuple in the comp type*)
-Definition picomp1 (M: term False) := ppi1 M.
-Definition picomp2 (M: term False) := ppi1 (ppi1 (ppi2 M) ). 
-Definition picomp3 (M: term False) := ppi2 (ppi1 (ppi2 M)). 
-Definition picomp4 (M: term False) := ppi2 (ppi2 M).
+Definition picomp1 (M: term obj) := ppi1 M.
+Definition picomp2 (M: term obj) := ppi1 (ppi1 (ppi2 M) ). 
+Definition picomp3 (M: term obj) := ppi2 (ppi1 (ppi2 M)). 
+Definition picomp4 (M: term obj) := ppi2 (ppi2 M).
 (********************************************)
 
 
 
 (*useful types*)
 
-Definition plus L R : (term False) := sigma booltp (bite (var 0) (subst (sh 1) L)
+Definition plus L R : (term obj) := sigma booltp (bite (var 0) (subst (sh 1) L)
                                            (subst (sh 1) R) ).
-Definition inl L: term False := ppair btrue L.
-Definition inr R: term False := ppair bfalse R.
+Definition inl L: term obj := ppair btrue L.
+Definition inr R: term obj := ppair bfalse R.
 
-Definition opt w: term False := sigma booltp (bite (var 0) w unittp).
+Definition opt w: term obj := sigma booltp (bite (var 0) w unittp).
 
-Definition laters A : term False := rec (plus (shift 1 A) (fut (var 0))).
+Definition laters A : term obj := rec (plus (shift 1 A) (fut (var 0))).
 (*notice similarity w type of nat in logic*)
 (********************************************)
 
@@ -37,7 +37,7 @@ Definition laters A : term False := rec (plus (shift 1 A) (fut (var 0))).
 (*useful terms*)
 
 (*Unguarded recursion*)
-Definition Yc: (term False) := lam ((*f := 0*)
+Definition Yc: (term obj) := lam ((*f := 0*)
                    app
                      (lam ( (*f := 1, x := 0*)
                           let f := (var 1) in
@@ -56,11 +56,11 @@ Definition Yc: (term False) := lam ((*f := 0*)
 ).
 
 (*Computation monad*)
-Definition ret: term False := lam (inl (var 0)).
+Definition ret: term obj := lam (inl (var 0)).
 
 Definition ret_a x := app ret x.
 
-Definition bind : term False := app Yc
+Definition bind : term obj := app Yc
    (lam   ( (*f := 0*)
       lam ( (*f:= 1, x := 0*)
           lam ( (*f:= 2, x := 1, g := 0*)
@@ -78,9 +78,9 @@ Definition make_bind E1 E2 := app (app bind E1) E2.
 
 (*arithmetic*)
 
-Definition if_z (n: term False): (term False) := ppi1 n.
+Definition if_z (n: term obj): (term obj) := ppi1 n.
 
-Definition minusbc: (term False) := lam
+Definition minusbc: (term obj) := lam
                          (
                            (*f := 0*)
                            lam ( (*f:= 1, n := 0*)
@@ -94,10 +94,10 @@ Definition minusbc: (term False) := lam
                                                      (n)
                                                     (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
                                                   ))).
- Definition minus: (term False) := app theta minusbc.
+ Definition minus: (term obj) := app theta minusbc.
 
 
- Definition plusbc: (term False) := lam
+ Definition plusbc: (term obj) := lam
                          (
                            (*f := 0*)
                            lam ( (*f:= 1, n := 0*)
@@ -109,7 +109,7 @@ Definition minusbc: (term False) := lam
                                                      (n)
                                                     (app (app f n) (app (ppi2 m) triv))
                                                   ))).
-Definition plus_n: (term False) := app theta plusbc.
+Definition plus_n: (term obj) := app theta plusbc.
 
 Definition lt_b := lam ( lam (if_z (app (app minus (var 0)) (nsucc (var 1)))
                        )).
@@ -123,17 +123,17 @@ Admitted.
 
 (*worlds*)
 
-Definition preworld: (term False) := rec 
+Definition preworld: (term obj) := rec 
                                    (arrow nattp (karrow (fut (var 0)) (arrow (fut nattp) U0))).
 
-Definition world: (term False) := sigma preworld nattp.
+Definition world: (term obj) := sigma preworld nattp.
 
-Definition len w: (term False) := ppi2 w.
+Definition len w: (term obj) := ppi2 w.
 
-Definition nth w n: term False := app (ppi1 w) n.
+Definition nth w n: term obj := app (ppi1 w) n.
 
 
- Definition subseq: (term False) -> (term False) -> (term False) :=
+ Definition subseq: (term obj) -> (term obj) -> (term obj) :=
    fun W1 => fun W2 =>
        app  (app   (lam (lam
                    (let W1 := var 0 in
@@ -157,14 +157,14 @@ Definition nth w n: term False := app (ppi1 w) n.
 
                  ))))) W1) W2.
 
- Definition make_subseq: term False := ppair triv (lam (lam (lam triv)) ).
+ Definition make_subseq: term obj := ppair triv (lam (lam (lam triv)) ).
 
  (*transitivity of subseq*)
 
 
  (*need to do refl*)
 
-(*mysterious error Definition if_z (n: term False) := ppi1 n. *)
+(*mysterious error Definition if_z (n: term obj) := ppi1 n. *)
 
 
 
@@ -174,7 +174,7 @@ Definition nth w n: term False := app (ppi1 w) n.
 
  (*gettype w v is a function which, when given an index i, gives the type
   at index i in w *)
- Definition gettype w v lv: (term False) := pi nattp ((*i = 0*)
+ Definition gettype w v lv: (term obj) := pi nattp ((*i = 0*)
                                            let i := var 0 in
                                            app (app (app (shift 1 w) i) (next (shift 1 v))) (next (shift 1 lv))
                                          ).
@@ -193,7 +193,7 @@ Definition nth w n: term False := app (ppi1 w) n.
 (*moving terms in a world to a future world*)
 
  (*start here get rid of vacuous cases w program module*)
- Definition move (A: source.term): term False :=
+ Definition move (A: source.term): term obj :=
    match A with
      nattp_m => lam (lam (var 0))
    | arrow_m _ _ =>
@@ -226,7 +226,7 @@ lam ( lam (
      | _ => lam (lam triv) (*not a type operator, error case*)
 end.
 
- Definition move_app A (m : term False) (x: term False) :=
+ Definition move_app A (m : term obj) (x: term obj) :=
    app (app (move A) m) x.
 
  Lemma subst_move: forall A s, (subst s (move A)) = move A.

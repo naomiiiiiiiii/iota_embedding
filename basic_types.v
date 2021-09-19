@@ -8,16 +8,16 @@ From istari Require Import Sigma Tactics
 
 
 
-Definition oof M A: (@Syntax.judgement False) := deq M M A.
+Definition oof M A: (@Syntax.judgement obj) := deq M M A.
 
-Definition oof_t M: (@Syntax.judgement False) := deqtype M M.
+Definition oof_t M: (@Syntax.judgement obj) := deqtype M M.
 
-Definition U0 : (term False) := univ nzero.
+Definition U0 : (term obj) := univ nzero.
 
-Definition leq_t n m : term False :=
+Definition leq_t n m : term obj :=
   app (app leqtp n) m.
 
-Definition lt_t n m : term False :=
+Definition lt_t n m : term obj :=
   app (app lttp n) m.
 
 Lemma zero_typed: forall G,

@@ -25,7 +25,7 @@ Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
 
 Coercion var: nat >-> term.
 
-Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}: (Syntax.term False)                                                                          
+Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: (Syntax.term obj)                                                                          
   :=
     let W := (ppair w1 l1) in
     match tau with
@@ -83,14 +83,14 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
 (*translation of source contexts to target contexts (at a given world)*)
 
 (*makes a product type at a world out of a source context *)
- Fixpoint Gamma_at (G: source.context) (w l: Syntax.term False) :=
+ Fixpoint Gamma_at (G: source.context) (w l: Syntax.term obj) :=
    match G with
      nil => unittp 
    | A::xs => (prod (trans_type w l A) (Gamma_at xs w l)) end
  .
 
 (*make a target context out of a source context*)
- Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term False):=
+ Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
    mapi (fun pair =>
            match pair with (i, A) => 
            hyp_tm (trans_type (shift i w) (shift i l) A) end) G.
@@ -105,13 +105,13 @@ Fixpoint  trans_type (w1 l1: Syntax.term False) (tau : source.term) {struct tau}
  (*making a pair of type (a big product at U) out of a pair of (a big product at W)
   iterating over the pair
  but how far to go? use the list because it should be the same size as the pair*)
-Fixpoint move_gamma (G: source.context) (m: Syntax.term False) (gamma: Syntax.term False) :=
+Fixpoint move_gamma (G: source.context) (m: Syntax.term obj) (gamma: Syntax.term obj) :=
    match G with
      nil => gamma
    | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
 
- Inductive trans: source.context -> source.term -> source.term -> (Syntax.term False) -> Type :=
+ Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
                                    trans G E1 (comp_m A) Et1 ->
                                    trans (A::G) E2 (comp_m B) Et2 ->

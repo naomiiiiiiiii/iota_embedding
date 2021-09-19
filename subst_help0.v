@@ -17,11 +17,11 @@ Ltac simpsubin_big H := repeat (simpsubin H; simpsubin1 H).
 
 Ltac sh_var_help sh_amt cap var_num := match (eval compute in (leq var_num cap)) with
                           true => let var_shed := eval compute in (var_num - sh_amt) in
-                                   (change (@var False var_num) with (shift sh_amt (@var False var_shed)));
+                                   (change (@ var obj var_num) with (shift sh_amt (@ var obj var_shed)));
                                                                sh_var_help sh_amt cap var_num.+1
                         | false => auto
-                          (*change (@var False 9) with
-                              (shift sh_amt (@var False 6))*)
+                          (*change (@ var obj 9) with
+                              (shift sh_amt (@ var obj 6))*)
 
                                        end.
 (*sh_var amt cap rewrites (Var i) as (shift sh_amt (var (i - sh_amt)))
@@ -36,7 +36,7 @@ Ltac weaken H := eapply tr_formation_weaken; apply H.
 
 
 (*Trivial lemmas to simplify substitutions*)
-Lemma fold_subst1:  forall m1 m2, (@subst False (dot m1 id) m2) = subst1 m1 m2.
+Lemma fold_subst1:  forall m1 m2, (@ subst obj (dot m1 id) m2) = subst1 m1 m2.
 intros. auto. Qed.
 
 Lemma subst_pw: forall s,
@@ -45,12 +45,12 @@ intros. unfold preworld. unfold nattp. auto. Qed.
 Hint Rewrite subst_pw : core subst1.
 
 Lemma subst_U0: forall s,
-    (@subst False s (univ nzero)) = univ nzero.
+    (@ subst obj s (univ nzero)) = univ nzero.
   auto. Qed.
 
 
 
-Lemma subst_theta s : @subst False s theta = theta. 
+Lemma subst_theta s : @ subst obj s theta = theta. 
   unfold theta. simpsub. auto. Qed.
 Hint Rewrite subst_theta: core subst1.
 
@@ -68,18 +68,18 @@ intros. unfold world. unfold preworld. unfold nattp. auto. Qed.
 Hint Rewrite subst_world: core subst1.
 
 Lemma subst_nat: forall s,
-    @subst False s nattp = nattp.
+    @ subst obj s nattp = nattp.
   intros. unfold nattp. auto. Qed.
 
 Hint Rewrite subst_nat: core subst1.
 
 Lemma subst_nzero: forall s,
-    @subst False s nzero = nzero.
+    @ subst obj s nzero = nzero.
   intros. unfold nzero. auto. Qed.
 Hint Rewrite subst_nzero: core subst1.
 
 Lemma subst_leqtp: forall s,
-    @subst False s (leqtp) = leqtp.
+    @ subst obj s (leqtp) = leqtp.
   intros. unfold leqtp. unfold wind. unfold theta.
   repeat rewrite subst_app.
   repeat rewrite subst_lam. simpsub. simpl.
@@ -88,24 +88,24 @@ Lemma subst_leqtp: forall s,
 Hint Rewrite subst_leqtp: core subst1.
 
 Lemma subst_bind: forall s m1 m2,
-    @subst False s (make_bind m1 m2) = make_bind (@subst False s m1) (@subst False s m2).
+    @ subst obj s (make_bind m1 m2) = make_bind (@ subst obj s m1) (@ subst obj s m2).
   intros. auto. Qed.
 
 
 Lemma subst_lttp: forall s,
-    @subst False s (lttp) = lttp.
+    @ subst obj s (lttp) = lttp.
   intros. unfold lttp.
   simpsub. rewrite subst_leqtp. unfold nsucc. simpsub. simpl.
   rewrite subst_leqtp. auto. Qed.
 Hint Rewrite subst_leqtp: core subst1.
 
 Lemma subst_leq: forall s n1 n2,
-    @subst False s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
+    @ subst obj s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
   intros. unfold leq_t.  repeat rewrite subst_app. auto. 
 Qed.
 
 Lemma subst_lt: forall s n1 n2,
-    subst s (lt_t n1 n2) = lt_t (subst s n1) (@subst False s n2).
+    subst s (lt_t n1 n2) = lt_t (subst s n1) (@ subst obj s n2).
   intros. repeat rewrite subst_app. rewrite subst_lttp. auto. Qed. 
 
 Lemma subst_subseq: forall W1 W2 s,
@@ -161,7 +161,7 @@ Lemma subst_store: forall w l s, subst s (store w l) = store (subst s w) (subst 
 Hint Rewrite subst_store: core subst1.
 
 
-Lemma subst_nsucc s n : (subst s (nsucc n)) = @nsucc False (subst s n).
+Lemma subst_nsucc s n : (subst s (nsucc n)) = @ nsucc obj (subst s n).
   unfold nsucc. simpsub. auto. Qed.
 
 Lemma subst_moveapp s A m1 m2 : (subst s (move_app A m1 m2)) =

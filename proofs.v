@@ -5,12 +5,9 @@ From istari Require Import lemmas0
      help subst_help0 subst_help trans derived_rules embedded_lemmas.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Rules Defined.
+     ContextHygiene Equivalence Rules Defined Sequence.
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
-
-
-
 
 (*proofs about type translation *)
 
@@ -346,9 +343,9 @@ hyp_tm preworld
       (tr G (oof (ppair w l) world)) ->
       tr G (oof (trans_type w l A) U0).
     move => w l A G Du.
-  move : w l G Du.
+  move : w l G Du. 
     induction A; intros; simpl; try apply tr_unittp_formation; try apply nat_U0.
-    + (*arrow*)
+    + (*arrow*) 
         apply tr_all_formation_univ.
       apply pw_kind.
       apply tr_pi_formation_univ.
@@ -394,7 +391,6 @@ hyp_tm preworld
       eapply tr_weakening_append; try apply Du; try reflexivity; auto. 
       apply tr_all_formation_univ. apply pw_kind.
       apply tr_pi_formation_univ; auto.
-      repeat rewrite subst_nzero. apply nat_U0.
       apply tr_eqtype_formation_univ.
       eapply (tr_arrow_elim _ (fut nattp) ). constructor; auto.
       apply tr_univ_formation.  auto.
@@ -498,7 +494,7 @@ Qed.
 
 
 
-Lemma sub_refl: forall ( U: term False) (G: context),
+Lemma sub_refl: forall ( U: term obj) (G: context),
                          tr G (oof U world)
                          ->tr G (oof make_subseq 
                                     (subseq U U)).
@@ -590,8 +586,8 @@ apply tr_arrow_intro; auto.
       (*start here should bring out this part as its exactly
        same as front of bind case*)
       simpsub_big. simpl. apply tr_arrow_intro; auto.
-    replace (@ppair False (var 4) (var 3)) with (@subst False (sh 2) (ppair (var 2) (var 1))); auto.
-    weaken compm2_type; auto.
+      sh_var 2 4. rewrite - ! subst_sh_shift - ! subst_ppair.
+      weaken compm2_type; auto.
  rewrite subst_trans_type; auto.
  apply trans_type_works; auto.
  move: Ht. simpsub_type; auto.
@@ -618,7 +614,7 @@ Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp
 Admitted.
 
              Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
-                               (substj (dot x id) (@deq False M1 M2 T)).
+                               (substj (dot x id) (@ deq obj M1 M2 T)).
 Admitted.
 
 Definition ltb_app m n := app (app lt_b m) n.
@@ -651,14 +647,14 @@ Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                 tr D (oof (cons_b w l x) preworld).
 Admitted.
 
-Lemma subst_consb w l x s: @subst False s (cons_b w l x) =
+Lemma subst_consb w l x s: @ subst obj s (cons_b w l x) =
                            cons_b (subst s w) (subst s l) (subst s x).
   unfold cons_b. simpsub_big. auto. Qed.
 
 Lemma sh_Gamma_at: forall G w l s,
     (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
                                                 (subst (sh s) l)). intros.
-  change (sh s) with (@under False 0 (sh s)). apply sh_under_Gamma_at.
+  change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
 Qed.
 
 Hint Rewrite subst_consb sh_Gamma_at: subst1 core.

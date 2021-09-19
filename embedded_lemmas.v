@@ -142,15 +142,15 @@ tr [:: hyp_tm
   eapply (tr_pi_elim _ (fut nattp) ).
    simpsub. simpl.
   assert (forall s, pi (fut nattp) (univ nzero)
-                     =  @subst False s (pi (fut nattp) (univ nzero))
+                     =  @ subst obj s (pi (fut nattp) (univ nzero))
          ) as sub1.
   auto.
-  assert (forall s, @subst False s (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
+  assert (forall s, @ subst obj s (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
                      = (karrow (fut preworld) (arrow (fut nattp) (univ nzero)))
          ) as sub2.
   auto.
   assert (forall s, arrow (fut nattp) (univ nzero)
-                     =  @subst False s (arrow (fut nattp) (univ nzero))
+                     =  @ subst obj s (arrow (fut nattp) (univ nzero))
          ) as sub3.
   auto.
   eapply tr_eqtype_convert.
@@ -168,7 +168,7 @@ tr [:: hyp_tm
   eapply pw_type2.
   assert (forall s, (arrow (fut preworld)
           (arrow (fut nattp) (univ nzero)))
-               =  @subst False s (arrow (fut preworld)
+               =  @ subst obj s (arrow (fut preworld)
           (arrow (fut nattp) (univ nzero)))
 )
     as sub4.
@@ -190,7 +190,7 @@ tr [:: hyp_tm
   eapply (tr_sigma_elim1 _ _ nattp).
   (*assert (forall s, (arrow nattp
              (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
-               =  @subst False s (arrow nattp
+               =  @ subst obj s (arrow nattp
              (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
 )
     as sub5.
