@@ -5,7 +5,8 @@ From istari Require Import lemmas0
      help subst_help0 subst_help trans derived_rules embedded_lemmas.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Rules Defined Sequence.
+     ContextHygiene Equivalence Equivalences.
+From istari Require Import Rules Defined DefsEquiv.
 (*crucial lemmas leading up to the final theorem (one) showing
  well-typedness of the translation*)
 
@@ -682,3 +683,22 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                                               (ppair (cons_b w' l' x) (nsucc l'))
                                       )).
 Admitted.
+
+Lemma reduce_consb w l x i v lv : equiv (app (app (app (cons_b w l x) i) v) lv)
+                                        (app (app (bite (ltb_app i l) (app w i) x) v) lv).
+  unfold cons_b.
+           do 2 (apply equiv_app; try apply equiv_refl).
+              apply reduce_equiv. 
+                replace (bite
+       (ltb_app i l)
+       (app w i)
+       x) with (subst1 i (bite
+       (ltb_app (var 0) (shift 1 l))
+       (app (shift 1 w) (var 0))
+       (shift 1 x))).
+                2:{ unfold ltb_app. simpsub_bigs. auto. }
+                apply reduce_app_beta; try apply reduce_id.
+Qed.
+
+Lemma ltb_false G n : tr G (oof n nattp) -> equiv (ltb_app n n) bfalse.
+  Admitted.
