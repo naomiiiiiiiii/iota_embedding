@@ -466,7 +466,6 @@ tr D (oof x (trans_type w l A)) ->
 tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
   move => Hw Hpair H1. simpl. apply tr_prod_intro; auto.
   (*show that the product type is wellformed *)
-    weaken trans_type_works; auto. apply Gamma_at_type; auto. 
 Qed.
 
 
@@ -515,9 +514,6 @@ Ltac trans_type := weaken trans_type_works; auto.
                                                   Hw1 Hw2 Hsub Hg; auto.
   (*IS*)
    apply tr_prod_intro.
-  - (*show product type is well formed*)
-    weaken trans_type_works; auto.
-    apply Gamma_at_type; auto.
   - (*pi1*)
     unfold move_app.
     (apply (tr_arrow_elim _ (trans_type w1 l1 a))); try trans_type.
