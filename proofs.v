@@ -684,7 +684,7 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                       )).
 Admitted.
 
-Lemma reduce_consb w l x i v lv : equiv (app (app (app (cons_b w l x) i) v) lv)
+Lemma reduce_consb {w l x i v lv} : equiv (app (app (app (cons_b w l x) i) v) lv)
                                         (app (app (bite (ltb_app i l) (app w i) x) v) lv).
   unfold cons_b.
            do 2 (apply equiv_app; try apply equiv_refl).
@@ -700,5 +700,95 @@ Lemma reduce_consb w l x i v lv : equiv (app (app (app (cons_b w l x) i) v) lv)
                 apply reduce_app_beta; try apply reduce_id.
 Qed.
 
-Lemma ltb_false G n : tr G (oof n nattp) -> equiv (ltb_app n n) bfalse.
-  Admitted.
+Lemma ltb_false G n : tr G (oof n nattp) -> tr G (deq (ltb_app n n) bfalse booltp).
+Admitted.
+
+Lemma nsucc_lt: forall G n, tr G (oof n nattp) ->
+                       tr G (oof triv (lt_t n (nsucc n))).
+Admitted.
+
+Lemma tr_eq_reflexivity:
+  forall G m n a,
+    tr G (deq m n a) ->
+    tr G (deq m m a).
+  intros  G m n a H0. pose proof (tr_symmetry _#4 H0) as H1.
+  apply (tr_transitivity _#5 H0 H1).
+Qed.
+
+Lemma eq_iffalse {G m n p A}: tr G (deq m bfalse booltp) ->
+                              tr G (oof p A) ->
+                              tr G (oof n A) ->
+                               tr G (deq (bite m n p) p A).
+  intros.
+  apply tr_equal_elim.
+  suffices: tr G (oof (lam triv) (pi (equal booltp m bfalse)
+                                     (shift 1 (equal A (bite m n p) p))
+                 )).
+  intros Heq.
+  eapply tr_compute. apply equiv_refl.
+  change triv with (@subst1 obj triv triv).
+  apply equiv_symm. apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+  change triv with (@subst1 obj triv triv).
+  apply equiv_symm. apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+  replace (equal A (bite m n p) p) with (subst1 triv
+                                                (shift 1 (equal A (bite m n p) p))).
+  2:{
+    simpsub_big. auto.
+  }
+  eapply tr_pi_elim. apply Heq. apply tr_equal_intro. assumption.
+  match goal with |- tr ?G ?J => replace J with
+    (substj (dot m id) (deq (lam triv) (lam triv)
+       (pi (equal booltp (var 0) bfalse)
+           (shift 1 (equal (shift 1 A) (bite (var 0)
+                                             (shift 1 n)
+                                             (shift 1 p))
+                           (shift 1 p)))))) end.
+  2: {
+    simpsub_bigs. auto.
+  }
+  eapply tr_generalize. eapply tr_eq_reflexivity. apply H.
+  apply tr_pi_intro.
+  - apply tr_equal_formation. weaken tr_booltp_formation.
+    rewrite - (@subst_booltp obj (sh 1)). var_solv0. constructor.
+  - simpsub_bigs.
+    match goal with |- tr (?x :: ?y :: ?G) (deq triv triv ?T) =>
+                    change (?x :: ?y :: ?G) with ([:: x] ++ (y :: G));
+    change triv with (@subst obj (under 1 sh1) triv);
+    eapply (tr_substitution G [::x] booltp bfalse) end.
+  - apply tr_equal_formation. simpl. unfold deqtype.
+    change triv with (@shift obj 2 triv).
+    inv_subst. rewrite ! subst_sh_shift.
+    apply tr_weakening_append2. eapply tr_inhabitation_formation. apply H0.
+    replace (@subst obj (sh 2) A) with (subst1 (var 1) (shift 3 A)).
+    2: {
+      simpsub_bigs. auto.
+    }
+    constructor. simpl. rewrite - (@subst_booltp obj (sh 2)). var_solv0.
+    simpsub_bigs. rewrite ! subst_sh_shift. apply tr_weakening_append2. assumption.
+    simpsub_bigs. rewrite ! subst_sh_shift. apply tr_weakening_append2. assumption.
+    simpsub_bigs. rewrite ! subst_sh_shift. apply tr_weakening_append2. assumption.
+  - simpl. eapply (deq_intro _#4 (var 0) (var 0)).
+    change (subst (sh 2) booltp) with (@subst obj sh1 (subst sh1 booltp)).
+    change (subst (sh 2) bfalse) with (@subst obj sh1 (subst sh1 bfalse)).
+    sh_var 1 1. inv_subst. var_solv.
+  - simpsub_bigs. simpsub. eapply tr_compute; try (eapply equiv_equalterm; try (apply reduce_equiv;
+                                                                           apply reduce_bite_beta2);
+                                              try (apply equiv_refl)); try apply equiv_refl.
+    apply reduce_id. apply tr_equal_intro. rewrite ! subst_sh_shift.
+    apply tr_weakening_append1. assumption.
+Qed.
+
+    (*Lemma reduce_consb1_help {G m n p a b c A}: tr G (deq m bfalse booltp) ->
+                                      tr G (oof p A) ->
+                                      tr G (deqtype (app (app p a) b) c) ->
+                                      tr G (deqtype (app (app (bite m n p) a) b) c).
+  intros.
+  eapply tr_eqtype_transitivity; [.. | apply H1].
+
+apply (tr_eqtype_transitivity #4_
+need too much stuff about p being a function
+which produces a type, just do consb straight 
+ *)
+
+(*need to change ltb_false to have n < n = false,
+ not equiv*)

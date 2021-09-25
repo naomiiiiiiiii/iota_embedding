@@ -180,35 +180,7 @@ Theorem two: forall G e T ebar,
       Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append.
       apply world_pair. u1_pw2. apply Hu1. apply nsucc_nat; var_solv.
       2: { unfold gettype. simpsub_bigs. apply tr_pi_intro; auto.
-
-
-
-
-
-
-
-           unfold cons_b.
-           match goal with |- tr ?G' (deq ?M ?M ?T)
-                           => suffices: (equiv T  (app (app (bite (ltb_app (var 0) (var 6))
-                                                                     (app (var 7) (var 0))
-                                                                     (shift 4 x)
-                                                           ) (next (var 3))) (next (var 2))))
-           end.
-           move => HeqT.
-           (*show that the type does reduce to what I claim it reduces to*)
-           2: { do 2 (apply equiv_app; try apply equiv_refl).
-              apply reduce_equiv. simpsub_bigs.
-                replace (bite
-       (ltb_app (var 0) (var 6))
-       (app (var 7) (var 0))
-       (subst (sh 4) x)) with (subst1 (var 0) (bite
-       (ltb_app (var 0) (var 7))
-       (app (var 8) (var 0))
-       (subst (sh 5) x))). apply reduce_app_beta; try apply reduce_id. subst x.
-       simpsub_bigs. auto. 
-           }
-           eapply (tr_compute _ _ _ _ _ _ _ HeqT); try (apply equiv_refl).
-           clear HeqT.
+           eapply (tr_compute _ _ _ _ _ _ _ reduce_consb); try (apply equiv_refl).
 (*match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => change M with M end.
   literally what ask karl
  *)
@@ -377,7 +349,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              (*showing m2: U1 <= U2*)
              replace (shift 4 u1) with (shift 2 (shift 2 u1)); last by
              simpsub_bigs; auto. sh_var 2 6.
-             inv_subst. rewrite make_app2. var_solv.
+             inv_subst. rewrite make_app2. subst. var_solv.
              - (*showing Et l G : A@W*)
                apply (tr_arrow_elim _ (Gamma_at G (var 10) (var 9))); auto.
                apply Gamma_at_type; auto. trans_type.
@@ -421,13 +393,7 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                  rewrite subst1_under_trans_type.
                  simpsub_bigs.
                  constructor. var_solv.
-                 simpsub_bigs. apply tr_prod_intro.
-                 { (*2 <= succ 2 *)
-                   assert (forall G n, tr G (oof n nattp) ->
-                                  tr G (oof triv (lt_t n (nsucc n)))
-                          ) as nsucc_lt. (*start here move me out*)
-                   shelve. apply nsucc_lt. var_solv.
-                 }
+                 simpsub_bigs. apply tr_prod_intro. apply nsucc_lt. var_solv.
                  { (*\lv.<> : (U1 v lv)[l] = |> tau @ <v, lv>*)
                    constructor; auto.
                    change (dot (var 0) (dot (var 1)
@@ -437,7 +403,29 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                    simpsub_bigs.
                    constructor; auto.
                    (*(U1 v lv)[l] = |> tau @ <v, lv> *)
-                   subst u1. unfold cons_b.
+                   subst u1. simpsub_bigs.
+                   eapply tr_compute.
+                   {   (*start here move this out.*)
+  apply equiv_eqtype.
+  eapply equiv_trans.
+  apply reduce_consb. apply equiv_app. apply equiv_app.
+  apply equiv_bite. eapply ltb_false.
+  apply equiv_refl.
+                     }
+                   do 2 (apply equiv_refl).
+                   apply equiv_refl. (*start here clean this up*)
+                   match goal with tr ?G (deq triv triv ?T) =>
+                                   assert (equiv T
+       (eqtype
+          (app (app (bite (ltb_app (var 4) (var 4)) (app (var 5) (var 4))
+                          (subst (sh 2) x)) v) lv).
+                       (next (obj 0)))
+          (fut (trans_type (obj 1) (obj 0) A))))
+                                          )
+
+
+
+                   unfold cons_b.
                  }
 
 

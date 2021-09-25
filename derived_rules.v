@@ -160,3 +160,86 @@ Lemma tr_weakening_append4: forall G1 x y z a J1 J2 t,
                             (shift 4 J2)
                             (shift 4 t))).
 Admitted.
+
+Lemma deqtype_intro :
+  forall G a b m n,
+    tr G (deq m n (eqtype a b))
+    -> tr G (deqtype a b).
+Proof.
+intros G a b m n H.
+unfold deqtype.
+apply (tr_transitivity _ _ m).
+  {
+  apply tr_symmetry.
+  apply tr_eqtype_eta.
+  apply (tr_transitivity _ _ n); auto.
+  apply tr_symmetry; auto.
+  }
+
+  {
+  apply tr_eqtype_eta.
+  apply (tr_transitivity _ _ n); auto.
+  apply tr_symmetry; auto.
+  }
+Qed.
+
+Lemma tr_eqtype_reflexivity:
+  forall G a a',
+    tr G (deqtype a a') ->
+    tr G (deqtype a a).
+  intros  G a a' H0. pose proof (tr_eqtype_symmetry _#3 H0) as H1.
+  apply (tr_eqtype_transitivity _#4 H0 H1).
+Qed.
+
+Lemma tr_eq_reflexivity:
+  forall G m n a,
+    tr G (deq m n a) ->
+    tr G (deq m m a).
+  intros  G m n a H0. pose proof (tr_symmetry _#4 H0) as H1.
+  apply (tr_transitivity _#5 H0 H1).
+Qed.
+
+
+Lemma deq_intro :
+  forall G a m n p q,
+    tr G (deq p q (equal a m n))
+    -> tr G (deq m n a).
+Proof.
+intros G a m n p q H.
+apply tr_equal_elim.
+apply (tr_transitivity _ _ p).
+  {
+  apply tr_symmetry.
+  apply tr_equal_eta.
+  apply (tr_transitivity _ _ q); auto.
+  apply tr_symmetry; auto.
+  }
+
+  {
+  apply tr_equal_eta.
+  apply (tr_transitivity _ _ q); auto.
+  apply tr_symmetry; auto.
+  }
+Qed.
+
+Ltac prove_equiv_compat :=
+  intros;
+  apply equiv_compat;
+  apply mc_oper; repeat2 (apply mcr_cons); [.. | apply mcr_nil]; auto.
+
+Lemma equiv_eqtype {a a' b b'}:
+    equiv a a'
+    -> equiv b b'
+    -> equiv (eqtype a b) (@eqtype obj a' b').
+  prove_equiv_compat.
+Qed.
+
+
+
+Lemma equiv_equalterm {a a' m m' n n'}:
+    equiv a a'
+    -> equiv m m'
+    -> equiv n n'
+    -> equiv (equal a m n) (@equal obj a' m' n').
+  prove_equiv_compat.
+Qed.
