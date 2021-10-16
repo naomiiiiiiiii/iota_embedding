@@ -720,57 +720,6 @@ Lemma eq_iffalse {G m n p A}: tr G (deq m bfalse booltp) ->
                               tr G (oof p A) ->
                               tr G (oof n A) ->
                               tr G (deq (bite m n p) p A).
-  Admitted.
-
-Lemma U0_type: forall G,
-    tr G (deqtype U0 U0). Admitted.
-
-Hint Resolve U0_type.
-
-Lemma reduce_consb_end {G w l x v lv} :
-  tr G (oof w preworld) ->
-  tr G (oof l nattp) ->
-  tr G (oof v (fut preworld)) ->
-  tr G (oof lv (fut nattp)) ->
-  tr G (oof x U0) ->
-  tr G (deq (app (app (app (cons_b w l (lam (lam (shift 2 x)))) l) v) lv) x U0).
-  intros.
-  unfold cons_b.
-  - eapply tr_compute; try apply reduce_consb; try eapply equiv_refl.
-  - eapply tr_transitivity. 
-    eapply (tr_arrow_elim _ (fut nattp)); try apply H2; auto.
-    eapply (tr_karrow_elim _ (fut preworld)); try apply H1; auto.
-    apply eq_iffalse; try apply ltb_false; auto.
-    + (**\\x : |> pw -> |> N -> U0 *)
-      eapply tr_karrow_intro; auto. simpsub.
-      eapply tr_arrow_intro; auto. simpsub. rewrite subst_sh_shift.
-      apply tr_weakening_append2. auto.
-    + (*w l : |> pw -> |> N -> U0 *)
-      eapply tr_arrow_elim; try apply H0; auto.
-    eapply tr_eqtype_convert; try apply unfold_pw; auto.
-  - eapply tr_compute; last 3
-   [ eapply equiv_trans;
-    [ apply equiv_app; [ apply reduce_equiv;
-                         apply reduce_app_beta; try apply reduce_id | ..]; apply equiv_refl
-                                                                                 |
-    simpsub_bigs; apply reduce_equiv;
-    apply reduce_app_beta; try apply reduce_id]]; try apply equiv_refl.
-   - simpsub_bigs. auto.
-(*need to type v : fut pw, lv: fut nattp *)
-    eapply (tr_arrow_elim)
-
-    eapply tr_eqtype_convert. apply tr_eqtype_formation.
-    unfold deqtype.
-
-  ============================
-  tr G
-    (deq triv triv
-       (eqtype
-          (app
-             (app
-                (bite (ltb_app l l) 
-                   (app w l) x) v) lv) x))
-  (*proof eq_ifffalse*)
   intros.
   apply tr_equal_elim.
   suffices: tr G (oof (lam triv) (pi (equal booltp m bfalse)
@@ -828,6 +777,37 @@ Lemma reduce_consb_end {G w l x v lv} :
                                               try (apply equiv_refl)); try apply equiv_refl.
     apply reduce_id. apply tr_equal_intro. rewrite ! subst_sh_shift.
     apply tr_weakening_append1. assumption.
+Qed.
+
+
+
+Lemma reduce_consb_end {G w l x v lv} :
+  tr G (oof w preworld) ->
+  tr G (oof l nattp) ->
+  tr G (oof v (fut preworld)) ->
+  tr G (oof lv (fut nattp)) ->
+   tr G (oof (lam (lam x)) (karrow (fut preworld) (arrow (fut nattp) U0))) ->
+  tr G (deq (app (app (app (cons_b w l (lam (lam x))) l) v) lv) (subst1 lv (subst (under 1 (dot v id)) x)) U0).
+  intros.
+  unfold cons_b.
+  - eapply tr_compute; try apply reduce_consb; try eapply equiv_refl.
+  - eapply tr_transitivity. 
+    eapply (tr_arrow_elim _ (fut nattp)); try apply H2; auto.
+    eapply (tr_karrow_elim _ (fut preworld)); try apply H1; auto.
+    apply eq_iffalse; try apply ltb_false; auto.
+    (*w l : |> pw -> |> N -> U0 *)
+      eapply tr_arrow_elim; try apply H0; auto.
+    eapply tr_eqtype_convert; try apply unfold_pw; auto.
+  - eapply tr_compute; last 2 [ apply (equiv_symm _ (app (app (lam (lam x)) v) lv)) ]; try (apply equiv_refl).
+     eapply equiv_trans.
+     apply equiv_app; [ apply reduce_equiv;
+                        apply reduce_app_beta; try apply reduce_id | ..]; apply equiv_refl.
+     replace (subst1 v (lam x)) with (lam (subst (under 1 (dot v id)) x)).
+     2: { simpsub_bigs. auto. }
+     apply reduce_equiv.
+    apply reduce_app_beta; try apply reduce_id; try apply equiv_refl.
+  - eapply (tr_arrow_elim _ (fut nattp)); auto.
+    (eapply (tr_karrow_elim _ (fut preworld))); auto.
 Qed.
 
     (*Lemma reduce_consb1_help {G m n p a b c A}: tr G (deq m bfalse booltp) ->

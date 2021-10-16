@@ -111,6 +111,8 @@ Lemma ref_type1 G w1 i A:
                  (fut A) ))) U0).
 Admitted.
 
+Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
+
 Theorem two: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -128,6 +130,10 @@ Theorem two: forall G e T ebar,
                    (subst1 (prev ((var 0)))
                       (subst1 (prev ((var 2)))
                               (fut (trans_type ((var 0)) ((var 1)) A)))))) as x.
+       assert (x = lam
+    (lam (fut (trans_type (prev (var 1)) (prev (var 0)) A)))) as Heq1x. subst x.
+       unfold subst1. rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type.
+               do 2 simpsubs. auto. 
          remember (cons_b ((var 3)) ((var 2)) x) as u1. (*u1 = u::A*)
          remember (ppair u1 (nsucc (var 2))) as U1.
         - (*u1 : preworld*)
@@ -137,7 +143,6 @@ Theorem two: forall G e T ebar,
          subst x. move =>>. apply tr_karrow_intro; try assumption; auto.
          simpsub_big_T.
          apply tr_arrow_intro; try assumption; auto.
-         apply tr_univ_formation; auto.
          simpsub_big_T. change (univ nzero) with (@ subst1 obj (prev (var 0)) (univ nzero)).
          apply (tr_fut_elim _ _ _ nattp). var_solv. inv_subst. var_solv. auto.
          change (univ nzero) with (@ subst1 obj (prev (var 2)) (univ nzero)).
@@ -176,7 +181,6 @@ Theorem two: forall G e T ebar,
       subst u1. unfold store. apply tr_all_intro; auto. simpsub_bigs.
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
       (*ltac for showing (sh 2 U1) to be a world in context grown by 2*)
-      Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
       Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append.
       apply world_pair. u1_pw2. apply Hu1. apply nsucc_nat; var_solv.
       2: { unfold gettype. simpsub_bigs. apply tr_pi_intro; auto.
@@ -291,10 +295,10 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              subst. do 2 (apply equiv_app; try apply equiv_refl). apply reduce_equiv.
              apply reduce_bite_beta2; apply reduce_id.
              assert (equiv T0 T1) as Heq1.
-             subst. rewrite ! subst_lam. apply equiv_app; try apply equiv_refl.
-             apply reduce_equiv. apply reduce_app_beta;
-               [unfold subst1; rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type;
-               do 2 simpsubs; rewrite subst_trans_type; auto | ..]; apply reduce_id.
+             subst. rewrite Heq1x. apply equiv_app; try apply equiv_refl.
+             apply reduce_equiv. rewrite subst_lam.
+             apply reduce_app_beta; [simpsub_bigs; rewrite subst_trans_type; auto | ..];
+               apply reduce_id.
              unfold subst1 in HeqT1.
              rewrite subst_lam subst_fut subst1_under_trans_type in HeqT1.
              simpsubin_bigs HeqT1.
@@ -404,6 +408,56 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                    constructor; auto.
                    (*(U1 v lv)[l] = |> tau @ <v, lv> *)
                    subst u1. simpsub_bigs.
+                   rewrite Heq1x. simpsub_type; auto. 
+                   eapply tr_eqtype_transitivity.
+                   -(*(U1 v lv)[l] = subst1 subst1 x*)
+                     eapply tr_formation_weaken.
+                     apply reduce_consb_end; try var_solv; try
+                                                             (constructor ; var_solv); auto.
+                     rewrite - Heq1x. apply Hx.
+                     unfold subst1. rewrite ! subst_fut ! fold_subst1
+                                            subst1_under_trans_type subst1_trans_type.
+                     simpsub.
+                     eapply tr_compute.
+                     (*next prev -> now *)
+                     eapply equiv_eqtype; first by (apply equiv_fut; apply trans_type_equiv;
+                     (apply reduce_equiv; apply reduce_prev_beta; apply reduce_id)).
+                     apply equiv_refl.
+                     apply equiv_refl.
+                     apply equiv_refl.
+                     constructor. weaken trans_type_works; auto.
+                     simpl. auto.
+
+
+
+
+
+
+
+
+
+
+
+
+                     simpsub_bigs.
+replace 
+                (subst 
+                   (dot (prev (var 1))
+                      (dot (prev (var 0))
+                         (dot (var 0) (dot (var 1) (sh 4)))))
+                   (trans_type (var 0) (var 1) A)) with
+                  (subst1 (prev (var 0))
+                     (subst1 (prev (var 2))
+                             (trans_type (var 0) (var 1) A))).
+2: {
+simpsub_bigs 
+}
+
+                     simpsubin_bigs Hx.
+                     simpsub.
+                     apply Hx.
+                     constructor. var_solv.
+
                    eapply tr_compute.
                    {   (*start here move this out.*)
   apply equiv_eqtype.

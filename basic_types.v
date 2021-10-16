@@ -44,6 +44,9 @@ Lemma nat_U0: forall G,
 Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
 
-Hint Resolve nat_type nat_U0 zero_typed leq_refl leq_type lt_type.
+Lemma U0_type: forall G,
+    tr G (deqtype U0 U0). Admitted.
+
+Hint Resolve nat_type nat_U0 zero_typed leq_refl leq_type lt_type U0_type.
 
 
