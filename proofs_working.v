@@ -426,9 +426,54 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                      apply equiv_refl.
                      apply equiv_refl.
                      constructor. weaken trans_type_works; auto.
-                     simpl. auto.
-
-
+                     simpl. auto. }
+  assert (forall A G w1 l1,
+      (tr G (oof (ppair w1 l1) world)) ->
+      (tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & G] (oof A U0)) ->
+      tr ((hyp_tm nattp) :: G) (oof
+(prod (lt_t (var 0) (shift 1 l1))
+          (all nzero preworld
+             (pi nattp
+                (eqtype
+                   (app
+                      (app
+                         (app (subst (sh 3) w1) (var 2))
+                         (next (var 1))) 
+                      (next (var 0)))
+                   (fut A))))) U0)) as ref0_type.
+                 shelve.
+                   change (nsucc (var 3)) with (@shift obj 1 (nsucc (var 2))).
+                   weaken ref0_type; auto. apply trans_type_works; auto.
+}
+(*bind ref*) 
+replace 
+          (sigma nattp
+             (prod (lt_t (var 0) (var 1))
+                (all nzero preworld
+                   (pi nattp
+                      (eqtype
+                         (app
+                            (app
+                               (app
+                                 (subst (sh 4) u1)
+                                 (var 2))
+                               (next (var 1)))
+                            (next (var 0)))
+                         (fut
+                            (trans_type 
+                               (var 1) 
+                               (var 0) A))))))) with
+    (trans_type (shift 1 u1) (var 0) (reftp_m A)).
+      2: {
+simpl. simpsub_bigs. auto.
+      }
+      weaken compm5_type; auto; try apply trans_type_works; apply world_pair; try var_solv;
+      rewrite - (subst_pw sh1) ! subst_sh_shift;
+      apply tr_weakening_append1; auto.
+  }
+                 match goal with |- tr ?G (deqtype ?T ?T) =>
+                                 change ?T with
+                     trans_type ()
 
 
 
