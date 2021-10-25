@@ -98,7 +98,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
 (*making a product value out of the variables in a source context
  assume vars to start at 0*)
  Definition gamma_at (G: source.context ):= foldri (fun pair => fun acc => match pair with (i, A) =>
-                                                                   @ppair False (var i) acc end) triv G.
+                                                                   @ppair obj (var i) acc end) triv G.
 
 
 

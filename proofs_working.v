@@ -100,7 +100,7 @@ Goal (@ subst1 obj nattp (var 0)) = nattp.
   unfold subst1. simpl (subst (dot ?x1 ?s) ?x2). cbn - [ nattp].
   cbn [traverse]. *)
 
-Lemma ref_type1 G w1 i A:
+Lemma ref1_type G w1 i A:
   tr G (oof w1 preworld) -> tr G (oof A U0) ->
   tr G (oof i nattp) ->
       tr G (oof (all nzero preworld
@@ -112,6 +112,100 @@ Lemma ref_type1 G w1 i A:
 Admitted.
 
 Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
+
+Theorem two: forall G e T ebar,
+    trans G e T ebar ->
+    tr [::] (oof ebar
+                (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
+                                                     (trans_type (var 1) (var 0) T))))
+           ).
+  Admitted.
+
+Lemma size_Gamma_at: forall w l G,
+    size (Gamma_at_ctx G w l) = size G. Admitted.
+
+Lemma shift_trans_type : forall w l A s ,
+    (shift s (trans_type w l A)) = (trans_type                                 
+                                            (shift s w)
+                                            (shift s l) A).
+  intros.
+  rewrite - ! subst_sh_shift. change (sh s) with (@under obj 0 (sh s)).
+  apply sh_under_trans_type.
+ Qed.
+
+Theorem one: forall G e A ebar w1 l1,
+    of_m G e A ->
+    tr [::] (oof (ppair w1 l1) world) ->
+    trans G e A ebar -> 
+    tr (Gamma_at_ctx G w1 l1) (oof (app (app (shift (size G) ebar)
+                                             (shift (size G) l1))
+                                        (gamma_at G))
+                                     (trans_type (shift (size G) w1) (shift (size G) l1) A)).
+  move => G e A ebar w1 l1 He Hwl Htrans.
+  eapply (tr_arrow_elim _ (Gamma_at G (shift (size G) w1) (shift (size G) l1))).
+  apply Gamma_at_type.
+  rewrite - ! subst_sh_shift - subst_ppair - (subst_world (sh (size G))) - (size_Gamma_at w1 l1) ! subst_sh_shift - {1} (cats0 (Gamma_at_ctx G w1 l1)).
+  apply (tr_weakening_append [::]).
+  auto.
+  rewrite - (cats0 (Gamma_at_ctx G w1 l1)) - (size_Gamma_at w1 l1) - shift_trans_type.
+  apply (tr_weakening_appendt [::]).
+  weaken trans_type_works; auto.
+  match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (subst1 (shift (size G) l1) (arrow
+          (Gamma_at G
+             (shift 
+                (size G + 1) w1) (var 0))
+          (trans_type
+             (shift 
+                (size G + 1) w1)
+             (var 0) A))) end.
+  2: {
+    simpsub_bigs.
+    rewrite subst1_Gamma_at fold_subst1 subst1_trans_type.
+    simpsub_big.
+    replace (size G + 1) with ((size G).+1). 
+    rewrite compose_sh_dot.
+    simpsub_bigs.
+    rewrite plusE.
+    replace (size G + 0) with (size G).
+    auto.
+    rewrite addn0. auto.
+    rewrite addn1. auto.
+  }
+  apply (tr_pi_elim _ nattp).
+  match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+      (subst1 (shift (size G) w1)
+       (pi nattp
+          (arrow (Gamma_at G (var 1) (var 0))
+                 (trans_type (var 1) (var 0) A)))) end.
+  2: {
+    unfold subst1. rewrite subst_pi subst_arrow.
+    rewrite subst1_under_Gamma_at subst1_under_trans_type.
+    simpsub_big.
+    rewrite plusE. auto.
+  }
+  eapply (tr_all_elim _ nzero preworld). 
+  match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+      (shift (size G) T) end. 
+  2: {
+    rewrite - subst_sh_shift subst_all subst_pi subst_arrow under_sum.
+    rewrite sh_under_Gamma_at sh_under_trans_type.
+    simpsub_bigs. auto.
+  }
+  rewrite - (cats0 (Gamma_at_ctx G w1 l1)) - (size_Gamma_at w1 l1).
+  apply tr_weakening_append. eapply two. apply Htrans. 
+  + rewrite - (cats0 (Gamma_at_ctx G w1 l1))  - (subst_pw (sh (size G)))
+  - (size_Gamma_at w1 l1) subst_sh_shift.
+  apply tr_weakening_append. eapply split_world1. apply Hwl.
+  change (var 1) with (@shift obj 1 (var 0)).
+  apply trans_type_works1. var_solv.
+  + rewrite - (cats0 (Gamma_at_ctx G w1 l1))  - (subst_nat (sh (size G)))
+  - (size_Gamma_at w1 l1) subst_sh_shift.
+  apply tr_weakening_append. eapply split_world2. apply Hwl.
+  change (var 1) with (@shift obj 1 (var 0)).
+  apply trans_type_works1. var_solv.
+ 
+ 
 
 Theorem two: forall G e T ebar,
     trans G e T ebar ->
@@ -471,142 +565,7 @@ simpl. simpsub_bigs. auto.
       rewrite - (subst_pw sh1) ! subst_sh_shift;
       apply tr_weakening_append1; auto.
   }
-                 match goal with |- tr ?G (deqtype ?T ?T) =>
-                                 change ?T with
-                     trans_type ()
-
-
-
-
-
-
-
-
-
-
-                     simpsub_bigs.
-replace 
-                (subst 
-                   (dot (prev (var 1))
-                      (dot (prev (var 0))
-                         (dot (var 0) (dot (var 1) (sh 4)))))
-                   (trans_type (var 0) (var 1) A)) with
-                  (subst1 (prev (var 0))
-                     (subst1 (prev (var 2))
-                             (trans_type (var 0) (var 1) A))).
-2: {
-simpsub_bigs 
-}
-
-                     simpsubin_bigs Hx.
-                     simpsub.
-                     apply Hx.
-                     constructor. var_solv.
-
-                   eapply tr_compute.
-                   {   (*start here move this out.*)
-  apply equiv_eqtype.
-  eapply equiv_trans.
-  apply reduce_consb. apply equiv_app. apply equiv_app.
-  apply equiv_bite. eapply ltb_false.
-  apply equiv_refl.
-                     }
-                   do 2 (apply equiv_refl).
-                   apply equiv_refl. (*start here clean this up*)
-                   match goal with tr ?G (deq triv triv ?T) =>
-                                   assert (equiv T
-       (eqtype
-          (app (app (bite (ltb_app (var 4) (var 4)) (app (var 5) (var 4))
-                          (subst (sh 2) x)) v) lv).
-                       (next (obj 0)))
-          (fut (trans_type (obj 1) (obj 0) A))))
-                                          )
-
-
-
-                   unfold cons_b.
-                 }
-
-
-                 subst. unfold subst1.
-                 rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type.
-                 simpsub_bigs.
-                 constructor. var_solv. simpsub_bigs.
-                 rewrite ! subst_trans_type; auto.
-                 apply tr_prod_intro. weaken lt_type. var_solv.
-                 apply nsucc_nat; var_solv. (*typing goal*)
-                 match goal with |- tr ?G (deqtype ?T ?T) => replace T with
-       (shift 2 (all nzero preworld
-          (pi nattp
-             (eqtype
-                (app
-                   (app
-                      (app
-                         (cons_b (var 3) 
-                            (var 2)
-                            (lam
-                               (lam
-                                  (fut
-                                   (trans_type
-                                   (prev (var 1))
-                                   (prev (var 0)) A)))))
-                         (var 2)) 
-                      (next (var 1)))
-                   (next (var 0)))
-                (fut
-                   (trans_type (var 1) (var 0) A)))))) end.
-                 2: {
-                   simpsub_bigs. rewrite ! subst_trans_type; auto.
-                 }
-                 eapply (tr_formation_weaken _ nzero).
-                 rewrite make_app2 - (subst_U0 (sh 2)) subst_sh_shift.
-                 apply tr_weakening_append.
-                 replace (cons_b (var 3) (var 2)
-                            (lam
-                               (lam
-                                  (fut
-                                   (trans_type
-                                   (prev (var 1))
-                                   (prev (var 0)) A))))) with
-                     (subst (sh 2) (cons_b (var 1) (var 0)
-                            (lam
-                               (lam
-                                  (fut
-                                   (trans_type
-                                   (prev (var 1))
-                                   (prev (var 0)) A)))))). sh_var 2 2.
-                 rewrite - subst_sh_shift.
-                 eapply ref_type1. apply consb_typed; try var_solv.
-                 unfold subst1 in Hx. rewrite ! subst_fut ! fold_subst1
-                                              ! subst1_trans_type in Hx.
-                 do 2 simpsubin Hx.
-                 apply Hx.
-                 apply trans_type_works; auto. var_solv. simpsub_bigs.
-                 rewrite subst_trans_type; auto.
-                 (*2 < succ 2 *)
-
-                 2: { apply trans_ty
-
-                 }
-
-                 eapply ref_type1.
-                 assumption.
-                 subst. unfold subst1.
-                 change (dot (var 0)
-                         (dot (var 1)
-                            (dot (var 4)
-                               (dot 
-                                  (nsucc (var 4))
-                                  (sh 2))))) with
-                     (under )
-
-rewrite ! subst_fut ! fold_subst1 ! subst1_trans_type.
-                ! sh_under_trans_type. do 2 simpsubs.
-
-
-                 weaken ref_type1.
-
-                 1: { apply comp_front.
+{ apply comp_front.
     simpsub. rewrite subst_bind.
     simpsub_big. simpl.
     eapply (bind_type _
@@ -1047,7 +1006,7 @@ var_solv. eapply tr_formation_weaken; apply compm0_type.
 match goal with |- tr (?y::(?x::?G')) (oof ?M world) =>                 
            (change M with
                 (@subst
-                   False (sh 2) (ppair (var 1) (ppi1 (var 0)))
+                   obj (sh 2) (ppair (var 1) (ppi1 (var 0)))
            ); change (y::x::G') with ([:: y; x] ++ G'))
 end.
 rewrite - (subst_world (sh 2)) ! subst_sh_shift. apply tr_weakening_append; auto.
@@ -1089,7 +1048,7 @@ comptype.
 match goal with |- tr (?x::?G') (oof ?M world) =>                 
            (change M with
                 (@subst
-                   False (sh 1) (ppair (var 1) (ppi1 (var 0)))
+                   obj (sh 1) (ppair (var 1) (ppi1 (var 0)))
            ); change (x::G') with ([:: x] ++ G'))
 end.
 rewrite - (subst_world (sh 1)) ! subst_sh_shift. apply tr_weakening_append; auto. rewrite ! subst_trans_type; auto. apply trans_type_works; auto.
@@ -1100,13 +1059,9 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
       change (dot (var 0) (dot (var 2) sh1))  with (@ under obj 1 (dot (var 1) id)). rewrite ! subst1_under_trans_type; auto. simpsub. simpl.
       apply tr_sigma_intro; auto.
 - simpsub_big. simpl. apply tr_prod_intro.
-  * constructor. apply subseq_type; auto. apply store_type; auto.
-    fold (@ subst1 obj (ppi1 (var 0))).
-    rewrite subst1_trans_type. simpsub_big. simpl.
-    eapply tr_formation_weaken. apply trans_type_works. auto.
-    + apply tr_prod_intro. apply subseq_type; auto. apply store_type; auto.
-eapply (subseq_trans (picomp2 (var 0)) (picomp2 (var 3))
-                          _ (ppair (var 4) (
+  + apply tr_prod_intro.
+    eapply (subseq_trans (picomp2 (var 0)) (picomp2 (var 3))
+                         _ (ppair (var 4) (
                                      ppi1 (var 3)))); auto.
 sh_var 3 9.
 rewrite - ! subst_sh_shift.
@@ -1122,10 +1077,5 @@ intros.
 sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
 weaken compm4_type; auto. apply trans_type_works; auto.
 }
+Admitted.
 
-Theorem onef: forall G e T ebar w1 l1,
-    of_m G e T ->
-    tr [::] (oof (ppair w1 l1) world) ->
-    trans G e ebar -> 
-    tr (Gamma_at_ctx G w1 l1) (oof (app (app ebar l1) 
-              (arrow (Gamma_at G w1 l1) (trans_type w1 l1 T))).
