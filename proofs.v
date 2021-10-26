@@ -448,6 +448,11 @@ Lemma subst_move_gamma :forall g m s G,
 Hint Rewrite subst_move_gamma: subst1.
 
 
+(*make a target context out of a source context*)
+ Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
+   mapi (fun pair =>
+           match pair with (i, A) => 
+           hyp_tm (trans_type (shift (size G - 1 - i) w) (shift (size G - 1 - i) l) A) end) G.
 
 
  Lemma Gamma_at_type {D G w l}:
@@ -469,14 +474,24 @@ tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
   (*show that the product type is wellformed *)
 Qed.
 
+(*making a product value out of the variables in a source context
+ assume vars to start at 0*)
+Definition gamma_at (G: source.context ):= foldr (fun acc => fun term => @ppair obj acc term)
+                                                 triv
+                                                  (mkseq (fun i => (var i)) (size G)).
 
-
- Lemma sh_under_Gamma_at: forall G w l s n, 
+Lemma sh_under_Gamma_at: forall G w l s n,
     (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
                                                 (subst (under n (sh s)) l)).
    intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
    rewrite sh_under_trans_type IHG. auto. Qed.
 
+
+Lemma sh_Gamma_at: forall G w l s,
+    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
+                                                (subst (sh s) l)). intros.
+  change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
+Qed.
 
  Lemma subst1_Gamma_at: forall G w l s, 
     (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
@@ -491,6 +506,89 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   intros. induction G. simpl; auto.
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
+
+
+
+Lemma map_iota {T} : forall n l (f: nat -> T), map f (iota n l) =
+                         map (fun i => f (i - 1)) (iota (n+1) l).
+  Admitted.
+
+Lemma subst_itprod : forall n s, foldr (fun acc => fun term => @ppair obj acc term)
+                                                 triv
+                                                 (mkseq (fun i => shift s (var i)) n) =
+shift s (foldr (fun acc => fun term => @ppair obj acc term)
+                                                 triv
+                                                 (mkseq (fun i => (var i)) n)).
+Admitted.
+
+
+Lemma gamma_at_rec {a G}: (gamma_at (a:: G)) =
+                          ppair (var 0) (shift 1 (gamma_at G)).
+  unfold gamma_at. simpl. rewrite - subst_itprod.
+  unfold mkseq. rewrite (map_iota 0).
+  suffices: {in (iota 1 (size G)),  (fun i => shift 1 (var (i - 1))) =1 (fun i => @var obj i)}.
+  intros Hfn.
+  apply eq_in_map in Hfn.
+  rewrite Hfn.
+  auto.
+  intros i Hi. rewrite mem_iota in Hi.
+  induction i.
+  discriminate Hi.
+  simpsub_bigs. rewrite subn1. simpl. auto.
+Qed.
+
+Lemma Gamma_at_ctx_rec {a G w l}: behead (Gamma_at_ctx (a:: G) w l ) =
+                                  (Gamma_at_ctx G w l).
+  simpl. change (iota 1) with (iota (0 + 1)). rewrite - (map_iota 0).
+
+
+Lemma gamma_at_typed {G w l} :
+  tr [::] (oof (ppair w l) world) ->
+  tr (Gamma_at_ctx G w l) (deq (gamma_at G) (gamma_at G)
+       (Gamma_at G (shift (size G) w)
+                 (shift (size G) l))).
+  intros. induction G.
+  - simpl. unfold mapi. unfold gamma_at. simpl.
+    constructor.
+  - rewrite gamma_at_rec.
+    apply Gamma_at_intro.
+  - 
+    rewrite - ! subst_sh_shift - subst_ppair - (subst_world (sh (size (a::G)))) ! subst_sh_shift
+    - (cats0 (Gamma_at_ctx (a:: G) w l)).
+    replace (size (a::G)) with (size (Gamma_at_ctx (a:: G) w l)).
+    apply tr_weakening_append. auto.
+    shelve.
+  - Opaque Gamma_at_ctx. simpl.
+    rewrite - ! subst_sh_shift - sh_Gamma_at - (addn1 (size G)) addnC - sh_sum.
+    Transparent Gamma_at_ctx. unfold Gamma_at_ctx. unfold mapi.
+    simpl.
+    rewrite - sh_sum.
+    rewrite - (sh_sum 1 (size G) (Gamma_at G w l)).
+    - sh_sum.
+    .
+
+    unfold Gamma_at_ctx. unfold mapi. simpl.
+    rewrite subn0 subn1. simpl.
+    
+
+
+    Search (?n = ?n.+1 - 1).
+
+1 subgoal (ID 189)
+  
+  G : source.context
+  e, A : source.term
+  ebar, w1, l1 : term obj
+  He : of_m G e A
+  Hwl : tr [::] (oof (ppair w1 l1) world)
+  Htrans : trans G e A ebar
+  ============================
+  tr (Gamma_at_ctx G w1 l1)
+    (deq (gamma_at G) (gamma_at G)
+       (Gamma_at G (shift (size G) w1)
+          (shift (size G) l1)))
+
+
 
 
 
@@ -648,11 +746,6 @@ Lemma subst_consb w l x s: @ subst obj s (cons_b w l x) =
                            cons_b (subst s w) (subst s l) (subst s x).
   unfold cons_b. simpsub_big. auto. Qed.
 
-Lemma sh_Gamma_at: forall G w l s,
-    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
-                                                (subst (sh s) l)). intros.
-  change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
-Qed.
 
 Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
 

@@ -89,16 +89,8 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
    | A::xs => (prod (trans_type w l A) (Gamma_at xs w l)) end
  .
 
-(*make a target context out of a source context*)
- Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
-   mapi (fun pair =>
-           match pair with (i, A) => 
-           hyp_tm (trans_type (shift i w) (shift i l) A) end) G.
 
-(*making a product value out of the variables in a source context
- assume vars to start at 0*)
- Definition gamma_at (G: source.context ):= foldri (fun pair => fun acc => match pair with (i, A) =>
-                                                                   @ppair obj (var i) acc end) triv G.
+
 
 
 

@@ -9,20 +9,20 @@ From istari Require Import Sigma Tactics
 Lemma eqsub_project : forall s s',
   (forall i,
       subst s (var i) = subst s' (var i)) ->
-    @eqsub False s s'
+    @eqsub obj s s'
 .
   Admitted. 
 
 Lemma size_substctx :
-  forall s G, size (@substctx False s G) = size G.
+  forall s G, size (@substctx obj s G) = size G.
 Proof.
-  intros. move: (length_substctx False s G). apply.
+  intros. move: (length_substctx obj s G). apply.
 Qed.
 
 Hint Rewrite size_substctx.
 
 Lemma substctx_app: forall G1 G2 s,
-    @substctx False s (G1 ++ G2) = (substctx (under (size G2) s) G1) ++ (substctx s G2).
+    @substctx obj s (G1 ++ G2) = (substctx (under (size G2) s) G1) ++ (substctx s G2).
   intros. induction G1; simpsub. repeat rewrite cat0s. auto.
   simpl. simpsub. repeat rewrite plusE.
   replace ((length G1) + (size G2)) with (size (G1 ++ G2)).
@@ -30,27 +30,27 @@ Lemma substctx_app: forall G1 G2 s,
   rewrite size_cat. auto. Qed.
 
 Lemma substctx_rcons: forall G1 g s,
-    @substctx False s (rcons G1 g) = rcons (substctx (under 1 s) G1) (substh s g).
+    @substctx obj s (rcons G1 g) = rcons (substctx (under 1 s) G1) (substh s g).
   intros. repeat rewrite - cats1. rewrite substctx_app. simpl. auto. Qed.
 
-Lemma substctx_eqsub {s s': @sub False} {G: context}
+Lemma substctx_eqsub {s s': @sub obj} {G: context}
 : eqsub s s'
     -> substctx s G = substctx s' G. Admitted.
 
 Lemma project_dot_geq :
   forall t s i, i > 0 ->
-           project (dot t s) i = @project False s (i - 1).
+           project (dot t s) i = @project obj s (i - 1).
   Admitted.
 
 Lemma sh_sum :
   forall m n t,
-    @subst False (sh n) (subst (sh m) t) = @subst False (sh (n+m)) t.
+    @subst obj (sh n) (subst (sh m) t) = @subst obj (sh (n+m)) t.
   intros. repeat rewrite subst_sh_shift.
   rewrite shift_sum. auto. Qed.
 
 Lemma shh_sum :
   forall m n t,
-    @substh False (sh n) (substh (sh m) t) = @substh False (sh (n+m)) t.
+    @substh obj (sh n) (substh (sh m) t) = @substh obj (sh (n+m)) t.
 Admitted.
 
 (*substitutions for moving variables around in context*)
@@ -58,13 +58,13 @@ Admitted.
 Fixpoint gen_sub_mvl G := match G with
                         0 => id
                           | n'.+1 =>
-@compose False (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl n')
+@compose obj (under n' (dot (var 1) (dot (var 0) (sh 2)))) (gen_sub_mvl n')
                                     end.
 
 (*move new to old*)
 Fixpoint gen_sub_mvr E := match E with
                         0 => id
-    | n'.+1 => @compose False (gen_sub_mvr n')
+    | n'.+1 => @compose obj (gen_sub_mvr n')
 (under n' (dot (var 1) (dot (var 0) (sh 2))))
                           end.
 
