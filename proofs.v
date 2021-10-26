@@ -448,12 +448,12 @@ Lemma subst_move_gamma :forall g m s G,
 Hint Rewrite subst_move_gamma: subst1.
 
 
-(*make a target context out of a source context*)
- Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
-   mapi (fun pair =>
-           match pair with (i, A) => 
-           hyp_tm (trans_type (shift (size G - 1 - i) w) (shift (size G - 1 - i) l) A) end) G.
-
+Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
+  match G with
+    [::] => [::]
+  | A::rem => hyp_tm (trans_type (shift (size G - 1) w) (shift (size G - 1) l) A) ::
+                               (Gamma_at_ctx rem w l)
+                    end.
 
  Lemma Gamma_at_type {D G w l}:
    tr D (oof (ppair w l) world) ->
@@ -476,9 +476,11 @@ Qed.
 
 (*making a product value out of the variables in a source context
  assume vars to start at 0*)
-Definition gamma_at (G: source.context ):= foldr (fun acc => fun term => @ppair obj acc term)
-                                                 triv
-                                                  (mkseq (fun i => (var i)) (size G)).
+Fixpoint gamma_at (G: source.context ):= match G with
+                                             [::] => triv
+                                           | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
+
+
 
 Lemma sh_under_Gamma_at: forall G w l s n,
     (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
@@ -507,7 +509,7 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
-
+(*
 
 Lemma map_iota {T} : forall n l (f: nat -> T), map f (iota n l) =
                          map (fun i => f (i - 1)) (iota (n+1) l).
@@ -535,11 +537,13 @@ Lemma gamma_at_rec {a G}: (gamma_at (a:: G)) =
   induction i.
   discriminate Hi.
   simpsub_bigs. rewrite subn1. simpl. auto.
-Qed.
+Qed.*)
 
-Lemma Gamma_at_ctx_rec {a G w l}: behead (Gamma_at_ctx (a:: G) w l ) =
-                                  (Gamma_at_ctx G w l).
-  simpl. change (iota 1) with (iota (0 + 1)). rewrite - (map_iota 0).
+
+Lemma size_Gamma_at_ctx {G w l} : (size G) = (size (Gamma_at_ctx G w l)).
+    induction G.
+    simpl. auto.
+    simpl. rewrite IHG. auto. Qed. 
 
 
 Lemma gamma_at_typed {G w l} :
@@ -550,45 +554,23 @@ Lemma gamma_at_typed {G w l} :
   intros. induction G.
   - simpl. unfold mapi. unfold gamma_at. simpl.
     constructor.
-  - rewrite gamma_at_rec.
+  - Opaque Gamma_at_ctx. simpl. 
     apply Gamma_at_intro.
   - 
-    rewrite - ! subst_sh_shift - subst_ppair - (subst_world (sh (size (a::G)))) ! subst_sh_shift
+    rewrite - ! subst_sh_shift - subst_ppair - (subst_world (sh (size G).+1)) ! subst_sh_shift
     - (cats0 (Gamma_at_ctx (a:: G) w l)).
-    replace (size (a::G)) with (size (Gamma_at_ctx (a:: G) w l)).
+    replace (size G).+1 with (size (Gamma_at_ctx (a:: G) w l)).
     apply tr_weakening_append. auto.
-    shelve.
-  - Opaque Gamma_at_ctx. simpl.
-    rewrite - ! subst_sh_shift - sh_Gamma_at - (addn1 (size G)) addnC - sh_sum.
-    Transparent Gamma_at_ctx. unfold Gamma_at_ctx. unfold mapi.
-    simpl.
-    rewrite - sh_sum.
-    rewrite - (sh_sum 1 (size G) (Gamma_at G w l)).
-    - sh_sum.
-    .
-
-    unfold Gamma_at_ctx. unfold mapi. simpl.
-    rewrite subn0 subn1. simpl.
-    
-
-
-    Search (?n = ?n.+1 - 1).
-
-1 subgoal (ID 189)
-  
-  G : source.context
-  e, A : source.term
-  ebar, w1, l1 : term obj
-  He : of_m G e A
-  Hwl : tr [::] (oof (ppair w1 l1) world)
-  Htrans : trans G e A ebar
-  ============================
-  tr (Gamma_at_ctx G w1 l1)
-    (deq (gamma_at G) (gamma_at G)
-       (Gamma_at G (shift (size G) w1)
-          (shift (size G) l1)))
-
-
+    rewrite - size_Gamma_at_ctx. auto.
+  - simpl.
+    rewrite - ! subst_sh_shift - sh_Gamma_at - (addn1 (size G)) addnC - sh_sum ! subst_sh_shift.
+    Transparent Gamma_at_ctx. simpl.
+    apply tr_weakening_append1.
+    rewrite - subst_sh_shift sh_Gamma_at ! subst_sh_shift.
+    assumption.
+  - simpl. rewrite subn1. simpl. rewrite - addn1 addnC - ! subst_sh_shift - ! sh_sum
+                                 - ! sh_trans_type. var_solv0.
+Qed.
 
 
 
