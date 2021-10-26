@@ -203,8 +203,9 @@ Theorem one: forall G e A ebar w1 l1,
   - (size_Gamma_at w1 l1) subst_sh_shift.
   apply tr_weakening_append. eapply split_world2. apply Hwl.
   change (var 1) with (@shift obj 1 (var 0)).
-  apply trans_type_works1. var_solv.
- 
+  apply gamma_at_typed. auto.
+Qed.
+
  
 
 Theorem two: forall G e T ebar,

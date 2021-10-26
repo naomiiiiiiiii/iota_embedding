@@ -186,5 +186,59 @@ that. you want to bind
                                  ) 
                           )
                    ))))))).
-
-
+  | t_ref: forall G E Et A, 
+         of_m G (ref_m E) (comp_m (reftp_m A)) -> trans G E A Et ->
+         trans G (ref_m E) (comp_m (reftp_m A)) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
+         let l := var 2 in                                                        
+         let m1 := make_subseq in (*u <= u1)*)
+         let p1 := (ppair m1
+                         (lam (lam ( lam ( (*making a value of type store U1, lambdas go l2, m2, i*)
+                                         let l1 := var 7 in
+                                         let g := var 6 in
+                                         let l := var 5 in
+                                         let s := var 3 in
+                                         let l2 := var 2 in
+                                         let i := var 0 in
+                                         let x := app (app (shift 8 Et) l1) g in
+                                         let m12 := make_subseq in (*m2 o m1 : U <= U2*)
+                                         let m02 := make_subseq in (*m12 o m : W <= U2*)
+                                         bite (app (app lt_b i) l)
+                                              (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
+                                              (next (move_app A m02 x)) (*move x to be : |> A @ U2*)
+                                               ))
+                         ))
+         ) in
+             ret_a (ppair (nsucc l) (*length of new world*)
+                          (ppair p1 (*new word is accessible from current world, *)
+                                 (ppair l (ppair triv (lam triv)) (*ref A @ new world*)
+                                 ) 
+                          )
+                                                )))))))
+  | t_assign: forall G R Rt E Et A,
+      of_m G R (reftp_m A) ->
+      of_m G E A ->
+      trans G R A Rt ->
+      trans G E A Et ->
+      trans G (asgn_m R E)
+            (lam (lam (lam (lam ( lam ( (*l = 4, g = 3, l1 = 2, m = 1, s1 = 0*)
+                                      let m = var 1 in
+                                      let l1 = var 2 in
+                                      let s1 = var 0 in 
+                                      let ref =move_app (reftp_m A) m (app (app Rt l) g) in
+                                      let i = ppi1 ref in
+                                      let p = ppi2 ref in
+                                      let store_u1  = lam (lam (lam (*l2 = 2, m1 = 1,j = 0*)
+                                                                  (
+                                                                    let j = (var 0) in
+                                                                    let l2 = var 2 in
+                                                                    let i = shift 3 i in
+                                                                    bite
+                                                                      (eq_b j i)
+                                                                      (next (move_app A (make_subseq) (app (app Et) g)))
+                                                                      (app (app (app (shift 3 s1) l2) make_subseq) j)
+                                                                 ))) in
+                                      ret_a (ppair l1
+                                                   (ppair
+                                                      (ppair make_subseq store_u1)
+                                                      triv))
+                                            ))))))
