@@ -208,7 +208,14 @@ Qed.
 
  
 
-Theorem two: forall G e T ebar,
+Lemma subst_eqb s : subst s eq_b = eq_b.
+  intros. unfold eq_b. simpsub. auto. Qed.
+Hint Rewrite subst_eqb: core subst1.
+
+Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (app (app eq_b m) n) booltp). Admitted.
+
+Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
                 (all nzero preworld (pi nattp (arrow (Gamma_at G (var 1) (var 0))
@@ -216,6 +223,97 @@ Theorem two: forall G e T ebar,
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G e T ebar Dtrans. induction Dtrans; intros.
+  3: {
+    apply comp_front.
+    simpsub_bigs.  simpsub_bigs.
+    apply ret_type.
+    (*l1 = var 2 = pw*)
+    apply (tr_exist_intro _ nzero preworld _ (var 3)); auto.
+    var_solv.
+    simpsub_bigs. constructor; try var_solv. (*l1 : nat*)
+    simpsub_bigs.
+    apply tr_prod_intro.
+    - apply tr_prod_intro.
+      + (*U1 <= U1*)
+        apply sub_refl; auto.
+      + (*lam : store u1*)unfold store. apply tr_all_intro; auto. simpsub_bigs.
+        apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
+        apply world_pair; var_solv.
+        apply gettype_typed; try var_solv; auto.
+        unfold gettype.
+        simpsub_bigs. apply tr_pi_intro; auto.
+        (*case on whether index = i size u*)
+        remember 
+             (ppi1
+                (move_app (reftp_m A) 
+                   (var 5)
+                   (app
+                      (app (subst (sh 11) Rt)
+                         (var 9)) 
+                      (var 8)))) as i.
+        match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
+            (subst1 (app (app eq_b (var 0)) i)
+                    (
+                      bite (var 0)
+          (next
+             (move_app A make_subseq
+                (app
+                   (app (subst (sh 12) Et)
+                      (var 10)) 
+                   (var 5))))
+          (app
+             (app (app (var 4) (var 2))
+                  make_subseq) (var 0)))
+            );
+                                                          replace T with (
+                                                                        subst1 (app (app eq_b (var 0)) i)
+       (shift 1 (app (app (app (var 7) (var 0)) (next (var 3)))
+          (next (var 2))))) end. rewrite fold_substj.
+        eapply (tr_generalize _ booltp). apply eqapp_typed; try var_solv.
+    - (*i : nat*) subst.
+      eapply (tr_sigma_elim1 _ _
+            (prod (lt_t (var 0) (subst sh1 (var 6)))
+                (all nzero preworld (*wl1:= 2, i := 1, v := 0*)
+                      (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
+                      (
+            let w := (shift 3 (var 7)) in
+            let l1 := (shift 3 (var 6)) in
+            let i := (var 2) in
+            let v := (var 1) in
+            let lv := (var 0) in
+          eqtype (app (app (app w i) (next v)) (next lv))
+                 (fut (trans_type v lv A))
+                      )
+             )))).
+      match goal with |- (tr ?G (deq ?M ?M ?T)) => change T with
+          (trans_type (var 7) (var 6) (reftp_m A)) end.
+      apply (@moveapp_works _ _ (var 10) (var 9)); auto.
+      (*m : W <= U1*)
+      sh_var 6 10.
+      inv_subst. var_solv0.
+      change 
+       (subseq (ppair (var 10) (var 9))
+               (ppair (var 7) (var 6))) with
+          subst (sh 6) (subseq (ppair (var 10) (var 9))
+               (ppair (var 7) (var 6)))
+                        .
+
+                    )
+             
+
+
+      apply (tr_arrow_elim _ (subseq (ppair (var 7) (var 6)) (ppair (var 3) (var 2)))).
+             apply subseq_type; auto.
+             apply tr_pi_formation; auto.
+             apply pw_app_typed; try apply tr_fut_intro; try var_solv.
+             match goal with |- tr ?G' (deq ?M ?M ?T) => change T with
+                 (@ subst1 obj (var 2) (arrow (subseq (ppair (var 8) (var 7)) (ppair (var 4) (var 0)))
+                                           (pi nattp
+                                               (app (app (app (var 9) (var 0)) (next (var 5)))
+                                                    (next (var 1)))))) end.
+             apply (tr_pi_elim _ nattp); auto.
+
+  }
 (*ref case*)
   2: { apply comp_front. (*is a valid intro form for comp type*)
        simpsub_bigs. simpsubs.
