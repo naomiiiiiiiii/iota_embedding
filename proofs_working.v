@@ -108,8 +108,9 @@ Lemma ref1_type G w1 i A:
                ( let v := (var 1) in
             let lv := (var 0) in
           eqtype (app (app (app (subst (sh 2) w1) (subst (sh 2 ) i)) (next v)) (next lv))
-                 (fut A) ))) U0).
+                 (fut (shift 2 A)) ))) U0).
 Admitted.
+
 
 Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
 
@@ -354,12 +355,8 @@ Theorem two_working: forall G e T ebar,
              ))))) as Hp. subst p.
       eapply (tr_prod_elim2 _ (subst1 i (lt_t (var 0) (subst sh1 (var 6))))).
       inv_subst. subst i. eapply tr_sigma_elim2. apply Hru1.
-     )
-
-             ))
-      match goal with |- (tr ?G (deq ?M ?M ?T)) => change T with
-          (trans_type (var 7) (var 6) (reftp_m A)) end. apply Hru1.
-        suffices: tr G'' (deq
+      (*casing on i = j with lambda trick*)
+      suffices: tr G'' (deq
       (lam (bite (app (app eq_b (var 1)) i)
           (next
              (move_app A make_subseq
@@ -382,7 +379,7 @@ replace
        (next
           (move_app A make_subseq
              (app (app (subst (sh 11) Et) (var 9))
-                (var 4))))
+                (var 8))))
        (app
           (app (app (var 4) (var 2)) make_subseq)
           (var 0))) with
@@ -393,7 +390,7 @@ replace
                           (app
                              (app (subst (sh 12) Et)
                                 (var 10)) 
-                             (var 5))))
+                             (var 9))))
                     (app
                        (app (app (var 5) (var 3))
                           make_subseq) 
@@ -409,7 +406,7 @@ replace
                           (app
                              (app (subst (sh 12) Et)
                                 (var 10)) 
-                             (var 5))))
+                             (var 9))))
                     (app
                        (app (app (var 5) (var 3))
                           make_subseq) 
@@ -438,7 +435,7 @@ apply reduce_app_beta; apply reduce_id.
                 (app
                    (app (subst (sh 13) Et)
                       (var 11)) 
-                   (var 6))))
+                   (var 10))))
           (app
              (app (app (var 6) (var 4))
                   make_subseq) (var 2))))
@@ -475,7 +472,7 @@ apply reduce_app_beta; apply reduce_id.
        replace M with  (bite (var 1)
          (subst (under 1 sh1) (next
              (move_app A make_subseq
-                (app (app (subst (sh 12) Et) (var 10)) (var 5)))))
+                (app (app (subst (sh 12) Et) (var 10)) (var 9)))))
          (subst (under 1 sh1) (app (app (app (var 5) (var 3)) make_subseq)
                                    (var 1)))) end.
         2:{
@@ -496,13 +493,107 @@ apply reduce_app_beta; apply reduce_id.
         match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
             (subst (sh 1)
        (equal booltp btrue (app (app eq_b (var 0)) i))) end.
-        var_solv0. simpsub_bigs. auto.
+        var_solv0. simpsub_bigs. auto. 
         (*convert from u1 i u2 l2 to |>(A @ u2, l2)*)
         eapply (tr_eqtype_convert _ _ _
-                                  (trans_type (var 4) (var 3) A)).
-        apply tr_eqtype_symmetry. apply (tr_deqtype_intro _ _ _
-                                                          ppi2
+                                  (fut (trans_type (var 4) (var 3) A))).
+        simpsubin_bigs Hp.
+        apply tr_eqtype_symmetry. apply (deqtype_intro _ _ _
+                                                       (app (shift 1 p) (var 3))
+                                                       (app (shift 1 p) (var 3))
+                                        ).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (subst1 (var 3) (eqtype
+          (app
+             (app (app (var 9) (shift 2 i))
+                (next (var 5))) 
+             (next (var 0)))
+          (fut (trans_type (var 5) (var 0) A)))) end.
+        2:{
+          simpsub_bigs. rewrite fold_subst1 subst1_trans_type. simpsub_bigs. auto.
+        }
+        apply (tr_pi_elim _ nattp).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (subst1 (var 4) 
+       (pi nattp
+          (eqtype
+             (app
+                (app (app (var 10) (shift 3 i))
+                   (next (var 1)))
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A))))) end.
+        eapply (tr_all_elim _ nzero preworld).
+        move : Hp. simpl. simpsubs.
+        replace (dot (var 0)
+                         (dot (var 1)
+                              (dot (subst (sh 2) i) (sh 2)))) with
+            (under 2 (dot i id)).
+        2:{
+          simpsub_bigs. auto.
+        } rewrite subst1_under_trans_type. simpsub_bigs.
+        move => Hp. 
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (shift 1 
+       (all nzero preworld (pi nattp
+          (eqtype
+             (app
+                (app (app (var 9) (subst (sh 2) i))
+                   (next (var 1)))
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A)))))) end.
+        2: {
+          simpsub_bigs. auto.
+          replace (dot (var 0) (dot (var 1) (sh 3))) with
+              (@under obj 2 (sh 1)).
+          2:{
+            simpsubs. auto.
+          } rewrite sh_under_trans_type. auto. }
+        rewrite ! subst_sh_shift. apply tr_weakening_append1.
+        rewrite - subst_sh_shift. assumption.
+        subst; var_solv.
+sh_var 1 10. replace (shift 3 i) with (shift 1 (shift 2 i)).
+weaken ref2_type; try (subst; var_solv).
+rewrite - (subst_nat (sh 2)) subst_sh_shift. apply tr_weakening_append2. assumption.
+simpsub_bigs. auto.
+simpsub_bigs. auto.
+replace (dot (var 0) (dot (var 5) sh1)) with (@under obj 1 (dot (var 4) id)).
+2:{
+simpsub. auto.
+} 
+rewrite subst1_under_trans_type. simpsub_bigs. auto.
+subst; var_solv.
+(*show move (Et @ u l) : A @ U2*)
+subst.
 
+
+
+
+match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (shift 1 
+       (all nzero preworld (pi nattp
+          (eqtype
+             (app
+                (app (app (var 8) (shift 1 i))
+                   (next (var 4)))
+                (next (var 0)))
+             (fut (trans_type (var 4) (var 0) A)))))) end.
+apply tr_fut_formation_univ. apply trans_type_works. simpsub_bigs. auto.
+
+Admitted.
+
+        (all nzero preworld
+          (pi nattp
+             (eqtype
+                (app
+                   (app (app (var 10) (shift 3 i))
+                      (next (var 1))) (next (var 0)))
+                (trans_type (var 1) (var 0) A)))))
+
+
+        
+end.
+
+end.
 
         eapply (tr_formation_weaken _ nzero).
 

@@ -339,6 +339,16 @@ hyp_tm preworld
     Hint Resolve picomp1_works picomp2_works1 picomp2_works2 picomp3_works picomp4_works
       picomp_world.
 
+Lemma ref2_type: (forall G w1 v i A,
+  tr G (oof w1 preworld) -> 
+  tr G (oof i nattp) ->
+  tr G (oof v preworld) ->
+      tr G (oof (pi nattp 
+               ( let lv := (var 0) in
+                 eqtype (app (app (app (shift 1 w1) (shift 1 i))
+                                  (next (shift 1 v)))
+                                  (next lv))
+                        (fut (trans_type (shift 1 v) (var 0) A)))) U0)). Admitted.
 
   Lemma trans_type_works : forall w l A G,
       (tr G (oof (ppair w l) world)) ->

@@ -224,10 +224,11 @@ that. you want to bind
                                                                     let l2 := var 2 in
                                                                     let i := shift 3 i in
                                                                     let l := shift 3 l in
+                                                                    let g := shift 3 g in
                                                                     bite
                                                                       (app (app eq_b j) i)
                                                                       (next (move_app A (make_subseq)
-                                                                                      (app (app (shift 8 Et) l) g)))
+                                                                    (app (app (shift 8 Et) l) g)))
                                                                       (app (app (app (shift 3 s1) l2) make_subseq) j)
                                                                  ))) in
                                       ret_a (ppair l1
