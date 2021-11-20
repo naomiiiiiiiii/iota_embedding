@@ -23,7 +23,6 @@ Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
 (*make_ref: tau in source -> (translation of ref tau into target)*)
 
 
-Coercion var: nat >-> term.
 
 Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: (Syntax.term obj)                                                                          
   :=
@@ -207,7 +206,7 @@ that. you want to bind
   | t_assign: forall G R Rt E Et A,
       of_m G R (reftp_m A) ->
       of_m G E A ->
-      trans G R A Rt ->
+      trans G R (reftp_m A) Rt ->
       trans G E A Et ->
       trans G (asgn_m R E) (comp_m unittp_m)
             (lam (lam (lam (lam ( lam ( (*l = 4, g = 3, l1 = 2, m = 1, s1 = 0*)

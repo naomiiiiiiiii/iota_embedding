@@ -215,6 +215,52 @@ Hint Rewrite subst_eqb: core subst1.
 Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
   tr G (oof (app (app eq_b m) n) booltp). Admitted.
 
+Lemma apply_IH: forall A Et G G' w l g,
+      tr [::]
+                (oof Et
+                   (all nzero preworld
+                      (pi nattp
+                         (arrow
+                            (Gamma_at G (var 1) (var 0))
+                            (trans_type (var 1) (var 0) A))))) ->
+      tr G' (oof w preworld) ->
+      tr G' (oof l nattp) ->
+      tr G' (oof g (Gamma_at G w l)) ->
+      tr G' (oof (app (app (subst (sh (size G')) Et) l) g)
+          (trans_type w l A)).
+intros.
+apply (tr_arrow_elim _ (Gamma_at G w l)).
+apply Gamma_at_type; auto. apply world_pair; assumption.
+weaken trans_type_works; apply world_pair; assumption.
+match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+                   (subst1 l (arrow (Gamma_at G (shift 1 w) (var 0))
+                                          (trans_type (shift 1 w) (var 0) A))) end.
+               2: { simpsub. unfold subst1 at 1.
+                    rewrite subst1_Gamma_at subst1_trans_type. simpsub_bigs. auto.
+               }
+               apply (tr_pi_elim _ nattp).
+               match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+                   (subst1 w (pi nattp (arrow (Gamma_at G (var 1) (var 0))
+                                          (trans_type (var 1) (var 0) A)))) end.
+               2: { unfold subst1. rewrite subst_pi subst_arrow. 
+                    rewrite subst1_under_Gamma_at subst1_under_trans_type.
+                    simpsub_bigs. auto.
+               }
+               apply (tr_all_elim _ nzero preworld).
+               match goal with |- tr ?G' (deq ?M ?M ?T) =>
+                               rewrite - {1} (cats0 G'); replace T with
+                                                         (subst (sh (size G')) T) end.
+               2: {rewrite subst_all subst_pi subst_arrow.
+                   rewrite under_sum sh_under_Gamma_at sh_under_trans_type.
+                   simpsub_bigs. auto.
+               }
+               rewrite ! subst_sh_shift. apply tr_weakening_append.
+               assumption. assumption.
+               sh_var 1 1.
+               apply trans_type_works1; try var_solv.
+               assumption. assumption.
+Qed.
+
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -251,26 +297,11 @@ Theorem two_working: forall G e T ebar,
                       (app (subst (sh 11) Rt)
                          (var 9)) 
                       (var 8)))) as i.
-        match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
-            (subst1 (app (app eq_b (var 0)) i)
-                    (
-                      bite (var 0)
-          (next
-             (move_app A make_subseq
-                (app
-                   (app (subst (sh 12) Et)
-                      (var 10)) 
-                   (var 5))))
-          (app
-             (app (app (var 4) (var 2))
-                  make_subseq) (var 0)))
-            );
-                                                          replace T with (
-                                                                        subst1 (app (app eq_b (var 0)) i)
-       (shift 1 (app (app (app (var 7) (var 0)) (next (var 3)))
-          (next (var 2))))) end. rewrite fold_substj.
-        eapply (tr_generalize _ booltp). apply eqapp_typed; try var_solv.
-    - (*i : nat*) subst.
+
+        match goal with |- tr ?G' (@ deq obj ?M ?M ?T) =>
+                        remember G' as G'' end.
+    - assert (tr G'' (oof i nattp)) as Hi.
+    (*i : nat*) subst.
       eapply (tr_sigma_elim1 _ _
             (prod (lt_t (var 0) (subst sh1 (var 6)))
                 (all nzero preworld (*wl1:= 2, i := 1, v := 0*)
@@ -291,27 +322,135 @@ Theorem two_working: forall G e T ebar,
       (*m : W <= U1*)
       sh_var 6 10.
       inv_subst. var_solv0.
-      change 
-       (subseq (ppair (var 10) (var 9))
-               (ppair (var 7) (var 6))) with
-          subst (sh 6) (subseq (ppair (var 10) (var 9))
-               (ppair (var 7) (var 6)))
-                        .
+      eapply apply_IH; try apply IHDtrans1; try var_solv.
+      sh_var 9 10.
+      inv_subst. var_solv0.
+        suffices: tr G'' (deq
+      (lam (bite (app (app eq_b (var 1)) i)
+          (next
+             (move_app A make_subseq
+                (app (app (subst (sh 12) Et) (var 10)) (var 5))))
+          (app (app (app (var 5) (var 3)) make_subseq) (var 1))))
+      (lam (bite (app (app eq_b (var 1)) i)
+          (next
+             (move_app A make_subseq
+                (app (app (subst (sh 12) Et) (var 10)) (var 5))))
+          (app (app (app (var 5) (var 3)) make_subseq) (var 1))))
+      (arrow (equal (app (app eq_b (var 0)) i) (app (app eq_b (var 0)) i) booltp)
+             (app (app (app (var 7) (var 0)) (next (var 3)))
+                  (next (var 2))))).
+        intros Hlam.
+        suffices: (tr G'' (oof triv (equal booltp (app (app eq_b (var 0)) i)
+                                           (app (app eq_b (var 0)) i)))).
+        intros Harg.
+replace 
+    (bite (app (app eq_b (var 0)) i)
+       (next
+          (move_app A make_subseq
+             (app (app (subst (sh 11) Et) (var 9))
+                (var 4))))
+       (app
+          (app (app (var 4) (var 2)) make_subseq)
+          (var 0))) with
+    (subst1 triv
+(bite (app (app eq_b (var 1)) (shift 1 i))
+                    (next
+                       (move_app A make_subseq
+                          (app
+                             (app (subst (sh 12) Et)
+                                (var 10)) 
+                             (var 5))))
+                    (app
+                       (app (app (var 5) (var 3))
+                          make_subseq) 
+                       (var 1)))).
+2:{ subst. simpsub_bigs. auto.
+     }
+        eapply (tr_compute _ _ _ _ 
+           ( app 
+              (lam
+                 (bite (app (app eq_b (var 1)) (shift 1 i))
+                    (next
+                       (move_app A make_subseq
+                          (app
+                             (app (subst (sh 12) Et)
+                                (var 10)) 
+                             (var 5))))
+                    (app
+                       (app (app (var 5) (var 3))
+                          make_subseq) 
+                       (var 1)))) triv)).
+        apply equiv_refl.
+        apply equiv_symm.
+        apply reduce_equiv.
+apply reduce_app_beta; apply reduce_id.
+        apply equiv_symm.
+        apply reduce_equiv.
+        apply reduce_app_beta; apply reduce_id.
+        apply (tr_arrow_elim _
+                 (equal booltp (app (app eq_b (var 0)) i)
+                    (app (app eq_b (var 0)) i))).
+        apply tr_equal_formation. weaken tr_booltp_formation.
+        apply eqapp_typed; auto. subst. var_solv.
+        apply eqapp_typed. subst; var_solv. assumption.
+        subst.
+        apply pw_app_typed; try apply tr_fut_intro; try var_solv.
+        match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
+            (subst1 (app (app eq_b (var 0))  i)
+                    ( lam (
+                      bite (var 1)
+          (next
+             (move_app A make_subseq
+                (app
+                   (app (subst (sh 13) Et)
+                      (var 11)) 
+                   (var 6))))
+          (app
+             (app (app (var 6) (var 4))
+                  make_subseq) (var 2))))
+            );
+  replace T with (
+       subst1 (app (app eq_b (var 0)) i)
+       (arrow
+          (equal booltp (var 0)
+             (app (app eq_b (var 1)) (shift 1 i)))
+       (shift 1 (app (app (app (var 7) (var 0)) (next (var 3)))
+                     (next (var 2)))))) end. 
+        2: { simpsub_bigs. auto.
+     }
+        2: { unfold subst1. simpsub_bigs. auto.
+     }
+        rewrite fold_substj.
+        eapply (tr_generalize _ booltp).
+        apply eqapp_typed; try (subst; var_solv). assumption.
+        apply tr_arrow_intro.
+        apply tr_equal_formation. weaken tr_booltp_formation.
+        rewrite - (@subst_booltp obj (sh 1)). var_solv0.
+        apply eqapp_typed; auto. subst. var_solv.
+        rewrite - (subst_nat (sh 1)) subst_sh_shift.
+        apply tr_weakening_append1. assumption.
+        unfold deqtype.
+        change triv with (@shift obj 1 triv).
+        inv_subst. rewrite ! subst_sh_shift.
+        apply tr_weakening_append1. 
+        apply pw_app_typed; subst;
+          try apply tr_fut_intro; try var_solv.
+        simpsub. (*make a template for this casing reasoning*)
+        rewrite - cat1s.
+        match goal with |- tr ?G (deq ?M ?M ?T) =>
+       replace M with  (bite (var 1)
+         (subst (under 1 sh1) (next
+             (move_app A make_subseq
+                (app (app (subst (sh 12) Et) (var 10)) (var 5)))))
+         (subst (under 1 sh1) (app (app (app (var 5) (var 3)) make_subseq)
+                                   (var 1)))) end.
+        2:{
+          simpsub_bigs. auto.
+        }
+        apply tr_booltp_eta_hyp.
 
-                    )
-             
-
-
-      apply (tr_arrow_elim _ (subseq (ppair (var 7) (var 6)) (ppair (var 3) (var 2)))).
-             apply subseq_type; auto.
-             apply tr_pi_formation; auto.
-             apply pw_app_typed; try apply tr_fut_intro; try var_solv.
-             match goal with |- tr ?G' (deq ?M ?M ?T) => change T with
-                 (@ subst1 obj (var 2) (arrow (subseq (ppair (var 8) (var 7)) (ppair (var 4) (var 0)))
-                                           (pi nattp
-                                               (app (app (app (var 9) (var 0)) (next (var 5)))
-                                                    (next (var 1)))))) end.
-             apply (tr_pi_elim _ nattp); auto.
+        apply eqapp_typed. subst; var_solv. assumption.
+   
 
   }
 (*ref case*)
