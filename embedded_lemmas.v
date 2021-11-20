@@ -61,12 +61,12 @@ Lemma pw_app_typed1 G u l v: tr G (oof u preworld) ->
                                     tr G (deqtype (app (app u l) v)
                                                        (app (app u l) v)).
   Admitted.
-Lemma pw_app_typed G u l v i: tr G (oof u preworld) ->
-                                    tr G (oof l nattp) ->
-                                    tr G (oof v (fut preworld)) ->
-                                    tr G (oof i (fut nattp)) ->
+Lemma pw_app_typed G u u' l l' v v' i i': tr G (deq u u' preworld) ->
+                                    tr G (deq l l' nattp) ->
+                                    tr G (deq v v' (fut preworld)) ->
+                                    tr G (deq i i' (fut nattp)) ->
                                     tr G (deqtype (app (app (app u l) v) i)
-                                                  (app (app (app u l) v) i)).
+                                                  (app (app (app u' l') v') i')).
   Admitted.
 
 Lemma unfold_pw: forall G,

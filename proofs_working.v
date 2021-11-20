@@ -261,6 +261,21 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
                assumption. assumption.
 Qed.
 
+Lemma eqb_P G n m : tr G (oof n nattp) ->
+                    tr G (oof m nattp) ->
+  tr G (deq (app (app eq_b n) m) btrue booltp) ->
+                    tr G (deq n m nattp).
+  intros.
+  Admitted.
+
+Lemma pw_app_typed1 G u u' l l' v v' i i': tr G (deq u u' preworld) ->
+                                    tr G (deq l l' nattp) ->
+                                    tr G (deq v v' (fut preworld)) ->
+                                    tr G (deq i i' (fut nattp)) ->
+                                    tr G (deqtype (app (app (app u l) v) i)
+                                                  (app (app (app u' l') v') i')).
+  Admitted.
+
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -289,17 +304,25 @@ Theorem two_working: forall G e T ebar,
         unfold gettype.
         simpsub_bigs. apply tr_pi_intro; auto.
         (*case on whether index = i size u*)
-        remember 
-             (ppi1
-                (move_app (reftp_m A) 
+        remember (move_app (reftp_m A) 
                    (var 5)
                    (app
                       (app (subst (sh 11) Rt)
                          (var 9)) 
-                      (var 8)))) as i.
-
+                      (var 8))) as Ru1.
+        remember (ppi1 Ru1) as i.
+        remember (ppi2 (ppi2 Ru1))  as p.
         match goal with |- tr ?G' (@ deq obj ?M ?M ?T) =>
                         remember G' as G'' end.
+    - assert (tr G'' (oof Ru1 (trans_type (var 7) (var 6) (reftp_m A)))) as Hru1.
+      subst.
+      apply (@moveapp_works _ _ (var 10) (var 9)); auto.
+      (*m : W <= U1*)
+      sh_var 6 10.
+      inv_subst. var_solv0.
+      eapply apply_IH; try apply IHDtrans1; try var_solv.
+      sh_var 9 10.
+      inv_subst. var_solv0.
     - assert (tr G'' (oof i nattp)) as Hi.
     (*i : nat*) subst.
       eapply (tr_sigma_elim1 _ _
@@ -315,16 +338,27 @@ Theorem two_working: forall G e T ebar,
           eqtype (app (app (app w i) (next v)) (next lv))
                  (fut (trans_type v lv A))
                       )
-             )))).
+             )))). assumption.
+    - assert (tr G'' (oof p (subst1 i 
+                (all nzero preworld (*wl1:= 2, i := 1, v := 0*)
+                      (pi nattp (*wl1:= 3, i := 2, v := 1, lv := 0*)
+                      (
+            let w := (shift 3 (var 7)) in
+            let l1 := (@shift obj 3 (var 6)) in
+            let i := (var 2) in
+            let v := (var 1) in
+            let lv := (var 0) in
+          eqtype (app (app (app w i) (next v)) (next lv))
+                 (fut (trans_type v lv A))
+                      )
+             ))))) as Hp. subst p.
+      eapply (tr_prod_elim2 _ (subst1 i (lt_t (var 0) (subst sh1 (var 6))))).
+      inv_subst. subst i. eapply tr_sigma_elim2. apply Hru1.
+     )
+
+             ))
       match goal with |- (tr ?G (deq ?M ?M ?T)) => change T with
-          (trans_type (var 7) (var 6) (reftp_m A)) end.
-      apply (@moveapp_works _ _ (var 10) (var 9)); auto.
-      (*m : W <= U1*)
-      sh_var 6 10.
-      inv_subst. var_solv0.
-      eapply apply_IH; try apply IHDtrans1; try var_solv.
-      sh_var 9 10.
-      inv_subst. var_solv0.
+          (trans_type (var 7) (var 6) (reftp_m A)) end. apply Hru1.
         suffices: tr G'' (deq
       (lam (bite (app (app eq_b (var 1)) i)
           (next
@@ -448,6 +482,37 @@ apply reduce_app_beta; apply reduce_id.
           simpsub_bigs. auto.
         }
         apply tr_booltp_eta_hyp.
+      + (*i= j *) simpsub_bigs. simpsub_bigs.
+        eapply (tr_eqtype_convert _ _ _ 
+                                  (app (app (app (var 8) (shift 1 i)) (next (var 4))) (next (var 3)))).
+        (*convert from u1 j u2 l2 to u1 i u2 l2*)
+        apply pw_app_typed1; try apply tr_fut_intro; try (subst; var_solv).
+        apply tr_symmetry. apply eqb_P.
+        subst; var_solv.
+        rewrite - (subst_nat (sh 1)) subst_sh_shift.
+        apply tr_weakening_append1. assumption.
+        apply tr_symmetry.
+       apply (deq_intro _#4 (var 0) (var 0)).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+            (subst (sh 1)
+       (equal booltp btrue (app (app eq_b (var 0)) i))) end.
+        var_solv0. simpsub_bigs. auto.
+        (*convert from u1 i u2 l2 to |>(A @ u2, l2)*)
+        eapply (tr_eqtype_convert _ _ _
+                                  (trans_type (var 4) (var 3) A)).
+        apply tr_eqtype_symmetry. apply (tr_deqtype_intro _ _ _
+                                                          ppi2
+
+
+        eapply (tr_formation_weaken _ nzero).
+
+        change (univ nzero) with (@subst1 obj (next (var 3)) (univ nzero)).
+        apply tr
+
+        unfold deqtype.
+        apply 
+
+        apply eqtype_convert
 
         apply eqapp_typed. subst; var_solv. assumption.
    
