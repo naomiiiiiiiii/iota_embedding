@@ -564,8 +564,13 @@ rewrite subst1_under_trans_type. simpsub_bigs. auto.
 subst; var_solv.
 (*show move (Et @ u l) : A @ U2*)
 subst.
-
-
+constructor. apply (@moveapp_works _ _ (var 11) (var 10)); auto; try (apply world_pair; var_solv). simpl.
+(*U <= U2*)
+apply (subseq_trans (var 2) (var 6) _ (ppair (var 8) (var 7))).
+sh_var 3 8. inv_subst. rewrite subst_sh_shift. var_solv.
+sh_var 7 11. inv_subst. rewrite subst_sh_shift. var_solv.
+eapply apply_IH; try apply IHDtrans2; try var_solv.
+sh_var 10 11. inv_subst. rewrite subst_sh_shift. var_solv.
 
 
 match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
