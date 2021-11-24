@@ -277,6 +277,19 @@ Lemma pw_app_typed1 G u u' l l' v v' i i': tr G (deq u u' preworld) ->
                                                   (app (app (app u' l') v') i')).
   Admitted.
 
+Lemma store_works_test: forall l1 G u1 u2 l2 s1 m1 i,
+      tr G (oof u1 preworld) ->
+      tr G (oof u2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
+      tr G (oof s1 (store u1 l1)) ->
+      tr G (oof m1 (subseq (ppair u1 l1) (ppair u2 l2))) ->
+      tr G (oof i nattp) ->
+      tr G (oof (app (app (app s1 l2) m1) i)
+               (app (app (app u1 i) (next u2)) (next l2))
+           ).
+    Admitted.
+
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -355,7 +368,7 @@ Theorem two_working: forall G e T ebar,
              ))))) as Hp. subst p.
       eapply (tr_prod_elim2 _ (subst1 i (lt_t (var 0) (subst sh1 (var 6))))).
       inv_subst. subst i. eapply tr_sigma_elim2. apply Hru1.
-      (*casing on i = j with lambda trick*)
+      (*casing on i = j with lambda trick
       suffices: tr G'' (deq
       (lam (bite (app (app eq_b (var 1)) i)
           (next
@@ -370,10 +383,10 @@ Theorem two_working: forall G e T ebar,
       (arrow (equal (app (app eq_b (var 0)) i) (app (app eq_b (var 0)) i) booltp)
              (app (app (app (var 7) (var 0)) (next (var 3)))
                   (next (var 2))))).
-        intros Hlam.
+        intros Hlam. 
         suffices: (tr G'' (oof triv (equal booltp (app (app eq_b (var 0)) i)
                                            (app (app eq_b (var 0)) i)))).
-        intros Harg.
+        intros Harg. *)
 replace 
     (bite (app (app eq_b (var 0)) i)
        (next
@@ -381,7 +394,7 @@ replace
              (app (app (subst (sh 11) Et) (var 9))
                 (var 8))))
        (app
-          (app (app (var 4) (var 2)) make_subseq)
+          (app (app (var 4) (var 2)) (var 1))
           (var 0))) with
     (subst1 triv
 (bite (app (app eq_b (var 1)) (shift 1 i))
@@ -393,7 +406,7 @@ replace
                              (var 9))))
                     (app
                        (app (app (var 5) (var 3))
-                          make_subseq) 
+                          (var 2)) 
                        (var 1)))).
 2:{ subst. simpsub_bigs. auto.
      }
@@ -409,7 +422,7 @@ replace
                              (var 9))))
                     (app
                        (app (app (var 5) (var 3))
-                          make_subseq) 
+                          (var 2)) 
                        (var 1)))) triv)).
         apply equiv_refl.
         apply equiv_symm.
@@ -438,7 +451,7 @@ apply reduce_app_beta; apply reduce_id.
                    (var 10))))
           (app
              (app (app (var 6) (var 4))
-                  make_subseq) (var 2))))
+                  (var 3)) (var 2))))
             );
   replace T with (
        subst1 (app (app eq_b (var 0)) i)
@@ -473,7 +486,7 @@ apply reduce_app_beta; apply reduce_id.
          (subst (under 1 sh1) (next
              (move_app A make_subseq
                 (app (app (subst (sh 12) Et) (var 10)) (var 9)))))
-         (subst (under 1 sh1) (app (app (app (var 5) (var 3)) make_subseq)
+         (subst (under 1 sh1) (app (app (app (var 5) (var 3)) (var 2))
                                    (var 1)))) end.
         2:{
           simpsub_bigs. auto.
@@ -571,7 +584,34 @@ sh_var 3 8. inv_subst. rewrite subst_sh_shift. var_solv.
 sh_var 7 11. inv_subst. rewrite subst_sh_shift. var_solv.
 eapply apply_IH; try apply IHDtrans2; try var_solv.
 sh_var 10 11. inv_subst. rewrite subst_sh_shift. var_solv.
+      + (*i != j *) simpsub_bigs. simpsub_bigs. subst.
+        eapply (@store_works_test (var 7)); try (subst; var_solv).
+        sh_var 6 8. inv_subst. rewrite - subst_store.
+        var_solv0.
+        sh_var 3 8. inv_subst. 
+        var_solv0.
+        simpsub_bigs. auto.
+        constructor. apply eqapp_typed; try (subst; var_solv). assumption.
+        constructor.
+        weaken compm5_type; auto. apply world_pair; var_solv.
+        constructor.
+        sh_var 2 5. rewrite - ! subst_sh_shift - ! subst_ppair. weaken compm4_type; auto.
+constructor.
 
+        eapply (tr_eqtype_convert _ _ _ 
+                                  (app (app (app (var 8) (shift 1 i)) (next (var 4))) (next (var 3)))).
+        (*convert from u1 j u2 l2 to u1 i u2 l2*)
+       apply pw_app_typed1; try apply tr_fut_intro; try (subst; var_solv).
+        apply tr_symmetry. apply eqb_P.
+        subst; var_solv.
+        rewrite - (subst_nat (sh 1)) subst_sh_shift.
+        apply tr_weakening_append1. assumption.
+        apply tr_symmetry.
+       apply (deq_intro _#4 (var 0) (var 0)).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+            (subst (sh 1)
+       (equal booltp btrue (app (app eq_b (var 0)) i))) end.
+        var_solv0. simpsub_bigs. auto. 
 
 match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
        (shift 1 

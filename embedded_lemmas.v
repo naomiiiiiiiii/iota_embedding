@@ -341,6 +341,20 @@ Admitted.
     (tr G (oof (ppair w l) world)) -> tr G (deqtype (store w l) (store w l)).
 Admitted.
 
+Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
+      tr G (oof u1 preworld) ->
+      tr G (oof u2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
+      tr G (oof s1 (store u1 l1)) ->
+      tr G (oof m1 (subseq (ppair u1 l1) (ppair u2 l2))) ->
+      tr G (oof i nattp) ->
+      tr G (oof (app (app (app s1 l2) m1) i)
+               (app (app (app u1 i) (next u2)) (next l2))
+           ).
+    Admitted.
+
+
 Lemma subseq_type: forall G w1 w2,
     tr G (oof w1 world) -> tr G (oof w2 world) ->
     tr G (deqtype (subseq w1 w2) (subseq w1 w2)).
