@@ -257,5 +257,33 @@ that. you want to bind
                                                                                    e)
                                                                                )
                                     ))))
-                                      ))))).
+            )))))
+| t_ap : forall G E1 Et1 E2 Et2 Targ T2,  
+      of_m G E1 (arrow_m Targ T2) ->
+      of_m G E2 Targ ->
+      trans G E1 (arrow_m Targ T2) Et1 ->
+      trans G E2 Targ Et2 ->
+      trans G (app_m E1 E2)
+            lam (lam  (*l = 1, g = 0*)
+                   let Et1 := shift 2 E1 in
+                   let l := (var 1) in
+                   let g := (var 0) in
+                   let arg := (app Et2 l) in
+                   ((app (app (app Et1 l) g) l) make_subseq)
+                )
+| t_lam : forall G E Et Targ T2,
+      of_m (Targ::G) E T2 ->
+      trans (Targ::G) E T2 Et ->
+      trans G (lam E)
+            (lam (lam (lam (lam (lam (*l1 =4, g = 3, l = 2
+                                      m = 1, x = 0*)
+                                   (app (app Et (var 2))
+                                        (move_gamma G (var 1) (var 3)))
 
+            )))))
+            |
+
+(ppair x' (move_gamma G make_subseq (var 4)))                                                 in
+ (*making a pair of type (a big product at U) out of a pair of (a big product at W)
+  iterating over the pair
+ but how far to go? use the list because it should be the same size as the pair*)
