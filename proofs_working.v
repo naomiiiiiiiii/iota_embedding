@@ -329,6 +329,8 @@ Lemma ref1_type: forall A G w1 i,
                       (next (var 0)))
                    (fut A))) U0). Admitted.
 
+(*need another lemma showing that trans is total probably*)
+
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
