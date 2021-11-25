@@ -100,16 +100,23 @@ Goal (@ subst1 obj nattp (var 0)) = nattp.
   unfold subst1. simpl (subst (dot ?x1 ?s) ?x2). cbn - [ nattp].
   cbn [traverse]. *)
 
-Lemma ref1_type G w1 i A:
-  tr G (oof w1 preworld) -> tr G (oof A U0) ->
-  tr G (oof i nattp) ->
-      tr G (oof (all nzero preworld
-           (pi nattp 
-               ( let v := (var 1) in
-            let lv := (var 0) in
-          eqtype (app (app (app (subst (sh 2) w1) (subst (sh 2 ) i)) (next v)) (next lv))
-                 (fut (shift 2 A)) ))) U0).
-Admitted.
+
+Lemma ref0_type: forall A G w1 l1,
+      (tr G (oof (ppair w1 l1) world)) ->
+      (tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & G] (oof A U0)) ->
+      tr ((hyp_tm nattp) :: G) (oof
+(prod (lt_t (var 0) (shift 1 l1))
+          (all nzero preworld
+             (pi nattp
+                (eqtype
+                   (app
+                      (app
+                         (app (subst (sh 3) w1) (var 2))
+                         (next (var 1))) 
+                      (next (var 0)))
+                   (fut A))))) U0). Admitted.
+
+
 
 
 Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
@@ -308,6 +315,20 @@ Lemma inr_laters_type: forall G A m,
   Admitted.
 
 
+Lemma ref1_type: forall A G w1 i,
+      (tr G (oof w1 preworld)) ->
+      (tr G (oof i nattp)) ->
+      (tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof A U0)) ->
+      tr  [:: hyp_tm preworld & G] (oof
+             (pi nattp
+                (eqtype
+                   (app
+                      (app
+                         (app (subst (sh 2) w1) (subst (sh 2) i))
+                         (next (var 1))) 
+                      (next (var 0)))
+                   (fut A))) U0). Admitted.
+
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
     tr [::] (oof ebar
@@ -403,12 +424,93 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
                       (trans_type 
                          (var 1) 
                          (var 0) A))))))) end.
-      subst G'.
+      subst G'. 
       apply (tr_fut_elim _#3 (trans_type (var 3) (var 2) A) ).
       (*s l1 m i: fut A @ u1*)
+      subst e. 
+      eapply (tr_eqtype_convert _ _ _
+               (app (app (app (var 3) i) (next (var 3))) (next (var 2)))).
+      (*convert from fut A @ u1 to u1 i u1 l1*)
+        simpsubin_bigs Hp. 
+        apply (deqtype_intro _ _ _ (app p (var 2))
+                             (app p (var 2))
+                                        ).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (subst1 (var 2) (eqtype
+          (app
+             (app (app (var 4) (shift 1 i))
+                (next (var 4))) 
+             (next (var 0)))
+          (fut (trans_type (var 4) (var 0) A)))) end.
+        2:{
+          subst. simpsub_bigs. rewrite fold_subst1 subst1_trans_type. simpsub_bigs. auto.
+        }
+        apply (tr_pi_elim _ nattp).
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (subst1 (var 3) 
+       (pi nattp
+          (eqtype
+             (app
+                (app (app (var 5) (shift 2 i))
+                   (next (var 1)))
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A))))) end.
+        eapply (tr_all_elim _ nzero preworld).
+        move : Hp. simpl. simpsubs.
+        replace (dot (var 0)
+                         (dot (var 1)
+                              (dot (subst (sh 2) i) (sh 2)))) with
+            (under 2 (dot i id)).
+        2:{
+          simpsub_bigs. auto.
+        } rewrite subst1_under_trans_type. simpsub_bigs.
+        apply; auto; try var_solv. var_solv.
+        sh_var 2 5. rewrite - ! subst_sh_shift.
+        weaken ref1_type; try var_solv. assumption.
+        apply trans_type_works; auto.
+        simpsub_bigs. auto.
+        change (dot (var 0) (dot (var 4) sh1)) with
+            (@under obj 1 (dot (var 3) id)).
+        rewrite subst1_under_trans_type.
+        simpsub_bigs. auto. var_solv.
+        (*s l1 m i: u1 i u1 l1*)
+        eapply (@store_works (var 2)); try var_solv.
+        sh_var 1 3. rewrite - ! subst_sh_shift - ! (subst_store _ _ (sh 1)).
+        var_solv0.
+        apply sub_refl; auto. assumption.
+        weaken trans_type_works; auto. apply world_pair; var_solv.
 
-(*blur : later*)
-
+        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
+       (shift 1 
+       (all nzero preworld (pi nattp
+          (eqtype
+             (app
+                (app (app (var 9) (subst (sh 2) i))
+                   (next (var 1)))
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A)))))) end.
+        2: {
+          simpsub_bigs. auto.
+          replace (dot (var 0) (dot (var 1) (sh 3))) with
+              (@under obj 2 (sh 1)).
+          2:{
+            simpsubs. auto.
+          } rewrite sh_under_trans_type. auto. }
+        rewrite ! subst_sh_shift. apply tr_weakening_append1.
+        rewrite - subst_sh_shift. assumption.
+        subst; var_solv.
+sh_var 1 10. replace (shift 3 i) with (shift 1 (shift 2 i)).
+weaken ref2_type; try (subst; var_solv).
+rewrite - (subst_nat (sh 2)) subst_sh_shift. apply tr_weakening_append2. assumption.
+simpsub_bigs. auto.
+simpsub_bigs. auto.
+replace (dot (var 0) (dot (var 5) sh1)) with (@under obj 1 (dot (var 4) id)).
+2:{
+simpsub. auto.
+} 
+rewrite subst1_under_trans_type. simpsub_bigs. auto.
+subst; var_solv.
+apply ref1_typ.
 
 
   }
@@ -1017,20 +1119,6 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
                      apply equiv_refl.
                      constructor. weaken trans_type_works; auto.
                      simpl. auto. }
-  assert (forall A G w1 l1,
-      (tr G (oof (ppair w1 l1) world)) ->
-      (tr [:: hyp_tm nattp, hyp_tm preworld, hyp_tm nattp & G] (oof A U0)) ->
-      tr ((hyp_tm nattp) :: G) (oof
-(prod (lt_t (var 0) (shift 1 l1))
-          (all nzero preworld
-             (pi nattp
-                (eqtype
-                   (app
-                      (app
-                         (app (subst (sh 3) w1) (var 2))
-                         (next (var 1))) 
-                      (next (var 0)))
-                   (fut A))))) U0)) as ref0_type.
                  shelve.
                    change (nsucc (var 3)) with (@shift obj 1 (nsucc (var 2))).
                    weaken ref0_type; auto. apply trans_type_works; auto.
