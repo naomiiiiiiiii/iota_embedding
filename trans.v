@@ -236,4 +236,26 @@ that. you want to bind
                                                    (ppair
                                                       (ppair make_subseq store_u1)
                                                       triv))
-                                            )))))).
+            ))))))
+  | t_deref: forall G R Rt A,
+      of_m G R (reftp_m A) ->
+      trans G R (reftp_m A) Rt ->
+      trans G (deref_m R) (comp_m A) 
+            (lam (lam (lam (lam ( lam ( (*l = 4, g = 3, l1 = 2, m = 1, s = 0*)
+                                      let l := var 4 in
+                                      let g := var 3 in
+                                      let l1 := var 2 in
+                                      let m := var 1 in
+                                      let s := var 0 in
+                                      let ref := move_app (reftp_m A) m (app (app (shift 5 Rt) l) g) in
+                                      let i := ppi1 ref in
+                                      let e := prev (app (app (app s l1) make_subseq) i) in
+                                     (inr (next (inl (ppair
+                                                                            l1
+                                                                            (ppair (
+                                                                                 ppair make_subseq s)
+                                                                                   e)
+                                                                               )
+                                    ))))
+                                      ))))).
+
