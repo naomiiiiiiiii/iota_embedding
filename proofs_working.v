@@ -479,40 +479,38 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
         var_solv0.
         apply sub_refl; auto. assumption.
         weaken trans_type_works; auto. apply world_pair; var_solv.
-
-        match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
-       (shift 1 
-       (all nzero preworld (pi nattp
-          (eqtype
-             (app
-                (app (app (var 9) (subst (sh 2) i))
-                   (next (var 1)))
-                (next (var 0)))
-             (fut (trans_type (var 1) (var 0) A)))))) end.
-        2: {
-          simpsub_bigs. auto.
-          replace (dot (var 0) (dot (var 1) (sh 3))) with
-              (@under obj 2 (sh 1)).
-          2:{
-            simpsubs. auto.
-          } rewrite sh_under_trans_type. auto. }
-        rewrite ! subst_sh_shift. apply tr_weakening_append1.
-        rewrite - subst_sh_shift. assumption.
-        subst; var_solv.
-sh_var 1 10. replace (shift 3 i) with (shift 1 (shift 2 i)).
-weaken ref2_type; try (subst; var_solv).
-rewrite - (subst_nat (sh 2)) subst_sh_shift. apply tr_weakening_append2. assumption.
-simpsub_bigs. auto.
-simpsub_bigs. auto.
-replace (dot (var 0) (dot (var 5) sh1)) with (@under obj 1 (dot (var 4) id)).
-2:{
-simpsub. auto.
-} 
-rewrite subst1_under_trans_type. simpsub_bigs. auto.
-subst; var_solv.
-apply ref1_typ.
-
-
+        (*pair : laters*)
+        apply tr_fut_intro. simpl.
+        apply inl_laters_type.
+        apply (tr_exist_intro _ _ _ _ (var 4)); auto; try var_solv.
+        simpsub_bigs.
+        apply tr_sigma_intro; auto; try var_solv.
+        simpsub_bigs.
+        apply tr_prod_intro; auto.
+        apply tr_prod_intro; auto.
+        apply sub_refl. auto.
+        sh_var 2 4. rewrite - ! subst_sh_shift - ! (subst_store _ _ (sh 2)).
+        var_solv.
+       replace (subst (dot (var 3) (dot (var 4) id))
+              (trans_type (var 1) (var 0) A)) with
+       (subst (dot (var 4) id) (subst (dot (var 4) id)
+                                      (trans_type (var 1) (var 0) A))).
+       2:{ simpsub_bigs. auto.
+       }
+       rewrite ! fold_subst1 ! subst1_trans_type.
+       simpsub_bigs. sh_var 1 4. rewrite - ! subst_sh_shift.
+    rewrite -  (sh_trans_type (var 3)).
+    var_solv0. 
+    weaken compm5_type; auto; try (apply world_pair; var_solv).
+    change (dot (var 0) (dot (var 5) sh1)) with
+        (@under obj 1 (dot (var 4) id)).
+    rewrite subst1_under_trans_type. simpsub_bigs.
+    apply trans_type_works; try (apply world_pair; var_solv).
+    sh_var 2 6. inv_subst. weaken compm4_type; auto; try (apply world_pair; var_solv).
+    apply trans_type_works; auto.
+simpsub_type; auto.
+simpsub_bigs; auto.
+simpsub_type; auto.
   }
   3: {
     apply comp_front.
