@@ -266,11 +266,12 @@ that. you want to bind
       trans G (app_m E1 E2) T2
            ( lam (lam  (*l = 1, g = 0*)
                    (let Et1 := shift 2 Et1 in
+                   let Et2 := shift 2 Et2 in
                    let l := (var 1) in
                    let g := (var 0) in
-                   let arg := (app Et2 l) in
-                   (app (app (app (app Et1 l) g) l) make_subseq))
-                ))
+                   let arg := (app (app Et2 l) g) in
+                   (app (app (app (app (app Et1 l) g) l) make_subseq) arg)
+                )))
 | t_lam : forall G E Et Targ T2,
       of_m (Targ::G) E T2 ->
       trans (Targ::G) E T2 Et ->

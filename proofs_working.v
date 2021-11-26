@@ -339,6 +339,64 @@ Theorem two_working: forall G e T ebar,
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G e T ebar Dtrans. induction Dtrans; intros.
+  5: { simpl.
+       (*ap case*)
+       apply tr_all_intro; auto. simpsub_bigs.
+       apply tr_pi_intro; auto.
+       apply tr_arrow_intro; auto.
+       apply Gamma_at_type; auto.
+       weaken trans_type_works; auto.
+       rewrite sh_trans_type.  simpsub_bigs.
+       apply (tr_arrow_elim _ (trans_type (var 2) (var 1) Targ)); try (weaken trans_type_works; auto).
+       apply (tr_arrow_elim _
+                            (subseq (ppair (var 2) (var 1))
+                                    (ppair (var 2) (var 1))
+                            )
+             ).
+       apply subseq_type; auto.
+       apply tr_arrow_formation; try (weaken trans_type_works; auto).
+       match goal with |- tr ?G (deq ?M ?M ?T) =>
+                       replace T with
+          ( subst1 (var 1)
+       (arrow
+          (subseq (ppair (var 3) (var 2)) (ppair (var 3) (var 0)))
+          (arrow (trans_type (var 3) (var 0) Targ)
+                 (trans_type (var 3) (var 0) T2)))) end.
+       2: {
+         simpsub_bigs. rewrite fold_subst1 ! subst1_trans_type. simpsubs.
+         auto.
+       }
+       apply (tr_pi_elim _ nattp); try var_solv.
+       match goal with |- tr ?G (deq ?M ?M ?T) =>
+                       replace T with
+       (subst1 (var 2) (pi nattp
+          (arrow
+             (subseq (ppair (var 4) (var 3))
+                (ppair (var 1) (var 0)))
+             (arrow
+                (trans_type (var 1) (var 0) Targ)
+                (trans_type (var 1) (var 0) T2))))) end.
+       2: {
+         simpsub_bigs.
+         change (dot (var 0) (dot (var 3) sh1)) with
+             (@under obj 1 (dot (var 2) id)).
+         rewrite ! subst1_under_trans_type. simpsubs.
+         auto.
+       }
+       apply (tr_all_elim _ nzero preworld).
+       match goal with |- tr ?G (deq ?M ?M ?T) =>
+                       change T with (trans_type (var 2) (var 1)
+                                                  (arrow_m Targ T2)) end.
+       eapply apply_IH; auto; try var_solv. apply IHDtrans1.
+       sh_var 1 2. inv_subst. var_solv0. var_solv.
+       apply tr_pi_formation; auto; try var_solv.
+       apply tr_arrow_formation; try (weaken trans_type_works; auto).
+       apply subseq_type; auto.
+       apply tr_arrow_formation; try (weaken trans_type_works; auto).
+       apply sub_refl; auto.
+       eapply apply_IH; auto; try var_solv. apply IHDtrans2.
+       sh_var 1 2. inv_subst. var_solv0. 
+  }
   4:{
     apply comp_front.
     simpsub_bigs.  simpsub_bigs. apply inr_laters_type.
