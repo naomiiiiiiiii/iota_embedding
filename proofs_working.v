@@ -397,6 +397,59 @@ Theorem two_working: forall G e T ebar,
        eapply apply_IH; auto; try var_solv. apply IHDtrans2.
        sh_var 1 2. inv_subst. var_solv0. 
   }
+  5: { (*arrow case*)
+    assert (tr [:: hyp_tm nattp; hyp_tm preworld; hyp_tm nattp; hyp_tm preworld]
+    (deqtype
+             (arrow
+                (subseq (ppair (var 3) (var 2))
+                   (ppair (var 1) (var 0)))
+                (arrow (trans_type (var 1) (var 0) Targ)
+                   (trans_type (var 1) (var 0) T2)))
+             (arrow
+                (subseq (ppair (var 3) (var 2))
+                   (ppair (var 1) (var 0)))
+                (arrow (trans_type (var 1) (var 0) Targ)
+                       (trans_type (var 1) (var 0) T2))))) as Htyp1.
+    apply tr_arrow_formation; auto.
+    apply tr_arrow_formation; try (weaken trans_type_works; auto).
+    assert (
+  tr
+    [:: hyp_tm nattp; hyp_tm preworld;
+        hyp_tm (Gamma_at G (var 1) (var 0)); 
+       hyp_tm nattp; hyp_tm preworld]
+    (deqtype
+       (arrow (trans_type (var 1) (var 0) Targ)
+          (trans_type (var 1) (var 0) T2))
+       (arrow (trans_type (var 1) (var 0) Targ)
+          (trans_type (var 1) (var 0) T2)))
+      ) as Htyp2.
+    apply tr_arrow_formation; auto;
+      try (weaken trans_type_works; auto).
+        apply tr_all_intro; auto. simpsub_bigs. 
+       apply tr_pi_intro; auto.
+       apply tr_arrow_intro; auto.
+       apply Gamma_at_type; auto.
+       apply tr_all_formation; auto.
+       apply tr_pi_formation; auto.
+       simpsub_bigs.
+       change (dot (var 0) (dot (var 1) (sh 3))) with
+           (@under obj 2 (sh 1)). rewrite ! sh_under_trans_type.
+        apply tr_all_intro; auto. simpsub_bigs.
+        apply tr_pi_intro; auto.
+        apply tr_arrow_intro; auto.
+        simpsub_bigs. rewrite ! sh_trans_type. simpsub_bigs.
+        apply tr_arrow_intro; try (weaken trans_type_works; auto).
+        rewrite ! sh_trans_type. simpsub_bigs.
+        eapply apply_IH; auto; try var_solv.
+        apply IHDtrans.
+        apply Gamma_at_intro; auto.
+        eapply move_gamma_works; auto.
+        sh_var 2 6. inv_subst. var_solv0.
+        sh_var 5 6. inv_subst. var_solv0.
+        sh_var 1 3. rewrite - ! subst_sh_shift - ! sh_trans_type.
+        var_solv0. rewrite ! sh_trans_type. simpsubs.
+        apply Sequence.index_0.
+  }
   4:{
     apply comp_front.
     simpsub_bigs.  simpsub_bigs. apply inr_laters_type.

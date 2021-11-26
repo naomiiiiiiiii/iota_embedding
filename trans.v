@@ -275,13 +275,13 @@ that. you want to bind
 | t_lam : forall G E Et Targ T2,
       of_m (Targ::G) E T2 ->
       trans (Targ::G) E T2 Et ->
-      trans G (arrow_m Targ T2) (lam_m E)
+      trans G (lam_m E) (arrow_m Targ T2) 
             (lam (lam (lam (lam (lam (*l1 =4, g = 3, l = 2
                                       m = 1, x = 0*)
-                                   (app (app Et (var 2))
-                                        (move_gamma G (var 1) (var 3)))
+                                   (app (app (shift 5 Et) (var 2))
+                                        (ppair (var 0) (move_gamma G (var 1) (var 3)))
 
-            )))))
+            ))))))
 | t_ret : forall G E Et A,
     of_m G E A ->
     trans G E A Et ->
