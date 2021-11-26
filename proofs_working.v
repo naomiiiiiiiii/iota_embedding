@@ -450,6 +450,31 @@ Theorem two_working: forall G e T ebar,
         var_solv0. rewrite ! sh_trans_type. simpsubs.
         apply Sequence.index_0.
   }
+  5:{ (*ret case*)
+    simpl. apply comp_front.
+    simpsub_bigs. simpsub_bigs.
+    apply inl_laters_type.
+    apply (tr_exist_intro _#4 (var 3)); auto; try var_solv.
+    simpsub_bigs.
+       change (dot (var 0) (dot (var 4) (sh1))) with
+           (@under obj 1 (dot (var 3) id)).
+       rewrite ! subst1_under_trans_type.
+    apply tr_sigma_intro; try var_solv.
+    simpsub_bigs. rewrite fold_subst1 subst1_trans_type.
+    simpsub_bigs. apply tr_prod_intro.
+    apply tr_prod_intro.
+    apply sub_refl; auto.
+    sh_var 1 3. inv_subst. rewrite - ! (subst_store _ _ (sh 1)).
+    var_solv0.
+    eapply (@moveapp_works _ _ (var 6) (var 5)); auto.
+    sh_var 2 6. inv_subst. var_solv0.
+    eapply apply_IH; try apply IHDtrans; auto; try var_solv.
+    sh_var 5 6. inv_subst. var_solv0.
+    weaken compm5_type; auto. apply world_pair; var_solv.
+    apply trans_type_works; simpsubs; apply world_pair; var_solv.
+    sh_var 2 5. inv_subst. weaken compm4_type; auto.
+    apply trans_type_works; auto.
+  }
   4:{
     apply comp_front.
     simpsub_bigs.  simpsub_bigs. apply inr_laters_type.

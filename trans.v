@@ -289,12 +289,13 @@ that. you want to bind
           (lam (lam (lam (lam (lam (*l1 = 4, g = 3, l =2, m = 1, s = 0*)
                                  (let l1 := var 4 in
                                   let g := var 3 in
+                                  let l := var 2 in
                             let m := var 1 in
                             let s := var 0 in
-                            let e := move_app A m (app (app Et l1) g) in
+                            let e := move_app A m (app (app (shift 5 Et) l1) g) in
                             inl (
                                 (ppair
-                                   l1
+                                   l
                                    (ppair (ppair make_subseq s) e))
                             )
 
