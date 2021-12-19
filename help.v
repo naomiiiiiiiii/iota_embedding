@@ -58,7 +58,7 @@ Definition Yc: (term obj) := lam ((*f := 0*)
 (*Computation monad*)
 Definition ret: term obj := lam (inl (var 0)).
 
-Definition ret_a x := app ret x.
+Definition ret_a x := inl x.
 
 Definition bind : term obj := app Yc
    (lam   ( (*f := 0*)

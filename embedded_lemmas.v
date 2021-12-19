@@ -271,9 +271,6 @@ Lemma bind_type: forall G A B M0 M1,
     tr G (oof M1 (arrow A (laters B))) ->
     tr G (oof (make_bind M0 M1) (laters B)). Admitted.
 
-Lemma ret_type: forall G A M0,
-    tr G (oof M0 A) ->
-    tr G (oof (ret_a M0) (laters A)). Admitted.
 
 (*repeated patterns of proofs.v*)
 

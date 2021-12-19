@@ -34,6 +34,17 @@ Ltac simpsubss H := simpsubin H; simpl.
 
 Ltac weaken H := eapply tr_formation_weaken; apply H.
 
+Ltac var_nf_help cap var_num := match (eval compute in (leq var_num cap)) with
+                          true => (change (@ var obj var_num) with (subst (sh var_num) (@ var obj 0)));
+                                                              var_nf_help cap var_num.+1
+                        | false => auto
+                          (*change (@ var obj 9) with
+                              (shift sh_amt (@ var obj 6))*)
+
+                                       end.
+(*change var n to sh n var 0 for n <= cap *)
+Ltac var_nf cap := var_nf_help cap 1.
+
 
 (*Trivial lemmas to simplify substitutions*)
 Lemma fold_subst1:  forall m1 m2, (@ subst obj (dot m1 id) m2) = subst1 m1 m2.
