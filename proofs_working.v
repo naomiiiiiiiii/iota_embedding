@@ -92,6 +92,27 @@ intros.
     rewrite subst_sh_shift; apply tr_weakening_append1; auto).
 Qed.
 
+Lemma inr_plus_typ: forall G A B m,
+    tr G (oof m B) ->
+    tr G (deqtype A A) ->
+    tr G (deqtype B B) ->
+    tr G (oof (inr m) (plus A B)).
+  intros. unfold plus. unfold inr.
+  apply tr_sigma_intro. constructor.
+  simpsub_bigs.
+  eapply tr_compute; try apply H.
+  apply reduce_equiv. apply reduce_bite_beta2.
+  apply reduce_id.
+  apply equiv_refl. apply equiv_refl.
+   apply tr_booltp_elim_eqtype; try ( 
+    unfold deqtype;
+    sh_var 1 1;
+    change triv with (@shift obj 1 triv); inv_subst;
+    rewrite ! subst_sh_shift; apply tr_weakening_append1;
+    auto).
+  change booltp with (@subst obj (sh 1) booltp).
+  var_solv0. Qed.
+
 (*start here this is pasically ret, redefine ret to be this*)
 Lemma inl_laters_type: forall G A m,
     tr (promote G) (oof_t A) ->
@@ -100,7 +121,8 @@ Lemma inl_laters_type: forall G A m,
   intros. unfold laters.
   eapply tr_eqtype_convert.
   - eapply tr_eqtype_symmetry.
-    apply tr_rec_unroll.  apply plus_typed. 
+    apply tr_rec_unroll.
+ - apply plus_typed. 
     unfold deqtype. change triv with (@shift obj 1 triv).
     inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append1.
     apply (tr_inhabitation_formation _ m m). auto.
@@ -119,8 +141,29 @@ Lemma inl_laters_type: forall G A m,
 
 Lemma inr_laters_type: forall G A m,
     tr G (oof m (fut (laters A))) ->
+    tr (promote G) (oof A U0) ->
+    tr G (oof A U0) ->
     tr G (oof (inr m) (laters A)).
-  Admitted.
+  intros. unfold laters.
+  eapply tr_eqtype_convert.
+  eapply tr_eqtype_symmetry.
+  - apply tr_rec_unroll.
+  - apply plus_typed. 
+    unfold deqtype. change triv with (@shift obj 1 triv).
+    inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append1.
+    weaken H1.
+     constructor.
+    apply tr_hyp_tp. apply Sequence.index_0.
+  - simpsub_bigs. apply inr_plus_typ. unfold laters in H.
+    rewrite subst_sh_shift. auto.
+  - weaken H1. constructor. 
+    match goal with |- tr ?G (deqtype ?T ?T) =>
+                    replace T with (laters A) end.
+    2: {
+      unfold laters. simpsub_bigs. auto.
+    }
+    weaken laters_type. apply H0. Qed.
+
 
 
 
@@ -322,6 +365,13 @@ Theorem two_working: forall G e T ebar,
   4:{
     apply comp_front.
     simpsub_bigs.  simpsub_bigs. apply inr_laters_type.
+    2:{ simpl. sh_var 2 5. inv_subst. apply compm3_type; auto.
+        apply trans_type_works; auto.
+    }
+    2:{ simpl. sh_var 2 5. inv_subst. apply compm3_type; auto.
+        apply trans_type_works; auto.
+    }
+
 remember (move_app (reftp_m A) (var 1) (app (app (subst (sh 7) Rt) (var 5)) (var 4))) as Ru1.
 remember (ppi1 Ru1) as i.
 remember (ppi2 (ppi2 Ru1))  as p.
@@ -612,9 +662,8 @@ simpsub_type; auto.
     simpl. apply comp_front.
     simpsub_bigs. simpsub_bigs.
     apply inl_laters_type.
-   * sh_var 2 6. inv_subst. weaken compm3_type; auto.
+   * sh_var 2 6. inv_subst. simpl. weaken compm3_type; auto.
         apply trans_type_works; auto.
-    apply compm5_type.
   * apply (tr_exist_intro _#4 (var 3)); auto; try var_solv.
     simpsub_bigs.
        change (dot (var 0) (dot (var 4) (sh1))) with
