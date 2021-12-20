@@ -100,7 +100,7 @@ Lemma inl_laters_type: forall G A m,
   intros. unfold laters.
   eapply tr_eqtype_convert.
   - eapply tr_eqtype_symmetry.
-    apply tr_rec_unroll. apply plus_typed. 
+    apply tr_rec_unroll.  apply plus_typed. 
     unfold deqtype. change triv with (@shift obj 1 triv).
     inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append1.
     apply (tr_inhabitation_formation _ m m). auto.
@@ -115,19 +115,7 @@ Lemma inl_laters_type: forall G A m,
     change triv with (@shift obj 1 triv).
     rewrite ! subst_sh_shift. apply tr_weakening_append1. auto.
     constructor.
-    simpl.
-    unfold deqtype.
-    sh_var 1 1. 
-    change triv with (@shift obj 1 triv). inv_subst.
-    rewrite ! subst_sh_shift. apply tr_weakening_append1.
-    simpsub_bigs. apply inl_plus_typ. auto.
-
-Qed.
-    apply tr_sigma_intro. constructor.
-    simpsub_bigs.
-    eapply tr_compute.
-
-Admitted.
+    apply tr_hyp_tp. apply Sequence.index_0. Qed.
 
 Lemma inr_laters_type: forall G A m,
     tr G (oof m (fut (laters A))) ->
@@ -475,7 +463,9 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
         weaken trans_type_works; auto. apply world_pair; var_solv.
         (*pair : laters*)
         apply tr_fut_intro. simpl.
-        apply inl_laters_type.
+        apply inl_laters_type. simpl.
+      * sh_var 2 6. inv_subst. weaken compm3_type; auto.
+        apply trans_type_works; auto.
         apply (tr_exist_intro _ _ _ _ (var 4)); auto; try var_solv.
         simpsub_bigs.
         apply tr_sigma_intro; auto; try var_solv.
@@ -506,9 +496,9 @@ simpsub_type; auto.
 simpsub_bigs; auto.
 simpsub_type; auto.
   }
-  5: { simpl.
-       (*ap case*)
-       apply tr_all_intro; auto. simpsub_bigs.
+   4: { 
+       (*ap case*) 
+ apply tr_all_intro; auto. simpsub_bigs.
        apply tr_pi_intro; auto.
        apply tr_arrow_intro; auto.
        apply Gamma_at_type; auto.
@@ -529,7 +519,8 @@ simpsub_type; auto.
           (subseq (ppair (var 3) (var 2)) (ppair (var 3) (var 0)))
           (arrow (trans_type (var 3) (var 0) Targ)
                  (trans_type (var 3) (var 0) T2)))) end.
-       2: {
+
+     2: {
          simpsub_bigs. rewrite fold_subst1 ! subst1_trans_type. simpsubs.
          auto.
        }
@@ -564,7 +555,7 @@ simpsub_type; auto.
        eapply apply_IH; auto; try var_solv. apply IHDtrans2.
        sh_var 1 2. inv_subst. var_solv0. 
   }
-  5: { (*arrow case*)
+  4: { (*arrow case*)
     assert (tr [:: hyp_tm nattp; hyp_tm preworld; hyp_tm nattp; hyp_tm preworld]
     (deqtype
              (arrow
@@ -617,11 +608,14 @@ simpsub_type; auto.
         var_solv0. rewrite ! sh_trans_type. simpsubs.
         apply Sequence.index_0.
   }
-  5:{ (*ret case*)
+  4:{ (*ret case*)
     simpl. apply comp_front.
     simpsub_bigs. simpsub_bigs.
     apply inl_laters_type.
-    apply (tr_exist_intro _#4 (var 3)); auto; try var_solv.
+   * sh_var 2 6. inv_subst. weaken compm3_type; auto.
+        apply trans_type_works; auto.
+    apply compm5_type.
+  * apply (tr_exist_intro _#4 (var 3)); auto; try var_solv.
     simpsub_bigs.
        change (dot (var 0) (dot (var 4) (sh1))) with
            (@under obj 1 (dot (var 3) id)).
