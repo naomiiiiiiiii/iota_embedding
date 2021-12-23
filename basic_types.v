@@ -132,6 +132,15 @@ Lemma w_elim_hyp G1 G2 a b J :
       -> tr (G2 ++ hyp_tm (wt a b) :: G1) J.
   Admitted.
 
+Lemma equiv_arrow :
+  forall (m m' n n' : term obj),
+    equiv m m'
+    -> equiv n n'
+    -> equiv (arrow m n) (arrow m' n').
+Proof.
+prove_equiv_compat.
+Qed.
+
            Lemma eqb_typed {G} n1:
   tr G (oof n1 nattp) ->
   tr G (oof (eq_b n1) (arrow nattp booltp)).
@@ -177,13 +186,27 @@ Lemma w_elim_hyp G1 G2 a b J :
           apply reduce_bite_beta2. apply reduce_id.
           apply equiv_refl.
         }
+        simpl. eapply (tr_compute_hyp _ [::]).
+        {
+          constructor. apply equiv_arrow. apply reduce_equiv.
+          apply reduce_bite_beta2. apply reduce_id.
+          apply equiv_refl.
+        }
+        simpl.
+        apply (tr_arrow_elim _ nattp); auto. weaken tr_booltp_formation.
+        change (arrow nattp booltp) with (@subst1 obj triv (arrow nattp booltp)). 
+        apply (tr_pi_elim _ (unittp)).
+        - change (pi unittp (arrow nattp booltp))
+          with (@subst obj (sh 2) (pi unittp (arrow nattp booltp))).
+        var_solv0. constructor.
+        - apply (tr_arrow_elim _ unittp); auto. weaken tr_unittp_formation.
+          change (arrow unittp nattp) with (@subst obj (sh 1) (arrow
+                                                                 unittp nattp)).
+          var_solv0.
+          constructor.
+Qed.
 
-              )
-
-           )
-Admitted.
-
-Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+          Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
   tr G (oof (app (eq_b m) n) booltp). Admitted.
 
 Lemma eqb_P G n m : tr G (oof n nattp) ->
