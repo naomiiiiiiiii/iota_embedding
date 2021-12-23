@@ -1,10 +1,13 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help subst_help basic_types.
+From istari Require Import source subst_src rules_src.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
+Definition oof M A: (@Syntax.judgement obj) := deq M M A.
+
+Definition oof_t M: (@Syntax.judgement obj) := deqtype M M.
 (*more useful inference rules*)
 
 Lemma tr_arrow_elim: forall G a b m n p q,
@@ -79,13 +82,6 @@ Lemma tr_booltp_eta_hyp0 :
   apply tr_booltp_eta_hyp; simpl; assumption.
 Qed. 
 
-Lemma nat_U0: forall G,
-    tr G (oof nattp U0). Admitted.
-Hint Resolve nat_U0. 
-
-Lemma nat_type: forall G,
-      tr G (deqtype nattp nattp). Admitted.
-Hint Resolve nat_type. 
 
 Lemma tr_weakening_appends: forall G1 G2 G3 J1 J2 t J1' J2' t',
     tr G1 (deq J1 J2 t) ->

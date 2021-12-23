@@ -32,7 +32,6 @@ Ltac simpsub_bigs := simpsub_big; simpl.
 Ltac simpsubin_bigs H := simpsubin_big H; simpl.
 Ltac simpsubss H := simpsubin H; simpl.
 
-Ltac weaken H := eapply tr_formation_weaken; apply H.
 
 Ltac var_nf_help cap var_num := match (eval compute in (leq var_num cap)) with
                           true => (change (@ var obj var_num) with (subst (sh var_num) (@ var obj 0)));

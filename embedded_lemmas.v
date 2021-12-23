@@ -9,7 +9,7 @@ From istari Require Import Sigma Tactics
 
 Hint Resolve tr_fut_intro: core.
 
-Ltac var_solv0 := try (apply tr_hyp_tm; repeat constructor).
+
 Ltac var_solv := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) => try
                                  rewrite - (subst_nat (sh (n.+1))); try rewrite - (subst_pw (sh (n.+1))); var_solv0 end.
 
