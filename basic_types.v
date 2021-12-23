@@ -128,9 +128,22 @@ Ltac var_solv' := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) =>
                                  rewrite - (subst_nat (sh (n.+1))); var_solv0 end.
 
 Lemma w_elim_hyp G1 G2 a b J :
+  tr G1 (deqtype a a) ->
+      tr (cons (hyp_tm a) G1) (deqtype b b) ->
       tr (G2 ++ hyp_tm (sigma a (arrow b (subst sh1 (wt a b)))) :: G1) J
       -> tr (G2 ++ hyp_tm (wt a b) :: G1) J.
-  Admitted.
+  intros. eapply tr_subtype_convert_hyp; unfold dsubtype;
+  change triv with (@shift obj 1 triv);
+  change (subtype
+       (subst sh1 ?one)
+       (subst sh1 ?sigma)) with
+      (subst sh1 (subtype one sigma)) (*ask karl if i write shift here it doesnt work*); try rewrite ! subst_sh_shift;
+    try apply tr_weakening_append1. apply tr_wt_subtype_sigma; auto.
+  apply tr_wt_sigma_subtype; auto.
+  assumption.
+Qed.
+
+
 
 Lemma equiv_arrow :
   forall (m m' n n' : term obj),
