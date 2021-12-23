@@ -76,49 +76,7 @@ Definition bind : term obj := app Yc
 
 Definition make_bind E1 E2 := app (app bind E1) E2.
 
-(*arithmetic*)
 
-Definition if_z (n: term obj): (term obj) := ppi1 n.
-
-Definition minusbc: (term obj) := lam
-                         (
-                           (*f := 0*)
-                           lam ( (*f:= 1, n := 0*)
-                               lam ((*f := 2, n:= 1, m := 0*)
-                                   let f := (var 2) in
-                                   let n := (var 1) in
-                                   let m := (var 0) in
-                                                  bite (if_z n)
-                                                  (n)
-                                                  (bite (if_z m)
-                                                     (n)
-                                                    (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
-                                                  ))).
- Definition minus: (term obj) := app theta minusbc.
-
-
- Definition plusbc: (term obj) := lam
-                         (
-                           (*f := 0*)
-                           lam ( (*f:= 1, n := 0*)
-                               lam ((*f := 2, n:= 1, m := 0*)
-                                   let f := (var 2) in
-                                   let n := (var 1) in
-                                   let m := (var 0) in
-                                                  bite (if_z m)
-                                                     (n)
-                                                    (app (app f n) (app (ppi2 m) triv))
-                                                  ))).
-Definition plus_n: (term obj) := app theta plusbc.
-
-Definition lt_b := lam ( lam (if_z (app (app minus (var 0)) (nsucc (var 1)))
-                       )).
-
-Lemma minus_typed {G}: tr G (oof minus (arrow nattp (arrow nattp nattp))).
-Admitted.
-
-Lemma plus_typed {G}: tr G (oof plus_n (arrow nattp (arrow nattp nattp))).
-Admitted.
 
 
 (*worlds*)

@@ -180,3 +180,19 @@ Lemma subst_moveapp s A m1 m2 : (subst s (move_app A m1 m2)) =
    unfold move_app. simpsub_big. auto. Qed.
 
 Hint Rewrite subst_nsucc subst_moveapp: core subst1.
+
+Lemma subst_eqb s : subst s eq_b = eq_b.
+  intros. unfold eq_b. simpsub. auto. Qed.
+Hint Rewrite subst_eqb: core subst1.
+
+Lemma subst_inr: forall s t, subst s (inr t)  = inr (subst s t).
+  intros. unfold inr. simpsub. auto. Qed.
+
+Lemma subst_inl: forall s t, subst s (inl t)  = inl (subst s t).
+  intros. unfold inl. simpsub. auto. Qed.
+
+Lemma subst_plus: forall s A B, subst s (plus A B) =
+                           plus (subst s A) (subst s B).
+  intros. unfold plus. simpsub_bigs. auto.
+  Qed.
+  Hint Rewrite subst_inl subst_inr subst_plus: core subst1.

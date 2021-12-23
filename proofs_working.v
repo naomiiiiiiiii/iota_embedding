@@ -28,34 +28,9 @@ Lemma shift_trans_type : forall w l A s ,
   apply sh_under_trans_type.
  Qed.
 
-(*bool stuff*)
-
-Lemma subst_eqb s : subst s eq_b = eq_b.
-  intros. unfold eq_b. simpsub. auto. Qed.
-Hint Rewrite subst_eqb: core subst1.
-
-Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (app (app eq_b m) n) booltp). Admitted.
-
-Lemma eqb_P G n m : tr G (oof n nattp) ->
-                    tr G (oof m nattp) ->
-  tr G (deq (app (app eq_b n) m) btrue booltp) ->
-                    tr G (deq n m nattp).
-  intros.
-Admitted.
-(****)
-
-Lemma subst_inr: forall s t, subst s (inr t)  = inr (subst s t).
-  intros. unfold inr. simpsub. auto. Qed.
-
-Lemma subst_inl: forall s t, subst s (inl t)  = inl (subst s t).
-  intros. unfold inl. simpsub. auto. Qed.
 
 
-Lemma subst_plus: forall s A B, subst s (plus A B) =
-                           plus (subst s A) (subst s B).
-  Admitted.
-Hint Rewrite subst_inl subst_inr subst_plus: core subst1.
+
 
 Lemma inl_plus_typ: forall G A B m,
     tr G (oof m A) ->
@@ -1037,7 +1012,7 @@ constructor. }
          + assert (tr [:: hyp_tm (store (var 2) (var 1)); hyp_tm (subseq (ppair (var 4) (var 3)) (ppair (var 1) (var 0))); hyp_tm nattp; hyp_tm preworld; hyp_tm (Gamma_at G (var 1) (var 0)); hyp_tm nattp; hyp_tm preworld]
                     (deq make_subseq make_subseq
                          (subseq (ppair (var 3) (var 2)) (ppair u1 (nsucc (var 2))))))
-             as HUsubU1.
+             as HUsubU1. (*m1*)
            subst. apply consb_subseq; try (apply Hx); try var_solv.
            repeat (apply tr_prod_intro); try assumption.
            (*showing the new store is a store at U1*)

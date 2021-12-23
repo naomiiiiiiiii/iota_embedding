@@ -704,10 +704,6 @@ Admitted.
                                (substj (dot x id) (@ deq obj M1 M2 T)).
 Admitted.
 
-Definition ltb_app m n := app (app lt_b m) n.
-
-Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (ltb_app m n) booltp). Admitted.
 
   Ltac simpsubs := simpsub; simpl.
 
@@ -758,7 +754,8 @@ Hint Resolve nsucc_nat.
 
 (*start here move to subst_help0*)
 
-(*for any W, W <= x:: W, start here move this out of here*)
+(*for any W, W <= x:: W
+ going to need lt reflection *)
 Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                     tr G' (oof l' nattp) ->
                                 tr G' (oof x (karrow (fut preworld)
@@ -770,12 +767,6 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
 Admitted.
 
 
-Lemma ltb_false G n : tr G (oof n nattp) -> tr G (deq (ltb_app n n) bfalse booltp).
-Admitted.
-
-Lemma nsucc_lt: forall G n, tr G (oof n nattp) ->
-                       tr G (oof triv (lt_t n (nsucc n))).
-Admitted.
 
 Lemma tr_eq_reflexivity:
   forall G m n a,

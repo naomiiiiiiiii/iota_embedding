@@ -5,13 +5,7 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
-Definition mapi {A B: Type} (f: (nat * A) -> B) (L: seq A) :=
-   let enumerated := iota 0 (size L) in
-  map f (zip enumerated L).
 
- Definition foldri {A B: Type} (f: (nat * A) -> B -> B) (acc: B) (L: seq A) :=
-   let enumerated := iota 0 (size L) in
-  foldr f acc (zip enumerated L).
 
 (*moveGamma almost definitely wrong because it assumes Gamma starts from beginning of
  context (var 0) where as there's probably more stuff at the end
@@ -89,10 +83,6 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
  .
 
 
-
-
-
-
  (*making a pair of type (a big product at U) out of a pair of (a big product at W)
   iterating over the pair
  but how far to go? use the list because it should be the same size as the pair*)
@@ -101,24 +91,6 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term obj) (gamma: Syntax.term
      nil => gamma
    | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
-Definition eq_bbc: (term obj) := lam
-                         (
-                           (*f := 0*)
-                           lam ( (*f:= 1, n := 0*)
-                               lam ((*f := 2, n:= 1, m := 0*)
-                                   let f := (var 2) in
-                                   let n := (var 1) in
-                                   let m := (var 0) in
-                                                  bite (if_z n)
-                                                  (if_z m)
-                                                  (bite (if_z m)
-                                                     (bfalse)
-                                                    (app (app f (app (ppi2 n) triv)) (app (ppi2 m) triv)))
-                                                  ))).
- Definition eq_b: (term obj) := app theta eq_bbc.
-
-Lemma eqb_typed {G}: tr G (oof eq_b (arrow nattp (arrow nattp booltp))).
-Admitted.
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
