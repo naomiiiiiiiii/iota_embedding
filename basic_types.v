@@ -8,6 +8,15 @@ From istari Require Import Sigma Tactics
 
 Definition U0 : (term obj) := univ nzero.
 
+Lemma equiv_arrow :
+  forall (m m' n n' : term obj),
+    equiv m m'
+    -> equiv n n'
+    -> equiv (arrow m n) (arrow m' n').
+Proof.
+prove_equiv_compat.
+Qed.
+
 Lemma nat_U0: forall G,
     tr G (oof nattp U0). Admitted.
 Hint Resolve nat_U0. 
@@ -145,14 +154,6 @@ Qed.
 
 
 
-Lemma equiv_arrow :
-  forall (m m' n n' : term obj),
-    equiv m m'
-    -> equiv n n'
-    -> equiv (arrow m n) (arrow m' n').
-Proof.
-prove_equiv_compat.
-Qed.
 
            Lemma eqb_typed {G} n1:
   tr G (oof n1 nattp) ->
@@ -177,7 +178,12 @@ Qed.
     apply tr_booltp_eta_hyp; simpsub; simpl; simpsub; rewrite ! subst_nat;
       apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
     + apply if_z_typed. var_solv'.
-    + apply (w_elim_hyp _ [::]). match goal with |- tr ?G (deq ?M ?M ?A) => change M with
+    + apply (w_elim_hyp _ [::]).
+      weaken tr_booltp_formation.
+      {
+        apply tr_booltp_elim_eqtype. change booltp with (@subst obj (sh 1) booltp). var_solv0. weaken tr_voidtp_formation. weaken tr_unittp_formation.
+      }
+      match goal with |- tr ?G (deq ?M ?M ?A) => change M with
        (@subst obj (under 0 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
        (bite (var 1) bfalse
           (app (app (var 2) triv)
@@ -219,8 +225,36 @@ Qed.
           constructor.
 Qed.
 
-          Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (app (eq_b m) n) booltp). Admitted.
+
+Definition nat_ind_fn := lam (lam (lam (lam (*P = 3 BC = 2 IS = 1 x = 0 *)
+                                          (
+                                            wind ( lam (lam (lam ( (*c = 0, b= 1, a = 2, x = 3, IS = 4, BC = 5,
+                                                                    P = 6*)
+                                                                 bite (var 2) (var 5)
+                                                                      (app (app (var 4)
+                                                                           (app (var 1) triv))
+                                                                           (app (var 0) triv))
+                          ))))                
+                           )))).
+
+
+  Lemma nat_ind G : tr G (oof nat_ind_fn
+                              (pi (arrow nattp U0)
+                                  (arrow (app (var 0) 0)
+                                         (arrow (pi nattp
+                                                    (
+                                                      arrow (app (var 1) (var 0))
+                                                            (app (var 1) (nsucc (var 0)))
+                                                           )
+                                                )
+                                                (pi nattp
+                                                    (app (var 1) (var 0))
+                                                )
+                                         )
+                                  )
+                              )).
+                         
+
 
 Lemma eqb_P G n m : tr G (oof n nattp) ->
                     tr G (oof m nattp) ->
@@ -228,5 +262,9 @@ Lemma eqb_P G n m : tr G (oof n nattp) ->
                     tr G (deq n m nattp).
   intros.
 Admitted.
+
+          Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (app (eq_b m) n) booltp). Admitted.
+
 
 
