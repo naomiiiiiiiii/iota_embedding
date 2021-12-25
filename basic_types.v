@@ -449,6 +449,83 @@ change (arrow (nattp) (univ nzero)) with
             constructor. }
             Qed.
 
+  Lemma nat_ind_app G P BC IS: tr G (oof P (arrow nattp U0)) ->
+                        tr G (oof BC (app P nzero)) ->
+                        tr G (oof IS
+                                  (pi nattp
+                                      (arrow (app P (var 0))
+                                             (app P (nsucc (var 0)))
+                                  ))) ->
+                              tr G (oof (app (app (app nat_ind_fn P) BC
+                                   ) IS)
+                                                (pi nattp
+                                                    (app (shift 1 P) (var 0))
+                                   )).
+    intros.
+    replace (pi nattp (app (shift 1 P) (var 0))) with
+        (subst1 IS
+(pi nattp (app (shift 2 P) (var 0)))
+        ).
+    2:{
+      rewrite - ! subst_sh_shift. simpsub. unfold subst1. rewrite subst_nat. auto.
+    }
+    apply (tr_pi_elim _
+           (pi nattp
+             (arrow (app (shift 1 P) (var 0))
+                      (app (shift 1 P) (nsucc (var 0))))
+          )).
+    match goal with |- tr ?G (deq ?T ?T ?A) =>
+                    replace A with
+        (subst1 BC
+       (pi
+          (pi nattp
+             (arrow (app (shift 2 P) (var 0))
+                (app (shift 2 P)
+                   (nsucc (var 0)))))
+          (pi nattp
+             (app (shift 3 P) (var 0))))) end.
+    2:{ unfold nsucc.
+      rewrite - ! subst_sh_shift. simpsub. unfold subst1. rewrite ! subst_nat.
+      simpsub. auto.
+    }
+    apply (tr_pi_elim _ (app P nzero)).
+    match goal with |- tr ?G (deq ?T ?T ?A) =>
+                    replace A with (subst1 P
+       (pi (app (var 0) nzero)
+          (pi
+             (pi nattp
+                (arrow
+                   (app (var 2)
+                      (var 0))
+                   (app (var 2)
+                      (nsucc (var 0)))))
+             (pi nattp
+                 (app (var 3) (var 0)))))) end.
+    eapply tr_pi_elim; try apply nat_ind; auto.
+    unfold nsucc. simpsub. rewrite ! subst_nattp.
+
+
+        )
+
+          )
+
+                             )
+
+    Tr G (oof nat_ind_fn
+                              (pi (arrow nattp U0)
+                                  (pi (app (var 0) nzero)
+                                         (pi (pi nattp
+                                                    (
+                                                      arrow (app (var 2) (var 0))
+                                                            (app (var 2) (nsucc (var 0)))
+                                                           )
+                                                )
+                                                (pi nattp
+                                                    (app (var 3) (var 0))
+                                                )
+                                         )
+                                  )
+                         )).
 
 (*do a lemma for applying nat ind*)
 
