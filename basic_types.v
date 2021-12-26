@@ -257,21 +257,10 @@ Lemma eq_b_succ n1 n2: equiv (app (eq_b (nsucc n1)) n2) (bite (if_z n2)
                     simpsub. auto.
                  }
                }
+               apply equiv_refl.
            }
-
-        unfold if_z. apply reduce_equiv.
-        replace (ppi1 n2) with (subst1 n2 (ppi1 (var 0))).
-        2: {
-          simpsub. auto.
-        }
-        apply reduce_app_beta; apply reduce_id.
-      }
-    }
-    }
-    
-  }
-  }
-  }
+           } } } } } } }
+Qed.
 
 
 Lemma eq_b0 n2: equiv (app (eq_b nzero) n2) (if_z n2).
@@ -392,7 +381,7 @@ Lemma eqb_typed {G} n1:
   - assumption.
   - simpsub. simpl.
     rewrite make_app2.
-    change (lam (if_z (var 0))) with
+     change (lam (if_z (var 0))) with
       (subst (under 2 sh1)  (lam (if_z (var 0)))).
     change (lam
              (bite (if_z (var 0)) bfalse
@@ -403,7 +392,8 @@ Lemma eqb_typed {G} n1:
                 (app (app (var 1) triv)
                      (app (ppi2 (var 0)) triv))))
         ).
-    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub; rewrite ! subst_nat;
+    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub;
+    (*rewrite ! subst_nat; *)
       apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
     + apply if_z_typed. var_solv'.
     + apply (w_elim_hyp _ [::]).
@@ -557,9 +547,9 @@ change (arrow (nattp) (univ nzero)) with
           }
           apply tr_symmetry. apply tr_arrow_eta.
           change 
-            (arrow voidtp (wt booltp (bite (var 0) voidtp unittp)))
+            (arrow voidtp nattp)
             with (@subst obj (sh 2)
-            (arrow voidtp (wt booltp (bite (var 0) voidtp unittp)))
+            (arrow voidtp nattp)
                  ). var_solv0.
           apply tr_booltp_elim_eqtype. change booltp with (@subst obj (sh 1) booltp). var_solv0. weaken tr_voidtp_formation. weaken tr_unittp_formation. }
         change (app (var 5) nzero) with
@@ -680,7 +670,7 @@ change (arrow (nattp) (univ nzero)) with
 (pi nattp (app (shift 2 P) (var 0)))
         ).
     2:{
-      rewrite - ! subst_sh_shift. simpsub. unfold subst1. rewrite subst_nat. auto.
+      rewrite - ! subst_sh_shift. simpsub. unfold subst1. auto.
     }
     apply (tr_pi_elim _
            (pi nattp
@@ -698,7 +688,7 @@ change (arrow (nattp) (univ nzero)) with
           (pi nattp
              (app (shift 3 P) (var 0))))) end.
     2:{ unfold nsucc.
-      rewrite - ! subst_sh_shift. simpsub. unfold subst1. rewrite ! subst_nat.
+      rewrite - ! subst_sh_shift. simpsub. unfold subst1. 
       simpsub. auto.
     }
     apply (tr_pi_elim _ (app P nzero)).
@@ -715,20 +705,122 @@ change (arrow (nattp) (univ nzero)) with
              (pi nattp
                  (app (var 3) (var 0)))))) end.
     eapply tr_pi_elim; try apply nat_ind; auto.
-    unfold nsucc. unfold nzero. simpsub. rewrite ! subst_nat - ! subst_sh_shift. simpl.
+    unfold nsucc. unfold nzero. simpsub. rewrite - ! subst_sh_shift. simpl.
     auto. assumption. assumption.
-Qed.
+  Qed.
+
+  Definition eqb_sound_fn :=
+    (app (app (app nat_ind_fn (lam
+                  (pi nattp
+                      ( (*x = 1, y = 0*)
+                        arrow 
+                        (equal (app (eq_b (var 1)) (var 0)) btrue
+                               booltp)
+                        (equal (var 1) (var 0) nattp)
+                  )
+               )))
+               (lam (*y : nat*)
+                  (lam  (*hyp : eqb 0 y  = tt*)
+                  triv 
+                  )
+               ))
+               (lam (*x : nat*) (lam (*IH: P(x) ie pi y (eqb x y = t -> x = y)*)
+                                   (lam  (*y'  : nat*)
+                                      (lam (*eqb s x y' = t*)
+                                         triv (*s x  = y  : nat*)
+                                      )
+                  )
+               ))).
+               
 
 
-Lemma eqb_P G n m : tr G (oof n nattp) ->
-                    tr G (oof m nattp) ->
-  tr G (deq (app (app eq_b n) m) btrue booltp) ->
-                    tr G (deq n m nattp).
-  intros.
-Admitted.
+  Lemma eqb_sound G : tr G (oof eqb_sound_fn (pi nattp (pi nattp (arrow (equal booltp (app (eq_b (var 1)) (var 0))
+                                                                               btrue
+                                                                        )
+                                                                        (equal nattp (var 1) (var 0))
+
+                           )))).
+    Admitted.
 
           Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
   tr G (oof (app (eq_b m) n) booltp). Admitted.
 
+          Lemma subst_eqb s n: subst s (eq_b n) = eq_b (subst s n).
+  intros. unfold eq_b. simpsub. auto. Qed.
+          Hint Rewrite subst_eqb: core subst1.
+
+
+Ltac simpsub1 :=
+autounfold with subst1; autorewrite with subst1.
+
+Ltac simpsub_big := repeat (simpsub; simpsub1).
+
+
+Hint Unfold subst1: subst1.
+Lemma eqb_P G n m : tr G (oof n nattp) ->
+                    tr G (oof m nattp) ->
+  tr G (deq (app (eq_b n) m) btrue booltp) ->
+                    tr G (deq n m nattp).
+  intros.
+  match goal with |- tr G ?J => replace J with (substj (dot triv id)
+                                                    (deq (subst (sh 1) n)
+                                                         (subst (sh 1) m)
+                                                    nattp)
+                                             ) end.
+  2:{
+    unfold substj. simpsub. auto.
+  }
+  eapply tr_generalize. apply tr_equal_intro in H1. apply H1.
+  remember (subst (sh 1) n) as n'.
+  remember (subst (sh 1) m) as m'.
+  suffices: (tr (hyp_tm (equal booltp (app (eq_b n) m) btrue) :: G)
+                (deq triv (app (app (app eqb_sound_fn n') m') (var 0))
+                       (equal nattp n' m')
+            )).
+  move/ tr_eq_reflexivity => Hdeq.
+  constructor. assumption.
+  apply tr_symmetry. apply tr_equal_eta.
+  assert (tr
+    (hyp_tm (equal booltp (app (eq_b n) m) btrue)
+     :: G) (deq n' n' nattp)) as Hn. 
+    subst; change nattp with (@subst obj (sh 1) nattp);
+      rewrite ! subst_sh_shift; apply tr_weakening_append1; assumption.
+  assert (tr
+    (hyp_tm (equal booltp (app (eq_b n) m) btrue)
+     :: G) (deq m' m' nattp)) as Hm. 
+  subst; change nattp with (@subst obj (sh 1) nattp);
+      rewrite ! subst_sh_shift; apply tr_weakening_append1; assumption.
+ (* replace (equal nattp n' m') with
+      (subst1 (var 0) (equal nattp (subst (sh 1) n') (subst (sh 1) m'))). *)
+  apply (tr_arrow_elim _ (equal booltp (app (eq_b n') m') btrue)
+        ).
+  - apply tr_equal_formation. weaken tr_booltp_formation.
+    apply eqapp_typed; assumption.
+    constructor. apply tr_equal_formation; auto.
+    - match goal with |- tr ?G (deq ?M ?M ?T) => replace T with  
+          (subst1 m' 
+       (arrow
+          (equal booltp (app (eq_b (subst (sh 1) n')) (var 0)) btrue)
+          (equal nattp (subst (sh 1) n') (var 0)))) end.
+      2:{
+        unfold subst1. simpsub_big.  auto.
+      }
+      apply (tr_pi_elim _ nattp).
+      match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+       (subst1 n' (pi nattp
+          (arrow
+             (equal booltp
+                (app
+                   (eq_b (var 1))
+                   (var 0)) btrue)
+             (equal nattp  (var 1)
+                (var 0))))) end.
+      apply (tr_pi_elim _ nattp); try assumption. apply eqb_sound.
+      simpsub_big. auto.
+      assumption.
+      match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+      (subst (sh 1) (equal booltp (app (eq_b n) m) btrue)) end. var_solv0.
+      subst. simpsub_big. auto.
+Qed.
 
 
