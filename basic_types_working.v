@@ -27,24 +27,96 @@ From istari Require Import Sigma Tactics
                                       )
                   )
                ))).
-               
+     (*          
+  tr
+    [:: hyp_tm
+          (equal booltp
+             (if_z (var 0)) btrue),
+        hyp_tm nattp
+      & G]
+    (deq nzero
+       (var (1 + 0)%coq_nat) nattp) *)
 
-Lemma equal_nzero G n: tr G (deq (if_z n) btrue booltp) ->
-                       tr G (deq nzero n nattp). (*
-eapply tr_compute_hyp.
+      Lemma bool_contra G J : tr G (deq bfalse btrue booltp) ->
+                          tr G J.
+    Admitted.
+
+      Lemma equal_nzero G n:
+        tr G (oof n nattp) -> tr G (oof (lam triv)
+                                       (arrow (equal booltp (if_z n) btrue)
+                                              (equal nattp nzero n)
+                                       )
+                                  ).
+        intros. 
+        replace 
+    (oof (lam triv)
+       (arrow
+          (equal booltp 
+             (if_z n) btrue)
+          (equal nattp nzero n)))
+ with
+            (substj (dot n id) 
+    (oof (lam triv)
+       (arrow
+          (equal booltp 
+             (if_z (var 0)) btrue)
+          (equal nattp nzero (var 0))))) .
+        2:{ simpl. simpsub_big. auto. } 
+        eapply (tr_generalize _ nattp). assumption.
+        apply tr_arrow_intro; auto. { apply tr_equal_formation; auto.
+                                      weaken tr_booltp_formation.
+                                      apply if_z_typed. var_solv'. constructor. }
+                                    { apply tr_equal_formation; auto. var_solv'. }
+                                    simpsub_big.
+        rewrite make_app1. eapply w_elim_hyp.
+        weaken tr_booltp_formation. weaken nat_U01.
+        change triv with (@subst obj (under 1 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1))) triv). apply tr_sigma_eta_hyp. simpsub_big.
+        simpl. simpsub_big. simpl.
+        rewrite make_app2.
+      match goal with |- tr ?G (deq triv triv ?T) =>
+                      suffices: (tr G (oof (bite (var 2) triv triv) T)) end.
+      { intros Hannoying. constructor. eapply deq_intro. apply Hannoying. }
+      rewrite make_app2.
+        change triv with 
+            (@subst obj (under 2 sh1) triv).
+        apply tr_booltp_eta_hyp; simpl; simpsub_big; simpl.
+        { (*true*)
+          rewrite make_app1.
+          eapply tr_compute_hyp.
         {
           constructor. apply equiv_arrow. apply reduce_equiv.
           apply reduce_bite_beta1. apply reduce_id.
           apply equiv_refl.
         }
-        simpl. eapply (tr_compute_hyp _ [::]).
-        {
-          constructor. apply equiv_pi. apply reduce_equiv.
+        constructor. apply tr_wt_intro. constructor.
+        simpsub_big.
+        eapply tr_compute. { apply equiv_arrow. apply reduce_equiv.
           apply reduce_bite_beta1. apply reduce_id.
           apply equiv_refl.
+ } apply equiv_refl. apply equiv_refl.
+        apply (tr_transitivity _#2 (lam (app (subst sh1 (var 1)) (var 0)))).
+        { apply tr_arrow_intro; auto. weaken tr_voidtp_formation.
+          eapply (tr_voidtp_elim  _ (var 0) (var 0)).
+          change voidtp with (@subst obj (sh 1) voidtp). var_solv0.
         }
-        simpl.
-        apply (tr_eqtype_convert _#3 (app (var 5) nzero)).
+        { apply tr_symmetry. apply tr_arrow_eta.
+          change (arrow voidtp nattp) with (@subst obj (sh 2) (arrow voidtp nattp)).
+          var_solv0.
+        }
+        weaken nat_U01. }
+        {(*false*)
+          eapply (tr_compute_hyp _ [::]).
+        {
+          constructor. apply equiv_equal. apply equiv_refl. apply reduce_equiv.
+          apply reduce_ppi1_beta. apply reduce_id.
+          apply equiv_refl.
+        }
+        apply bool_contra. simpl. apply (deq_intro _#4 (var 0) (var 0)).
+        change (equal booltp bfalse btrue) with (@subst obj sh1 (equal booltp bfalse btrue)).
+        var_solv0. } 
+       Qed. 
+        apply
+        }
         { 
           rewrite make_app5. apply Hp.
           unfold nzero. apply tr_wt_intro. constructor.
@@ -74,10 +146,11 @@ eapply tr_compute_hyp.
                         tr G (deq (nsucc (app preds triv )) (ppair bfalse preds) nattp).
     Admitted.
 
-  Lemma bool_contra G J : tr G (deq bfalse btrue booltp) ->
-                          tr G J.
-    Admitted.
 
+      Lemma equal_nzero G n:
+        tr G (oof n nattp) ->
+        tr G (deq (if_z n) btrue booltp) ->
+                       tr G (deq nzero n nattp).
 
   Lemma eqb_sound G : tr G (oof eqb_sound_fn (pi nattp (pi nattp (arrow (equal booltp (app (eq_b (var 1)) (var 0))
                                                                                btrue
