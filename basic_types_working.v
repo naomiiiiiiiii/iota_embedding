@@ -41,7 +41,7 @@ From istari Require Import Sigma Tactics
                           tr G J.
     Admitted.
 
-      Lemma equal_nzero G n:
+      Lemma equal_nzero_help G n:
         tr G (oof n nattp) -> tr G (oof (lam triv)
                                        (arrow (equal booltp (if_z n) btrue)
                                               (equal nattp nzero n)
@@ -115,42 +115,42 @@ From istari Require Import Sigma Tactics
         change (equal booltp bfalse btrue) with (@subst obj sh1 (equal booltp bfalse btrue)).
         var_solv0. } 
        Qed. 
-        apply
-        }
-        { 
-          rewrite make_app5. apply Hp.
-          unfold nzero. apply tr_wt_intro. constructor.
-          simpsub. eapply tr_compute.
-          apply equiv_arrow. apply reduce_equiv.
-          apply reduce_bite_beta1. apply reduce_id.
-          apply equiv_refl. apply equiv_refl. apply equiv_refl.
-          apply (tr_transitivity _ _ (lam (app (subst sh1 (var 1)) (var 0))) ).
-          {
-            simpsub. simpl. apply tr_arrow_intro; auto.
-            - weaken tr_voidtp_formation.
-              apply (tr_voidtp_elim _ (var 0) (var 0)).
-              change voidtp with (@subst obj (sh 1) voidtp).
-              var_solv0.
-          }
-          apply tr_symmetry. apply tr_arrow_eta.
-          change 
-            (arrow voidtp nattp)
-            with (@subst obj (sh 2)
-            (arrow voidtp nattp)
-                 ). var_solv0.
-          apply tr_booltp_elim_eqtype. change booltp with (@subst obj (sh 1) booltp). var_solv0. weaken tr_voidtp_formation. weaken tr_unittp_formation. }
-        change (app (var 5) nzero) with
-            (@subst obj (sh 5) (app (var 0) nzero)). var_solv0. } *) Admitted.
-
-  Lemma equal_succ G preds: tr G (oof preds (arrow unittp nattp)) ->
-                        tr G (deq (nsucc (app preds triv )) (ppair bfalse preds) nattp).
-    Admitted.
 
 
       Lemma equal_nzero G n:
         tr G (oof n nattp) ->
         tr G (deq (if_z n) btrue booltp) ->
-                       tr G (deq nzero n nattp).
+        tr G (deq nzero n nattp).
+        intros.
+        apply (deq_intro _#4 (app (lam triv) triv) (app (lam triv) triv)).
+        apply (tr_arrow_elim _ (equal booltp (if_z n) btrue)).
+        apply tr_equal_formation; auto. weaken tr_booltp_formation.
+        apply if_z_typed. assumption. constructor.
+        apply tr_equal_formation; auto. apply equal_nzero_help. assumption.
+        constructor. assumption. Qed.
+
+  Lemma equal_succ G preds: tr G (oof preds (arrow unittp nattp)) ->
+                        tr G (deq (nsucc (app preds triv )) (ppair bfalse preds) nattp).
+    intros. unfold nsucc. simpsub. apply tr_wt_intro. constructor.
+    simpsub_big.
+    eapply tr_compute. { apply equiv_arrow. apply reduce_equiv.
+                         apply reduce_bite_beta2. apply reduce_id. apply equiv_refl. } apply equiv_refl. apply equiv_refl.
+    apply (tr_transitivity _ _ (lam (app (subst sh1 preds) (var 0)))).
+    {
+            apply tr_arrow_intro; auto.
+            apply (tr_arrow_elim _ unittp); auto.
+            match goal with |- tr ?G (deq ?M ?M ?T) =>
+                                                      change T with
+       (@shift obj 1
+               (arrow unittp nattp)) end. rewrite subst_sh_shift. apply tr_weakening_append1.
+            assumption.
+          apply tr_symmetry. apply tr_unittp_eta.
+          change unittp with (@subst obj (sh 1) unittp). var_solv0.
+    }
+    {
+      apply tr_symmetry. apply tr_arrow_eta. assumption.
+    }
+    weaken nat_U01. Qed.
 
   Lemma eqb_sound G : tr G (oof eqb_sound_fn (pi nattp (pi nattp (arrow (equal booltp (app (eq_b (var 1)) (var 0))
                                                                                btrue
