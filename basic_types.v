@@ -48,9 +48,9 @@ Lemma unit_type: forall G,
       tr G (deqtype unittp unittp). Admitted.
 Hint Resolve unit_type. 
 
-Lemma nsucc_type G n:
-  tr G (oof n nattp) ->
-  tr G (oof (nsucc n) nattp). Admitted.
+Lemma nsucc_type G n m:
+  tr G (deq n m nattp) ->
+  tr G (deq (nsucc n) (nsucc m) nattp). Admitted.
 Hint Resolve nsucc_type. 
 
 Definition leq_t n m : term obj :=

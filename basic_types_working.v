@@ -70,9 +70,14 @@ eapply tr_compute_hyp.
         change (app (var 5) nzero) with
             (@subst obj (sh 5) (app (var 0) nzero)). var_solv0. } *) Admitted.
 
-  Lemma equal_succ G preds: tr G (oof preds (arrow (bite bfalse voidtp unittp) nattp)) ->
-                        tr G (deq (ppair bfalse preds) (nsucc (app preds triv)) nattp).
+  Lemma equal_succ G preds: tr G (oof preds (arrow unittp nattp)) ->
+                        tr G (deq (nsucc (app preds triv )) (ppair bfalse preds) nattp).
     Admitted.
+
+  Lemma bool_contra G J : tr G (deq bfalse btrue booltp) ->
+                          tr G J.
+    Admitted.
+
 
   Lemma eqb_sound G : tr G (oof eqb_sound_fn (pi nattp (pi nattp (arrow (equal booltp (app (eq_b (var 1)) (var 0))
                                                                                btrue
@@ -152,12 +157,95 @@ eapply tr_compute_hyp.
       apply tr_sigma_eta_hyp.
       simpsub_big. simpl. simpsub_big.
       eapply (tr_compute_hyp _ [::]).
-      { constructor. 
+      { constructor. apply equiv_equal. apply equiv_refl.
+        apply equiv_bite. apply reduce_equiv.
+        apply reduce_ppi1_beta. apply reduce_id. apply equiv_refl.
+        apply equiv_app. apply equiv_refl. apply equiv_app.
+        apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+        apply equiv_refl. apply equiv_refl.
       }
-        }
-    }
+      simpl. rewrite make_app2.
+      match goal with |- tr ?G (deq triv triv ?T) =>
+                      suffices: (tr G (oof (bite (var 2) triv triv) T)) end.
+      { intros Hannoying. constructor. eapply deq_intro. apply Hannoying. }
+      change triv with (@subst obj (under 2 sh1) triv).
+      apply tr_booltp_eta_hyp; simpl; simpsub_big.
+      { (*y' = 0*)
+        eapply (tr_compute_hyp _ [::]). { constructor. apply equiv_equal.
+        apply equiv_refl. apply reduce_equiv. apply reduce_bite_beta1.
+        apply reduce_id. apply equiv_refl. }
+        apply bool_contra. simpl. apply (deq_intro _#4 (var 0) (var 0)).
+        change (equal booltp bfalse btrue) with
+            (@subst obj (sh 1) (equal booltp bfalse btrue)). var_solv0. }
+      { (*y' = s y''*)
+       simpl.  eapply (tr_compute_hyp _ [::]).
+          { constructor. apply equiv_equal.
+        apply equiv_refl. apply reduce_equiv. apply reduce_bite_beta2.
+        apply reduce_id. apply equiv_refl. }
+          simpl. rewrite make_app1. eapply tr_compute_hyp.
+          { constructor. apply equiv_arrow. apply reduce_equiv.
+       apply reduce_bite_beta2.
+        apply reduce_id. apply equiv_refl. }
+          simpl.
+          constructor.
+          eapply (tr_transitivity _#2 (nsucc (app (var 1) triv))).
+          { (*succ x = succ (y' * *)
+            apply nsucc_type.
+            apply (deq_intro _#4 (app (app (var 2) (app (var 1) triv))
+                                      (var 0))
+                             (app (app (var 2) (app (var 1) triv))
+                                      (var 0))
+                  ).
+            apply (tr_arrow_elim _
+(equal booltp (app (eq_b (var 3)) (app (var 1) triv))
+       btrue)).
+      { apply tr_equal_formation; auto.
+      weaken tr_booltp_formation.
+      apply eqapp_typed; auto; try apply nsucc_type; try var_solv'.
+      apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'. constructor. constructor. }
+      {
+        apply tr_equal_formation; auto; try var_solv'.
+        apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'. constructor. 
+      }
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+          (subst1 (app (var 1) triv)
+       (arrow
+          (equal booltp
+             (app (eq_b (var 4))
+                (var 0)) btrue)
+          (equal nattp (var 4) (var 0)))) end.
+      apply (tr_pi_elim _ nattp).
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+      ( subst (sh 3) (pi nattp
+          (arrow
+             (equal booltp
+                (app (eq_b (var 1)) (var 0)) btrue)
+             (equal nattp (var 1) (var 0))))) end. var_solv'.
+        apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'. constructor.
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+          (subst (sh 1)
+       (equal booltp
+          (app (eq_b (var 2)) (app (var 0) triv))
+          btrue)) end. var_solv'. }
+          {  apply equal_succ.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'.  } } } 
+Qed.
 
-          
 Lemma eqb_P G n m : tr G (oof n nattp) ->
                     tr G (oof m nattp) ->
   tr G (deq (app (eq_b n) m) btrue booltp) ->
