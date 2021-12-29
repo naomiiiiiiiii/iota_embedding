@@ -90,12 +90,8 @@ Definition len w: (term obj) := ppi2 w.
 
 Definition nth w n: term obj := app (ppi1 w) n.
 
-
  Definition subseq: (term obj) -> (term obj) -> (term obj) :=
    fun W1 => fun W2 =>
-       app  (app   (lam (lam
-                   (let W1 := var 0 in
-                   let W2 := var 1 in
             let w1 := ppi1  W1 in
             let w2 := ppi1 W2 in
             let l1 := ppi2 W1 in
@@ -113,7 +109,9 @@ Definition nth w n: term obj := app (ppi1 w) n.
                                                    )
                                            )
 
-                 ))))) W1) W2.
+                 )).
+
+
 
  Definition make_subseq: term obj := ppair triv (lam (lam (lam triv)) ).
 

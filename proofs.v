@@ -113,8 +113,8 @@ Lemma compm5_type:
     tr G (oof (ppair w lw) world) ->
     tr G (oof (ppair u lu) world) ->
     (tr G (oof T U0)) ->
-    tr G (oof  (prod (prod (subseq (ppair w lw) (ppair u lu)) (store u lu)) T) U0).
-move =>> H1 H2. repeat (eapply tr_prod_formation_univ).
+    tr G (oof  (prod (prod (subseq (ppair w lw) (ppair u lu)) (store u lu)) T) U0). 
+  move =>> H1 H2. do 2 (eapply tr_prod_formation_univ).
 apply subseq_U0; auto.
 apply store_U0; auto. 
 Qed.
@@ -706,7 +706,7 @@ Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply co
 try apply trans_type_works; auto.
 (*default value after s(len w1) is x*)
 Definition cons_b w l x :=lam (let i := (var 0) in
-                              bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
+                              bite (ltb_app i (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
 
 Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                 tr D (oof l nattp) ->
@@ -726,7 +726,7 @@ Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
 Hint Rewrite <- sh_Gamma_at subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
      subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
-     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
+     subst_picomp3 subst_make_subseq subst_theta  subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
 
 Ltac inv_subst :=
 autounfold with subst1; autorewrite with inv_subst.

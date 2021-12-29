@@ -126,8 +126,11 @@ Lemma subst_subseq: forall W1 W2 s,
        (subst s
               (subseq W1 W2)) = subseq (subst s W1)
                                        (subst s W2).
-  intros. unfold subseq. repeat rewrite subst_app. auto.
-Qed.
+   intros. unfold subseq.
+   unfold app3.
+   simpsub_bigs.
+   auto.
+ Qed.
 
 
 

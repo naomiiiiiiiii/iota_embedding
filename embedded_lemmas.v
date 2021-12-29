@@ -112,21 +112,17 @@ Lemma subseq_U0: forall G w1 w2,
     tr G (oof (subseq w1 w2) (univ nzero)).
   intros.
   assert (forall V,
-tr [:: hyp_tm
-          (leq_t (var 0)
-             (subst (sh 3) (ppi2 (var 0)))),
+tr 
+    [:: hyp_tm (leq_t (var 0) (ppi2 (subst (sh 3) w1))),
         hyp_tm nattp, hyp_tm (fut nattp),
-        hyp_tm (fut preworld), hyp_tm world,
-        hyp_tm world
-        & G] (oof V world) ->
+        hyp_tm (fut preworld)
+      & G]
+(oof V world) ->
 
   tr
-    [:: hyp_tm
-          (leq_t (var 0)
-             (subst (sh 3) (ppi2 (var 0)))),
+    [:: hyp_tm (leq_t (var 0) (ppi2 (subst (sh 3) w1))),
         hyp_tm nattp, hyp_tm (fut nattp),
-        hyp_tm (fut preworld), hyp_tm world,
-        hyp_tm world
+        hyp_tm (fut preworld)
       & G]
     (oof
        (app3 (ppi1 V) 
@@ -186,8 +182,7 @@ tr [:: hyp_tm
   apply nat_type.
   eapply pw_type1.
   eapply tr_eqtype_convert.
-  apply unfold_pw.
-  eapply (tr_sigma_elim1 _ _ nattp).
+  apply unfold_pw. eapply split_world_elim1. assumption.
   (*assert (forall s, (arrow nattp
              (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))
                =  @ subst obj s (arrow nattp
@@ -195,7 +190,6 @@ tr [:: hyp_tm
 )
     as sub5.
   intros. auto.*)
-  apply Hvw.
   (*assert (sigma preworld nattp = world) by auto. rewrite H.
   rewrite - {3}(subst_world (sh 5)).
   apply tr_hyp_tm. repeat constructor.*)
@@ -213,22 +207,16 @@ tr [:: hyp_tm
 unfold subseq.
   rewrite - (subst_nzero (dot w2 id)).
   rewrite - subst_univ.
-  eapply (tr_pi_elim _ world).
+ (* eapply (tr_pi_elim _ world).
   rewrite - (subst_nzero (under 1 (dot w1 id)) ).
   rewrite - subst_univ.
   rewrite - (subst_world (dot w1 id)).
   rewrite - subst_pi.
   eapply (tr_pi_elim _ world).
   apply tr_pi_intro. apply world_type.
-  apply tr_pi_intro. apply world_type.
+  apply tr_pi_intro. apply world_type.*) simpsub_bigs.
   eapply tr_prod_formation_univ.
-  eapply leq_type.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 1)).
-  eapply tr_hyp_tm. constructor.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 2)).
-  eapply tr_hyp_tm. repeat constructor.
+  eapply leq_type; eapply split_world_elim2; assumption.
   eapply tr_all_formation_univ.
   eapply tr_fut_kind_formation.
   apply pw_kind.
@@ -240,24 +228,14 @@ unfold subseq.
   repeat rewrite subst_nzero.
   eapply tr_pi_formation_univ. apply nat_U0.
   repeat rewrite subst_nzero. eapply tr_pi_formation_univ.
-  apply leq_type.
-  rewrite - (subst_nat (sh 1)).
-  eapply tr_hyp_tm. repeat constructor.
-  rewrite subst_ppi2. simpsub. simpl.
-  eapply split_world_elim2.
-  rewrite - (subst_world (sh 4)).
-  eapply tr_hyp_tm. repeat constructor.
-  repeat rewrite subst_nzero.
-  eapply tr_eqtype_formation_univ.
-apply Hworldapp. 
-  rewrite - {3}(subst_world (sh 5)).
-  apply tr_hyp_tm. repeat constructor.
-simpsub. simpl. apply Hworldapp. 
-  rewrite - {3}(subst_world (sh 6)).
-  apply tr_hyp_tm. repeat constructor.
+  apply leq_type; try var_solv'.
+    eapply split_world_elim2.
+ rewrite - (subst_world (sh 3)) ! subst_sh_shift. apply tr_weakening_append3. assumption.
+  eapply tr_eqtype_formation_univ; apply Hworldapp;
+rewrite - (subst_world (sh 4)) ! subst_sh_shift; apply tr_weakening_append4;
+  assumption.
   auto.
-  repeat rewrite subst_nzero. apply leq_refl. auto.
-assumption. assumption.
+  apply leq_refl. auto.
 Qed.
 
 (*simple lemmas about well typedness of embedding*)
@@ -388,33 +366,13 @@ Hint Resolve tr_fut_formation tr_fut_formation_univ: core.
           ).
  Admitted.
 
- Definition subseq_easier: (term obj) -> (term obj) -> (term obj) :=
-   fun W1 => fun W2 =>
-            let w1 := ppi1  W1 in
-            let w2 := ppi1 W2 in
-            let l1 := ppi2 W1 in
-            let l2 := ppi2 W2 in
-            prod (leq_t l1 l2)
-                 (all nzero (fut preworld)
-                 (*u = 0*)
-                 (pi (fut nattp) (*u = 1, l = 0*)
-                     (pi (nattp) (*u = 2, l = 1, i = 0*)(
-                           pi (leq_t (var 0) (subst (sh 3) l1))
-                              ( (*u = 3, l = 2, i = 1, m = 0*)
-                          eqtype (app3 (subst (sh 4) w1) (var 1) (var 3) (var 2))
-                          (app3 (subst (sh 4) w2) (var 1) (var 3) (var 2))
-                              )
-                                                   )
-                                           )
-
-                 )).
-
 
 Lemma subseq_refl: forall ( U: term obj) (G: context),
                          tr G (oof U world)
                          ->tr G (oof make_subseq 
                                     (subseq U U)).
-intros. unfold subseq. unfold make_subseq.
+  intros. unfold subseq. unfold make_subseq.
+  Admitted.
 
 Lemma subseq_trans M M' U1 U2 U3 G:
                          tr G (oof M (subseq U2 U3))

@@ -3,7 +3,7 @@ From Coq Require Import ssreflect ssrfun ssrbool.
 From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types
-     help subst_help0 subst_help trans hygiene_help derived_rules embedded_lemmas proofs.
+     help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences.
@@ -1025,9 +1025,11 @@ constructor. }
                          (subseq (ppair (var 3) (var 2)) (ppair u1 (nsucc (var 2))))))
              as HUsubU1. (*m1*)
            subst. apply consb_subseq; try (apply Hx); try var_solv.
-           repeat (apply tr_prod_intro); try assumption.
+           apply tr_prod_intro; try assumption.
+           apply tr_prod_intro. assumption.
            (*showing the new store is a store at U1*)
-      subst u1. unfold store. apply tr_all_intro; auto. simpsub_bigs.
+           subst u1. unfold store.
+           apply tr_all_intro; auto. simpsub_bigs.
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
       (*ltac for showing (sh 2 U1) to be a world in context grown by 2*)
       Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append.
@@ -1165,9 +1167,9 @@ replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (va
              - (*showing next(move A (m2 o m1 o m) (e @W)) : |>(T @ U2) *)
                apply (@moveapp_works _ _ (var 10) (var 9) (var 3) (var 2)); try (apply world_pair; var_solv).
              assert (forall w l x, cons_b w l x = lam (let i := (var 0) in
-                                                  bite (app (app lt_b i) (shift 1 l)) (app (shift 1 w) i) (shift 1 x))) as fold_consb. auto.
+                                                  bite (ltb_app i (shift 1 l)) (app (shift 1 w) i) (shift 1 x))) as fold_consb. auto.
              remember (cons_b (var 3) (var 2) x) as u1.
-             replace (lam (bite (app (app lt_b (var 0)) (var 5))
+             replace (lam (bite (ltb_app (var 0) (var 5))
                                  (app (var 6) (var 0))
                                  (subst (sh 3) x))) with (shift 2 u1);
                last by subst; unfold cons_b; simpsub_bigs; auto.
