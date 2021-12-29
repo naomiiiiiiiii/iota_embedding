@@ -63,13 +63,17 @@ Lemma subst_U0: forall s,
 Lemma subst_theta s : @ subst obj s theta = theta. 
   unfold theta. simpsub. auto. Qed.
 Hint Rewrite subst_theta: core subst1.
-
+(*
 Lemma subst_minus s: subst s minus = minus.
   auto. Qed.
-Hint Rewrite subst_minus: core subst1.
+Hint Rewrite subst_minus: core subst1. *)
 
-Lemma subst_ltb s : subst s lt_b = lt_b.
-  intros. unfold lt_b. simpsub. auto. Qed.
+Lemma subst_leq_b s n: subst s (leq_b n) = leq_b (subst s n).
+  intros. unfold leq_b. simpsub. auto. Qed.
+Hint Rewrite subst_leq_b: core subst1.
+
+Lemma subst_ltb s n m: subst s (ltb_app n m) = ltb_app (subst s n) (subst s m).
+  intros. unfold ltb_app. simpsub_big. auto. Qed.
 Hint Rewrite subst_ltb: core subst1.
 
 Lemma subst_world: forall s,
@@ -158,7 +162,7 @@ Lemma subst_picomp4: forall s m, (subst s (picomp4 m)) = picomp4 (subst s m).
 Hint Rewrite subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
      subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
      subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
-     subst_picomp3 subst_make_subseq subst_theta subst_minus subst_ltb: core subst1.
+     subst_picomp3 subst_make_subseq subst_theta  subst_ltb: core subst1.
 
 Hint Rewrite <- subst_sh_shift: core subst1.
 
@@ -180,9 +184,6 @@ Lemma subst_moveapp s A m1 m2 : (subst s (move_app A m1 m2)) =
 
 Hint Rewrite subst_nsucc subst_moveapp: core subst1.
 
-Lemma subst_eqb s : subst s eq_b = eq_b.
-  intros. unfold eq_b. simpsub. auto. Qed.
-Hint Rewrite subst_eqb: core subst1.
 
 Lemma subst_inr: forall s t, subst s (inr t)  = inr (subst s t).
   intros. unfold inr. simpsub. auto. Qed.

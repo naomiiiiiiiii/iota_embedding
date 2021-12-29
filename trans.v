@@ -163,7 +163,7 @@ that. you want to bind
                                          let x := app (app (shift 8 Et) l1) g in
                                          let m12 := make_subseq in (*m2 o m1 : U <= U2*)
                                          let m02 := make_subseq in (*m12 o m : W <= U2*)
-                                         bite (app (app lt_b i) l)
+                                         bite (ltb_app i l)
                                               (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
                                               (next (move_app A m02 x)) (*move x to be : |> A @ U2*)
                                                ))
@@ -199,7 +199,7 @@ that. you want to bind
                                                                     let l := shift 3 l in
                                                                     let g := shift 3 g in
                                                                     bite
-                                                                      (app (app eq_b j) i)
+                                                                      (app (eq_b j) i)
                                                                       (next (move_app A (make_subseq)
                                                                     (app (app (shift 8 Et) l) g)))
                                                                       (app (app (app (shift 3 s1) l2) m1) j)

@@ -562,7 +562,7 @@ Lemma gamma_at_typed {G w l} :
        (Gamma_at G (shift (size G) w)
                  (shift (size G) l))).
   intros. induction G.
-  - simpl. unfold mapi. unfold gamma_at. simpl.
+  - simpl. 
     constructor.
   - Opaque Gamma_at_ctx. simpl. 
     apply Gamma_at_intro.
@@ -584,14 +584,6 @@ Qed.
 
 
 
-Lemma sub_refl: forall ( U: term obj) (G: context),
-                         tr G (oof U world)
-                         ->tr G (oof make_subseq 
-                                    (subseq U U)).
-Admitted.
-
-(*don't do this because figuring out the substitutions for the term will be weird
- and hard*)
 
 
 Ltac trans_type := weaken trans_type_works; auto.
@@ -686,12 +678,6 @@ Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
   Admitted.
 
 
- Lemma subseq_trans M M' U1 U2 U3 G:
-                         tr G (oof M (subseq U2 U3))
-                         -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof make_subseq 
-                                    (subseq U1 U3)).
- Admitted.
 
 Lemma store_type1 G w l: (tr G (oof (ppair w l) world)) -> tr G (oof_t (pi nattp (*v = 1, l v= 0*) 
                                                 ( let W := (shift 1 (ppair w l)) in

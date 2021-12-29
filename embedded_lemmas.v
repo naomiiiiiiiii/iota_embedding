@@ -388,4 +388,38 @@ Hint Resolve tr_fut_formation tr_fut_formation_univ: core.
           ).
  Admitted.
 
+ Definition subseq_easier: (term obj) -> (term obj) -> (term obj) :=
+   fun W1 => fun W2 =>
+            let w1 := ppi1  W1 in
+            let w2 := ppi1 W2 in
+            let l1 := ppi2 W1 in
+            let l2 := ppi2 W2 in
+            prod (leq_t l1 l2)
+                 (all nzero (fut preworld)
+                 (*u = 0*)
+                 (pi (fut nattp) (*u = 1, l = 0*)
+                     (pi (nattp) (*u = 2, l = 1, i = 0*)(
+                           pi (leq_t (var 0) (subst (sh 3) l1))
+                              ( (*u = 3, l = 2, i = 1, m = 0*)
+                          eqtype (app3 (subst (sh 4) w1) (var 1) (var 3) (var 2))
+                          (app3 (subst (sh 4) w2) (var 1) (var 3) (var 2))
+                              )
+                                                   )
+                                           )
+
+                 )).
+
+
+Lemma subseq_refl: forall ( U: term obj) (G: context),
+                         tr G (oof U world)
+                         ->tr G (oof make_subseq 
+                                    (subseq U U)).
+intros. unfold subseq. unfold make_subseq.
+
+Lemma subseq_trans M M' U1 U2 U3 G:
+                         tr G (oof M (subseq U2 U3))
+                         -> tr G (oof M' (subseq U1 U2))
+                         ->tr G (oof make_subseq 
+                                    (subseq U1 U3)).
+ Admitted.
 
