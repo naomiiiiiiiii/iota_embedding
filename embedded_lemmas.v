@@ -13,6 +13,13 @@ Hint Resolve tr_fut_intro: core.
 Ltac var_solv := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) => try
                                  rewrite - (subst_nat (sh (n.+1))); try rewrite - (subst_pw (sh (n.+1))); var_solv0 end.
 
+(*
+Ltac weak_prep := match goal with |- tr ?G (deq (subst (sh ?n) ?M) ?M' ?T) =>
+                                  change T with (@subst obj (sh n) T)
+
+                                       [:: hyp_tm nattp, hyp_tm (fut nattp),
+        hyp_tm (fut preworld)
+      & G] (oof (subst (sh 3) U1) world) *)
 (*quick facts about worlds*)
 
 (*preworlds can indeed be impredicatively quantified over *)
@@ -372,12 +379,81 @@ Lemma subseq_refl: forall ( U: term obj) (G: context),
                          ->tr G (oof make_subseq 
                                     (subseq U U)).
   intros. unfold subseq. unfold make_subseq.
-  Admitted.
+  apply tr_prod_intro. apply leq_refl.
+  apply split_world_elim2. assumption.
+  apply tr_all_intro; auto.
+  constructor. apply pw_kind. auto.
+  simpsub_big.
+  - apply tr_pi_intro. constructor. auto.
+    apply tr_pi_intro; auto.
+    apply tr_pi_intro; auto.
+    weaken leq_type. var_solv'.
+    apply split_world_elim2.
+    change world with (@subst obj (sh 3) world).
+    rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption.
+    eapply tr_formation_weaken. unfold app3.
+    eapply (tr_arrow_elim _ (fut nattp)); auto.
+    apply tr_univ_formation. apply zero_typed.
+    eapply (tr_karrow_elim _ (fut preworld)).
+    constructor. auto.
+    apply pw_type2.
+    apply (tr_arrow_elim _ nattp); auto.
+    apply (tr_eqtype_convert _#3 preworld ). apply unfold_pw.
+    apply split_world_elim1.
+    change world with (@subst obj (sh 4) world).
+    rewrite ! subst_sh_shift. apply tr_weakening_append4.
+    assumption. var_solv'. change (fut preworld) with
+                               (@subst obj (sh 4) (fut preworld)).
+    var_solv'. change (fut nattp) with (@subst obj (sh 3) (fut nattp)). var_solv'.
+Qed.
+
+(*will have to induct on n1 here*)
+Lemma leq_trans n2 G n1 n3 t1 t2 t3:
+  tr G (oof t1 (leq_t n1 n2)) ->
+  tr G (oof t2 (leq_t n2 n3)) ->
+  tr G (oof t3 (leq_t n1 n3)).
+Admitted.
+
+Hint Resolve zero_typed.
 
 Lemma subseq_trans M M' U1 U2 U3 G:
+  tr G (oof U1 world) ->
+  tr G (oof U2 world) ->
+  tr G (oof U3 world) ->
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
                          ->tr G (oof make_subseq 
                                     (subseq U1 U3)).
- Admitted.
+  intros Hu1 Hu2 Hu3 Hsub2 Hsub1. unfold subseq. unfold make_subseq.
+  apply tr_prod_intro.
+  {
+    eapply (leq_trans (ppi2 U2)); eapply tr_prod_elim1;
+      [apply Hsub1 | apply Hsub2].
+  }
+  {
+    apply tr_all_intro; auto. constructor. auto. apply zero_typed.
+    simpsub_bigs. repeat apply tr_pi_intro; auto.
+    - weaken leq_type. var_solv'. apply split_world_elim2.
+      change world with (@subst obj (sh 3) world). rewrite ! subst_sh_shift.
+      apply tr_weakening_append3.  assumption.
+    - apply (tr_eqtype_transitivity _ _
+          (app3
+             (ppi1 (subst (sh 4) U2))
+             (var 1) (var 3) 
+             (var 2))
+            ).
+      { unfold subseq in Hsub1.
+        eapply (deqtype_intro _#3
+                             (app3 (ppi2 M') (var 2) (var 1) (var 0))
+              ).
 
+      }
+
+      apply pw_app_typed. apply split_world_elim1.
+      tr_eqtype_intro.
+  }
+    {eapply tr_prod_elim1. apply H0.
+    }
+    { unfold subseq in H. eapply tr_prod_elim1. apply H0.
+    }
+  }
