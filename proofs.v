@@ -12,100 +12,6 @@ From istari Require Import Rules Defined DefsEquiv.
 
 (*proofs about type translation *)
 
-(*no free variables in translation of types*)
-Lemma subst_trans_type :forall w l A s,
-    (subst s (ppair w l)) = (ppair w l) ->
-    (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl; try rewrite - subst_ppair;
- try rewrite subst_compose; try rewrite H. 
-  - (*arrow*)
-    suffices:  ((subst
-                (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1)) /\ ((subst
-                (dot (var 0) (dot (var 1) (compose s (sh 2))))
-                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2)). move => [Heq1 Heq2].
-    rewrite Heq1 Heq2. auto.
-    split; [eapply IHA1 | eapply IHA2]; simpsub; auto.
-  - (*comp*)
- rewrite subst_ppair in H. inversion H. rewrite H1.
-rewrite !subst_ppair !subst_compose !H2.
-simpsub_big. simpl. suffices: (
-            (subst
-                            (dot (var 0)
-                               (dot (var 1)
-                                  (dot (var 2)
-                                     (dot (var 3)
-                                        (dot 
-                                           (subst (sh 4) l)
-                                           (compose s (sh 4)))))))
-                            (trans_type (var 1) (var 0) A)
-            ) = subst
-                            (dot (var 0)
-                               (dot 
-                                 (var 1)
-                                 (dot 
-                                 (var 2)
-                                 (dot 
-                                 (var 3)
-                                 (dot
-                                 (subst (sh 4) l)
-                                 (sh 4))))))
-                            (trans_type 
-                               (var 1) 
-                               (var 0) A)
-
-          ).
-move => Heq.
-rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
-  - (*ref*)
-    rewrite !subst_compose.
-    simpsubin H. inversion H. rewrite ! H1 ! H2.
-    suffices: (subst
-                      (dot (var 0)
-                         (dot (var 1)
-                            (dot (var 2) (compose s (sh 3)))))
-                      (trans_type (var 1) (var 0) A)) =
-              (trans_type (var 1) (var 0) A).
-    move => Heq. rewrite Heq. auto. simpsub_big.
-eapply IHA. simpsub. auto.
-Qed.
-Ltac simpsub_type := simpl; simpsub_big; simpl; rewrite subst_trans_type; simpl.
-
-  (*start here automate these ugly cases*)
-Lemma sh_trans_type : forall w l A s,
-    (subst (sh s) (trans_type w l A)) = (trans_type
-                                           (subst (sh s) w)
-                                           (subst (sh s) l) A).
-  induction A; intros; simpl; auto; simpsub_big; repeat rewrite plusE;
-repeat rewrite - addnA;
-    simpl; change (1 + 1) with 2;
-      replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
-Qed.
-
-(*start here write ltac for these two*)
- Lemma subst1_trans_type : forall w l A s,
-    (subst1 s (trans_type w l A)) = (trans_type
-                                            (subst1 s w)
-                                         (subst1 s l) A).
-  induction A; intros; simpl; auto; simpsub_big; auto; try
-                   (simpl; rewrite ! subst_trans_type; auto).
- Qed.
-
- Lemma subst1_under_trans_type : forall w l A s n ,
-    (subst (under n (dot s id)) (trans_type w l A)) = (trans_type
-                                            (subst (under n (dot s id)) w)
-                                         (subst (under n (dot s id)) l) A).
-  induction A; intros; simpl; auto; simpsub_big; auto; try
-                   (simpl; rewrite ! subst_trans_type; auto).
- Qed.
-
-Lemma sh_under_trans_type : forall w l A s n ,
-    (subst (under n (sh s)) (trans_type w l A)) = (trans_type
-                                            (subst (under n (sh s)) w)
-                                         (subst (under n (sh s)) l) A).
-  induction A; intros; simpl; auto; simpsub_big; auto; try
-                   (simpl; rewrite ! subst_trans_type; auto).
- Qed.
 
 (*subterms of the computation type's translation*)
 Lemma compm5_type: 
@@ -443,19 +349,6 @@ Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
 
 
 (**************proofs about translation of contexts*****************)
-Lemma subst_Gamma_at :forall w l s G,
-    (subst s (ppair w l)) = (ppair w l) ->
-    (subst s (Gamma_at G w l)) = (Gamma_at G w l).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite IHG subst_trans_type; auto. Qed.
-
-Lemma subst_move_gamma :forall g m s G,
-    (subst s (move_gamma G m g)) = move_gamma G (subst s m) (subst s g).
-  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
-  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
-  auto. Qed.
-
-Hint Rewrite subst_move_gamma: subst1.
 
 
 Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
@@ -484,40 +377,9 @@ tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
   (*show that the product type is wellformed *)
 Qed.
 
-(*making a product value out of the variables in a source context
- assume vars to start at 0*)
-Fixpoint gamma_at (G: source.context ):= match G with
-                                             [::] => triv
-                                           | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
 
 
 
-Lemma sh_under_Gamma_at: forall G w l s n,
-    (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
-                                                (subst (under n (sh s)) l)).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite sh_under_trans_type IHG. auto. Qed.
-
-
-Lemma sh_Gamma_at: forall G w l s,
-    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
-                                                (subst (sh s) l)). intros.
-  change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
-Qed.
-
- Lemma subst1_Gamma_at: forall G w l s, 
-    (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
-                                                                (subst1 s l)).
-   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
-   rewrite subst1_trans_type IHG. auto. Qed.
-
-Lemma subst1_under_Gamma_at: forall G w l s n, 
-     (subst (under n (dot s id)) (Gamma_at G w l)) =
-     (Gamma_at G (subst (under n (dot s id) ) w)
-               (subst (under n (dot s id) ) l)).
-  intros. induction G. simpl; auto.
-  simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
-Qed.
 
 (*
 
@@ -705,8 +567,6 @@ Ltac comptype := eapply tr_formation_weaken; try apply compm5_type; try apply co
                    try apply compm1_type; try apply compm0_type; auto;
 try apply trans_type_works; auto.
 (*default value after s(len w1) is x*)
-Definition cons_b w l x :=lam (let i := (var 0) in
-                              bite (ltb_app i (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
 
 Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                 tr D (oof l nattp) ->
@@ -716,20 +576,9 @@ Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                 tr D (oof (cons_b w l x) preworld).
 Admitted.
 
-Lemma subst_consb w l x s: @ subst obj s (cons_b w l x) =
-                           cons_b (subst s w) (subst s l) (subst s x).
-  unfold cons_b. simpsub_big. auto. Qed.
 
 
-Hint Rewrite subst_consb sh_Gamma_at: subst1 core.
 
-Hint Rewrite <- sh_Gamma_at subst_sh_shift subst_consb subst_U0 subst_ret subst_ret_a subst_subseq subst_leq subst_leq
-     subst_lttp subst_lt subst_nzero subst_nat subst_world subst_pw subst_world
-     subst_nth subst_laters subst_picomp1 subst_picomp2 subst_picomp4
-     subst_picomp3 subst_make_subseq subst_theta  subst_ltb subst_univ subst_cty subst_con subst_karrow subst_arrow subst_pi subst_clam subst_capp subst_ctlam subst_ctapp subst_lam subst_app subst_fut subst_cnext subst_cprev subst_next subst_prev subst_rec subst_equal subst_triv subst_eqtype subst_subtype subst_kuniv subst_all subst_exist subst_voidtp subst_unittp subst_cunit subst_booltp subst_btrue subst_bfalse subst_bite subst_prod subst_sigma subst_cpair subst_cpi1 subst_cpi2 subst_ppair subst_ppi1 subst_ppi2 subst_set subst_quotient subst_guard subst_wt subst_ext : inv_subst.
-
-Ltac inv_subst :=
-autounfold with subst1; autorewrite with inv_subst.
 
 
 Lemma nsucc_nat G n: tr G (oof n nattp) ->

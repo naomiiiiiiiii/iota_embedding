@@ -199,3 +199,10 @@ Lemma subst_plus: forall s A B, subst s (plus A B) =
   intros. unfold plus. simpsub_bigs. auto.
   Qed.
   Hint Rewrite subst_inl subst_inr subst_plus: core subst1.
+
+Lemma subst_consb w l x s: @ subst obj s (cons_b w l x) =
+                           cons_b (subst s w) (subst s l) (subst s x).
+  unfold cons_b. simpsub_big. auto.
+Qed.
+
+Hint Rewrite subst_consb : subst1 core.

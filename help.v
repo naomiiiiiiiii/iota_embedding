@@ -101,10 +101,10 @@ Definition nth w n: term obj := app (ppi1 w) n.
                  (*u = 0*)
                  (pi (fut nattp) (*u = 1, l = 0*)
                      (pi (nattp) (*u = 2, l = 1, i = 0*)(
-                           pi (leq_t (var 0) (subst (sh 3) l1))
-                              ( (*u = 3, l = 2, i = 1, m = 0*)
-                          eqtype (app3 (subst (sh 4) w1) (var 1) (var 3) (var 2))
-                          (app3 (subst (sh 4) w2) (var 1) (var 3) (var 2))
+                           arrow (leq_t (var 0) (subst (sh 3) l1))
+                              (
+                          eqtype (app3 (subst (sh 3) w1) (var 0) (var 2) (var 1))
+                          (app3 (subst (sh 3) w2) (var 0) (var 2) (var 1))
                               )
                                                    )
                                            )
@@ -195,4 +195,12 @@ Opaque laters preworld U0 subseq leqtp nzero nattp world nth.
 
 (*cons_b w l x is a preworld equal to <w, l> only with x consed onto the back*)
 
+
+
+(*translation of source contexts to target contexts (at a given world)*)
+
+(*makes a product type at a world out of a source context *)
+
+Definition cons_b w l x :=lam (let i := (var 0) in
+                              bite (ltb_app i (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
 

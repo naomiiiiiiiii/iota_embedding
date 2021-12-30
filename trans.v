@@ -1,6 +1,7 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import basic_types source subst_src rules_src derived_rules help subst_help0 subst_help.
+From istari Require Import basic_types source subst_src rules_src
+     derived_rules help subst_help0 subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -72,10 +73,107 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
                       ))
       | _ => unittp end.
 
+(*no free variables in translation of types*)
+Lemma subst_trans_type :forall w l A s,
+    (subst s (ppair w l)) = (ppair w l) ->
+    (subst s (trans_type w l A)) = (trans_type w l A).
+  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl; try rewrite - subst_ppair;
+ try rewrite subst_compose; try rewrite H. 
+  - (*arrow*)
+    suffices:  ((subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1)) /\ ((subst
+                (dot (var 0) (dot (var 1) (compose s (sh 2))))
+                (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2)). move => [Heq1 Heq2].
+    rewrite Heq1 Heq2. auto.
+    split; [eapply IHA1 | eapply IHA2]; simpsub; auto.
+  - (*comp*)
+ rewrite subst_ppair in H. inversion H. rewrite H1.
+rewrite !subst_ppair !subst_compose !H2.
+simpsub_big. simpl. suffices: (
+            (subst
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot (var 2)
+                                     (dot (var 3)
+                                        (dot 
+                                           (subst (sh 4) l)
+                                           (compose s (sh 4)))))))
+                            (trans_type (var 1) (var 0) A)
+            ) = subst
+                            (dot (var 0)
+                               (dot 
+                                 (var 1)
+                                 (dot 
+                                 (var 2)
+                                 (dot 
+                                 (var 3)
+                                 (dot
+                                 (subst (sh 4) l)
+                                 (sh 4))))))
+                            (trans_type 
+                               (var 1) 
+                               (var 0) A)
 
-(*translation of source contexts to target contexts (at a given world)*)
+          ).
+move => Heq.
+rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
+  - (*ref*)
+    rewrite !subst_compose.
+    simpsubin H. inversion H. rewrite ! H1 ! H2.
+    suffices: (subst
+                      (dot (var 0)
+                         (dot (var 1)
+                            (dot (var 2) (compose s (sh 3)))))
+                      (trans_type (var 1) (var 0) A)) =
+              (trans_type (var 1) (var 0) A).
+    move => Heq. rewrite Heq. auto. simpsub_big.
+eapply IHA. simpsub. auto.
+Qed.
+Ltac simpsub_type := simpl; simpsub_big; simpl; rewrite subst_trans_type; simpl.
 
-(*makes a product type at a world out of a source context *)
+  (*start here automate these ugly cases*)
+Lemma sh_trans_type : forall w l A s,
+    (subst (sh s) (trans_type w l A)) = (trans_type
+                                           (subst (sh s) w)
+                                           (subst (sh s) l) A).
+  induction A; intros; simpl; auto; simpsub_big; repeat rewrite plusE;
+repeat rewrite - addnA;
+    simpl; change (1 + 1) with 2;
+      replace (1 + 0) with 1; auto; repeat rewrite subst_trans_type; auto.
+Qed.
+
+(*start here write ltac for these two*)
+ Lemma subst1_trans_type : forall w l A s,
+    (subst1 s (trans_type w l A)) = (trans_type
+                                            (subst1 s w)
+                                         (subst1 s l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
+
+ Lemma subst1_under_trans_type : forall w l A s n ,
+    (subst (under n (dot s id)) (trans_type w l A)) = (trans_type
+                                            (subst (under n (dot s id)) w)
+                                         (subst (under n (dot s id)) l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
+
+Lemma sh_under_trans_type : forall w l A s n ,
+    (subst (under n (sh s)) (trans_type w l A)) = (trans_type
+                                            (subst (under n (sh s)) w)
+                                         (subst (under n (sh s)) l) A).
+  induction A; intros; simpl; auto; simpsub_big; auto; try
+                   (simpl; rewrite ! subst_trans_type; auto).
+ Qed.
+
+
+
+ (*making a pair of type (a big product at U) out of a pair of (a big product at W)
+  iterating over the pair
+ but how far to go? use the list because it should be the same size as the pair*)
+
  Fixpoint Gamma_at (G: source.context) (w l: Syntax.term obj) :=
    match G with
      nil => unittp 
@@ -91,6 +189,53 @@ Fixpoint move_gamma (G: source.context) (m: Syntax.term obj) (gamma: Syntax.term
      nil => gamma
    | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
+(*making a product value out of the variables in a source context
+ assume vars to start at 0*)
+Fixpoint gamma_at (G: source.context ):= match G with
+                                             [::] => triv
+                                           | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
+
+Lemma subst_Gamma_at :forall w l s G,
+    (subst s (ppair w l)) = (ppair w l) ->
+    (subst s (Gamma_at G w l)) = (Gamma_at G w l).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite IHG subst_trans_type; auto. Qed.
+
+Lemma subst_move_gamma :forall g m s G,
+    (subst s (move_gamma G m g)) = move_gamma G (subst s m) (subst s g).
+  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
+  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
+  auto. Qed.
+
+
+Lemma sh_under_Gamma_at: forall G w l s n,
+    (subst (under n (sh s)) (Gamma_at G w l)) = (Gamma_at G (subst (under n (sh s)) w)
+                                                (subst (under n (sh s)) l)).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite sh_under_trans_type IHG. auto. Qed.
+
+
+Lemma sh_Gamma_at: forall G w l s,
+    (subst (sh s) (Gamma_at G w l)) = (Gamma_at G (subst (sh s) w)
+                                                (subst (sh s) l)). intros.
+  change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
+Qed.
+
+Hint Rewrite sh_Gamma_at subst_move_gamma: subst1.
+
+ Lemma subst1_Gamma_at: forall G w l s, 
+    (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
+                                                                (subst1 s l)).
+   intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
+   rewrite subst1_trans_type IHG. auto. Qed.
+
+Lemma subst1_under_Gamma_at: forall G w l s n, 
+     (subst (under n (dot s id)) (Gamma_at G w l)) =
+     (Gamma_at G (subst (under n (dot s id) ) w)
+               (subst (under n (dot s id) ) l)).
+  intros. induction G. simpl; auto.
+  simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
+Qed.
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
@@ -273,6 +418,3 @@ that. you want to bind
 
           )))))).
 
- (*making a pair of type (a big product at U) out of a pair of (a big product at W)
-  iterating over the pair
- but how far to go? use the list because it should be the same size as the pair*)
