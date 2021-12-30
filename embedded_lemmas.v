@@ -577,20 +577,120 @@ Lemma subseq_trans M M' U1 U2 U3 G:
        { unfold app3. simpsub_bigs.  auto. }
        var_solv. 
        var_solv0.
-       change (fut preworld)
-
-
-       replace (subst (sh 7) U1) with (subst (sh 4) (subst (sh 3) U1)).
-                               )
-     }
-
-      }
-
-      apply pw_app_typed. apply split_world_elim1.
-      tr_eqtype_intro.
-  }
-    {eapply tr_prod_elim1. apply H0.
-    }
-    { unfold subseq in H. eapply tr_prod_elim1. apply H0.
-    }
-  }
+       replace (subst (sh 7) U1) with (subst (sh 3) (subst (sh 4) U1)).
+       replace (subst (sh 7) U2) with (subst (sh 3) (subst (sh 4) U2)).
+       weaken subseq_U01; change world with (subst (sh 4) world);
+       rewrite ! subst_sh_shift;
+       apply tr_weakening_append4; assumption.
+       simpsub_bigs; auto.
+       simpsub_bigs; auto.
+       var_solv. var_solv. }
+     replace (subst (sh 4) U1) with (subst (sh 1) (subst (sh 3) U1)). inv_subst.
+     sh_var 1 1. inv_subst.
+     var_solv. simpsub_bigs. auto. }
+      {
+unfold subseq in Hsub2.
+        eapply (deqtype_intro _#3
+                             (app3 (shift 4 (ppi2 M)) (var 2) (var 1) triv)
+               ).
+        apply (tr_arrow_elim _
+                                 (leq_t (var 1) (ppi2 (subst (sh 4) U2)))).
+     { weaken leq_type.  var_solv'. apply split_world_elim2. 
+      change world with (@subst obj (sh 4) world). rewrite ! subst_sh_shift.
+      apply tr_weakening_append4.  assumption. }
+     {apply tr_eqtype_formation; subseq_pwapp 4. }
+     { match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
+                                    (@subst1 obj (var 1)
+                                    (arrow
+          (leq_t (var 0) (ppi2 (subst (sh 5) U2)))
+          (eqtype
+             (app
+                (app
+                   (app (ppi1 (subst (sh 5) U2))
+                      (var 0)) (var 4)) 
+                (var 3))
+             (app3 (ppi1 (subst (sh 5) U3))
+                   (var 0) (var 4) (var 3))))) end.
+       2:{
+         unfold app3. simpsub_bigs. auto.
+       }
+       eapply (tr_pi_elim _ nattp).
+       match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
+                                    (@subst1 obj (var 2)
+       (pi nattp
+          (arrow
+             (leq_t (var 0) (ppi2 (subst (sh 6) U2)))
+             (eqtype
+                (app
+                   (app
+                      (app (ppi1 (subst (sh 6) U2))
+                         (var 0)) 
+                      (var 5)) (var 1))
+                (app3 (ppi1 (subst (sh 6) U3))
+                   (var 0) (var 5) 
+                   (var 1)))))) end .
+       2:{ unfold app3. simpsub_bigs. auto. }
+       eapply (tr_pi_elim _ (fut nattp)).
+       match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
+                                    (@subst1 obj (var 3)
+       (pi (fut nattp)
+          (pi nattp
+             (arrow
+                (leq_t (var 0) (ppi2 (subst (sh 7) U2)))
+                (eqtype
+                   (app
+                      (app
+                         (app (ppi1 (subst (sh 7) U2))
+                            (var 0)) 
+                         (var 2)) (var 1))
+                   (app3 (ppi1 (subst (sh 7) U3))
+                      (var 0) (var 2) 
+                      (var 1))))))) end.
+       2:{ unfold app3. simpsub_bigs. auto. }
+       apply (tr_all_elim _ nzero (fut preworld)); auto. 
+       match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
+           (shift 4
+      (all nzero (fut preworld) (pi (fut nattp)
+         (pi nattp
+            (arrow
+               (leq_t (var 0)
+                  (ppi2 (subst (sh 3) U2)))
+               (eqtype
+                  (app
+                     (app
+                        (app
+                           (ppi1
+                              (subst (sh 3) U2))
+                           (var 0)) 
+                        (var 2)) 
+                     (var 1))
+                  (app3
+                     (ppi1 (subst (sh 3) U3))
+                     (var 0) (var 2) 
+                     (var 1)))))))) end.
+       apply tr_weakening_append4.
+       eapply tr_prod_elim2. inv_subst. apply Hsub2.
+       { unfold app3. simpsub_bigs.  auto. }
+       var_solv. 
+       var_solv0.
+       replace (subst (sh 7) U2) with (subst (sh 3) (subst (sh 4) U2)).
+       replace (subst (sh 7) U3) with (subst (sh 3) (subst (sh 4) U3)).
+       weaken subseq_U01; change world with (subst (sh 4) world);
+       rewrite ! subst_sh_shift;
+       apply tr_weakening_append4; assumption.
+       simpsub_bigs; auto.
+       simpsub_bigs; auto.
+       var_solv. var_solv. }
+     replace (subst (sh 4) U2) with (subst (sh 1) (subst (sh 3) U2)). inv_subst.
+     apply (leq_trans (ppi2 (subst (sh 4) U1)) _ _ _ (var 0)
+                      (ppi1 (subst (sh 4) M'))).
+     { sh_var 1 1. replace (subst (sh 4) U1) with (subst (sh 1) (subst (sh 3) U1)).
+       rewrite - ! subst_sh_shift. inv_subst. var_solv.
+     simpsub_bigs. auto. }
+     { eapply tr_prod_elim1.
+       match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
+           (subst (sh 4) (subseq U1 U2)) end.
+       rewrite ! subst_sh_shift. apply tr_weakening_append4. assumption.
+       simpsub_bigs. reflexivity. }
+     simpsub_bigs. auto. } }
+  Qed.
