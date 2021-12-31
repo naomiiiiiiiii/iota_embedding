@@ -517,6 +517,14 @@ Qed.*)
 
 
 
+Lemma subst_leqtp: forall s,
+    @ subst obj s (leqtp) = leqtp.
+  intros. unfold leqtp. unfold wind. unfold theta.
+  repeat rewrite subst_app.
+  repeat rewrite subst_lam. simpsub. simpl.
+  repeat rewrite project_dot_succ.
+  rewrite project_dot_zero. auto. Qed.
+Hint Rewrite subst_leqtp: core subst1.
 
 Definition lt_t n m : term obj :=
   app (app lttp n) m.
@@ -541,7 +549,20 @@ Lemma leq_trans_help G : tr G (oof (app (app (app nat_ind_fn (lam leq_P))
                                       (lam (*n3*)
                                          (lam (*n1 <= n2*)
                                             (lam (*n2 <= n3*)
-(bite (if_z (var 3)) triv (bite (if_z (var 2)) triv triv))
+                                               (bite (if_z (var 3)) triv (bite (if_z (var 2)) triv
+(*
+ih = 4
+n2 = 3
+n3 = 2
+n1 <= n2 = 1
+n2 <= n3 = var 0*)
+
+      (app (app (app (app  (var 4) (*IH*)
+         (app (ppi2 (var 3)) triv)) (*n2 * *)
+              (app (ppi2 (var 2)) triv)) (*n3 **)
+              (var 1))
+              (var 0))
+                                               ))
                                                (*s x  = y  : nat*)
                                       )))))
                   ))
@@ -672,7 +693,56 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
        eapply (tr_compute_hyp _ [::]). constructor. apply leq_succ_equiv.
        simpl.
        (*case on n3*)
-       unfold leqpagetp. apply reduce_app. }
+       simpl. rewrite make_app2. apply w_elim_hyp. weaken tr_booltp_formation.
+     weaken nat_U01. constructor.
+      change triv with (@subst obj (under 2 (dot (ppi2 (var 0))
+                                                 (dot (ppi1 (var 0)) sh1))) triv).
+      apply tr_sigma_eta_hyp. simpsub_big. simpl. simpsub_big. simpl.
+      constructor.
+      eapply tr_compute; try (apply equiv_bite;
+                                            [apply reduce_equiv;
+                                            [apply reduce_ppi1_beta;
+                                            apply reduce_id] |
+                                             apply equiv_refl | apply equiv_refl]).
+      simpsub_big. 
+     eapply (tr_compute_hyp _ [::]).
+     { constructor. apply equiv_bite. apply reduce_equiv.
+       apply reduce_ppi1_beta; apply reduce_id.  apply equiv_refl.
+       unfold leqpagetp. apply equiv_app. apply equiv_refl.
+       apply equiv_app. apply reduce_equiv. apply reduce_ppi2_beta.
+       apply reduce_id. apply equiv_refl. }
+     simpl. rewrite make_app4. eapply tr_compute_hyp.
+     { constructor. apply equiv_arrow. apply reduce_equiv.
+       apply reduce_bite_beta2. apply reduce_id. apply equiv_refl. }
+     simpl. rewrite make_app3.
+         change triv with
+                 (@subst obj (under 3 sh1) triv) at 4 5 6 7.
+     apply tr_booltp_eta_hyp; simpsub_big; simpl; simpsub_big; simpl.
+     { (*case: n3 = 0 *)
+       eapply (tr_compute_hyp _ [::]). constructor.
+       apply reduce_equiv. apply reduce_bite_beta1. apply reduce_id.
+       simpl. eapply (tr_voidtp_elim _ (var 0)). change voidtp with
+                                                     (@subst obj (sh 1) voidtp).
+       var_solv'.
+     }
+     { (*case: n3 = s n3 '*)
+        eapply (tr_compute_hyp _ [::]). constructor. 
+       {apply reduce_equiv. apply reduce_bite_beta2.
+        apply reduce_id. }
+       simpl.
+       unfold leq_P.
+       eapply tr_compute.
+       eapply equiv_trans.
+       {apply reduce_equiv. apply reduce_bite_beta2.
+       apply reduce_id. }
+       {apply equiv_app. apply equiv_app.
+        apply equiv_refl.
+        apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+        apply equiv_app. apply reduce_equiv.
+        apply reduce_ppi2_beta. apply reduce_id.
+        apply equiv_refl. }
+       apply equiv_refl. apply equiv_refl.
+       simpsub. simpl.
 
      }
 
