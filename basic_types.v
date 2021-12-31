@@ -8,11 +8,36 @@ From istari Require Import Sigma Tactics
 
 Definition U0 : (term obj) := univ nzero.
 
+Lemma U0_type: forall G,
+    tr G (deqtype U0 U0). Admitted.
+
+Hint Resolve U0_type : core.
+
 Lemma subst_nat: forall s,
     @ subst obj s nattp = nattp.
   intros. unfold nattp. auto. Qed.
 
 Hint Rewrite subst_nat: core subst1.
+
+Lemma subst_U0: forall s,
+    (@ subst obj s (univ nzero)) = univ nzero.
+  auto. Qed.
+Hint Rewrite subst_U0: core subst1.
+
+Lemma subst_nzero: forall s,
+    @ subst obj s nzero = nzero.
+  intros. unfold nzero. auto. Qed.
+Hint Rewrite subst_nzero: core subst1.
+
+Lemma equiv_equal :
+  forall (m m' n n' t t' : term obj),
+    equiv t t' ->
+    equiv m m'
+    -> equiv n n'
+    -> equiv (equal t m n) (equal t' m' n').
+Proof.
+prove_equiv_compat.
+Qed.
 
 Ltac weaken H := eapply tr_formation_weaken; apply H.
 Ltac var_solv0 := try (apply tr_hyp_tm; repeat constructor).
@@ -44,6 +69,10 @@ Hint Resolve nat_U0.
 Lemma nat_type: forall G,
       tr G (deqtype nattp nattp). Admitted.
 Hint Resolve nat_type. 
+
+Lemma zero_typed: forall G,
+    tr G (oof nzero nattp). Admitted.
+Hint Resolve zero_typed :core .
 Lemma unit_type: forall G,
       tr G (deqtype unittp unittp). Admitted.
 Hint Resolve unit_type. 
@@ -52,390 +81,6 @@ Lemma nsucc_type G n m:
   tr G (deq n m nattp) ->
   tr G (deq (nsucc n) (nsucc m) nattp). Admitted.
 Hint Resolve nsucc_type. 
-
-Definition leq_t n m : term obj :=
-  app (app leqtp n) m.
-
-Definition lt_t n m : term obj :=
-  app (app lttp n) m.
-
-Lemma zero_typed: forall G,
-    tr G (oof nzero nattp). Admitted.
-
-Lemma leq_refl: forall G n,
-    tr G (deq n n nattp) ->
-    tr G (oof triv (leqpagetp n n)). Admitted.
-
-Lemma leq_type: forall G n1 n2,
-    tr G (oof n1 nattp) -> tr G (oof n2 nattp) ->
-    tr G (oof (leq_t n1 n2) U0).
-  Admitted.
-
-
-Lemma lt_type: forall G n1 n2,
-    tr G (oof n1 nattp) -> tr G (oof n2 nattp) ->
-    tr G (oof (ltpagetp n1 n2) U0).
-  Admitted.
-
-
-Lemma U0_type: forall G,
-    tr G (deqtype U0 U0). Admitted.
-
-Hint Resolve nat_type nat_U0 zero_typed leq_refl leq_type lt_type U0_type.
-
-Definition if_z (n: term obj): (term obj) := ppi1 n.
-
-
-Lemma if_z_typed n G : tr G (oof n nattp) -> tr G (oof (if_z n) booltp).
-Admitted.
-
-(*n1 <= n2*)
- Definition leq_b n1 := app (wind (lam (* x = 0*)
-                             (lam (*x = 1, y= 0*)
-                                ( lam
-                                    ( (*x = 2, y = 1, z = 0*)
-                                      bite (var 2) (*if n1 = 0*)
-                                           (lam (*x = 3, y = 2, z = 1, n2 = 0*)
-                                             btrue) 
-                                           ( 
-                                             lam
-                                               ( (*x = 3, y = 2, z = 1, n2 = 0*)
-                                                 bite (if_z (var 0))
-                                                      bfalse
-                                                      (app (app (var 1) triv) (app (ppi2 (var 0)) triv))
-                                               )
-                                           )
-                                    )
-                                )
-                             )                           
-                            )) n1.
-
-
-Definition ltb_app n1 n2 := app (leq_b (nsucc n1)) n2.
-
-(*should be fine*)
-Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (ltb_app m n) booltp). Admitted.
-
-(*more difficult, need induction*)
-Lemma ltb_false G n : tr G (oof n nattp) -> tr G (deq (ltb_app n n) bfalse booltp).
-Admitted.
-
-Lemma nsucc_lt: forall G n, tr G (oof n nattp) ->
-                       tr G (oof triv (lt_t n (nsucc n))).
-Admitted.
-
-Definition eq_b n1 := app (wind (lam (* x = 0*)
-                             (lam (*x = 1, y= 0*)
-                                ( lam
-                                    ( (*x = 2, y = 1, z = 0*)
-                                      bite (var 2)
-                                           (lam (*x = 3, y = 2, z = 1, n2 = 0*)
-                                              (if_z (var 0))
-                                           ) (*first one is zero*)
-                                           ( (*first one is nonzero*)
-                                             lam
-                                               ( (*x = 3, y = 2, z = 1, n2 = 0*)
-                                                 bite (if_z (var 0))
-                                                      bfalse
-                                                      (app (app (var 1) triv) (app (ppi2 (var 0)) triv))
-                                               )
-                                           )
-                                    )
-                                )
-                             )                           
-                          )) n1.
-
-Lemma eq_b_succ n1 n2: equiv (app (eq_b (nsucc n1)) n2) (bite (if_z n2)
-                                                      bfalse
-                                                      (app (eq_b n1) (app (ppi2 n2) triv))).
-  intros.
-  unfold eq_b. unfold wind.
-  eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply equiv_app.
-      { apply steps_equiv. apply theta_fix. }
-      {apply equiv_refl. }
-    }
-    {apply equiv_refl. }
-  }
-  {
-  eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply equiv_app.
-      { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-      }
-      {apply equiv_refl. }
-    }
-    {apply equiv_refl. }
-  }
-  {
-    simpsub. simpl. simpsub.
-    eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-      }
-      {apply equiv_refl. }
-    }
-  { simpsub. simpl.
-    eapply equiv_trans.
-    {
-      apply equiv_app.
-      {
-        apply equiv_app.
-        {
-          apply equiv_app.
-          {
-            apply reduce_equiv. apply reduce_app_beta. apply reduce_id.
-            unfold nzero. apply reduce_ppi1_beta. apply reduce_id.
-          }
-          {
-            unfold nsucc. apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
-          }
-        }
-        apply equiv_refl.
-      }
-      {apply equiv_refl. }
-    }
-    { simpsub. simpl.
-    eapply equiv_trans.
-    {
-      apply equiv_app.
-      {
-        apply equiv_app.
-        {
-          apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-        }
-        { apply equiv_refl.
-        }
-      }
-      {apply equiv_refl. }
-    }
-    { simpsub. simpl.
-      eapply equiv_trans.
-      { apply equiv_app.
-        apply reduce_equiv. apply reduce_app_beta.
-        apply reduce_bite_beta2. apply reduce_id.
-        apply reduce_id.
-        {apply equiv_refl. }
-      }
-      {
-        simpsub.
-        simpl.
-        {eapply equiv_trans.
-         { apply reduce_equiv.
-           apply reduce_app_beta; apply reduce_id. }
-           {
-             simpsub. simpl.
-             apply equiv_bite.
-             - apply equiv_refl.
-             - apply equiv_refl.
-             - apply equiv_app.
-               { eapply equiv_trans. 
-                 { apply reduce_equiv. apply reduce_app_beta;
-                   apply reduce_id. (*?*)
-                 }
-                 {simpsub. simpl.
-                  apply equiv_app.
-                  - apply equiv_refl.
-                  - unfold nsucc.
-                    eapply equiv_trans.
-                    apply equiv_app.
-                    apply reduce_equiv. apply reduce_ppi2_beta;
-                                          apply reduce_id. apply equiv_refl.
-                    apply reduce_equiv.
-                    replace n1 with (subst1 triv (subst sh1 n1)).
-                    apply reduce_app_beta. simpsub. apply reduce_id.
-                    apply reduce_id.
-                    simpsub. auto.
-                 }
-               }
-               apply equiv_refl.
-           }
-           } } } } } } }
-Qed.
-
-
-Lemma eq_b0 n2: equiv (app (eq_b nzero) n2) (if_z n2).
-  unfold eq_b. unfold wind.
-  eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply equiv_app.
-      { apply steps_equiv. apply theta_fix. }
-      {apply equiv_refl. }
-    }
-    {apply equiv_refl. }
-  }
-  {
-  eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply equiv_app.
-      { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-      }
-      {apply equiv_refl. }
-    }
-    {apply equiv_refl. }
-  }
-  {
-    simpsub. simpl. simpsub.
-    eapply equiv_trans.
-  {
-    apply equiv_app.
-    { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-      }
-      {apply equiv_refl. }
-    }
-  { simpsub. simpl.
-    eapply equiv_trans.
-    {
-      apply equiv_app.
-      {
-        apply equiv_app.
-        {
-          apply equiv_app.
-          {
-            apply reduce_equiv. apply reduce_app_beta. apply reduce_id.
-            unfold nzero. apply reduce_ppi1_beta. apply reduce_id.
-          }
-          {
-            unfold nzero. apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
-          }
-        }
-        apply equiv_refl.
-      }
-      {apply equiv_refl. }
-    }
-    { simpsub. simpl.
-    eapply equiv_trans.
-    {
-      apply equiv_app.
-      {
-        apply equiv_app.
-        {
-          apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-        }
-        { apply equiv_refl.
-        }
-      }
-      {apply equiv_refl. }
-    }
-    { simpsub. simpl.
-      eapply equiv_trans.
-      { apply equiv_app.
-        apply reduce_equiv. apply reduce_app_beta.
-        apply reduce_bite_beta1. apply reduce_id.
-        apply reduce_id.
-        {apply equiv_refl. }
-      }
-      {
-        simpsub. unfold if_z. apply reduce_equiv.
-        replace (ppi1 n2) with (subst1 n2 (ppi1 (var 0))).
-        2: {
-          simpsub. auto.
-        }
-        apply reduce_app_beta; apply reduce_id.
-      }
-    }
-    }
-    
-  }
-  }
-  }
-  Qed.
-
-
-Lemma w_elim_hyp G1 G2 a b J :
-  tr G1 (deqtype a a) ->
-      tr (cons (hyp_tm a) G1) (deqtype b b) ->
-      tr (G2 ++ hyp_tm (sigma a (arrow b (subst sh1 (wt a b)))) :: G1) J
-      -> tr (G2 ++ hyp_tm (wt a b) :: G1) J.
-  intros. eapply tr_subtype_convert_hyp; unfold dsubtype;
-  change triv with (@shift obj 1 triv);
-  change (subtype
-       (subst sh1 ?one)
-       (subst sh1 ?sigma)) with
-      (subst sh1 (subtype one sigma)) (*ask karl if i write shift here it doesnt work*); try rewrite ! subst_sh_shift;
-    try apply tr_weakening_append1. apply tr_wt_subtype_sigma; auto.
-  apply tr_wt_sigma_subtype; auto.
-  assumption.
-Qed.
-
-
-
-
-Lemma eqb_typed {G} n1:
-  tr G (oof n1 nattp) ->
-  tr G (oof (eq_b n1) (arrow nattp booltp)).
-  intros.
-  change (arrow nattp booltp) with (subst1 n1 (arrow nattp booltp)).
-  apply (tr_wt_elim _ booltp (bite (var 0) voidtp unittp)).
-  - assumption.
-  - simpsub. simpl.
-    rewrite make_app2.
-     change (lam (if_z (var 0))) with
-      (subst (under 2 sh1)  (lam (if_z (var 0)))).
-    change (lam
-             (bite (if_z (var 0)) bfalse
-                (app (app (var 1) triv)
-                     (app (ppi2 (var 0)) triv)))) with
-        (subst (under 2 sh1)
-(lam (bite (if_z (var 0)) bfalse
-                (app (app (var 1) triv)
-                     (app (ppi2 (var 0)) triv))))
-        ).
-    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub;
-    (*rewrite ! subst_nat; *)
-      apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
-    + apply if_z_typed. var_solv'.
-    + apply (w_elim_hyp _ [::]).
-      weaken tr_booltp_formation. weaken nat_U01.
-      match goal with |- tr ?G (deq ?M ?M ?A) => change M with
-       (@subst obj (under 0 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
-       (bite (var 1) bfalse
-          (app (app (var 2) triv)
-               (app (var 0) triv)))) end.
-      apply tr_sigma_eta_hyp.
-      simpsub. simpl.
-          change (app (app (var 2) triv)
-                      (app (var 0) triv)) with
-              (@subst obj (under 1 sh1)
-                     (app (app (var 1) triv)
-                          (app (var 0) triv))).
-          change bfalse with (@subst obj (under 1 sh1) bfalse).
-          rewrite make_app1.
-          apply tr_booltp_eta_hyp; simpsub.
-      * constructor.
-      * eapply tr_compute_hyp.
-        {
-          constructor. apply equiv_pi. apply reduce_equiv.
-          apply reduce_bite_beta2. apply reduce_id.
-          apply equiv_refl.
-        }
-        simpl. eapply (tr_compute_hyp _ [::]).
-        {
-          constructor. apply equiv_arrow. apply reduce_equiv.
-          apply reduce_bite_beta2. apply reduce_id.
-          apply equiv_refl.
-        }
-        simpl.
-        apply (tr_arrow_elim _ nattp); auto. weaken tr_booltp_formation.
-        change (arrow nattp booltp) with (@subst1 obj triv (arrow nattp booltp)). 
-        apply (tr_pi_elim _ (unittp)).
-        - change (pi unittp (arrow nattp booltp))
-          with (@subst obj (sh 2) (pi unittp (arrow nattp booltp))).
-        var_solv0. constructor.
-        - apply (tr_arrow_elim _ unittp); auto. 
-          change (arrow unittp nattp) with (@subst obj (sh 1) (arrow
-                                                                 unittp nattp)).
-          var_solv0.
-          constructor.
-Qed.
-
 
 Definition nat_ind_fn : (term obj) := lam (lam (lam (lam (*P = 3 BC = 2 IS = 1 x = 0 *)
                                           (app (
@@ -468,12 +113,23 @@ Ltac simpsub_big := repeat (simpsub; simpsub1).
 
 Hint Unfold subst1: subst1.
 
-Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (app (eq_b m) n) booltp). Admitted.
+Lemma w_elim_hyp G1 G2 a b J :
+  tr G1 (deqtype a a) ->
+      tr (cons (hyp_tm a) G1) (deqtype b b) ->
+      tr (G2 ++ hyp_tm (sigma a (arrow b (subst sh1 (wt a b)))) :: G1) J
+      -> tr (G2 ++ hyp_tm (wt a b) :: G1) J.
+  intros. eapply tr_subtype_convert_hyp; unfold dsubtype;
+  change triv with (@shift obj 1 triv);
+  change (subtype
+       (subst sh1 ?one)
+       (subst sh1 ?sigma)) with
+      (subst sh1 (subtype one sigma)) (*ask karl if i write shift here it doesnt work*); try rewrite ! subst_sh_shift;
+    try apply tr_weakening_append1. apply tr_wt_subtype_sigma; auto.
+  apply tr_wt_sigma_subtype; auto.
+  assumption.
+Qed.
 
-          Lemma subst_eqb s n: subst s (eq_b n) = eq_b (subst s n).
-  intros. unfold eq_b. simpsub. auto. Qed.
-          Hint Rewrite subst_eqb: core subst1.
+
 
   Lemma nat_ind G : tr G (oof nat_ind_fn
                               (pi (arrow nattp U0)
@@ -757,27 +413,657 @@ apply nat_ind_app; try assumption.
 Qed.
 
 
+Definition leq_t n m : term obj :=
+  app (app leqtp n) m.
+
+Lemma leq_type: forall G n1 n2,
+    tr G (oof n1 nattp) -> tr G (oof n2 nattp) ->
+    tr G (oof (leq_t n1 n2) U0).
+  Admitted.
+
+
+Definition if_z (n: term obj): (term obj) := ppi1 n.
+Lemma leq_succ_equiv n1_pred n2 : equiv (leq_t (ppair bfalse n1_pred) n2) (bite (if_z n2)
+                                                      voidtp
+                                                      (leq_t (app n1_pred triv)
+                                                             (app (ppi2 n2) triv))).
+  Admitted. 
+
+Lemma leq_zero_equiv n2: equiv (leq_t nzero n2) unittp. Admitted.
+ (* unfold wind. unfold leq_t. unfold leqtp. unfold wind.
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply steps_equiv. apply theta_fix. }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+    simpsub. simpl. simpsub.
+    eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+  { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply equiv_app.
+          {
+            apply reduce_equiv. apply reduce_app_beta. apply reduce_id.
+            unfold nzero. apply reduce_ppi1_beta. apply reduce_id.
+          }
+          {
+            unfold nzero. apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+          }
+        }
+        apply equiv_refl.
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+        }
+        { apply equiv_refl.
+        }
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+      eapply equiv_trans.
+      { apply equiv_app.
+        apply reduce_equiv. apply reduce_app_beta.
+        apply reduce_bite_beta1. apply reduce_id.
+        apply reduce_id.
+        {apply equiv_refl. }
+      }
+      {
+        simpsub.  apply reduce_equiv.
+        change unittp with (subst1 n2 unittp).
+        apply reduce_app_beta; apply reduce_id.
+      }
+    }
+    }
+    
+  }
+  }
+  } 
+Qed.*)
+
+
+
+
+Definition lt_t n m : term obj :=
+  app (app lttp n) m.
+
+Definition leq_P := (pi nattp (pi nattp 
+                      ( (*n1 = 2, n2 = 1, n3 = 0*)
+                        arrow 
+                        (leq_t (var 2) (var 1))
+                        (arrow (leq_t (var 1) (var 0))
+                               (leq_t (var 2) (var 0))
+                        )))).
+
+Lemma leq_trans_help G : tr G (oof (app (app (app nat_ind_fn (lam leq_P))
+                  (lam (*n2 : nat*)
+                     (lam (*n3 : nat*)
+                        (lam (*n1 <= n2*)
+                  (lam  (*n2 <= n3*)
+                  triv) 
+               ))))
+               (lam (*x : nat*) (lam (*IH: P(x) ie pi y (eqb x y = t -> x = y)*)
+                                   (lam  (*n2  : nat*)
+                                      (lam (*n3*)
+                                         (lam (*n1 <= n2*)
+                                            (lam (*n2 <= n3*)
+(bite (if_z (var 3)) triv (bite (if_z (var 2)) triv triv))
+                                               (*s x  = y  : nat*)
+                                      )))))
+                  ))
+                                                     (pi nattp leq_P)
+                              ).
+      assert (forall G' x, tr G' (oof x nattp) ->
+                    tr G' (oof 
+        (pi nattp
+          (pi nattp
+             (arrow
+                (leq_t (subst (sh 2) x) (var 1))
+                (arrow
+                   (leq_t 
+                      (var 1) 
+                      (var 0))
+                   (leq_t 
+                      (subst (sh 2) x) 
+                      (var 0))))))
+                               U0)
+             ) as Hp.
+      {
+        intros. repeat apply tr_pi_formation_univ; auto.
+        apply tr_arrow_formation_univ.
+        {apply leq_type. change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
+         apply tr_weakening_append2. assumption.
+         var_solv'.
+        }
+        {apply tr_arrow_formation_univ; apply leq_type; try var_solv'.
+change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
+         apply tr_weakening_append2. assumption.
+        }
+      }
+  eapply nat_ind_lamapp.
+    { (*type p*)
+      apply tr_arrow_intro; auto. simpsub_big. unfold leq_P.
+      change (var 2) with (@subst obj (sh 2) (var 0)). apply Hp; var_solv'. }
+    {
+(*type BC*)
+      unfold leq_P. simpsub_big.
+      repeat apply tr_pi_intro; auto. 
+      apply tr_arrow_intro; simpsub;
+        try apply tr_arrow_intro; auto;
+        try weaken leq_type; try var_solv'; auto.
+      apply tr_arrow_formation; auto;
+        try weaken leq_type; try var_solv'; auto.
+      simpsub_big.
+      eapply tr_compute.
+      {apply leq_zero_equiv. }
+      apply equiv_refl. apply equiv_refl. constructor.
+    }
+    {unfold leq_P. simpsub_big. simpl. reflexivity. }
+    { (*type IS*)
+      apply tr_pi_intro; auto.
+      apply tr_arrow_intro; auto.
+      { unfold leq_P. change (var 2) with
+                          (@subst obj (sh 2) (var 0)).
+        weaken Hp. var_solv'.
+      }
+      {repeat apply tr_pi_formation; auto.
+      apply tr_arrow_formation; auto;
+        try weaken leq_type; try var_solv'; auto.
+      apply nsucc_type. var_solv'.
+      apply tr_arrow_formation; auto;
+        try weaken leq_type; try var_solv'; auto.
+      apply nsucc_type. var_solv'.
+      }
+      {
+        simpsub_big. repeat apply tr_pi_intro; auto.
+        simpl. apply tr_arrow_intro; auto.
+        try weaken leq_type; try apply nsucc_type;
+          try var_solv'; auto.
+      apply tr_arrow_formation; auto;
+        try weaken leq_type; try apply nsucc_type;
+          try var_solv'; auto.
+      simpsub.
+      apply tr_arrow_intro; auto; 
+        try weaken leq_type; try apply nsucc_type;
+          try var_solv'; auto.
+      simpsub.
+      eapply tr_compute. apply leq_succ_equiv.
+     apply equiv_refl.
+     apply equiv_refl.
+     simpl. rewrite make_app1.
+     eapply tr_compute_hyp. constructor. apply leq_succ_equiv.
+     (*case on n2*)
+     simpl. rewrite make_app3. apply w_elim_hyp. weaken tr_booltp_formation.
+     weaken nat_U01. constructor.
+      change triv with (@subst obj (under 3 (dot (ppi2 (var 0))
+                                                 (dot (ppi1 (var 0)) sh1))) triv).
+      apply tr_sigma_eta_hyp. simpsub_big. simpl. simpsub_big. simpl.
+      constructor.
+      eapply tr_compute; try (apply equiv_bite;
+                                            [apply reduce_equiv;
+                                            [apply reduce_ppi1_beta;
+                                            apply reduce_id] |
+                                             apply equiv_refl | apply equiv_refl]).
+      apply equiv_refl.
+      rewrite make_app1. eapply tr_compute_hyp.
+     constructor; try (apply equiv_bite; [apply reduce_equiv;
+                                            [apply reduce_ppi1_beta;
+                                            apply reduce_id] |
+                                             apply equiv_refl | apply equiv_refl]).
+     simpl. rewrite make_app4.
+     change triv with
+                 (@subst obj (under 4 sh1) triv) at 3 6.
+     change (bite (ppi1 (var 2)) triv triv) with
+         (@subst obj (under 4 sh1) (bite (ppi1 (var 2)) triv triv)).
+     apply tr_booltp_eta_hyp; simpsub_big; simpl; simpsub_big; simpl.
+     { (*case: n2 = 0 *)
+       rewrite make_app1. eapply tr_compute_hyp. constructor.
+       apply reduce_equiv. apply reduce_bite_beta1. apply reduce_id.
+       simpl. eapply (tr_voidtp_elim _ (var 1)). change voidtp with
+                                                     (@subst obj (sh 2) voidtp).
+       var_solv'.
+     }
+     { (*case: n2 = s n2 '*)
+       rewrite make_app1. eapply tr_compute_hyp. constructor.
+       eapply equiv_trans.
+       { apply equiv_bite. apply equiv_refl. apply equiv_refl.
+       apply equiv_app. apply equiv_app. apply equiv_refl.
+       apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+       apply equiv_app.
+       apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+       apply equiv_refl. }
+       {apply reduce_equiv. apply reduce_bite_beta2.
+        apply reduce_id.
+       } simpsub_big. simpl.
+       eapply (tr_compute_hyp _ [::]). constructor. apply leq_succ_equiv.
+       simpl.
+       (*case on n3*)
+       unfold leqpagetp. apply reduce_app. }
+
+     }
+
+                              
+                                            apply equiv_refl.)
+                                           }
+
+      match goal with |- tr ?G (deq triv triv ?T) =>
+                      suffices: (tr G (oof (bite (var 3) triv triv) T)) end.
+      { intros Hannoying.
+        constructor.
+        eapply deq_intro. apply Hannoying. }
+
+      {
+      }
+
+      }
+
+
+(*will have to induct on n1 here
+ and lemmas for how leq_t computes*)
+(*start here*)
+Lemma leq_trans n2 G n1 n3 t1 t2 t3:
+  tr G (oof t1 (leq_t n1 n2)) ->
+  tr G (oof t2 (leq_t n2 n3)) ->
+  tr G (oof t3 (leq_t n1 n3)).
+Admitted.
+
+
+Lemma leq_refl: forall G n,
+    tr G (deq n n nattp) ->
+    tr G (oof triv (leqpagetp n n)). Admitted.
+
+
+
+Lemma lt_type: forall G n1 n2,
+    tr G (oof n1 nattp) -> tr G (oof n2 nattp) ->
+    tr G (oof (ltpagetp n1 n2) U0).
+  Admitted.
+
+
+
+Hint Resolve nat_type nat_U0 zero_typed leq_refl leq_type lt_type U0_type.
+
+
+
+Lemma if_z_typed n G : tr G (oof n nattp) -> tr G (oof (if_z n) booltp).
+Admitted.
+
+(*n1 <= n2*)
+ Definition leq_b n1 := app (wind (lam (* x = 0*)
+                             (lam (*x = 1, y= 0*)
+                                ( lam
+                                    ( (*x = 2, y = 1, z = 0*)
+                                      bite (var 2) (*if n1 = 0*)
+                                           (lam (*x = 3, y = 2, z = 1, n2 = 0*)
+                                             btrue) 
+                                           ( 
+                                             lam
+                                               ( (*x = 3, y = 2, z = 1, n2 = 0*)
+                                                 bite (if_z (var 0))
+                                                      bfalse
+                                                      (app (app (var 1) triv) (app (ppi2 (var 0)) triv))
+                                               )
+                                           )
+                                    )
+                                )
+                             )                           
+                            )) n1.
+
+
+Definition ltb_app n1 n2 := app (leq_b (nsucc n1)) n2.
+
+(*should be fine*)
+Lemma ltapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (ltb_app m n) booltp). Admitted.
+
+(*more difficult, need induction*)
+Lemma ltb_false G n : tr G (oof n nattp) -> tr G (deq (ltb_app n n) bfalse booltp).
+Admitted.
+
+Lemma nsucc_lt: forall G n, tr G (oof n nattp) ->
+                       tr G (oof triv (lt_t n (nsucc n))).
+Admitted.
+
+Definition eq_b n1 := app (wind (lam (* x = 0*)
+                             (lam (*x = 1, y= 0*)
+                                ( lam
+                                    ( (*x = 2, y = 1, z = 0*)
+                                      bite (var 2)
+                                           (lam (*x = 3, y = 2, z = 1, n2 = 0*)
+                                              (if_z (var 0))
+                                           ) (*first one is zero*)
+                                           ( (*first one is nonzero*)
+                                             lam
+                                               ( (*x = 3, y = 2, z = 1, n2 = 0*)
+                                                 bite (if_z (var 0))
+                                                      bfalse
+                                                      (app (app (var 1) triv) (app (ppi2 (var 0)) triv))
+                                               )
+                                           )
+                                    )
+                                )
+                             )                           
+                          )) n1.
+
+Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
+  tr G (oof (app (eq_b m) n) booltp). Admitted.
+
+          Lemma subst_eqb s n: subst s (eq_b n) = eq_b (subst s n).
+  intros. unfold eq_b. simpsub. auto. Qed.
+          Hint Rewrite subst_eqb: core subst1.
+
+Lemma eq_b_succ n1 n2: equiv (app (eq_b (nsucc n1)) n2) (bite (if_z n2)
+                                                      bfalse
+                                                      (app (eq_b n1) (app (ppi2 n2) triv))).
+  intros.
+  unfold eq_b. unfold wind.
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply steps_equiv. apply theta_fix. }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+    simpsub. simpl. simpsub.
+    eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+  { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply equiv_app.
+          {
+            apply reduce_equiv. apply reduce_app_beta. apply reduce_id.
+            unfold nzero. apply reduce_ppi1_beta. apply reduce_id.
+          }
+          {
+            unfold nsucc. apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+          }
+        }
+        apply equiv_refl.
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+        }
+        { apply equiv_refl.
+        }
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+      eapply equiv_trans.
+      { apply equiv_app.
+        apply reduce_equiv. apply reduce_app_beta.
+        apply reduce_bite_beta2. apply reduce_id.
+        apply reduce_id.
+        {apply equiv_refl. }
+      }
+      {
+        simpsub.
+        simpl.
+        {eapply equiv_trans.
+         { apply reduce_equiv.
+           apply reduce_app_beta; apply reduce_id. }
+           {
+             simpsub. simpl.
+             apply equiv_bite.
+             - apply equiv_refl.
+             - apply equiv_refl.
+             - apply equiv_app.
+               { eapply equiv_trans. 
+                 { apply reduce_equiv. apply reduce_app_beta;
+                   apply reduce_id. (*?*)
+                 }
+                 {simpsub. simpl.
+                  apply equiv_app.
+                  - apply equiv_refl.
+                  - unfold nsucc.
+                    eapply equiv_trans.
+                    apply equiv_app.
+                    apply reduce_equiv. apply reduce_ppi2_beta;
+                                          apply reduce_id. apply equiv_refl.
+                    apply reduce_equiv.
+                    replace n1 with (subst1 triv (subst sh1 n1)).
+                    apply reduce_app_beta. simpsub. apply reduce_id.
+                    apply reduce_id.
+                    simpsub. auto.
+                 }
+               }
+               apply equiv_refl.
+           }
+           } } } } } } }
+Qed.
+
+
+Lemma eq_b0 n2: equiv (app (eq_b nzero) n2) (if_z n2).
+  unfold eq_b. unfold wind.
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply steps_equiv. apply theta_fix. }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+  eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply equiv_app.
+      { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+    {apply equiv_refl. }
+  }
+  {
+    simpsub. simpl. simpsub.
+    eapply equiv_trans.
+  {
+    apply equiv_app.
+    { apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+      }
+      {apply equiv_refl. }
+    }
+  { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply equiv_app.
+          {
+            apply reduce_equiv. apply reduce_app_beta. apply reduce_id.
+            unfold nzero. apply reduce_ppi1_beta. apply reduce_id.
+          }
+          {
+            unfold nzero. apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+          }
+        }
+        apply equiv_refl.
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+    eapply equiv_trans.
+    {
+      apply equiv_app.
+      {
+        apply equiv_app.
+        {
+          apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+        }
+        { apply equiv_refl.
+        }
+      }
+      {apply equiv_refl. }
+    }
+    { simpsub. simpl.
+      eapply equiv_trans.
+      { apply equiv_app.
+        apply reduce_equiv. apply reduce_app_beta.
+        apply reduce_bite_beta1. apply reduce_id.
+        apply reduce_id.
+        {apply equiv_refl. }
+      }
+      {
+        simpsub. unfold if_z. apply reduce_equiv.
+        replace (ppi1 n2) with (subst1 n2 (ppi1 (var 0))).
+        2: {
+          simpsub. auto.
+        }
+        apply reduce_app_beta; apply reduce_id.
+      }
+    }
+    }
+    
+  }
+  }
+  }
+  Qed.
+
+
+
+
+
+Lemma eqb_typed {G} n1:
+  tr G (oof n1 nattp) ->
+  tr G (oof (eq_b n1) (arrow nattp booltp)).
+  intros.
+  change (arrow nattp booltp) with (subst1 n1 (arrow nattp booltp)).
+  apply (tr_wt_elim _ booltp (bite (var 0) voidtp unittp)).
+  - assumption.
+  - simpsub. simpl.
+    rewrite make_app2.
+     change (lam (if_z (var 0))) with
+      (subst (under 2 sh1)  (lam (if_z (var 0)))).
+    change (lam
+             (bite (if_z (var 0)) bfalse
+                (app (app (var 1) triv)
+                     (app (ppi2 (var 0)) triv)))) with
+        (subst (under 2 sh1)
+(lam (bite (if_z (var 0)) bfalse
+                (app (app (var 1) triv)
+                     (app (ppi2 (var 0)) triv))))
+        ).
+    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub;
+    (*rewrite ! subst_nat; *)
+      apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
+    + apply if_z_typed. var_solv'.
+    + apply (w_elim_hyp _ [::]).
+      weaken tr_booltp_formation. weaken nat_U01.
+      match goal with |- tr ?G (deq ?M ?M ?A) => change M with
+       (@subst obj (under 0 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
+       (bite (var 1) bfalse
+          (app (app (var 2) triv)
+               (app (var 0) triv)))) end.
+      apply tr_sigma_eta_hyp.
+      simpsub. simpl.
+          change (app (app (var 2) triv)
+                      (app (var 0) triv)) with
+              (@subst obj (under 1 sh1)
+                     (app (app (var 1) triv)
+                          (app (var 0) triv))).
+          change bfalse with (@subst obj (under 1 sh1) bfalse).
+          rewrite make_app1.
+          apply tr_booltp_eta_hyp; simpsub.
+      * constructor.
+      * eapply tr_compute_hyp.
+        {
+          constructor. apply equiv_pi. apply reduce_equiv.
+          apply reduce_bite_beta2. apply reduce_id.
+          apply equiv_refl.
+        }
+        simpl. eapply (tr_compute_hyp _ [::]).
+        {
+          constructor. apply equiv_arrow. apply reduce_equiv.
+          apply reduce_bite_beta2. apply reduce_id.
+          apply equiv_refl.
+        }
+        simpl.
+        apply (tr_arrow_elim _ nattp); auto. weaken tr_booltp_formation.
+        change (arrow nattp booltp) with (@subst1 obj triv (arrow nattp booltp)). 
+        apply (tr_pi_elim _ (unittp)).
+        - change (pi unittp (arrow nattp booltp))
+          with (@subst obj (sh 2) (pi unittp (arrow nattp booltp))).
+        var_solv0. constructor.
+        - apply (tr_arrow_elim _ unittp); auto. 
+          change (arrow unittp nattp) with (@subst obj (sh 1) (arrow
+                                                                 unittp nattp)).
+          var_solv0.
+          constructor.
+Qed.
+
+
+
 
       
-Lemma subst_U0: forall s,
-    (@ subst obj s (univ nzero)) = univ nzero.
-  auto. Qed.
-Hint Rewrite subst_U0: core subst1.
-
-Lemma subst_nzero: forall s,
-    @ subst obj s nzero = nzero.
-  intros. unfold nzero. auto. Qed.
-Hint Rewrite subst_nzero: core subst1.
-
-Lemma equiv_equal :
-  forall (m m' n n' t t' : term obj),
-    equiv t t' ->
-    equiv m m'
-    -> equiv n n'
-    -> equiv (equal t m n) (equal t' m' n').
-Proof.
-prove_equiv_compat.
-Qed.
 
 
 

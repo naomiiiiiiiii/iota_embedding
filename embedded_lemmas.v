@@ -455,14 +455,6 @@ Lemma subseq_refl: forall ( U: term obj) (G: context),
  } }
 Qed.
 
-(*will have to induct on n1 here*)
-Lemma leq_trans n2 G n1 n3 t1 t2 t3:
-  tr G (oof t1 (leq_t n1 n2)) ->
-  tr G (oof t2 (leq_t n2 n3)) ->
-  tr G (oof t3 (leq_t n1 n3)).
-Admitted.
-
-Hint Resolve zero_typed :core .
 
 
 
