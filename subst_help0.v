@@ -92,14 +92,6 @@ Lemma subst_nzero: forall s,
   intros. unfold nzero. auto. Qed.
 Hint Rewrite subst_nzero: core subst1.
 
-Lemma subst_leqtp: forall s,
-    @ subst obj s (leqtp) = leqtp.
-  intros. unfold leqtp. unfold wind. unfold theta.
-  repeat rewrite subst_app.
-  repeat rewrite subst_lam. simpsub. simpl.
-  repeat rewrite project_dot_succ.
-  rewrite project_dot_zero. auto. Qed.
-Hint Rewrite subst_leqtp: core subst1.
 
 Lemma subst_bind: forall s m1 m2,
     @ subst obj s (make_bind m1 m2) = make_bind (@ subst obj s m1) (@ subst obj s m2).

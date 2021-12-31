@@ -44,8 +44,11 @@ Ltac var_solv0 := try (apply tr_hyp_tm; repeat constructor).
 
 Hint Rewrite subst_nat: core subst1.
 
-Ltac var_solv' := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) => try
-                                 rewrite - (subst_nat (sh (n.+1))); var_solv0 end.
+Ltac var_solv' := unfold oof; match goal with |- tr ?G' (deq (var ?n) ?n' ?T) =>
+                                              try rewrite - (subst_nat (sh (n.+1)));
+                                              try rewrite - (subst_unittp _ (sh (n.+1)));
+                                              try rewrite - (subst_arrow _ (sh (n.+1)));
+                                                                               var_solv0 end.
 
 Lemma equiv_arrow :
   forall (m m' n n' : term obj),
@@ -654,12 +657,23 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
                                                  (dot (ppi1 (var 0)) sh1))) triv).
       apply tr_sigma_eta_hyp. simpsub_big. simpl. simpsub_big. simpl.
       constructor.
-      eapply tr_compute; try (apply equiv_bite;
-                                            [apply reduce_equiv;
-                                            [apply reduce_ppi1_beta;
-                                            apply reduce_id] |
-                                             apply equiv_refl | apply equiv_refl]).
-      apply equiv_refl.
+      eapply tr_compute. apply equiv_refl.
+      { apply equiv_bite.
+      {apply reduce_equiv; apply reduce_ppi1_beta; apply reduce_id. }
+      {apply equiv_refl. }
+      {apply equiv_bite. apply equiv_refl. apply equiv_refl.
+       repeat apply equiv_app; try (apply reduce_equiv; apply
+                                                          reduce_ppi2_beta; apply reduce_id);
+       try apply equiv_refl.
+      } }
+      { apply equiv_bite.
+      {apply reduce_equiv; apply reduce_ppi1_beta; apply reduce_id. }
+      {apply equiv_refl. }
+      {apply equiv_bite. apply equiv_refl. apply equiv_refl.
+       repeat apply equiv_app; try (apply reduce_equiv; apply
+                                                          reduce_ppi2_beta; apply reduce_id);
+       try apply equiv_refl.
+      } } (*make lemma for evaling both terms to the same thing*)
       rewrite make_app1. eapply tr_compute_hyp.
      constructor; try (apply equiv_bite; [apply reduce_equiv;
                                             [apply reduce_ppi1_beta;
@@ -667,9 +681,17 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
                                              apply equiv_refl | apply equiv_refl]).
      simpl. rewrite make_app4.
      change triv with
-                 (@subst obj (under 4 sh1) triv) at 3 6.
-     change (bite (ppi1 (var 2)) triv triv) with
-         (@subst obj (under 4 sh1) (bite (ppi1 (var 2)) triv triv)).
+         (@subst obj (under 4 sh1) triv) at 3 7.
+     match goal with |- tr ?G (deq (bite ?b ?m1 ?m2) ?M2 ?T) =>
+                     change m2 with
+          (@subst obj (under 4 sh1) (bite (ppi1 (var 2)) triv
+             (app
+                (app
+                   (app
+                      (app (var 4)
+                         (app (var 3)
+                            triv)) (app (ppi2 (var 2)) triv))
+                   (var 1)) (var 0)))) end.
      apply tr_booltp_eta_hyp; simpsub_big; simpl; simpsub_big; simpl.
      { (*case: n2 = 0 *)
        rewrite make_app1. eapply tr_compute_hyp. constructor.
@@ -697,13 +719,35 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
      weaken nat_U01. constructor.
       change triv with (@subst obj (under 2 (dot (ppi2 (var 0))
                                                  (dot (ppi1 (var 0)) sh1))) triv).
-      apply tr_sigma_eta_hyp. simpsub_big. simpl. simpsub_big. simpl.
+      apply tr_sigma_eta_hyp.  simpsub_big. simpl. simpsub_big. simpl.
       constructor.
-      eapply tr_compute; try (apply equiv_bite;
-                                            [apply reduce_equiv;
-                                            [apply reduce_ppi1_beta;
-                                            apply reduce_id] |
-                                             apply equiv_refl | apply equiv_refl]).
+      eapply tr_compute.
+      { apply equiv_bite.
+      {apply reduce_equiv; apply reduce_ppi1_beta; apply reduce_id. }
+      {apply equiv_refl. }
+      {unfold leqpagetp. 
+       apply equiv_app. apply equiv_app. apply equiv_refl.
+       apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+       apply equiv_app. apply reduce_equiv; apply reduce_ppi2_beta;
+                          apply reduce_id.
+       apply equiv_refl.
+      } }
+      { apply equiv_bite.
+      {apply reduce_equiv; apply reduce_ppi1_beta; apply reduce_id. }
+      {apply equiv_refl. }
+      {unfold leqpagetp. 
+       repeat apply equiv_app; try (apply reduce_equiv; apply
+                                                          reduce_ppi2_beta; apply reduce_id);
+       try apply equiv_refl.
+      } }
+      { apply equiv_bite.
+      {apply reduce_equiv; apply reduce_ppi1_beta; apply reduce_id. }
+      {apply equiv_refl. }
+      {unfold leqpagetp. 
+       repeat apply equiv_app; try (apply reduce_equiv; apply
+                                                          reduce_ppi2_beta; apply reduce_id);
+       try apply equiv_refl.
+      } } 
       simpsub_big. 
      eapply (tr_compute_hyp _ [::]).
      { constructor. apply equiv_bite. apply reduce_equiv.
@@ -716,7 +760,19 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
        apply reduce_bite_beta2. apply reduce_id. apply equiv_refl. }
      simpl. rewrite make_app3.
          change triv with
-                 (@subst obj (under 3 sh1) triv) at 4 5 6 7.
+             (@subst obj (under 3 sh1) triv) at 4 7.
+         change 
+          (app
+             (app
+                (app (app (var 5) (app (var 4) triv))
+                   (app (var 2) triv)) (var 1)) 
+             (var 0)) with
+             (@subst obj (under 3 sh1)
+          (app
+             (app
+                (app (app (var 4) (app (var 3) triv))
+                   (app (var 2) triv)) (var 1)) 
+             (var 0))).
      apply tr_booltp_eta_hyp; simpsub_big; simpl; simpsub_big; simpl.
      { (*case: n3 = 0 *)
        eapply (tr_compute_hyp _ [::]). constructor.
@@ -730,18 +786,24 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
        {apply reduce_equiv. apply reduce_bite_beta2.
         apply reduce_id. }
        simpl.
-       unfold leq_P.
-       eapply tr_compute.
-       eapply equiv_trans.
+       unfold leq_P. 
+       eapply tr_compute. 
        {apply reduce_equiv. apply reduce_bite_beta2.
        apply reduce_id. }
-       {apply equiv_app. apply equiv_app.
-        apply equiv_refl.
-        apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
-        apply equiv_app. apply reduce_equiv.
-        apply reduce_ppi2_beta. apply reduce_id.
-        apply equiv_refl. }
        apply equiv_refl. apply equiv_refl.
+       rewrite make_app2. eapply tr_compute_hyp.
+       apply (tr_arrow_elim _
+          (app (app leqtp (app (var 3) triv))
+               (app (var 3) triv))); try weaken leq_type; try 
+                                                            apply (tr_arrow_elim _ unittp); try var_solv'; auto; try apply tr_unittp_intro.
+       match goal with |- tr ?G' (deq (var ?n) ?n' ?T) =>
+                                              try rewrite - (subst_nat (sh (n.+1)));
+                                              rewrite - (subst_unittp _ (sh (n.+1)));
+                                              rewrite - (subst_arrow _ (sh (n.+1)));
+                                                                               var_solv0 end.
+
+
+                            
        simpsub. simpl.
 
      }
