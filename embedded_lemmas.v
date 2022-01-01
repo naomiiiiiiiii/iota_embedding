@@ -460,13 +460,37 @@ Qed.
  and lemmas for how leq_t computes*)
 (*start here*)
 Lemma leq_trans_app n2 G n1 n3 t1 t2:
+  tr G (oof n1 nattp) ->
+  tr G (oof n2 nattp) ->
+  tr G (oof n3 nattp) ->
   tr G (oof t1 (leq_t n1 n2)) ->
   tr G (oof t2 (leq_t n2 n3)) ->
   tr G (oof (leq_trans_fn_app n1 n2 n3
                           t1 t2)
  (leq_t n1 n3)).
-intros. Admitted. 
-
+  intros. unfold leq_t. unfold leq_trans_fn_app.
+  eapply (tr_arrow_elim _ (leq_t n2 n3)); try weaken leq_type; try assumption.
+  eapply (tr_arrow_elim _ (leq_t n1 n2)); try apply tr_arrow_formation;
+    try weaken leq_type; try assumption.
+  match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+      (@subst1 obj n3
+       (arrow (leq_t (subst sh1 n1) (subst sh1 n2))
+          (arrow (leq_t (subst sh1 n2) (var 0))
+                 (app (app leqtp (subst sh1 n1)) (var 0))))) end.
+  2:{ simpsub_bigs. auto. } apply (tr_pi_elim _ nattp); try assumption.
+  match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+      (@subst1 obj n2
+       (pi nattp (arrow (leq_t (subst (sh 2) n1) (var 1))
+          (arrow (leq_t (var 1) (var 0))
+                 (app (app leqtp (subst (sh 2) n1)) (var 0)))))) end.
+  2:{ simpsub_bigs. auto. } apply (tr_pi_elim _ nattp); try assumption.
+  match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+      (@subst1 obj n1
+(pi nattp (pi nattp (arrow (leq_t (var 2) (var 1))
+          (arrow (leq_t (var 1) (var 0))
+                 (app (app leqtp (var 2)) (var 0))))))) end.
+  2:{ simpsub_bigs. auto. } apply (tr_pi_elim _ nattp); try assumption.
+  apply leq_trans_help. Qed.
 
 Definition make_subseq_trans U1 U2 U3 M1 M2 :=
   ppair (leq_trans_fn_app (ppi2 U1) (ppi2 U2) (ppi2 U3)
@@ -487,7 +511,8 @@ Lemma subseq_trans M M' U1 U2 U3 G:
   intros Hu1 Hu2 Hu3 Hsub2 Hsub1. unfold subseq. unfold make_subseq.
   apply tr_prod_intro.
   {
-    eapply leq_trans_app; eapply tr_prod_elim1;
+    eapply leq_trans_app; try (apply split_world_elim2; assumption);
+    eapply tr_prod_elim1;
       [apply Hsub1 | apply Hsub2].
   }
   {
@@ -695,7 +720,11 @@ unfold subseq in Hsub2.
        simpsub_bigs; auto.
        var_solv. var_solv. }
  (* replace (subst (sh 4) U2) with (subst (sh 1) (subst (sh 3) U2)). inv_subst. *)
-     apply leq_trans_app.
+     apply leq_trans_app; try (apply split_world_elim2;
+                               change world with (@subst obj (sh 4) world);
+                               rewrite ! subst_sh_shift;
+                               apply tr_weakening_append4;
+                               assumption); try var_solv.
      { sh_var 1 1. replace (subst (sh 4) U1) with (subst (sh 1) (subst (sh 3) U1)). inv_subst.
        var_solv.
      simpsub_bigs. auto. }
