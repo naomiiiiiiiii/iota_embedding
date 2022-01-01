@@ -456,6 +456,23 @@ Lemma subseq_refl: forall ( U: term obj) (G: context),
 Qed.
 
 
+(*will have to induct on n1 here
+ and lemmas for how leq_t computes*)
+(*start here*)
+Lemma leq_trans_app n2 G n1 n3 t1 t2:
+  tr G (oof t1 (leq_t n1 n2)) ->
+  tr G (oof t2 (leq_t n2 n3)) ->
+  tr G (oof (leq_trans_fn_app n1 n2 n3
+                          t1 t2)
+ (leq_t n1 n3)).
+intros. Admitted. 
+
+
+Definition make_subseq_trans U1 U2 U3 M1 M2 :=
+  ppair (leq_trans_fn_app (ppi2 U1) (ppi2 U2) (ppi2 U3)
+                          (ppi1 M1) (ppi1 M2)
+        )
+        (lam (lam (lam triv))).
 
 
 Lemma subseq_trans M M' U1 U2 U3 G:
@@ -464,12 +481,13 @@ Lemma subseq_trans M M' U1 U2 U3 G:
   tr G (oof U3 world) ->
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
-                         ->tr G (oof make_subseq 
+                         ->tr G (oof (make_subseq_trans
+                                       U1 U2 U3 M' M)
                                     (subseq U1 U3)).
   intros Hu1 Hu2 Hu3 Hsub2 Hsub1. unfold subseq. unfold make_subseq.
   apply tr_prod_intro.
   {
-    eapply (leq_trans (ppi2 U2)); eapply tr_prod_elim1;
+    eapply leq_trans_app; eapply tr_prod_elim1;
       [apply Hsub1 | apply Hsub2].
   }
   {
@@ -583,8 +601,11 @@ Lemma subseq_trans M M' U1 U2 U3 G:
       {
 unfold subseq in Hsub2.
         eapply (deqtype_intro _#3
-                             (app3 (shift 4 (ppi2 M)) (var 2) (var 1) triv)
-               ).
+                              (app3 (shift 4 (ppi2 M)) (var 2) (var 1)
+  (*var 1 < l2*)                    (leq_trans_fn_app (var 1)
+                                    (ppi2 (subst (sh 4) U1))
+                                    (ppi2 (subst (sh 4) U2))
+                                    (var 0) (ppi1 (subst (sh 4) M'))))). 
         apply (tr_arrow_elim _
                                  (leq_t (var 1) (ppi2 (subst (sh 4) U2)))).
      { weaken leq_type.  var_solv'. apply split_world_elim2. 
@@ -673,16 +694,14 @@ unfold subseq in Hsub2.
        simpsub_bigs; auto.
        simpsub_bigs; auto.
        var_solv. var_solv. }
-     replace (subst (sh 4) U2) with (subst (sh 1) (subst (sh 3) U2)). inv_subst.
-     apply (leq_trans (ppi2 (subst (sh 4) U1)) _ _ _ (var 0)
-                      (ppi1 (subst (sh 4) M'))).
-     { sh_var 1 1. replace (subst (sh 4) U1) with (subst (sh 1) (subst (sh 3) U1)).
-       rewrite - ! subst_sh_shift. inv_subst. var_solv.
+ (* replace (subst (sh 4) U2) with (subst (sh 1) (subst (sh 3) U2)). inv_subst. *)
+     apply leq_trans_app.
+     { sh_var 1 1. replace (subst (sh 4) U1) with (subst (sh 1) (subst (sh 3) U1)). inv_subst.
+       var_solv.
      simpsub_bigs. auto. }
      { eapply tr_prod_elim1.
        match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
            (subst (sh 4) (subseq U1 U2)) end.
        rewrite ! subst_sh_shift. apply tr_weakening_append4. assumption.
-       simpsub_bigs. reflexivity. }
-     simpsub_bigs. auto. } }
+       simpsub_bigs. reflexivity. } } } 
   Qed.

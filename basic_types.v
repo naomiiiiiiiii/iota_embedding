@@ -540,7 +540,7 @@ Definition leq_P := (pi nattp (pi nattp
                                (leq_t (var 2) (var 0))
                         )))).
 
-Lemma leq_trans_help G : tr G (oof (app (app (app nat_ind_fn (lam leq_P))
+Definition leq_trans_fn := (app (app (app nat_ind_fn (lam leq_P))
                   (lam (*n2 : nat*)
                      (lam (*n3 : nat*)
                         (lam (*n1 <= n2*)
@@ -568,8 +568,13 @@ n2 <= n3 = var 0*)
                                                ))
                                                (*s x  = y  : nat*)
                                       )))))
-                  ))
-                                                     (pi nattp leq_P)
+                           )).
+
+Definition leq_trans_fn_app n1 n2 n3 h12 h23 :=
+  app (app (app (app (app leq_trans_fn n1) n2) n3) h12) h23.
+
+Lemma leq_trans_help G : tr G (oof leq_trans_fn
+                                 (pi nattp leq_P)
                               ).
       assert (forall G' x, tr G' (oof x nattp) ->
                     tr G' (oof 
@@ -866,14 +871,6 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
        } } 
 Qed.
 
-(*will have to induct on n1 here
- and lemmas for how leq_t computes*)
-(*start here*)
-Lemma leq_trans n2 G n1 n3 t1 t2 t3:
-  tr G (oof t1 (leq_t n1 n2)) ->
-  tr G (oof t2 (leq_t n2 n3)) ->
-  tr G (oof t3 (leq_t n1 n3)).
-Admitted.
 
 
 Lemma leq_refl: forall G n,
