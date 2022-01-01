@@ -792,37 +792,79 @@ change nattp with (@subst obj (sh 2) nattp). rewrite ! subst_sh_shift.
        apply reduce_id. }
        apply equiv_refl. apply equiv_refl.
        rewrite make_app2. eapply tr_compute_hyp.
-       apply (tr_arrow_elim _
+       constructor. {apply equiv_arrow. apply reduce_equiv.
+                     apply reduce_bite_beta2. apply reduce_id.
+                    apply equiv_refl. }
+       apply (tr_arrow_elim _ 
           (app (app leqtp (app (var 3) triv))
-               (app (var 3) triv))); try weaken leq_type; try 
-                                                            apply (tr_arrow_elim _ unittp); try var_solv'; auto; try apply tr_unittp_intro.
-       match goal with |- tr ?G' (deq (var ?n) ?n' ?T) =>
-                                              try rewrite - (subst_nat (sh (n.+1)));
-                                              rewrite - (subst_unittp _ (sh (n.+1)));
-                                              rewrite - (subst_arrow _ (sh (n.+1)));
-                                                                               var_solv0 end.
-
-
-                            
-       simpsub. simpl.
-
-     }
-
-                              
-                                            apply equiv_refl.)
-                                           }
-
-      match goal with |- tr ?G (deq triv triv ?T) =>
-                      suffices: (tr G (oof (bite (var 3) triv triv) T)) end.
-      { intros Hannoying.
-        constructor.
-        eapply deq_intro. apply Hannoying. }
-
-      {
-      }
-
-      }
-
+               (app (var 2) triv))).
+       3:{ apply (tr_arrow_elim _
+          (app (app leqtp (var 5))
+               (app (var 3) triv))).
+           3: { 
+             match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+       (@subst1 obj (app (var 2) triv) (arrow
+          (app (app leqtp (var 6))
+             (app (var 4) triv))
+          (arrow
+             (app
+                (app leqtp
+                   (app (var 4) triv))
+                (var 0))
+             (app
+                (app leqtp (var 6))
+                (var 0))))) end.
+             apply (tr_pi_elim _ nattp).
+             match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+       (@subst1 obj (app (var 3) triv) 
+       (pi nattp
+          (arrow
+             (app
+                (app leqtp (var 7))
+                (var 1))
+             (arrow
+                (app
+                   (app leqtp
+                      (var 1))
+                   (var 0))
+                (app
+                   (app leqtp
+                      (var 7))
+                   (var 0)))))) end.
+             apply (tr_pi_elim _ nattp). 
+             match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+       (@subst obj (sh 5)
+       (pi nattp (pi nattp
+          (arrow
+             (app
+                (app leqtp (var 2))
+                (var 1))
+             (arrow
+                (app
+                   (app leqtp
+                      (var 1))
+                   (var 0))
+                (app
+                   (app leqtp
+                      (var 2))
+                   (var 0))))))) end. var_solv0.
+             Ltac app_nat := try apply (tr_arrow_elim _ unittp); try var_solv';
+                             auto; try apply tr_unittp_intro.
+             app_nat. app_nat. }
+           try weaken leq_type; try app_nat.
+           apply tr_arrow_formation; try weaken leq_type; try app_nat. 
+           { match goal with |- tr ?G (deq ?M ?M ?T) => change T with  (@subst obj (sh 2)
+       (app (app leqtp (var 3))
+            (app (var 1) triv))) end. var_solv0. } }
+           weaken leq_type; try app_nat.
+           weaken leq_type; try app_nat.
+           { match goal with |- tr ?G (deq ?M ?M ?T) => change T with  (@subst obj (sh 1)
+       (app (app leqtp (app (var 2) triv))
+         (app (var 1) triv))) end. var_solv0. }
+           }
+          } 
+       } } 
+Qed.
 
 (*will have to induct on n1 here
  and lemmas for how leq_t computes*)
