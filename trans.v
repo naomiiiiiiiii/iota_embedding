@@ -237,6 +237,12 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
+Definition make_subseq_trans l1 l2 l3 M1 M2 :=
+  ppair (leq_trans_fn_app l1 l2 l3
+                          (ppi1 M1) (ppi1 M2)
+        )
+        (lam (lam (lam triv))).
+
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
                                    trans G E1 (comp_m A) Et1 ->
@@ -277,12 +283,15 @@ that. you want to bind
                                             (*5: Gamma_at G w
                                               move 5: Gamma_at G v
                                           <x, 5> : Gamma_at A::G v*)
-(ppair x' (move_gamma G make_subseq (var 4)))                                                 in
-                               let e2bar' := app (app (app btarg lv) make_subseq) sv in
+(ppair x' (move_gamma G (make_subseq_trans (var 5) (var 3) lv (var 2) mv) (var 4)))                                                 in
+                               let e2bar' := app (app (app btarg lv) make_subseq) (*v, z1 <= v, z1*)
+                                                 sv in
                                make_bind e2bar' (lam (
                                                     let z2 := (var 0) in
                                                     ret_a (ppair (picomp1 z2)
-                                                                   (ppair (ppair make_subseq (*z2 \circ z1*)
+                                                                 (ppair (ppair
+             (make_subseq_trans (shift 1 l) (shift 1 lv) (picomp1 z2) (picomp2 (shift 1 z1)) (picomp2 z2))
+                                                                           (*z2 \circ z1*)
                                                       (picomp3 z2)) (picomp4 z2))                         
                                                         )
                                                ))
@@ -296,18 +305,23 @@ that. you want to bind
          of_m G (ref_m E) (comp_m (reftp_m A)) -> trans G E A Et ->
          trans G (ref_m E) (comp_m (reftp_m A)) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
          let l := var 2 in                                                        
-         let m1 := make_subseq in (*u <= u1)*)
+         let m1 := make_subseq in (*u <= u1, consb subseq*)
          let p1 := (ppair m1
                          (lam (lam ( lam ( (*making a value of type store U1, lambdas go l2, m2, i*)
                                          let l1 := var 7 in
                                          let g := var 6 in
                                          let l := var 5 in
+                                         let m := var 4 in
                                          let s := var 3 in
                                          let l2 := var 2 in
+                                         let m2 := var 1 in
                                          let i := var 0 in
                                          let x := app (app (shift 8 Et) l1) g in
-                                         let m12 := make_subseq in (*m2 o m1 : U <= U2*)
-                                         let m02 := make_subseq in (*m12 o m : W <= U2*)
+                                         let m12 := (make_subseq_trans l (nsucc l)
+                                                                      l2 m1 m2)
+                                         in (*m2 o m1 : U <= U2*)
+                                         let m02 := make_subseq_trans l1 l l2 m m12 in
+                                         (*m12 o m : W <= U2*)
                                          bite (ltb_app i l)
                                               (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
                                               (next (move_app A m02 x)) (*move x to be : |> A @ U2*)
@@ -343,15 +357,18 @@ that. you want to bind
                                                                     let i := shift 3 i in
                                                                     let l := shift 3 l in
                                                                     let g := shift 3 g in
+                                                                    let m := shift 3 m in
                                                                     bite
                                                                       (app (eq_b j) i)
-                                                                      (next (move_app A (make_subseq)
+                                                                      (next (move_app A
+   (make_subseq_trans l l1 l2 m m1)
                                                                     (app (app (shift 8 Et) l) g)))
                                                                       (app (app (app (shift 3 s1) l2) m1) j)
                                                                  ))) in
                                       ret_a (ppair l1
                                                    (ppair
-                                                      (ppair make_subseq store_u1)
+                                                      (ppair make_subseq (*refl u1*)
+                                                             store_u1)
                                                       triv))
             ))))))
   | t_deref: forall G R Rt A,

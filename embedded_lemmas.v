@@ -492,12 +492,6 @@ Lemma leq_trans_app n2 G n1 n3 t1 t2:
   2:{ simpsub_bigs. auto. } apply (tr_pi_elim _ nattp); try assumption.
   apply leq_trans_help. Qed.
 
-Definition make_subseq_trans U1 U2 U3 M1 M2 :=
-  ppair (leq_trans_fn_app (ppi2 U1) (ppi2 U2) (ppi2 U3)
-                          (ppi1 M1) (ppi1 M2)
-        )
-        (lam (lam (lam triv))).
-
 
 Lemma subseq_trans M M' U1 U2 U3 G:
   tr G (oof U1 world) ->
@@ -506,9 +500,9 @@ Lemma subseq_trans M M' U1 U2 U3 G:
                          tr G (oof M (subseq U2 U3))
                          -> tr G (oof M' (subseq U1 U2))
                          ->tr G (oof (make_subseq_trans
-                                       U1 U2 U3 M' M)
+                                       (ppi2 U1) (ppi2 U2) (ppi2 U3) M' M)
                                     (subseq U1 U3)).
-  intros Hu1 Hu2 Hu3 Hsub2 Hsub1. unfold subseq. unfold make_subseq.
+  intros Hu1 Hu2 Hu3 Hsub2 Hsub1. unfold subseq. 
   apply tr_prod_intro.
   {
     eapply leq_trans_app; try (apply split_world_elim2; assumption);
