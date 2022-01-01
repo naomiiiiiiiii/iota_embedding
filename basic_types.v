@@ -573,6 +573,12 @@ n2 <= n3 = var 0*)
 Definition leq_trans_fn_app n1 n2 n3 h12 h23 :=
   app (app (app (app (app leq_trans_fn n1) n2) n3) h12) h23.
 
+(*try and get it to be so that if x : x <= y
+ then triv  : x <= y
+
+ induct on x F
+ honestly you do the trans reasoning in proofs_working already so just try and see how that goes*)
+
 Lemma leq_trans_help G : tr G (oof leq_trans_fn
                                  (pi nattp leq_P)
                               ).

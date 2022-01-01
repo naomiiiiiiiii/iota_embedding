@@ -328,6 +328,17 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
 Qed.
 
 
+Lemma subst_make_subseq_trans: forall s a b c d e, (subst s (make_subseq_trans a b c d e)) = (make_subseq_trans
+                                                                                 (subst s a)
+                                                                                 (subst s b)
+                                                                                 (subst s c)
+                                                                                 (subst s d)
+                                                                                 (subst s e)
+                                                                                        ).
+  intros. unfold make_subseq_trans. unfold leq_trans_fn_app. unfold leq_trans_fn. simpsub. auto. Qed.
+
+Hint Rewrite subst_make_subseq_trans: core subst1.
+Hint Rewrite <- subst_make_subseq_trans : inv_subst.
 
 Theorem two_working: forall G e T ebar,
     trans G e T ebar ->
@@ -749,21 +760,16 @@ simpsub_type; auto.
                   (next (var 2))))).
         intros Hlam. 
         suffices: (tr G'' (oof triv (equal booltp (app (app eq_b (var 0)) i)
-                                           (app (app eq_b (var 0)) i)))).
-        intros Harg. *)
-replace 
-    (bite (app (eq_b (var 0)) i)
-       (next
-          (move_app A make_subseq
-             (app (app (subst (sh 11) Et) (var 9))
-                (var 8))))
-       (app
-          (app (app (var 4) (var 2)) (var 1))
-          (var 0))) with
+                                           (app (app eq_b (var 0)) i)))). 
+        intros Harg. *) match goal with |- tr ?G (deq ?M ?M ?T) =>
+replace M with 
     (subst1 triv
 (bite (app (eq_b (var 1)) (shift 1 i))
                     (next
-                       (move_app A make_subseq
+                       (move_app A 
+                (make_subseq_trans (var 10) (var 7) 
+                   (var 3) (var 6) (var 2))
+
                           (app
                              (app (subst (sh 12) Et)
                                 (var 10)) 
@@ -771,15 +777,20 @@ replace
                     (app
                        (app (app (var 5) (var 3))
                           (var 2)) 
-                       (var 1)))).
+                       (var 1)))) end.
 2:{ subst. simpsub_bigs. auto.
-     }
+     } 
         eapply (tr_compute _ _ _ _ 
            ( app 
               (lam
                  (bite (app (eq_b (var 1)) (shift 1 i))
                     (next
-                       (move_app A make_subseq
+                       (move_app A 
+                (make_subseq_trans 
+                   (var 10) (var 7) 
+                   (var 3) (var 6) 
+                   (var 2))
+
                           (app
                              (app (subst (sh 12) Et)
                                 (var 10)) 
@@ -808,7 +819,11 @@ apply reduce_app_beta; apply reduce_id.
                     ( lam (
                       bite (var 1)
           (next
-             (move_app A make_subseq
+             (move_app A 
+                   (make_subseq_trans (var 11) 
+                      (var 8) (var 4) (var 7) 
+                      (var 3))
+
                 (app
                    (app (subst (sh 13) Et)
                       (var 11)) 
@@ -846,9 +861,12 @@ apply reduce_app_beta; apply reduce_id.
         simpsub. (*make a template for this casing reasoning*)
         rewrite - cat1s.
         match goal with |- tr ?G (deq ?M ?M ?T) =>
-       replace M with  (bite (var 1)
+      replace M with  (bite (var 1)
          (subst (under 1 sh1) (next
-             (move_app A make_subseq
+             (move_app A 
+                (make_subseq_trans (var 10) 
+                   (var 7) (var 3) (var 6) (var 2))
+
                 (app (app (subst (sh 12) Et) (var 10)) (var 9)))))
          (subst (under 1 sh1) (app (app (app (var 5) (var 3)) (var 2))
                                    (var 1)))) end.
@@ -942,8 +960,18 @@ subst; var_solv.
 (*show move (Et @ u l) : A @ U2*)
 subst.
 constructor. apply (@moveapp_works _ _ (var 11) (var 10)); auto; try (apply world_pair; var_solv). simpl.
-(*U <= U2*)
-apply (subseq_trans (var 2) (var 6) _ (ppair (var 8) (var 7))).
+assert (forall u2 M M' u1 l1 l2 u3 l3 G,
+  tr G (oof (ppair u1 l1) world) ->
+  tr G (oof (ppair u2 l2) world) ->
+  tr G (oof (ppair u3 l3) world) ->
+                         tr G (oof M (subseq (ppair u2 l2) (ppair u3 l3)))
+                         -> tr G (oof M' (subseq (ppair u1 l1) (ppair u2 l2)))
+                         ->tr G (oof (make_subseq_trans
+                                       l1 l2 l3 M' M)
+                                    (subseq (ppair u1 l1) (ppair u3 l3))) ) as subseq_trans.
+shelve.
+(*U <= U2*) 
+apply (subseq_trans (var 8)); auto; try (apply world_pair; var_solv).
 sh_var 3 8. inv_subst. rewrite subst_sh_shift. var_solv.
 sh_var 7 11. inv_subst. rewrite subst_sh_shift. var_solv.
 eapply apply_IH; try apply IHDtrans2; try var_solv.
