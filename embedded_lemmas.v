@@ -357,12 +357,15 @@ Lemma uworld87: forall G x y z a b c d,
   Hint Resolve uworld10 uworld32 uworld21 uworld43 uworld65 uworld76 uworld87 uworld98
   uworld109.
 
-  Lemma store_U0: forall w l G,
-    (tr G (oof (ppair w l) world)) -> tr G (oof (store w l) U0).
+  Lemma store_U0: forall w l G, tr G (oof w preworld) ->
+                           tr G (oof l nattp) ->
+                           tr G (oof (store w l) U0).
 Admitted.
 
   Lemma store_type: forall w l G,
-    (tr G (oof (ppair w l) world)) -> tr G (deqtype (store w l) (store w l)).
+   tr G (oof w preworld) ->
+   tr G (oof l nattp) ->
+ tr G (deqtype (store w l) (store w l)).
 Admitted.
 
 Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
@@ -380,7 +383,10 @@ Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
 
 
 Lemma subseq_type: forall G w1 l1 w2 l2,
-    tr G (oof (ppair w1 l1) world) -> tr G (oof (ppair w2 l1) world) ->
+      tr G (oof w1 preworld) ->
+      tr G (oof w2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
     tr G (deqtype (subseq w1 l1 w2 l2) (subseq w1 l1 w2 l2)).
 Admitted.
 Hint Resolve store_type subseq_type.
@@ -402,8 +408,10 @@ Hint Resolve pw_type3 pw_type2 pw_type1: core.
 Hint Resolve tr_fut_formation tr_fut_formation_univ: core.
 
  Lemma move_works: forall G w1 l1 w2 l2 T,
-     tr G (oof (ppair w1 l1) world) ->
-     tr G (oof (ppair w2 l2) world) ->
+      tr G (oof w1 preworld) ->
+      tr G (oof w2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
      tr G (oof (move T) (arrow (subseq w1 l1 w2 l2)
                                (arrow
                                   (trans_type w1 l1 T)
