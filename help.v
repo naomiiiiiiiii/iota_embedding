@@ -90,12 +90,7 @@ Definition len w: (term obj) := ppi2 w.
 
 Definition nth w n: term obj := app (ppi1 w) n.
 
- Definition subseq: (term obj) -> (term obj) -> (term obj) :=
-   fun W1 => fun W2 =>
-            let w1 := ppi1  W1 in
-            let w2 := ppi1 W2 in
-            let l1 := ppi2 W1 in
-            let l2 := ppi2 W2 in
+ Definition subseq w1 l1 w2 l2 :=
             prod (leq_t l1 l2)
                  (all nzero (fut preworld)
                  (*u = 0*)
@@ -114,6 +109,12 @@ Definition nth w n: term obj := app (ppi1 w) n.
 
 
  Definition make_subseq: term obj := ppair triv (lam (lam (lam triv)) ).
+
+ Definition make_subseq_trans l1 l2 l3 M1 M2 :=
+  ppair (leq_trans_fn_app l1 l2 l3
+                          (ppi1 M1) (ppi1 M2)
+        )
+        (lam (lam (lam triv))).
 
  (*transitivity of subseq*)
 
@@ -138,9 +139,9 @@ Definition nth w n: term obj := app (ppi1 w) n.
 
  (*the type of the store at world <w, l>*)
  Definition store w l := all nzero preworld (pi nattp (*v = 1, l v= 0*) 
-                                                ( let W := (shift 2 (ppair w l)) in
-                                                  let V := (ppair (var 1) (var 0)) in
-                                                       (arrow (subseq W V) (gettype (shift 2 w) (var 1) (var 0))))
+                                                (
+                                                  (arrow (subseq (shift 2 w) (shift 2 l) (var 1) (var 0))
+                                                         (gettype (shift 2 w) (var 1) (var 0))))
                                                 ).
 
 

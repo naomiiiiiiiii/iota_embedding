@@ -960,15 +960,6 @@ subst; var_solv.
 (*show move (Et @ u l) : A @ U2*)
 subst.
 constructor. apply (@moveapp_works _ _ (var 11) (var 10)); auto; try (apply world_pair; var_solv). simpl.
-assert (forall u2 M M' u1 l1 l2 u3 l3 G,
-  tr G (oof (ppair u1 l1) world) ->
-  tr G (oof (ppair u2 l2) world) ->
-  tr G (oof (ppair u3 l3) world) ->
-                         tr G (oof M (subseq (ppair u2 l2) (ppair u3 l3)))
-                         -> tr G (oof M' (subseq (ppair u1 l1) (ppair u2 l2)))
-                         ->tr G (oof (make_subseq_trans
-                                       l1 l2 l3 M' M)
-                                    (subseq (ppair u1 l1) (ppair u3 l3))) ) as subseq_trans.
 shelve.
 (*U <= U2*) 
 apply (subseq_trans (var 8)); auto; try (apply world_pair; var_solv).
@@ -1020,9 +1011,9 @@ constructor. }
          simpsub_big_T.
          apply tr_arrow_intro; try assumption; auto.
          simpsub_big_T. change (univ nzero) with (@ subst1 obj (prev (var 0)) (univ nzero)).
-         apply (tr_fut_elim _ _ _ nattp). var_solv. inv_subst. var_solv. auto.
+         apply (tr_fut_elim _ _ _ nattp). var_solv. inv_subst. auto.
          change (univ nzero) with (@ subst1 obj (prev (var 2)) (univ nzero)).
-         apply (tr_fut_elim _ _ _ preworld). var_solv. inv_subst. var_solv. auto.
+         apply (tr_fut_elim _ _ _ preworld). var_solv. inv_subst. auto.
          constructor. apply trans_type_works; auto. apply world_pair; var_solv.
          auto.
          simpl.
@@ -1061,21 +1052,30 @@ constructor. }
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
       (*ltac for showing (sh 2 U1) to be a world in context grown by 2*)
       Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append.
-      apply world_pair. u1_pw2. apply Hu1. apply nsucc_nat; var_solv.
+      apply world_pair. u1_pw2. apply Hu1. apply nsucc_nat; var_solv. 
       2: { unfold gettype. simpsub_bigs. apply tr_pi_intro; auto.
            eapply (tr_compute _ _ _ _ _ _ _ reduce_consb); try (apply equiv_refl).
 (*match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => change M with M end.
   literally what ask karl
  *)
-(*case on whether index is < l = size u*)
+(*case on whether index is < l = size u*) 
 match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with 
        (subst1 (ltb_app (var 0) (var 6)) (bite (var 0)
           (app
              (app (app (var 5) (var 3))
-                make_subseq) 
-             (var 1))
+                (make_subseq_trans 
+                   (var 7) (nsucc (var 7))
+                   (var 3) make_subseq 
+                   (var 2))) (var 1)) 
           (next
-             (move_app A make_subseq
+             (move_app A 
+                (make_subseq_trans 
+                   (var 10) (var 7) 
+                   (var 3) (var 6)
+                   (make_subseq_trans 
+                      (var 7) (nsucc (var 7))
+                      (var 3) make_subseq
+                      (var 2)))
                 (app
                    (app (subst (sh 12) Et)
                       (var 10)) 
@@ -1093,10 +1093,30 @@ end.
 2, 4: (simpsub_bigs; auto). rewrite fold_substj.
 eapply (tr_generalize _ booltp).
 apply ltapp_typed; try var_solv.
-change (app (app (app (var 5) (var 3)) make_subseq) (var 1)) with
-    (subst sh1 (app (app (app (var 4) (var 2)) make_subseq) (var 0))).
-replace (next (move_app A make_subseq (app (app (subst (sh 12) Et) (var 10)) (var 9)))) with
-    (subst sh1 (next (move_app A make_subseq (app (app (subst (sh 11) Et) (var 9)) (var 8))))).
+match goal with |- tr ?G (deq (bite ?M1 ?M2 ?M3) ?M4 ?T) =>
+change M2 with
+    (subst sh1 
+          (app
+             (app (app (var 4) (var 2))
+                (make_subseq_trans 
+                   (var 6) (nsucc (var 6))
+                   (var 2) make_subseq 
+                   (var 1))) (var 0)));
+  replace M3 with
+         (subst sh1 (next
+             (move_app A
+                (make_subseq_trans 
+                   (var 9) (var 6) 
+                   (var 2) (var 5)
+                   (make_subseq_trans 
+                      (var 6) (nsucc (var 6))
+                      (var 2) make_subseq
+                      (var 1)))
+                (app
+                   (app (subst (sh 11) Et)
+                      (var 9)) 
+                   (var 8))))) end.
+
 2: { simpsub_bigs. auto. }
      apply tr_booltp_eta_hyp0.
            - (*case: i < l*)

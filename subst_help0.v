@@ -114,10 +114,12 @@ Lemma subst_lt: forall s n1 n2,
     subst s (lt_t n1 n2) = lt_t (subst s n1) (@ subst obj s n2).
   intros. repeat rewrite subst_app. rewrite subst_lttp. auto. Qed. 
 
-Lemma subst_subseq: forall W1 W2 s,
+Lemma subst_subseq: forall w1 w2 l1 l2 s,
        (subst s
-              (subseq W1 W2)) = subseq (subst s W1)
-                                       (subst s W2).
+              (subseq w1 l1 w2 l2)) = subseq (subst s w1)
+                                             (subst s l1)
+                                             (subst s w2)
+                                             (subst s l2).
    intros. unfold subseq.
    unfold app3.
    simpsub_bigs.

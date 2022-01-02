@@ -237,11 +237,6 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
-Definition make_subseq_trans l1 l2 l3 M1 M2 :=
-  ppair (leq_trans_fn_app l1 l2 l3
-                          (ppi1 M1) (ppi1 M2)
-        )
-        (lam (lam (lam triv))).
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
