@@ -21,15 +21,13 @@ From istari Require Import Sigma Tactics
 
 Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: (Syntax.term obj)                                                                          
   :=
-    let W := (ppair w1 l1) in
     match tau with
         nattp_m => nattp
       | unittp_m => unittp
       | arrow_m A B => all nzero preworld (pi nattp (*u := 1, l := 0*)
                                         (let u := var 1 in
                                         let l := var 0 in
-                                        let U := ppair u l in
-                                        arrow (subseq (shift 2 W) U) (arrow (trans_type u l A) (trans_type u l B))
+                                        arrow (subseq (shift 2 w1) (shift 2 l1) u l) (arrow (trans_type u l A) (trans_type u l B))
                                     ))
                           (*does NOT send the refs to comp ref*)
       | reftp_m tau' => sigma nattp ( (* i := 0*)
@@ -55,7 +53,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
                                                        let u := Syntax.var 1 in
                                                        let l := Syntax.var 0 in
                                                        let U := (ppair u l) in
-                                                       arrow (subseq (ppair (shift 3 w1) l1) U)
+                                                       arrow (subseq (shift 3 w1) l1 u l)
  (*compm1_Type starts here*)                        (arrow (store u l)
                          (laters (exist nzero preworld ((* l1 = 3, u := 2, l:= 1, v = 0*)
                                           sigma nattp (*l1 = 4 u := 3, l := 2, v= 1, lv := 0*)
@@ -63,10 +61,8 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
                                               let l := Syntax.var 2 in
                                               let v := Syntax.var 1 in
                                               let lv := Syntax.var 0 in
-                                              let U := ppair u l in
-                                              let V := ppair v lv in
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
-                                                    prod (prod (subseq U V) (store v lv))
+                                                    prod (prod (subseq u l v lv) (store v lv))
                                                      (trans_type v lv tau'))))
                                     )
                        ))
@@ -74,23 +70,21 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
       | _ => unittp end.
 
 (*no free variables in translation of types*)
-Lemma subst_trans_type :forall w l A s,
-    (subst s (ppair w l)) = (ppair w l) ->
+Lemma subst_trans_type :forall A w l s,
+    subst s w = w ->
+    subst s l = l ->
     (subst s (trans_type w l A)) = (trans_type w l A).
-  move => w l A s H. move: w l s H. induction A; intros;simpl; auto; simpsub_big; simpl; try rewrite - subst_ppair;
- try rewrite subst_compose; try rewrite H. 
+   induction A; intros; simpl; auto; simpsub_big; simpl;  try rewrite ! subst_compose ! H ! H0. 
   - (*arrow*)
     suffices:  ((subst
                 (dot (var 0) (dot (var 1) (compose s (sh 2))))
                 (trans_type (var 1) (var 0) A1)) = (trans_type (var 1) (var 0) A1)) /\ ((subst
                 (dot (var 0) (dot (var 1) (compose s (sh 2))))
                 (trans_type (var 1) (var 0) A2)) = (trans_type (var 1) (var 0) A2)). move => [Heq1 Heq2].
-    rewrite Heq1 Heq2. auto.
-    split; [eapply IHA1 | eapply IHA2]; simpsub; auto.
+    rewrite Heq1 Heq2. auto. simpsub_big.
+     split; [eapply IHA1 | eapply IHA2]; simpsub; auto.
   - (*comp*)
- rewrite subst_ppair in H. inversion H. rewrite H1.
-rewrite !subst_ppair !subst_compose !H2.
-simpsub_big. simpl. suffices: (
+ suffices: (
             (subst
                             (dot (var 0)
                                (dot (var 1)
@@ -119,8 +113,6 @@ simpsub_big. simpl. suffices: (
 move => Heq.
 rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
   - (*ref*)
-    rewrite !subst_compose.
-    simpsubin H. inversion H. rewrite ! H1 ! H2.
     suffices: (subst
                       (dot (var 0)
                          (dot (var 1)
@@ -128,7 +120,7 @@ rewrite Heq. unfold subst1. auto. repeat rewrite IHA; simpsub; auto.
                       (trans_type (var 1) (var 0) A)) =
               (trans_type (var 1) (var 0) A).
     move => Heq. rewrite Heq. auto. simpsub_big.
-eapply IHA. simpsub. auto.
+eapply IHA. simpsub. auto. simpsub. auto.
 Qed.
 Ltac simpsub_type := simpl; simpsub_big; simpl; rewrite subst_trans_type; simpl.
 
@@ -196,7 +188,8 @@ Fixpoint gamma_at (G: source.context ):= match G with
                                            | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
 
 Lemma subst_Gamma_at :forall w l s G,
-    (subst s (ppair w l)) = (ppair w l) ->
+    subst s w = w ->
+    subst s l = l ->
     (subst s (Gamma_at G w l)) = (Gamma_at G w l).
    intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
    rewrite IHG subst_trans_type; auto. Qed.
