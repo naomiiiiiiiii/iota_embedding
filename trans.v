@@ -251,6 +251,7 @@ make_bind btarg ( lam (*l1 := 5, l := 3, m := 2, s := 1, z1 := 0*)
                                let mv := (picomp2 z1) in
                                let sv := (picomp3 z1) in
                                let x' := (picomp4 z1) in
+                               let l := (shift 1 l) in
                                                                         (*
 in the context (A :: G) Et2 is a function which wants a length
 in the context G, Et2 has var 0 free. In context G, (lam Et2) is a function which wants an
@@ -306,9 +307,10 @@ that. you want to bind
                                          let i := var 0 in
                                          let x := app (app (shift 8 Et) l1) g in
                                          let m12 := (make_subseq_trans l (nsucc l)
-                                                                      l2 m1 m2)
-                                         in (*m2 o m1 : U <= U2*)
-                                         let m02 := make_subseq_trans l1 l l2 m m12 in
+                                                                      l2 m1 m2) (*U <=  U1 <= U2*)
+                                         in 
+                                         let m02 := make_subseq_trans l1 l l2 m m12 in (*W <= U + U <= U2 = W <= U2*)
+                                         
                                          (*m12 o m : W <= U2*)
                                          bite (ltb_app i l)
                                               (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)

@@ -547,14 +547,6 @@ Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
 
 
 
-Lemma store_type1 G w l: 
-tr G (oof w preworld) ->
- tr G (oof l nattp) ->
- tr (hyp_tm preworld ::G) (oof_t (pi nattp (*v = 1, l v= 0*)
-                 (arrow (subseq (shift 2 w) (shift 2 l) (var 1) (var 0))
-                                                         (gettype (shift 1 w) (var 1) (var 0))))).
-                                                                       
-Admitted.
 
              Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
                                (substj (dot x id) (@ deq obj M1 M2 T)).
