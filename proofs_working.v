@@ -1180,13 +1180,6 @@ change M2 with
                       (next (var 1)))))))) end.
              var_solv0. var_solv. 
              sh_var 2 10. inv_subst.
-assert (forall G w l,
-tr G (oof w preworld) ->
- tr G (oof l nattp) ->
- tr (hyp_tm preworld ::G) (oof_t (pi nattp (*v = 1, l v= 0*)
-                 (arrow (subseq (shift 2 w) (shift 2 l) (var 1) (var 0))
-                        (gettype (shift 2 w) (var 1) (var 0)))))) as store_type1.
-shelve.
 rewrite ! subst_sh_shift. apply store_type1; auto; try var_solv.
 var_solv.
              (*showing U <= U2*)
@@ -1827,59 +1820,9 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
     apply tr_weakening_append3.
     sh_var 1 6.
     apply picomp3_works. rewrite ! fold_subst1 subst1_trans_type.
-
     apply picomp4_works.
-    apply picomp2_works.
-    apply picomp1_works.
-    sh_var 5 9. inv_subst. rewrite - (subst_nat (sh 5)) ! subst_sh_shift.
-    rewrite make_app5. apply tr_weakening_append. apply picomp1_works1.
-    weaken compm5_type; try var_solv; auto; try apply trans_type_works; try var_solv.
-    simpsub_bigs. var_solv. auto.
-
-  assert (forall G w l A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (subst (sh 1) w) (subst (sh 1) l)
-                    (var 1) (var 0))
-                   (store (var 1) (var 0)))
-                A)),
-hyp_tm preworld
-      & G]
-    (oof (picomp2 (var 0))
-         (subseq (subst (sh 1) w) (subst (sh 1)  l)
-                (var 1) (picomp1 (var 0)))
-         )) as picomp2_works_correct.
-  shelve.
-
-    sh_var 1 5. inv_subst.
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (subst (sh 1) (var 3))
-                      (subst (sh 1) (picomp1 (var 2)))
-                      (subst (sh 1) (var 0)) 
-                      (var 0))
-                   (store (subst (sh 1) (var 0)) (var 0)))
-                (trans_type (subst (sh 1) (var 0)) 
-                   (var 0) B))); hyp_tm preworld;
-    apply picomp2_works_correct.
-    apply tr_weakening_append5.
-    sh_var 3 9. inv_subst.
-rewrite - ! subst_sh_shift.
-rewrite - ! subst_picomp2 - ! subst_ppi1 - ! subst_ppair - !
-                                                             subst_subseq ! subst_sh_shift.
-rewrite make_app3.
-apply tr_weakening_append; auto.
-auto. repeat fold (@subst1 False).
-rewrite fold_subst1 subst1_trans_type.
-simpsub_big. simpl. apply picomp4_works.
 weaken compm5_type; try var_solv; auto; try apply trans_type_works; try var_solv.
-intros.
-sh_var 2 11. rewrite - ! subst_sh_shift - ! subst_ppair.
+sh_var 2 11. rewrite - ! subst_sh_shift.
 weaken compm4_type; try var_solv; auto. apply trans_type_works; try var_solv; auto.
 }
 Unshelve. apply nat. 

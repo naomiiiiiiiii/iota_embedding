@@ -96,7 +96,7 @@ Definition nth w n: term obj := app (ppi1 w) n.
                  (*u = 0*)
                  (pi (fut nattp) (*u = 1, l = 0*)
                      (pi (nattp) (*u = 2, l = 1, i = 0*)(
-                           arrow (leq_t (var 0) (subst (sh 3) l1))
+                           arrow (lt_t (var 0) (subst (sh 3) l1))
                               (
                           eqtype (app3 (subst (sh 3) w1) (var 0) (var 2) (var 1))
                           (app3 (subst (sh 3) w2) (var 0) (var 2) (var 1))

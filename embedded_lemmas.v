@@ -362,11 +362,21 @@ Lemma uworld87: forall G x y z a b c d,
                            tr G (oof (store w l) U0).
 Admitted.
 
-  Lemma store_type: forall w l G,
+  Lemma store_type1: forall w l G,
+tr G (oof w preworld) ->
+ tr G (oof l nattp) ->
+ tr (hyp_tm preworld ::G) (oof_t (pi nattp (*v = 1, l v= 0*)
+                 (arrow (subseq (shift 2 w) (shift 2 l) (var 1) (var 0))
+                        (gettype (shift 2 w) (var 1) (var 0))))).
+  Admitted.
+
+
+    Lemma store_type: forall w l G,
    tr G (oof w preworld) ->
    tr G (oof l nattp) ->
  tr G (deqtype (store w l) (store w l)).
 Admitted.
+
 
 Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
       tr G (oof u1 preworld) ->

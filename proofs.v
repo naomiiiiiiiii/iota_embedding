@@ -591,7 +591,13 @@ Hint Resolve nsucc_nat.
 
 (*for any W, W <= x:: W
  going to need lt reflection *)
-Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
+
+Lemma nsucc_leq: forall G n, tr G (oof n nattp) ->
+                       tr G (oof triv (leq_t n (nsucc n))).
+Admitted.
+
+
+  Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                     tr G' (oof l' nattp) ->
                                 tr G' (oof x (karrow (fut preworld)
                                                     (arrow (fut nattp) U0)
@@ -599,7 +605,36 @@ Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                 tr G' (oof make_subseq (subseq w' l'
                                                          (cons_b w' l' x) (nsucc l')
                                       )).
+  intros. unfold make_subseq.
+  apply tr_prod_intro.
+  { apply nsucc_leq; auto. }
+  { apply tr_all_intro; auto.
+  constructor. apply pw_kind. auto.
+  simpsub_bigs.
+  apply tr_pi_intro. constructor. auto.
+  apply tr_pi_intro; auto.
+  apply tr_arrow_intro; try apply tr_eqtype_formation; try (weaken leq_type; try var_solv;
+    try (rewrite - (subst_nat (sh 3)) ! subst_sh_shift; apply tr_weakening_append3;
+         assumption)).
+  apply pw_app_typed; try var_solv.
+ rewrite - (subst_pw (sh 3)) ! subst_sh_shift; apply tr_weakening_append3;
+   assumption.
+ apply pw_app_typed; try apply consb_typed;
+   try var_solv; try rewrite - (subst_pw (sh 3));
+   try rewrite - (subst_nat (sh 3));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append3;
+        assumption). change U0 with (subst (sh 3) U0). inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption.
+ {
+   unfold cons_b. unfold app3. simpsub_bigs. 
+ }
+ }
+
 Admitted.
+
+  Lemma leq_P G n m p: tr G (oof n nattp) ->
+                    tr G (oof m nattp) ->
+  tr G (oof p (lt_t n m)) ->
+                    tr G (deq (ltb_app n m) btrue booltp).
 
 
 
