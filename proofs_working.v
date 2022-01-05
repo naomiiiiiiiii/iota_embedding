@@ -1581,10 +1581,10 @@ apply tr_hyp_tm; repeat constructor.
                (inl (ppair (picomp1 (var 0))
                       (ppair (ppair 
                          (make_subseq_trans 
-                            (var 4) (picomp1 (var 1))
-                            (picomp1 (var 0))
-                            (picomp2 (var 1))
-                            (picomp2 (var 0)))
+                            (var 5) (picomp1 (var 1)) (*z1*)
+                            (picomp1 (var 0)) (*z2*)
+                            (picomp2 (var 1)) (*z1*)
+                            (picomp2 (var 0))) (*z2*)
  (*z2 \circ z1*)
                        (picomp3 (var 0))) (picomp4 (var 0)))                 
                                                         ))
@@ -1790,11 +1790,10 @@ apply subseq_refl; try var_solv; auto. rewrite ! subst_trans_type; auto.
           (ppair
              (ppair 
                 (make_subseq_trans 
-                   (var 6) (picomp1 (var 2))
-                   (picomp1 (var 0))
+                   (var 7) (picomp1 (var 2))
+                 (ppi1 (var 0))
                    (picomp2 (var 2))
                    (picomp2 (var 0)))
-
                 (picomp3 (var 0)))
              (picomp4 (var 0)))))
         end.
@@ -1821,12 +1820,55 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
       change (dot (var 0) (dot (var 2) sh1))  with (@ under obj 1 (dot (var 1) id)). rewrite ! subst1_under_trans_type; auto. simpsub. simpl.
       apply tr_sigma_intro; auto.
 - simpsub_big. simpl. apply tr_prod_intro.
-  + apply tr_prod_intro. apply (subseq_trans (var 4)); try var_solv.
-  (*  eapply (subseq_trans (picomp2 (var 0)) (picomp2 (var 3))
-                         _ (ppair (var 4) (
-                                     ppi1 (var 3)))); auto.
-   star here*)
-sh_var 3 9.
+  + apply tr_prod_intro.  apply (subseq_trans (var 4)); try var_solv; auto.
+    sh_var 3 3. inv_subst. rewrite - (subst_nat (sh 3)) ! subst_sh_shift.
+    apply tr_weakening_append3. apply picomp1_works.
+    sh_var 3 9. inv_subst. rewrite - (subst_nat (sh 3)) ! subst_sh_shift.
+    apply tr_weakening_append3.
+    sh_var 1 6.
+    apply picomp3_works. rewrite ! fold_subst1 subst1_trans_type.
+
+    apply picomp4_works.
+    apply picomp2_works.
+    apply picomp1_works.
+    sh_var 5 9. inv_subst. rewrite - (subst_nat (sh 5)) ! subst_sh_shift.
+    rewrite make_app5. apply tr_weakening_append. apply picomp1_works1.
+    weaken compm5_type; try var_solv; auto; try apply trans_type_works; try var_solv.
+    simpsub_bigs. var_solv. auto.
+
+  assert (forall G w l A,
+  tr
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (subst (sh 1) w) (subst (sh 1) l)
+                    (var 1) (var 0))
+                   (store (var 1) (var 0)))
+                A)),
+hyp_tm preworld
+      & G]
+    (oof (picomp2 (var 0))
+         (subseq (subst (sh 1) w) (subst (sh 1)  l)
+                (var 1) (picomp1 (var 0)))
+         )) as picomp2_works_correct.
+  shelve.
+
+    sh_var 1 5. inv_subst.
+    [:: hyp_tm
+          (sigma nattp
+             (prod
+                (prod
+                   (subseq (subst (sh 1) (var 3))
+                      (subst (sh 1) (picomp1 (var 2)))
+                      (subst (sh 1) (var 0)) 
+                      (var 0))
+                   (store (subst (sh 1) (var 0)) (var 0)))
+                (trans_type (subst (sh 1) (var 0)) 
+                   (var 0) B))); hyp_tm preworld;
+    apply picomp2_works_correct.
+    apply tr_weakening_append5.
+    sh_var 3 9. inv_subst.
 rewrite - ! subst_sh_shift.
 rewrite - ! subst_picomp2 - ! subst_ppi1 - ! subst_ppair - !
                                                              subst_subseq ! subst_sh_shift.

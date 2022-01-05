@@ -251,7 +251,7 @@ make_bind btarg ( lam (*l1 := 5, l := 3, m := 2, s := 1, z1 := 0*)
                                let mv := (picomp2 z1) in
                                let sv := (picomp3 z1) in
                                let x' := (picomp4 z1) in
-                               let l := (shift 1 l) in
+                               let l := (shift 1 l) in (*l = 3*)
                                                                         (*
 in the context (A :: G) Et2 is a function which wants a length
 in the context G, Et2 has var 0 free. In context G, (lam Et2) is a function which wants an
@@ -275,7 +275,7 @@ that. you want to bind
 (ppair x' (move_gamma G (make_subseq_trans (var 5) (var 3) lv (var 2) mv) (var 4)))                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) (*v, z1 <= v, z1*)
                                                  sv in
-                               make_bind e2bar' (lam (
+                               make_bind e2bar' (lam ( (*l = var 4*)
                                                     let z2 := (var 0) in
                                                     ret_a (ppair (picomp1 z2)
                                                                  (ppair (ppair
