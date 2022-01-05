@@ -150,7 +150,7 @@ tr G (oof (ppair w1 l1) world) -> tr G (oof l1 nattp). (*ask karl can't put a
        (pi (fut nattp)
           (pi nattp
              (arrow
-                (leq_t (var 0) (subst (sh 3) l1))
+                (lt_t (var 0) (subst (sh 3) l1))
                 (eqtype
                    (app
                       (app
@@ -257,7 +257,7 @@ tr
   repeat rewrite subst_nzero.
   eapply tr_pi_formation_univ. apply nat_U0.
   repeat rewrite subst_nzero. eapply tr_arrow_formation_univ.
- apply leq_type; try var_solv'. 
+ apply lt_type; try var_solv'. 
  rewrite - (subst_nat (sh 3)) ! subst_sh_shift; apply tr_weakening_append3.
  assumption.
   eapply tr_eqtype_formation_univ; apply Hworldapp;
@@ -288,7 +288,8 @@ unfold subseq.
   eapply tr_all_formation_univ.
   eapply tr_fut_kind_formation.
   apply pw_kind.
-  apply zero_typed. eapply subseq_U01; try assumption; auto.
+  apply zero_typed.
+  eapply subseq_U01; try assumption; auto.
   apply zero_typed. apply leq_refl; auto.
 Qed.
 
@@ -457,7 +458,7 @@ Lemma subseq_refl: forall ( u l: term obj) (G: context),
              (var 0) (var 2) (var 1)))).
   intros Hdeq.
     apply tr_arrow_intro.
-    { weaken leq_type. var_solv'.
+    { weaken lt_type. var_solv'.
     change nattp with (@subst obj (sh 3) nattp).
     rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption. }
     { eapply tr_eqtype_formation; assumption. }
@@ -513,6 +514,23 @@ Lemma leq_trans_app n2 G n1 n3 t1 t2:
   2:{ simpsub_bigs. auto. } apply (tr_pi_elim _ nattp); try assumption.
   apply leq_trans_help. Qed.
 
+
+Definition lt_trans_fn_app n1 n2 n3 h12 h23 :=
+ (* leq_trans_app (nsucc n1) (nsucc n2) n3
+                (leq_trans_app (nsucc n1) n2 (nsucc n2) h12 (leq_nsucc n2)) (*s(n1) <= s(n2)*)
+                h23.  *) leq_trans_fn_app n1 n2 n3 h12 h23.
+
+Lemma lt_trans_app n2 G n1 n3 t1 t2:
+  tr G (oof n1 nattp) ->
+  tr G (oof n2 nattp) ->
+  tr G (oof n3 nattp) ->
+  tr G (oof t1 (lt_t n1 n2)) ->
+  tr G (oof t2 (leq_t n2 n3)) ->
+  tr G (oof (lt_trans_fn_app n1 n2 n3
+                          t1 t2)
+ (lt_t n1 n3)). Admitted.
+
+
 Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
   tr G (oof u1 preworld) ->
   tr G (oof l1 nattp) ->
@@ -536,7 +554,7 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
   {
     apply tr_all_intro; auto. constructor. auto. apply zero_typed.
     simpsub_bigs. repeat apply tr_pi_intro; auto. apply tr_arrow_intro.
-    - weaken leq_type. var_solv'. 
+    - weaken lt_type. var_solv'. 
       change nattp with (@subst obj (sh 3) nattp). rewrite ! subst_sh_shift.
       apply tr_weakening_append3.  assumption.
     - apply tr_eqtype_formation; subseq_pwapp 3.
@@ -551,15 +569,15 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
                              (app3 (shift 4 (ppi2 M')) (var 2) (var 1) (var 0))
                ).
         apply (tr_arrow_elim _
-                                 (leq_t (var 1)  (subst (sh 4) l1))).
-     { weaken leq_type.  var_solv'. 
+                                 (lt_t (var 1)  (subst (sh 4) l1))).
+     { weaken lt_type.  var_solv'. 
       change nattp with (@subst obj (sh 4) nattp). rewrite ! subst_sh_shift.
       apply tr_weakening_append4.  assumption. }
-     {apply tr_eqtype_formation; subseq_pwapp 4. }
+     {apply tr_eqtype_formation; subseq_pwapp 4. } 
      { match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
                                     (@subst1 obj (var 1)
                                     (arrow
-          (leq_t (var 0) (subst (sh 5) l1))
+          (lt_t (var 0) (subst (sh 5) l1))
           (eqtype
              (app
                 (app
@@ -576,7 +594,7 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
                                     (@subst1 obj (var 2)
        (pi nattp
           (arrow
-             (leq_t (var 0) (subst (sh 6) l1))
+             (lt_t (var 0) (subst (sh 6) l1))
              (eqtype
                 (app
                    (app
@@ -593,7 +611,7 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
        (pi (fut nattp)
           (pi nattp
              (arrow
-                (leq_t (var 0) (subst (sh 7) l1))
+                (lt_t (var 0) (subst (sh 7) l1))
                 (eqtype
                    (app
                       (app
@@ -610,7 +628,7 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
       (all nzero (fut preworld) (pi (fut nattp)
          (pi nattp
             (arrow
-               (leq_t (var 0)
+               (lt_t (var 0)
                   (subst (sh 3) l1))
                (eqtype
                   (app
@@ -647,20 +665,20 @@ Lemma subseq_trans u2 M M' u1 l1 l2 u3 l3 G:
 unfold subseq in Hsub2.
         eapply (deqtype_intro _#3
                               (app3 (shift 4 (ppi2 M)) (var 2) (var 1)
-  (*var 1 < l2*)                    (leq_trans_fn_app (var 1)
+  (*var 1 < l2*)                    (lt_trans_fn_app (var 1)
                                     (subst (sh 4) l1)
                                     (subst (sh 4) l2)
                                     (var 0) (ppi1 (subst (sh 4) M'))))). 
         apply (tr_arrow_elim _
-                                 (leq_t (var 1) (subst (sh 4) l2))).
-     { weaken leq_type.  var_solv'. 
+                                 (lt_t (var 1) (subst (sh 4) l2))).
+     { weaken lt_type.  var_solv'. 
       change nattp with (@subst obj (sh 4) nattp). rewrite ! subst_sh_shift.
       apply tr_weakening_append4.  assumption. }
      {apply tr_eqtype_formation; subseq_pwapp 4. }
      { match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
                                     (@subst1 obj (var 1)
                                     (arrow
-          (leq_t (var 0) (subst (sh 5) l2))
+          (lt_t (var 0) (subst (sh 5) l2))
           (eqtype
              (app
                 (app
@@ -677,7 +695,7 @@ unfold subseq in Hsub2.
                                     (@subst1 obj (var 2)
        (pi nattp
           (arrow
-             (leq_t (var 0) (subst (sh 6) l2))
+             (lt_t (var 0) (subst (sh 6) l2))
              (eqtype
                 (app
                    (app
@@ -694,7 +712,7 @@ unfold subseq in Hsub2.
        (pi (fut nattp)
           (pi nattp
              (arrow
-                (leq_t (var 0) (subst (sh 7) l2))
+                (lt_t (var 0) (subst (sh 7) l2))
                 (eqtype
                    (app
                       (app
@@ -711,7 +729,7 @@ unfold subseq in Hsub2.
       (all nzero (fut preworld) (pi (fut nattp)
          (pi nattp
             (arrow
-               (leq_t (var 0)
+               (lt_t (var 0)
                   (subst (sh 3) l2))
                (eqtype
                   (app
@@ -741,9 +759,9 @@ unfold subseq in Hsub2.
        simpsub_bigs; auto.
        simpsub_bigs; auto.
        simpsub_bigs; auto.
-       var_solv. var_solv. }
+       var_solv. var_solv. } 
  (* replace (subst (sh 4) U2) with (subst (sh 1) (subst (sh 3) U2)). inv_subst. *)
-     apply leq_trans_app; try (
+     apply lt_trans_app; try (
                                change nattp with (@subst obj (sh 4) nattp);
                                rewrite ! subst_sh_shift;
                                apply tr_weakening_append4;
@@ -751,7 +769,7 @@ unfold subseq in Hsub2.
      { sh_var 1 1. replace (subst (sh 4) l1) with (subst (sh 1) (subst (sh 3) l1)). inv_subst.
        var_solv.
      simpsub_bigs. auto. }
-     { eapply tr_prod_elim1.
+     { eapply tr_prod_elim1. 
        match goal with |- tr ?G (deq ?M ?M' ?T) => replace T with
            (subst (sh 4) (subseq u1 l1 u2 l2)) end.
        rewrite ! subst_sh_shift. apply tr_weakening_append4. assumption.

@@ -596,6 +596,19 @@ Lemma nsucc_leq: forall G n, tr G (oof n nattp) ->
                        tr G (oof triv (leq_t n (nsucc n))).
 Admitted.
 
+  Lemma lt_P p G n m: tr G (oof n nattp) ->
+                    tr G (oof m nattp) ->
+  tr G (oof p (lt_t n m)) ->
+  tr G (deq (ltb_app n m) btrue booltp).
+  Admitted.
+
+
+Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
+                                    tr G (oof l nattp) ->
+                                    tr G (oof (app u l)
+       (karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero)))).
+  Admitted.
 
   Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                     tr G' (oof l' nattp) ->
@@ -613,7 +626,7 @@ Admitted.
   simpsub_bigs.
   apply tr_pi_intro. constructor. auto.
   apply tr_pi_intro; auto.
-  apply tr_arrow_intro; try apply tr_eqtype_formation; try (weaken leq_type; try var_solv;
+  apply tr_arrow_intro; try apply tr_eqtype_formation; try (weaken lt_type; try var_solv;
     try (rewrite - (subst_nat (sh 3)) ! subst_sh_shift; apply tr_weakening_append3;
          assumption)).
   apply pw_app_typed; try var_solv.
@@ -625,16 +638,103 @@ Admitted.
    try (rewrite ! subst_sh_shift; apply tr_weakening_append3;
         assumption). change U0 with (subst (sh 3) U0). inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption.
  {
-   unfold cons_b. unfold app3. simpsub_bigs. 
+   unfold cons_b. unfold app3. simpsub_bigs.
+   eapply tr_compute. eapply equiv_eqtype.
+   {apply equiv_refl. }
+   { apply equiv_app; try apply equiv_app;
+       try( apply reduce_equiv; apply reduce_app_beta;
+            apply reduce_id); try apply equiv_refl. } apply equiv_refl. apply equiv_refl.
+   simpsub_bigs.
+   eapply (tr_eqtype_convert _#3
+       (eqtype
+          (app
+             (app (app (subst (sh 4) w') (var 1))
+                (var 3)) (var 2))
+          (app
+             (app
+                   (app (subst (sh 4) w') (var 1))
+                (var 3)) (var 2))))
+   .
+   apply tr_eqtype_formation.
+   {apply pw_app_typed; try var_solv; try rewrite - (subst_pw (sh 4));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append4;
+        assumption). }
+   { apply tr_eqtype_symmetry. apply (tr_eqtype_transitivity _ _
+           ( app (app (bite
+               btrue 
+                (app (subst (sh 4) w') (var 1))
+                (subst (sh 4) x)) (var 3)) (var 2))  
+                                     ).
+     {
+       apply (tr_formation_weaken _ nzero).
+       apply (tr_arrow_elim _ (fut nattp)); try var_solv; auto.
+       apply (tr_karrow_elim _ (fut preworld)); try var_solv; auto.
+       change 
+       (karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero))) with
+           (subst1 (ltb_app (var 1) (subst (sh 4) l'))
+(karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero))) 
+           ).
+       apply tr_booltp_elim. 
+       {
+         apply (lt_P (var 0)); try var_solv. rewrite - (subst_nat (sh 4));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append4;
+        assumption). rewrite - (sh_sum 3 1). sh_var 1 1. inv_subst.
+         var_solv.
+       }
+       {simpsub_bigs.  apply pw_app_typed2; try var_solv.
+        rewrite - (subst_pw (sh 4));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append4;
+        assumption). }
+       {simpsub_bigs.
+       change 
+       (karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero))) with
+           (subst (sh 4)
+(karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero))) 
+           ). rewrite ! subst_sh_shift. apply tr_weakening_append4. assumption.
+       } }
+     { eapply tr_compute. eapply equiv_eqtype.
+       repeat apply equiv_app; try (apply reduce_equiv; apply reduce_bite_beta1; apply reduce_id);
+         apply equiv_refl. apply equiv_refl. apply equiv_refl. apply equiv_refl. apply pw_app_typed; try var_solv.
+       try rewrite - (subst_pw (sh 4));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append4;
+        assumption). } }
+   {
+apply pw_app_typed; try var_solv.
+       try rewrite - (subst_pw (sh 4));
+   try (rewrite ! subst_sh_shift; apply tr_weakening_append4;
+        assumption).
+  } } }
+
+  Qed.
+
+
+
+       }
+       
+
+       }
+
+                                         ).
+  Admitted.
+       }
+       apply tr
+     }
+
+   }
+    change U0 with (subst (sh 3) U0). inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption.
+    rewrite - (subst_pw (sh 4)) ! subst_sh_shift; apply tr_weakening_append4;
+   assumption. var_solv.
+   }
  }
+ simpsub_bigs.
  }
 
 Admitted.
 
-  Lemma leq_P G n m p: tr G (oof n nattp) ->
-                    tr G (oof m nattp) ->
-  tr G (oof p (lt_t n m)) ->
-                    tr G (deq (ltb_app n m) btrue booltp).
 
 
 
