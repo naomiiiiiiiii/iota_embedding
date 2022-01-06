@@ -1840,13 +1840,18 @@ Theorem one: forall G e A ebar w1 l1,
                                      (trans_type (shift (size G) w1) (shift (size G) l1) A)).
   move => G e A ebar w1 l1 He Hwl Htrans.
   eapply (tr_arrow_elim _ (Gamma_at G (shift (size G) w1) (shift (size G) l1))).
-  apply Gamma_at_type.
-  rewrite - ! subst_sh_shift - subst_ppair - (subst_world (sh (size G))) - (size_Gamma_at w1 l1) ! subst_sh_shift - {1} (cats0 (Gamma_at_ctx G w1 l1)).
+  apply Gamma_at_type; rewrite - ! subst_sh_shift; try rewrite
+                                                      - (subst_pw (sh (size G)));
+  try rewrite - (subst_nat (sh (size G))); rewrite -
+  (size_Gamma_at w1 l1) ! subst_sh_shift - {1} (cats0 (Gamma_at_ctx G w1 l1));
   apply (tr_weakening_append [::]).
-  auto.
+  eapply split_world1. apply Hwl.
+  eapply split_world2. apply Hwl.
   rewrite - (cats0 (Gamma_at_ctx G w1 l1)) - (size_Gamma_at w1 l1) - shift_trans_type.
   apply (tr_weakening_appendt [::]).
   weaken trans_type_works; try var_solv; auto.
+  eapply split_world1. apply Hwl.
+  eapply split_world2. apply Hwl.
   match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
        (subst1 (shift (size G) l1) (arrow
           (Gamma_at G
@@ -1895,10 +1900,11 @@ Theorem one: forall G e A ebar w1 l1,
   - (size_Gamma_at w1 l1) subst_sh_shift.
   apply tr_weakening_append. eapply split_world1. apply Hwl.
   change (var 1) with (@shift obj 1 (var 0)).
-  apply trans_type_works; try var_solv1. var_solv.
+  apply trans_type_works1; try var_solv. 
   + rewrite - (cats0 (Gamma_at_ctx G w1 l1))  - (subst_nat (sh (size G)))
   - (size_Gamma_at w1 l1) subst_sh_shift.
   apply tr_weakening_append. eapply split_world2. apply Hwl.
-  change (var 1) with (@shift obj 1 (var 0)).
-  apply gamma_at_typed. auto.
+  apply gamma_at_typed.
+  eapply split_world1. apply Hwl.
+  eapply split_world2. apply Hwl.
 Qed.

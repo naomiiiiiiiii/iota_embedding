@@ -68,13 +68,7 @@ Lemma subst_minus s: subst s minus = minus.
   auto. Qed.
 Hint Rewrite subst_minus: core subst1. *)
 
-Lemma subst_leq_b s n: subst s (leq_b n) = leq_b (subst s n).
-  intros. unfold leq_b. simpsub. auto. Qed.
-Hint Rewrite subst_leq_b: core subst1.
 
-Lemma subst_ltb s n m: subst s (ltb_app n m) = ltb_app (subst s n) (subst s m).
-  intros. unfold ltb_app. simpsub_big. auto. Qed.
-Hint Rewrite subst_ltb: core subst1.
 
 Lemma subst_world: forall s,
     subst s world = world.

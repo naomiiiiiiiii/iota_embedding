@@ -596,11 +596,6 @@ Lemma nsucc_leq: forall G n, tr G (oof n nattp) ->
                        tr G (oof triv (leq_t n (nsucc n))).
 Admitted.
 
-  Lemma lt_P p G n m: tr G (oof n nattp) ->
-                    tr G (oof m nattp) ->
-  tr G (oof p (lt_t n m)) ->
-  tr G (deq (ltb_app n m) btrue booltp).
-  Admitted.
 
 
 Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
@@ -710,32 +705,6 @@ apply pw_app_typed; try var_solv.
   } } }
 
   Qed.
-
-
-
-       }
-       
-
-       }
-
-                                         ).
-  Admitted.
-       }
-       apply tr
-     }
-
-   }
-    change U0 with (subst (sh 3) U0). inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption.
-    rewrite - (subst_pw (sh 4)) ! subst_sh_shift; apply tr_weakening_append4;
-   assumption. var_solv.
-   }
- }
- simpsub_bigs.
- }
-
-Admitted.
-
-
 
 
 Lemma tr_eq_reflexivity:
