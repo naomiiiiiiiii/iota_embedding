@@ -69,6 +69,7 @@ Proof.
 prove_equiv_compat.
 Qed.
 
+
 Ltac weaken H := eapply tr_formation_weaken; apply H.
 Ltac var_solv0 := try (apply tr_hyp_tm; repeat constructor).
 
@@ -462,6 +463,13 @@ Lemma leq_succ_equiv n1_pred n2 : equiv (leq_t (ppair bfalse n1_pred) n2) (bite 
   Admitted. 
 Lemma leq_zero_equiv n2: equiv (leq_t nzero n2) unittp. Admitted.
 
+Lemma leqb_succ_equiv n1_pred n2 : equiv (leqb_app (ppair bfalse n1_pred) n2) (bite (if_z n2)
+                                                     bfalse
+                                                      (leqb_app (app n1_pred triv)
+                                                             (app (ppi2 n2) triv))).
+  Admitted. 
+Lemma leqb_zero_equiv n2: equiv (leqb_app nzero n2) btrue. Admitted.
+
 Lemma lt_zero_equiv n2: equiv (lt_t nzero n2) (bite (if_z n2)
                                                        voidtp 
                                                        unittp).
@@ -584,6 +592,14 @@ Hint Rewrite subst_leqtp: core subst1.
 Lemma if_z_typed n G : tr G (oof n nattp) -> tr G (oof (if_z n) booltp).
 Admitted.
 
+Lemma equiv_leqb :
+  forall (m m' : term obj),
+    equiv m m'
+    -> equiv (leq_b m) (leq_b m').
+Proof.
+prove_equiv_compat. apply equiv_refl.
+Qed.
+
 (*n1 <= n2*)
 Lemma leqapp_typed {G} n1 n2:
   tr G (oof n1 nattp) ->
@@ -615,7 +631,7 @@ Admitted.
                       ( (*x = 1, y = 0*)
                         arrow 
                           (leq_t (var 1) (var 0))
-                          (equal booltp (ltb_app (var 1) (var 0)) btrue)
+                          (equal booltp (leqb_app (var 1) (var 0)) btrue)
                   )
                )))
                (lam (*y : nat*)
@@ -635,6 +651,10 @@ Admitted.
   intros. unfold leq_b. simpsub. auto. Qed.
 Hint Rewrite subst_leq_b: core subst1.
 
+Lemma subst_leqb_app s n m: subst s (leqb_app n m) = leqb_app (subst s n)(subst s m).
+  intros. unfold leqb_app. simpsub_big. auto. Qed.
+Hint Rewrite subst_leq_b: core subst1.
+
 Lemma subst_ltb s n m: subst s (ltb_app n m) = ltb_app (subst s n) (subst s m).
   intros. unfold ltb_app. simpsub_big. auto. Qed.
 
@@ -644,9 +664,170 @@ Hint Rewrite subst_ltb: core subst1.
                                        (pi nattp (pi nattp (arrow (leq_t (var 1) (var 0))
                                           (equal booltp (leqb_app (var 1) (var 0)) btrue)
                                    )))).
-      Admitted.
+        unfold leqb_complete_fn.
+    assert (forall G' x, tr G' (oof x nattp) ->
+                    tr G' (oof (pi nattp (arrow 
+                                            (leq_t (subst sh1 x) (var 0))
+                                            (equal booltp (leqb_app (subst sh1 x) (var 0)) btrue)
+                                                                        )
+                               )
+                               U0))
+           as Hp.
+    {
+      intros. unfold leqb_app. 
+      apply tr_pi_formation_univ; auto.
+      apply tr_arrow_formation_univ; auto.
+      apply leq_type; auto; try var_solv'.
+      change nattp with (@subst obj sh1 nattp).
+      rewrite ! subst_sh_shift. apply tr_weakening_append1. assumption.
+      apply tr_equal_formation_univ; auto.
+      simpsub_big. apply tr_booltp_formation.
+      apply leqapp_typed; try var_solv'.  change nattp with (@subst obj sh1 nattp).
+      rewrite ! subst_sh_shift. apply tr_weakening_append1. assumption.
+      constructor.
+    }
+    eapply nat_ind_lamapp; simpsub_big; try reflexivity.
+    { (*type p*)
+      apply tr_arrow_intro; auto. simpsub_big.
+      change (var 1) with (@subst obj sh1 (var 0)). apply Hp; var_solv'. }
+    { (*type BC*)
+       apply tr_pi_intro; auto. 
+       apply tr_arrow_intro; auto. 
+      weaken leq_type; auto; try var_solv'. 
+      apply tr_equal_formation; auto.
+      weaken tr_booltp_formation. unfold leqb_app. simpsub_big.
+      apply leqapp_typed; auto; try var_solv'. constructor.
+      unfold leqb_app. simpsub_big. simpl. eapply tr_compute;
+                                             try (apply equiv_equal; try apply leqb_zero_equiv); try apply equiv_refl.
+      repeat constructor. } 
+      { apply tr_pi_intro; auto. 
+       apply tr_arrow_intro; auto.
+       change (var 1) with (@subst obj sh1 (var 0)). weaken Hp.
+       var_solv'.
+       simpl. change (nsucc (var 1)) with (@subst obj sh1 (nsucc (var 0))).
+       weaken Hp. apply nsucc_type. var_solv'.
+       simpsub_big. apply tr_pi_intro; auto.
+       apply tr_arrow_intro; auto.
+       {
+      weaken leq_type; auto; try apply nsucc_type; try var_solv'. 
+       }
+      { 
+      apply tr_equal_formation; auto.
+      weaken tr_booltp_formation. unfold leqb_app. simpsub_big.
+      apply leqapp_typed; auto; try apply nsucc_type; try var_solv'.  constructor. 
+}
+      simpsub_big. eapply (tr_compute_hyp _ [::]).
+      { constructor. unfold nsucc. apply leq_succ_equiv. 
+      } simpl. unfold leqb_app. simpsub_big.
+      eapply tr_compute. {apply equiv_equal; try apply leqb_succ_equiv; apply equiv_refl. }
+                         apply equiv_refl. apply equiv_refl.
+      (*split y into pair*)
+      simpl. rewrite make_app1. apply w_elim_hyp. weaken tr_booltp_formation.
+      weaken nat_U01.
+      change triv with (@subst obj (under 1 (dot (ppi2 (var 0))
+                                                 (dot (ppi1 (var 0)) sh1))) triv).
+       apply tr_sigma_eta_hyp.
+      simpsub_big. simpl. simpsub_big.
+      eapply (tr_compute_hyp _ [::]).
+      {  constructor. 
+        apply equiv_bite. apply reduce_equiv.
+        apply reduce_ppi1_beta. apply reduce_id. apply equiv_refl.
+        apply equiv_app. apply equiv_refl. apply equiv_app.
+        apply reduce_equiv. apply reduce_ppi2_beta. apply reduce_id.
+        apply equiv_refl. 
+      }
+      simpl. eapply tr_compute.
+      {
+        apply equiv_equal. apply equiv_refl. apply equiv_bite. apply reduce_equiv.
+        apply reduce_ppi1_beta. apply reduce_id. apply equiv_refl.
+       unfold leqb_app.  
+        simpsub_big.  apply equiv_app.   apply equiv_leqb.
+        
+         apply reduce_equiv.   apply reduce_app_beta; apply reduce_id.
+         apply equiv_app. 
+        apply reduce_equiv.   apply reduce_ppi2_beta.  apply reduce_id.
+        apply equiv_refl. apply equiv_refl. 
+      } apply equiv_refl. apply equiv_refl. simpsub_big. simpl.
+      simpl. rewrite make_app2. 
+      match goal with |- tr ?G (deq triv triv ?T) =>
+                      suffices: (tr G (oof (bite (var 2) triv triv) T)) end.
+      { intros Hannoying. constructor. eapply deq_intro. apply Hannoying. }
+      change triv with (@subst obj (under 2 sh1) triv). 
+      apply tr_booltp_eta_hyp; simpl; simpsub_big.
+      { (*y' = 0*)
+        eapply (tr_compute_hyp _ [::]). { constructor. 
+        apply reduce_equiv. apply reduce_bite_beta1.
+        apply reduce_id. }
+                                       apply (tr_voidtp_elim _ (var 0) (var 0)).
+        change voidtp with (@subst obj sh1 voidtp). var_solv'. }
+      {  (*y' = s y''*)
+       simpl.  eapply (tr_compute_hyp _ [::]).
+          { constructor. 
+            eapply equiv_trans.
+            apply reduce_equiv. apply reduce_bite_beta2.
+            apply reduce_id. apply equiv_app.
+            apply equiv_app. apply equiv_refl. apply reduce_equiv.
+            apply reduce_app_beta; apply reduce_id. apply equiv_refl.
+          } simpsub_big.
+          simpl. rewrite make_app1. eapply tr_compute_hyp.
+          { constructor. apply equiv_arrow. apply reduce_equiv.
+       apply reduce_bite_beta2.
+       apply reduce_id. apply equiv_refl. }
+            eapply tr_compute.
+          {  eapply equiv_equal. apply equiv_refl.
+            apply reduce_equiv. apply reduce_bite_beta2.
+            apply reduce_id. apply equiv_refl.
+          }  apply equiv_refl.  apply equiv_refl.
+            constructor. simpl. 
+            apply (deq_intro _#4 (app (app (var 2) (app (var 1) triv))
+                                      (var 0))
+                             (app (app (var 2) (app (var 1) triv))
+                                      (var 0))
+                  ).
+            apply (tr_arrow_elim _ (app (app leqtp (var 3)) (app (var 1) triv))).
+       {
+      weaken leq_type; auto; try apply nsucc_type; try var_solv'. 
+      apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'.  constructor.  }
+      {   apply tr_equal_formation; auto.
+       weaken tr_booltp_formation.
+      apply leqapp_typed; auto; try apply nsucc_type; try var_solv'.
+        apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'. constructor.
+      constructor. }
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+          (subst1 (app (var 1) triv)
+       (arrow
+          (app (app leqtp (var 4))
+                (var 0))
+          (equal booltp (app (leq_b (var 4)) (var 0)) btrue))) end.
+      apply (tr_pi_elim _ nattp).
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+      ( subst (sh 3) 
+       (pi nattp
+          (arrow (app (app leqtp (var 1)) (var 0))
+             (equal booltp
+                (app (leq_b (var 1)) (var 0)) btrue))))
+ end. var_solv'.
+        apply (tr_arrow_elim _ unittp); auto.
+      change 
+          (arrow unittp nattp) with (@subst obj (sh 2)
+(arrow unittp nattp)
+                                    ). var_solv'. constructor.
+      match goal with |- tr ?G (deq ?M ?M ?T) => change T with
+          (@subst obj (sh 1)
+       (app (app leqtp (var 2)) (app (var 0) triv)))
+ end. var_solv'. } } 
+Qed.
 
-      Definition leqb_complete_fn_app n m h := (app (app (app leqb_complete_fn n) m) h).
+
+Definition leqb_complete_fn_app n m h := (app (app (app leqb_complete_fn n) m) h).
 
 
 Lemma lt_P p G n m: tr G (oof n nattp) ->
@@ -728,6 +909,7 @@ unfold lt_t in H1.
   }
   {apply equiv_refl. }
   {apply equiv_refl. } assumption. Qed.
+
 Definition leq_P := (pi nattp (pi nattp
                       ( (*n1 = 2, n2 = 1, n3 = 0*)
                         arrow 
