@@ -169,7 +169,29 @@ tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof l1 nattp) ->
                 T2)), hyp_tm preworld
       & G]
     (oof (picomp3 (var 0)) (store (var 1) (picomp1 (var 0)))).
-  Admitted.
+    intros. unfold picomp3. 
+    apply (tr_prod_elim2 _  (subst1 (ppi1 (var 0))
+                                     (subst (under 1 sh1) T1))).
+    apply (tr_prod_elim1 _  _ (subst1 (ppi1 (var 0))
+                                     (subst (under 1 sh1) T2))).
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst1 (ppi1 (var 0))
+                                       (prod (
+                 prod (subst (under 1 sh1) T1) 
+(store (var 2) (var 0))) (subst (under 1 sh1) T2) 
+                               )) end.
+    2:{ simpsub_bigs. auto. }
+    apply (tr_sigma_elim2 _ nattp). 
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst sh1 
+                                      (sigma nattp
+                                      (prod (
+                 prod T1
+(store (var 1) (var 0))) T2
+                               ))) end.
+    var_solv.
+    simpsub_bigs. auto.
+Qed.
 
   Lemma picomp4_works: forall G T1 T2 A,
   tr
@@ -180,7 +202,32 @@ tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof l1 nattp) ->
                 (trans_type (var 1) (var 0) A))), hyp_tm preworld
       & G]
     (oof (picomp4 (var 0)) (trans_type (var 1) (picomp1 (var 0)) A)).
-  Admitted.
+    intros. unfold picomp4.  
+    apply (tr_prod_elim2 _  (subst1 (ppi1 (var 0))
+                                     (subst (under 1 sh1) (prod T1 T2)))).
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst1 (ppi1 (var 0))
+                                       (prod (
+                 prod (subst (under 1 sh1) T1) 
+                      (subst (under 1 sh1) T2))
+          (trans_type (var 2)
+              (var 0) A))) end.
+    2:{ simpsub_bigs. rewrite fold_subst1 subst1_trans_type. auto. }
+    apply (tr_sigma_elim2 _ nattp). 
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst sh1 
+                                      (sigma nattp
+                                      (prod 
+                                           (prod T1 T2)
+                                             (trans_type
+                                                (var 1) (var 0) A))
+                               )) end.
+    var_solv.
+    simpsub_bigs. change (dot (var 0) (sh 2)) with
+                      (@under obj 1 (sh 1)).
+    rewrite sh_under_trans_type. auto.
+    Qed.
+
 
   Lemma picomp_world: forall G T,
       tr 
@@ -189,7 +236,7 @@ tr [:: hyp_tm nattp, hyp_tm preworld & G] (oof l1 nattp) ->
     intros. apply world_pair. var_solv. eapply picomp1_works.
   Qed.
 
-  Lemma picomp2_works: forall G w l u A,
+  Lemma picomp2_works: forall G w l A,
   tr
     [:: hyp_tm
           (sigma nattp
@@ -203,10 +250,11 @@ hyp_tm preworld
       & G]
     (oof (picomp2 (var 0))
          (subseq (shift 1 w) (shift 1 l)
-                (shift 1 u) (picomp1 (var 0)))
+                (var 1) (picomp1 (var 0)))
     ).
   Admitted.
 
+  (*
      Lemma picomp2_works1: forall G y z a A,
   tr
     [:: hyp_tm
@@ -224,8 +272,9 @@ hyp_tm preworld
                    (subseq  (var 6) (var 5)
         (var 1) (picomp1 (var 0)))
     ).
-  Admitted.
+  Admitted. *)
 
+     (*
  Lemma picomp2_works2: forall G x A T,
   tr
     [:: hyp_tm
@@ -246,9 +295,9 @@ hyp_tm preworld
                             (ppi1 (var 3))
        (var 1) (picomp1 (var 0)))
     ).
-  Admitted.
+  Admitted. *)
 
-    Hint Resolve picomp1_works picomp2_works1 picomp2_works2 picomp3_works picomp4_works
+    Hint Resolve picomp1_works picomp2_works picomp3_works picomp4_works
       picomp_world.
 
 Lemma ref2_type: (forall G w1 v i A,

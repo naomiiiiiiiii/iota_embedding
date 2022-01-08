@@ -1760,6 +1760,12 @@ sh_var 8 9. inv_subst.
 var_solv0.
 change (dot (var 0) (dot (@var obj 1) (sh 3))) with (@under obj 2 (sh 1)).
 rewrite ! sh_under_trans_type. simpsub_bigs.
+sh_var 1 6. inv_subst. 
+sh_var 5 9. inv_subst. var_solv.
+sh_var 8 9. inv_subst. var_solv.
+change (dot (var 0) (dot (var 1) (sh 3))) with
+    (@under obj 2 (sh 1)).
+rewrite sh_under_trans_type. simpsub.
 apply picomp4_works. var_solv.
 sh_var 3 2. inv_subst. comptype; try var_solv; auto.
 rewrite - (subst_nat (sh 2)). sh_var 2 2. inv_subst. rewrite ! subst_sh_shift.
@@ -1816,9 +1822,13 @@ apply (tr_exist_intro _ _ _ _ (var 1)); auto.
   + apply tr_prod_intro.  apply (subseq_trans (var 4)); try var_solv; auto.
     sh_var 3 3. inv_subst. rewrite - (subst_nat (sh 3)) ! subst_sh_shift.
     apply tr_weakening_append3. apply picomp1_works.
-    sh_var 3 9. inv_subst. rewrite - (subst_nat (sh 3)) ! subst_sh_shift.
+    sh_var 1 4. inv_subst. rewrite ! subst_sh_shift. apply picomp2_works.
+    sh_var 3 9. inv_subst.
+    rewrite ! subst_sh_shift.
     apply tr_weakening_append3.
+    simpsub_bigs.
     sh_var 1 6.
+    apply picomp2_works.
     apply picomp3_works. rewrite ! fold_subst1 subst1_trans_type.
     apply picomp4_works.
 weaken compm5_type; try var_solv; auto; try apply trans_type_works; try var_solv.
@@ -1826,7 +1836,7 @@ sh_var 2 11. rewrite - ! subst_sh_shift.
 weaken compm4_type; try var_solv; auto. apply trans_type_works; try var_solv; auto.
 }
 Unshelve. apply nat. 
-Unshelve. apply nat. 
+Unshelve. apply nat.  
 Qed.
 
 
