@@ -252,64 +252,37 @@ hyp_tm preworld
          (subseq (shift 1 w) (shift 1 l)
                 (var 1) (picomp1 (var 0)))
     ).
-  Admitted.
-
-  (*
-     Lemma picomp2_works1: forall G y z a A,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq (var 6) (var 5)
-                    (var 1) (var 0))
-                   (store (var 1) (var 0)))
-                A)),
-       hyp_tm preworld, y, z, a,
-       hyp_tm nattp, hyp_tm preworld
-      & G]
-    (oof (picomp2 (var 0))
-                   (subseq  (var 6) (var 5)
-        (var 1) (picomp1 (var 0)))
-    ).
-  Admitted. *)
-
-     (*
- Lemma picomp2_works2: forall G x A T,
-  tr
-    [:: hyp_tm
-          (sigma nattp
-             (prod
-                (prod
-                   (subseq 
-                        (var 4)
-                            (ppi1 (var 3))
-                  (var 1) (var 0))
-                   (store (var 1) (var 0)))
-                A)),
-     hyp_tm preworld, x,
-        hyp_tm
-          (sigma nattp T), hyp_tm preworld & G]
-    (oof (picomp2 (var 0))
-                   (subseq  (var 4)
-                            (ppi1 (var 3))
-       (var 1) (picomp1 (var 0)))
-    ).
-  Admitted. *)
+    intros. unfold picomp2.  
+    apply (tr_prod_elim1 _ _
+(subst1 (ppi1 (var 0)) (store (var 2) (var 0)))).
+    apply (tr_prod_elim1 _ _
+(subst1 (ppi1 (var 0)) (subst (under 1 sh1) A))). 
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst1 (ppi1 (var 0))
+                                       (prod (
+                 prod (subseq (subst (sh 2) w) (subst (sh 2) l) (var 2) (var 0)) 
+                      (store (var 2) (var 0)))
+                                             (subst (under 1 sh1) A)))
+                                        end.
+    2:{ simpsub_bigs. auto. }
+    apply (tr_sigma_elim2 _ nattp). 
+    match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+                               (subst sh1 
+                                      (sigma nattp
+                                      (prod 
+                                           (prod 
+                (subseq (subst (sh 1) w)
+                   (subst (sh 1) l) 
+                   (var 1) (var 0))
+                (store (var 1) (var 0)))
+                                           A
+                               ))) end.
+    rewrite - ! subst_sh_shift. var_solv.
+    simpsub_bigs. auto.    Qed.
 
     Hint Resolve picomp1_works picomp2_works picomp3_works picomp4_works
       picomp_world.
 
-Lemma ref2_type: (forall G w1 v i A,
-  tr G (oof w1 preworld) -> 
-  tr G (oof i nattp) ->
-  tr G (oof v preworld) ->
-      tr G (oof (pi nattp 
-               ( let lv := (var 0) in
-                 eqtype (app (app (app (shift 1 w1) (shift 1 i))
-                                  (next (shift 1 v)))
-                                  (next lv))
-                        (fut (trans_type (shift 1 v) (var 0) A)))) U0)). Admitted.
 
   Lemma trans_type_works : forall w l A G,
 tr G (oof w preworld) ->
@@ -373,36 +346,42 @@ tr G (oof w preworld) ->
       auto. apply leq_refl. auto. 
 Qed.
 
- (*the actual type of translated terms (without the forall)*)
-Lemma trans_type_works1: forall w A G D,
-      (tr D (oof w preworld)) ->
-  tr D (deqtype (pi nattp
-          (arrow (Gamma_at G (shift 1 w)  (var 0))
-                 (trans_type (shift 1 w) (var 0) A)))
-          (pi nattp
-          (arrow (Gamma_at G (shift 1 w) (var 0))
-             (trans_type (shift 1 w) (var 0) A)))).
-Admitted.
+Lemma ref2_type: (forall G w1 v i A,
+  tr G (oof w1 preworld) -> 
+  tr G (oof i nattp) ->
+  tr (promote G) (oof v preworld) ->
+      tr G (oof (pi nattp 
+               ( let lv := (var 0) in
+                 eqtype (app (app (app (shift 1 w1) (shift 1 i))
+                                  (next (shift 1 v)))
+                                  (next lv))
+                        (fut (trans_type (shift 1 v) (var 0) A)))) U0)).
+  intros. simpl.
+      apply tr_pi_formation_univ; auto.
+      apply tr_eqtype_formation_univ.
+      { eapply (tr_arrow_elim _ (fut nattp) ). constructor; auto.
+      apply tr_univ_formation.  auto.
+      apply (tr_karrow_elim _ (fut preworld)).
+      eapply kind_type. apply tr_fut_kind_formation. apply pw_kind. auto.
+      apply tr_arrow_formation. constructor; auto.
+      apply tr_univ_formation. auto. apply (tr_arrow_elim _ nattp); auto.
+     eapply tr_eqtype_convert; try apply unfold_pw.
+    rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    rewrite - (subst_nat (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    constructor.  simpl.
+    rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    constructor. var_solv. }
+      apply tr_fut_formation_univ; auto.
+      apply trans_type_works. simpl.
+    rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    var_solv.
+Qed.
 
-
-Lemma size_cons: forall(T: Type) (a: T) (L: seq T),
-    size (a:: L) = 1 + (size L). Admitted.
- 
-(*Lemma size_Gamma_at: forall G w l,
-    size (Gamma_at G w l) = size G. Admitted.*)
-
-
-(**************proofs about translation of contexts*****************)
-
-
-Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
-  match G with
-    [::] => [::]
-  | A::rem => hyp_tm (trans_type (shift (size G - 1) w) (shift (size G - 1) l) A) ::
-                               (Gamma_at_ctx rem w l)
-                    end.
-
- Lemma Gamma_at_type {D G w l}:
+Lemma Gamma_at_type {D G w l}:
 tr D (oof w preworld) ->
                                     tr D (oof l nattp) ->
  tr D
@@ -422,6 +401,41 @@ tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
   move => Hw Hl Hpair H1. simpl. apply tr_prod_intro; auto.
   (*show that the product type is wellformed *)
 Qed.
+ 
+ (*the actual type of translated terms (without the forall)*)
+Lemma trans_type_works1: forall w A G D,
+      (tr D (oof w preworld)) ->
+  tr D (deqtype (pi nattp
+          (arrow (Gamma_at G (shift 1 w)  (var 0))
+                 (trans_type (shift 1 w) (var 0) A)))
+          (pi nattp
+          (arrow (Gamma_at G (shift 1 w) (var 0))
+             (trans_type (shift 1 w) (var 0) A)))).
+  intros. apply tr_pi_formation; auto.
+  apply tr_arrow_formation.
+  {apply Gamma_at_type.
+    rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    var_solv.
+  }
+  {weaken trans_type_works.
+    rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
+    apply tr_weakening_append1; assumption.
+    var_solv. }
+  Admitted.
+
+
+
+(**************proofs about translation of contexts*****************)
+
+
+Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
+  match G with
+    [::] => [::]
+  | A::rem => hyp_tm (trans_type (shift (size G - 1) w) (shift (size G - 1) l) A) ::
+                               (Gamma_at_ctx rem w l)
+                    end.
+
 
 
 
@@ -589,11 +603,98 @@ apply tr_arrow_intro; auto.
  move: Ht. simpsub_type; auto.
 Qed.
 
+ Lemma subseq_equiv w1 w1' l1 l1' w2 w2' l2 l2':
+   equiv w1 w1' ->
+   equiv w2 w2' ->
+   equiv l1 l1' ->
+   equiv l2 l2' ->
+   equiv (subseq w1 l1 w2 l2)
+         (subseq w1' l1' w2' l2').
+   intros. unfold subseq. unfold leq_t.
+   prove_equiv_compat.
+   { repeat apply equiv_app; try apply equiv_refl; try assumption. }
+   repeat (prove_equiv_compat; try apply equiv_refl);
+     try (apply equiv_subst; assumption). Qed.
+
+ Lemma laters_equiv A A' :
+   equiv A A' ->
+   equiv (laters A) (laters A').
+   intros. unfold laters. unfold plus. prove_equiv_compat.
+   apply equiv_sigma; prove_equiv_compat; try apply equiv_refl.
+     rewrite - ! subst_sh_shift. repeat apply equiv_subst. assumption. Qed.
+
+ Lemma exist_equiv a a' b b' c c':
+   equiv a a' ->
+   equiv b b' ->
+   equiv c c' ->
+   equiv (exist a b c)
+         (@exist obj a' b' c').
+   intros. 
+   prove_equiv_compat.
+Qed.
+
 Lemma trans_type_equiv: forall A w w' l l', equiv w w' -> equiv l l' ->
                                        equiv (trans_type w l A)
                                              (trans_type w' l' A).
-  Admitted.
+  intros A. induction A; intros w w' l l' Hw Hl; simpl;
+              simpsub_bigs; prove_equiv_compat; try apply equiv_refl.
+  { fold trans_type. simpl.
+    apply equiv_pi; try apply equiv_refl.
+    apply equiv_arrow; try apply equiv_refl.
+    apply subseq_equiv; try apply equiv_refl;
+      try (apply equiv_subst; assumption).
+  }
+  {  replace 
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot 
+                                     (var 2)
+                                     (dot 
+                                     (var 3)
+                                     (dot
+                                     (subst (sh 4) l)
+                                     (sh 4))))))
+       with
+         (under 4 (dot l id)).
+     replace
+                            (dot (var 0)
+                               (dot (var 1)
+                                  (dot 
+                                     (var 2)
+                                     (dot 
+                                     (var 3)
+                                     (dot
+                                     (subst (sh 4) l')
+                                     (sh 4))))))
+       with
+         (under 4 (dot l' id)). 
 
+     2:{
+       simpsub_bigs. auto.
+     }
+     rewrite ! subst1_under_trans_type.
+     simpsub.
+    apply equiv_pi; try apply equiv_refl.
+    apply equiv_arrow; try apply equiv_refl.
+    apply subseq_equiv; try apply equiv_refl;
+      try (apply equiv_subst; assumption).
+     {
+       simpsub_bigs. auto.
+     }
+  }
+  {
+    unfold lt_t. prove_equiv_compat; try apply equiv_refl.
+    apply equiv_app; try apply equiv_refl.
+    apply equiv_subst. assumption.
+    apply equiv_all; try apply equiv_refl.
+    apply equiv_pi; try apply equiv_refl.
+    apply equiv_eqtype; try apply equiv_refl.
+    prove_equiv_compat.
+    repeat apply equiv_app; try apply equiv_refl.
+    apply equiv_subst. assumption.
+    apply equiv_refl.
+  }
+Qed.
 
 
 

@@ -954,7 +954,7 @@ apply reduce_app_beta; apply reduce_id.
         rewrite - subst_sh_shift. assumption.
         subst; var_solv.
 sh_var 1 10. replace (shift 3 i) with (shift 1 (shift 2 i)).
-weaken ref2_type; try (subst; var_solv).
+weaken ref2_type; try (subst; simpl; var_solv).
 rewrite - (subst_nat (sh 2)) subst_sh_shift. apply tr_weakening_append2. assumption.
 simpsub_bigs. auto.
 simpsub_bigs. auto.
