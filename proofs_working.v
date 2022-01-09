@@ -1027,7 +1027,9 @@ constructor. }
          intros. subst. apply consb_typed; try assumption; try var_solv; auto.
         - (*U1 : world*) 
          match goal with |- tr ?G' ?J => assert (tr G' (oof U1 world)) as HU1 end.
-         subst. apply world_pair; try (apply Hu1); apply nsucc_nat; var_solv; auto. subst U1.
+         subst.
+         apply world_pair; try (apply Hu1);
+           apply nsucc_type; var_solv; auto. subst U1.
          (*new reference is at world U1*)
          eapply (tr_exist_intro _ _ _ _ u1); auto.
          2: { sh_var 2 5. rewrite - ! subst_sh_shift.
@@ -1039,17 +1041,19 @@ constructor. }
          }
          simpsub_bigs. simpsub_type; auto.
          (*split up nat from pair*)
-         apply tr_sigma_intro. apply nsucc_nat. var_solv.
+         apply tr_sigma_intro. apply nsucc_type. var_solv.
          (*<p1, <l, <*, \_:nat.*>>>: <u, l> <= <u1, l1> x storeU1 x ref(A)@U1) *)
          (*7862 has appeared here, wasnt there at start of ref*)
          simpsub_bigs.
          (*showing U <= U1*)
          + assert (tr [:: hyp_tm (store (var 2) (var 1));
                        hyp_tm (subseq (var 4) (var 3) (var 1) (var 0)); hyp_tm nattp; hyp_tm preworld; hyp_tm (Gamma_at G (var 1) (var 0)); hyp_tm nattp; hyp_tm preworld]
-                    (deq make_subseq make_subseq
+                    (oof (make_consb_subseq (var 2))
                          (subseq  (var 3) (var 2) u1 (nsucc (var 2)))))
              as HUsubU1. (*m1*)
-           subst. apply consb_subseq; try (apply Hx); try var_solv.
+           subst.
+           apply consb_subseq; try (apply Hx); try var_solv.
+           
            apply tr_prod_intro; try assumption.
            apply tr_prod_intro. assumption.
            (*showing the new store is a store at U1*)
@@ -1058,21 +1062,21 @@ constructor. }
       apply tr_pi_intro; auto. apply tr_arrow_intro; auto. apply subseq_type; auto.
       (*ltac for showing (sh 2 U1) to be a world in context grown by 2*)
       Ltac u1_pw2 := sh_var 2 5; inv_subst; match goal with |- tr (?a::?b::?G') ?J => change (a::b::G') with ([::a; b] ++ G') end; rewrite - (subst_pw (sh 2)) ! subst_sh_shift; apply tr_weakening_append; try var_solv.
-      u1_pw2. apply Hu1. var_solv. apply nsucc_nat; var_solv.
+      u1_pw2. apply Hu1. var_solv. apply nsucc_type; var_solv.
       var_solv.
       2: { unfold gettype. simpsub_bigs. apply tr_pi_intro; auto.
            eapply (tr_compute _ _ _ _ _ _ _ reduce_consb); try (apply equiv_refl).
 (*match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => change M with M end.
   literally what ask karl
- *)
-(*case on whether index is < l = size u*) 
+ *) 
+(*case on whether index is < l = size u*)  
 match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with 
        (subst1 (ltb_app (var 0) (var 6)) (bite (var 0)
           (app
              (app (app (var 5) (var 3))
                 (make_subseq_trans 
                    (var 7) (nsucc (var 7))
-                   (var 3) make_subseq 
+                   (var 3) (make_consb_subseq (var 7))
                    (var 2))) (var 1)) 
           (next
              (move_app A 
@@ -1081,7 +1085,7 @@ match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
                    (var 3) (var 6)
                    (make_subseq_trans 
                       (var 7) (nsucc (var 7))
-                      (var 3) make_subseq
+                      (var 3) (make_consb_subseq (var 7)) 
                       (var 2)))
                 (app
                    (app (subst (sh 12) Et)
@@ -1099,7 +1103,7 @@ match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
 end.
 2, 4: (simpsub_bigs; auto). rewrite fold_substj.
 eapply (tr_generalize _ booltp).
-apply ltapp_typed; try var_solv.
+apply ltapp_typed; try var_solv.  
 match goal with |- tr ?G (deq (bite ?M1 ?M2 ?M3) ?M4 ?T) =>
 change M2 with
     (subst sh1 
@@ -1107,7 +1111,7 @@ change M2 with
              (app (app (var 4) (var 2))
                 (make_subseq_trans 
                    (var 6) (nsucc (var 6))
-                   (var 2) make_subseq 
+                   (var 2) (make_consb_subseq (var 6)) 
                    (var 1))) (var 0)));
   replace M3 with
          (subst sh1 (next
@@ -1117,7 +1121,7 @@ change M2 with
                    (var 2) (var 5)
                    (make_subseq_trans 
                       (var 6) (nsucc (var 6))
-                      (var 2) make_subseq
+                      (var 2) (make_consb_subseq (var 6)) 
                       (var 1)))
                 (app
                    (app (subst (sh 11) Et)
@@ -1183,7 +1187,8 @@ change M2 with
 rewrite ! subst_sh_shift. apply store_type1; auto; try var_solv.
 var_solv.
              (*showing U <= U2*)
-             + simpsub_bigs. apply (subseq_trans  (cons_b (var 7) (var 6) (shift 4 x)));
+             + simpsub_bigs.
+               apply (subseq_trans  (cons_b (var 7) (var 6) (shift 4 x)));
                                try apply nsucc_type;
                                try var_solv.
                { sh_var 4 7. inv_subst. 
@@ -1195,7 +1200,7 @@ var_solv.
                inv_subst. var_solv0. unfold cons_b. simpsub_big. apply Sequence.index_0. simpsub_big. auto.
                * (*U<= U1*) 
                  sh_var 4 7. inv_subst. rewrite make_app4.
-                 rewrite - (subst_make_subseq (sh 4)) ! subst_sh_shift.
+    rewrite ! subst_sh_shift.
                  apply tr_weakening_append. assumption.
                  var_solv.
            - (*i >= l*)
@@ -1270,7 +1275,7 @@ var_solv.
              (*showing m1: U <= U1*)
              { simpl. rewrite - (subst_sh_shift _ 4). sh_var 4 7.
                inv_subst. rewrite make_app4.
-             rewrite - (subst_make_subseq (sh 4)) ! subst_sh_shift.
+             rewrite ! subst_sh_shift.
              apply tr_weakening_append. assumption. }
              (*showing m: W <= U*)
              { sh_var 5 10.

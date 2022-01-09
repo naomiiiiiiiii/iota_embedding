@@ -422,7 +422,7 @@ Lemma trans_type_works1: forall w A G D,
     rewrite - (subst_pw (sh 1) )  ! subst_sh_shift.
     apply tr_weakening_append1; assumption.
     var_solv. }
-  Admitted.
+Qed.
 
 
 
@@ -445,7 +445,6 @@ Fixpoint Gamma_at_ctx (G: source.context) (w l: Syntax.term obj):=
 
 Lemma map_iota {T} : forall n l (f: nat -> T), map f (iota n l) =
                          map (fun i => f (i - 1)) (iota (n+1) l).
-  Admitted.
 
 Lemma subst_itprod : forall n s, foldr (fun acc => fun term => @ppair obj acc term)
                                                  triv
@@ -453,7 +452,6 @@ Lemma subst_itprod : forall n s, foldr (fun acc => fun term => @ppair obj acc te
 shift s (foldr (fun acc => fun term => @ppair obj acc term)
                                                  triv
                                                  (mkseq (fun i => (var i)) n)).
-Admitted.
 
 
 Lemma gamma_at_rec {a G}: (gamma_at (a:: G)) =
@@ -698,10 +696,19 @@ Qed.
 
 
 
-             Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
+Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
                                (substj (dot x id) (@ deq obj M1 M2 T)).
-Admitted.
+unfold substj. auto. Qed.
 
+Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
+                                    tr G (oof l nattp) ->
+                                    tr G (oof (app u l)
+       (karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero)))).
+  intros. apply (tr_arrow_elim _ nattp); auto.
+  eapply tr_eqtype_convert. 
+  apply unfold_pw. assumption. Qed.
+  (*start here move this to embedded*)
 
   Ltac simpsubs := simpsub; simpl.
 
@@ -724,43 +731,47 @@ Lemma consb_typed : forall D w l x, tr D (oof w preworld) ->
                                                     (arrow (fut nattp) U0)
                                      )) ->
                                 tr D (oof (cons_b w l x) preworld).
-Admitted.
-
-
-
-
-
-
-Lemma nsucc_nat G n: tr G (oof n nattp) ->
-                    tr G (oof (nsucc n) nattp).
-  Admitted. (*start here move this to basic types*)
-
-Hint Resolve nsucc_nat.
+  intros. unfold cons_b.
+  unfold preworld.
+  eapply tr_eqtype_convert. apply tr_eqtype_symmetry.
+  apply unfold_pw.
+  apply tr_arrow_intro; auto.
+  simpsub_bigs.
+  match goal with |- tr ?G (deq ?M ?M ?A) =>
+                  change A with (subst1 (ltb_app (var 0)
+                                 (subst sh1 l)) A) end.
+  apply tr_booltp_elim.
+  apply ltapp_typed. var_solv.
+  rewrite - (subst_nat (sh 1)) ! subst_sh_shift.
+  apply tr_weakening_append1. assumption.
+  simpsub_bigs. apply (tr_arrow_elim _ nattp); auto. 
+  match goal with |- tr ?G (deq ?M ?M ?A) =>
+                  change A with (subst sh1
+                                       A) end.
+  rewrite ! subst_sh_shift. apply tr_weakening_append1.
+  eapply tr_eqtype_convert. apply unfold_pw. assumption. var_solv.
+  simpsub_bigs.
+  match goal with |- tr ?G (deq ?M ?M ?A) =>
+                  change A with (subst sh1
+                                       A) end.
+  rewrite ! subst_sh_shift. apply tr_weakening_append1. assumption.
+  Qed.
 
 (*start here move to subst_help0*)
 
 (*for any W, W <= x:: W
  going to need lt reflection *)
 
-Lemma nsucc_leq: forall G n, tr G (oof n nattp) ->
-                       tr G (oof triv (leq_t n (nsucc n))).
-Admitted.
 
 
 
-Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
-                                    tr G (oof l nattp) ->
-                                    tr G (oof (app u l)
-       (karrow (fut preworld)
-               (arrow (fut nattp) (univ nzero)))).
-  Admitted.
 
   Lemma consb_subseq G' w' l' x: tr G' (oof w' preworld) ->
                                     tr G' (oof l' nattp) ->
                                 tr G' (oof x (karrow (fut preworld)
                                                     (arrow (fut nattp) U0)
                                      )) ->
-                                tr G' (oof make_subseq (subseq w' l'
+                                tr G' (oof (make_consb_subseq l') (subseq w' l'
                                                          (cons_b w' l' x) (nsucc l')
                                       )).
   intros. unfold make_subseq.

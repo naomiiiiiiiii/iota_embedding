@@ -230,6 +230,14 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
+Definition make_consb_subseq n := ppair (app nsucc_leq_fn n) (lam (lam (lam triv))).
+
+Lemma subst_make_consb_subseq n s : (subst s (make_consb_subseq n)) =
+                                    make_consb_subseq (subst s n).
+  intros. unfold make_consb_subseq. simpsub_bigs. auto. Qed.
+Hint Rewrite subst_make_consb_subseq: core subst1.
+Hint Rewrite <- subst_make_consb_subseq : inv_subst.
+
 
  Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
   t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
@@ -294,7 +302,7 @@ that. you want to bind
          of_m G (ref_m E) (comp_m (reftp_m A)) -> trans G E A Et ->
          trans G (ref_m E) (comp_m (reftp_m A)) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
          let l := var 2 in                                                        
-         let m1 := make_subseq in (*u <= u1, consb subseq*)
+         let m1 := (make_consb_subseq l) in (*u <= u1, consb subseq*)
          let p1 := (ppair m1
                          (lam (lam ( lam ( (*making a value of type store U1, lambdas go l2, m2, i*)
                                          let l1 := var 7 in
@@ -307,7 +315,7 @@ that. you want to bind
                                          let i := var 0 in
                                          let x := app (app (shift 8 Et) l1) g in
                                          let m12 := (make_subseq_trans l (nsucc l)
-                                                                      l2 m1 m2) (*U <=  U1 <= U2*)
+                                                                      l2 (subst (sh 3) m1) m2) (*U <=  U1 <= U2*)
                                          in 
                                          let m02 := make_subseq_trans l1 l l2 m m12 in (*W <= U + U <= U2 = W <= U2*)
                                          
