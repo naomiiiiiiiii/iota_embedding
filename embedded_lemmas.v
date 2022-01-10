@@ -1,10 +1,10 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src help subst_help0 subst_help
+From istari Require Import lemmas0 source subst_src rules_src help subst_help0 subst_help
      trans basic_types derived_rules.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
-     ContextHygiene Equivalence Equivalences Rules Defined.
+     ContextHygiene Equivalence Equivalences Rules Defined PageType.
 (*useful properties of the embedding*)
 
 Hint Resolve tr_fut_intro: core.
@@ -51,6 +51,19 @@ Lemma pw_type: forall {G},
 
 Hint Resolve pw_kind pw_type.
 
+Lemma unfold_pw: forall G,
+    tr G (deqtype preworld (arrow nattp
+                                  (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))).
+  intros. unfold preworld.
+  apply tr_rec_unroll.
+  apply tr_arrow_formation; auto.
+  apply tr_karrow_formation.
+  apply tr_fut_formation.
+  simpl. 
+  apply tr_hyp_tp. repeat constructor.
+  apply tr_arrow_formation; auto.
+  apply tr_fut_formation; auto. Qed.
+
 (*subtypes of preworld*)
 Lemma pw_type2: forall {G}, tr G (deqtype (arrow (fut nattp) (univ nzero))
                                    (arrow (fut nattp) (univ nzero))).
@@ -65,56 +78,37 @@ Lemma pw_type1: forall {G}, tr G (deqtype
   intros. apply tr_karrow_formation.
   apply tr_fut_formation. auto. apply pw_type2. Qed.
 
-Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
-                                    tr G (oof l nattp) ->
-                                    tr G (deqtype (app u l)
-                                                  (app u l)).
-  Admitted.
 
-Lemma pw_app_typed1 G u l v: tr G (oof u preworld) ->
-                                    tr G (oof l nattp) ->
-                                    tr G (oof v (fut preworld)) ->
-                                    tr G (deqtype (app (app u l) v)
-                                                       (app (app u l) v)).
-  Admitted.
+Lemma pw_app_typed2 G u u' l l': tr G (deq u u' preworld) ->
+                                    tr G (deq l l' nattp) ->
+                                    tr G (deq  (app u l) (app u' l')
+       (karrow (fut preworld)
+               (arrow (fut nattp) (univ nzero)))).
+  intros. apply (tr_arrow_elim _ nattp); auto.
+  apply pw_type1.
+  eapply tr_eqtype_convert. 
+  apply unfold_pw. assumption. Qed.
+
 Lemma pw_app_typed G u u' l l' v v' i i': tr G (deq u u' preworld) ->
                                     tr G (deq l l' nattp) ->
                                     tr G (deq v v' (fut preworld)) ->
                                     tr G (deq i i' (fut nattp)) ->
                                     tr G (deqtype (app (app (app u l) v) i)
                                                   (app (app (app u' l') v') i')).
-(* eapply tr_formation_weaken. unfold app3.
-      apply pw_app_typed.
-      eapply (tr_arrow_elim _ (fut nattp)); auto.
-    apply tr_univ_formation. apply zero_typed.
-    eapply (tr_karrow_elim _ (fut preworld)).
-    constructor. auto.
-    apply pw_type2.
-    apply (tr_arrow_elim _ nattp); auto.
-    apply (tr_eqtype_convert _#3 preworld ). apply unfold_pw.
-    apply split_world_elim1.
-    change world with (@subst obj (sh 3) world).
-    rewrite ! subst_sh_shift. apply tr_weakening_append3.
-    assumption. var_solv'. change (fut preworld) with
-                               (@subst obj (sh 3) (fut preworld)).
-    var_solv'. change (fut nattp) with (@subst obj (sh 2) (fut nattp)). var_solv'.
- *) Admitted.
+  intros. apply (tr_formation_weaken _ nzero).
+  apply (tr_arrow_elim _ (fut nattp)); auto.
+  apply tr_fut_formation. auto.
+  apply (tr_karrow_elim _ (fut preworld)); auto.
+  apply tr_fut_formation. auto.
+  apply tr_arrow_formation; auto.
+  apply tr_fut_formation. auto. apply pw_app_typed2; assumption. Qed.
 
-Lemma unfold_pw: forall G,
-    tr G (deqtype preworld (arrow nattp
-          (karrow (fut preworld) (arrow (fut nattp) (univ nzero))))). Admitted.
 
-Lemma split_world_elim2: forall W G,
-    tr G (oof W world) -> tr G (oof (ppi2 W) nattp).
-Admitted.
-
-Lemma split_world_elim1: forall W G,
-    tr G (oof W world) -> tr G (oof (ppi1 W) preworld).
-Admitted.
 
 Lemma world_type: forall G,
-      tr G (deqtype world world). Admitted.
-Hint Resolve world_type. 
+    tr G (deqtype world world).
+unfold world. intros. apply tr_sigma_formation; auto.
+Qed.
 
 Lemma world_pair: forall w l G, tr G (oof w preworld) ->
                            tr G (oof l nattp) ->
@@ -123,24 +117,33 @@ Lemma world_pair: forall w l G, tr G (oof w preworld) ->
   apply nat_type. Qed.
 
     Lemma split_world1: forall w1 l1 G,
-tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld). (*ask karl can't put a
-                                                          conjunction here*)
-    Admitted.
+    tr G (oof (ppair w1 l1) world) -> tr G (oof w1 preworld).
+      intros.
+      eapply tr_compute; try 
+      (apply (equiv_symm _ (ppi1 (ppair w1 l1))); apply reduce_equiv;
+       apply reduce_ppi1_beta; apply reduce_id); try apply equiv_refl.
+      eapply tr_sigma_elim1. apply H.
+Qed.
 
     Lemma split_world2: forall w1 l1 G,
 tr G (oof (ppair w1 l1) world) -> tr G (oof l1 nattp). (*ask karl can't put a
                                                           conjunction here*)
-    Admitted.
+      intros.
+      eapply tr_compute; try 
+      (apply (equiv_symm _ (ppi2 (ppair w1 l1))); apply reduce_equiv;
+       apply reduce_ppi2_beta; apply reduce_id); try apply equiv_refl.
+      change nattp with (subst1 (ppi1 (ppair w1 l1)) nattp).
+      eapply tr_sigma_elim2. apply H. Qed.
 
     Lemma nth_works: forall G w n,
         tr G (oof w world) -> tr G (oof n nattp) -> tr G (oof (nth w n)
                            (karrow (fut preworld) (arrow (fut nattp) U0))).
-      intros. unfold nth. apply (tr_arrow_elim _ nattp); auto.
+      intros G w n Hw Hn. unfold nth. apply (tr_arrow_elim _ nattp); auto.
       do 2? constructor. auto.
       constructor. auto.
       apply tr_univ_formation. auto.
       eapply tr_eqtype_convert. apply unfold_pw.
-      apply split_world_elim1. assumption.
+      eapply tr_sigma_elim1. apply Hw. 
       Qed.
 
     Lemma subseq_U01: forall G w1 l1 w2, tr G (oof w1 preworld) ->
@@ -294,17 +297,366 @@ unfold subseq.
 Qed.
 
 (*simple lemmas about well typedness of embedding*)
-Lemma laters_type: forall A G i,
-    (tr G (oof A (univ i))) -> tr G (oof (laters A) (univ i)).
-  Admitted.
-Hint Resolve laters_type.
+Lemma laters_type: forall A G,
+    (tr G (oof A (univ nzero))) -> tr G (oof (laters A) (univ nzero)).
+  intros. unfold laters. unfold plus.
+  apply tr_rec_formation_univ. apply tr_sigma_formation_univ; auto.
+  simpsub. apply tr_booltp_formation.
+  simpsub.
+  change (univ nzero) with (@subst1 obj (var 0) (univ nzero)).
+  apply tr_booltp_elim. rewrite - (@subst_booltp obj (sh 1)). var_solv.
+  simpsub_bigs. change (univ nzero) with (@subst obj (sh 2) (univ nzero)).
+  rewrite ! subst_sh_shift. apply tr_weakening_append2. assumption.
+  simpsub. constructor. simpl. change (univ nzero) with
+(@subst obj (sh 2) (univ nzero)). var_solv. auto. auto. Qed.
 
-Lemma bind_type: forall G A B M0 M1,
+  Hint Resolve laters_type.
+(* dont use theta, y comb special
+Definition bind : term obj := app theta
+   (lam   ( (*f := 0*)
+      lam ( (*f:= 1, x : laters A := 0*)
+          lam ( (*f:= 2, x := 1, g : A -> laters B := 0 *)
+              let f := (var 2) in
+              let x := (var 1) in
+              let g := (var 0) in
+              let y := ppi2 x in
+         bite (ppi1 x) (app g y) (*y : A*)
+              (let y' := prev y in (*y : |> laters A*)
+               let f' := prev f in
+               inr (next (app (app f' y') g))) )
+        ))).
+
+Definition make_bind E1 E2 := app (app bind E1) E2. *)
+
+  Lemma inl_plus_typ: forall G A B m,
+    tr G (oof m A) ->
+    tr G (deqtype A A) ->
+    tr G (deqtype B B) ->
+    tr G (oof (inl m) (plus A B)).
+  intros. unfold plus. unfold inl.
+  apply tr_sigma_intro. constructor.
+  simpsub_bigs.
+  eapply tr_compute; try apply H.
+  apply reduce_equiv. apply reduce_bite_beta1.
+  apply reduce_id.
+  apply equiv_refl. apply equiv_refl.
+   apply tr_booltp_elim_eqtype; try ( 
+    unfold deqtype;
+    sh_var 1 1;
+    change triv with (@shift obj 1 triv); inv_subst;
+    rewrite ! subst_sh_shift; apply tr_weakening_append1;
+    auto).
+  change booltp with (@subst obj (sh 1) booltp).
+  var_solv0. Qed.
+
+Lemma plus_typed: forall G A B,
+    tr G (deqtype A A) ->
+    tr G (deqtype B B) ->
+    tr G (oof_t (plus A B)).
+intros. 
+    unfold plus.
+    apply tr_sigma_formation.
+    weaken tr_booltp_formation.
+    constructor; try (change booltp with (@subst obj (sh 1) booltp); var_solv0); try (
+    unfold deqtype; simpsub_bigs; inv_subst;
+    change triv with (@shift obj 1 triv);
+    rewrite subst_sh_shift; apply tr_weakening_append1; auto).
+Qed.
+
+Lemma inr_plus_typ: forall G A B m,
+    tr G (oof m B) ->
+    tr G (deqtype A A) ->
+    tr G (deqtype B B) ->
+    tr G (oof (inr m) (plus A B)).
+  intros. unfold plus. unfold inr.
+  apply tr_sigma_intro. constructor.
+  simpsub_bigs.
+  eapply tr_compute; try apply H.
+  apply reduce_equiv. apply reduce_bite_beta2.
+  apply reduce_id.
+  apply equiv_refl. apply equiv_refl.
+   apply tr_booltp_elim_eqtype; try ( 
+    unfold deqtype;
+    sh_var 1 1;
+    change triv with (@shift obj 1 triv); inv_subst;
+    rewrite ! subst_sh_shift; apply tr_weakening_append1;
+    auto).
+  change booltp with (@subst obj (sh 1) booltp).
+  var_solv0. Qed.
+
+(*start here this is pasically ret, redefine ret to be this*)
+Lemma inl_laters_type: forall G A m,
+    tr (promote G) (oof_t A) ->
+    tr G (oof m A) ->
+    tr G (oof (inl m) (laters A)).
+  intros. unfold laters.
+  eapply tr_eqtype_convert.
+  - eapply tr_eqtype_symmetry.
+    apply tr_rec_unroll.
+ - apply plus_typed. 
+    unfold deqtype. change triv with (@shift obj 1 triv).
+    inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append1.
+    apply (tr_inhabitation_formation _ m m). auto.
+    constructor. simpl.
+    apply tr_hyp_tp. apply Sequence.index_0.
+    simpsub_bigs.
+    apply inl_plus_typ. auto.
+    apply (tr_inhabitation_formation _ m m). auto.
+    constructor.
+    constructor. apply plus_typed.
+    unfold deqtype. inv_subst.
+    change triv with (@shift obj 1 triv).
+    rewrite ! subst_sh_shift. apply tr_weakening_append1. auto.
+    constructor.
+    apply tr_hyp_tp. apply Sequence.index_0. Qed.
+
+Lemma inr_laters_type: forall G A m,
+    tr G (oof m (fut (laters A))) ->
+    tr (promote G) (oof A U0) ->
+    tr G (oof A U0) ->
+    tr G (oof (inr m) (laters A)).
+  intros. unfold laters.
+  eapply tr_eqtype_convert.
+  eapply tr_eqtype_symmetry.
+  - apply tr_rec_unroll.
+  - apply plus_typed. 
+    unfold deqtype. change triv with (@shift obj 1 triv).
+    inv_subst. rewrite ! subst_sh_shift. apply tr_weakening_append1.
+    weaken H1.
+     constructor.
+    apply tr_hyp_tp. apply Sequence.index_0.
+  - simpsub_bigs. apply inr_plus_typ. unfold laters in H.
+    rewrite subst_sh_shift. auto.
+  - weaken H1. constructor. 
+    match goal with |- tr ?G (deqtype ?T ?T) =>
+                    replace T with (laters A) end.
+    2: {
+      unfold laters. simpsub_bigs. auto.
+    }
+    weaken laters_type. apply H0. Qed.
+
+Lemma yc_typed G A: tr G (deqtype A A) ->
+                    tr G (oof Yc (arrow (arrow (fut A) A)
+                                        A
+                         )).
+  Admitted.
+
+Lemma tr_weakening_append5: forall G1 x y z a b J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::a::b::G1) (
+                       (deq (shift 5 J1)
+                            (shift 5 J2)
+                            (shift 5 t))).
+Admitted.
+
+Lemma bind_type G A B M0 M1 :
+    tr G (oof A U0) ->
+    tr (promote G) (oof A U0) ->
+    tr G (oof B U0) ->
+    tr (promote G) (oof B U0) ->
     tr G (oof M0 (laters A)) ->
     tr G (oof M1 (arrow A (laters B))) ->
-    tr G (oof (make_bind M0 M1) (laters B)). Admitted.
-
-
+    tr G (oof (make_bind M0 M1) (laters B)).
+  intros Ha Ha1 Hb Hb1 Hm0 Hm1.
+  unfold make_bind. unfold bind. 
+  apply (tr_arrow_elim _ (arrow A (laters B))); auto.
+  { apply tr_arrow_formation; auto. weaken Ha. weaken laters_type; auto.
+  }
+  { weaken laters_type; auto. }
+  apply (tr_arrow_elim _ (laters A) ); auto.
+  { weaken laters_type; auto. }
+  { repeat apply tr_arrow_formation; try weaken Ha; try weaken laters_type; auto.
+  } 
+  apply (tr_arrow_elim _
+                       (arrow
+                          (fut ((arrow (laters A)
+                                       (arrow (arrow A (laters B)) (laters B)))))
+                          ((arrow (laters A)
+                                       (arrow (arrow A (laters B)) (laters B)))))
+        ).
+  {  
+    repeat apply tr_arrow_formation; try apply tr_fut_formation;
+      repeat apply tr_arrow_formation; try weaken Ha;
+      try weaken Ha1; try weaken Hb1; try weaken laters_type; auto.
+  }
+   { repeat apply tr_arrow_formation; try weaken Ha;
+       try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+   apply yc_typed.
+   { repeat apply tr_arrow_formation; try weaken Ha;
+       try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+   apply tr_arrow_intro.
+   { try apply tr_fut_formation;
+      repeat apply tr_arrow_formation; try weaken Ha;
+      try weaken Ha1; try weaken Hb1; try weaken laters_type; auto.
+  }
+      { repeat apply tr_arrow_formation; try weaken Ha;
+          try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+      simpsub.
+   apply tr_arrow_intro; try (unfold deqtype; change triv with (@subst obj sh1 triv); inv_subst;
+   rewrite ! subst_sh_shift; apply tr_weakening_append1). try weaken laters_type; auto.
+      { repeat apply tr_arrow_formation; try weaken Ha;
+          try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+      simpsub. simpl.
+      apply tr_arrow_intro;
+        unfold deqtype; try (change triv with (@subst obj (sh 2) triv); inv_subst;
+                                          rewrite ! subst_sh_shift; apply tr_weakening_append2).
+      { repeat apply tr_arrow_formation; try weaken Ha;
+          try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+      { repeat apply tr_arrow_formation; try weaken Ha;
+          try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
+      simpsub_big. unfold laters at 1. unfold plus at 1.
+      rewrite make_app1.
+      eapply tr_eqtype_convert_hyp. apply tr_rec_unroll.
+       {apply tr_sigma_formation. weaken tr_booltp_formation.
+       apply tr_booltp_elim_eqtype. change booltp with (@subst obj sh1 booltp).
+       var_solv. simpsub_bigs.  unfold deqtype. inv_subst.
+       rewrite ! subst_sh_shift.
+   change triv with (@shift obj 3 triv). 
+   apply tr_weakening_append3. weaken Ha.
+   simpsub. apply tr_fut_formation. simpl. apply tr_hyp_tp. constructor.
+  apply Sequence.index_0. 
+      }
+      simpsub_bigs.
+      match goal with |- tr ?G (deq ?M ?M ?T) => change M with 
+          (@subst obj (under 1 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
+                  (bite (var 2)
+                        (app (var 0) (var 1))
+          (inr
+             (next
+                (app
+                   (app
+                     (prev
+                     (var 3))
+                     (prev
+                     (var 1)))
+                   (var 0)))))
+          ) end.
+      rewrite make_app1.
+      apply tr_sigma_eta_hyp.
+      simpsub_bigs.
+          change (inr
+             (next
+                (app
+                   (app (prev (var 3)) (prev (var 1)))
+                   (var 0)))) with
+              (@subst obj (under 2 sh1)
+            (inr (next
+                (app
+                   (app (prev (var 2)) (prev (var 1)))
+                   (var 0))))).
+          change (app (var 0) (var 1)) with
+              (@subst obj (under 2 sh1)
+                      (app (var 0) (var 1))
+              ). rewrite make_app2.
+replace 
+              (rec
+                 (sigma booltp
+                    (bite (var 0) (subst (sh 5) B)
+                          (fut (var 1))))) with
+    (laters (subst (sh 3) B)).
+replace (rec (plus (subst (sh 3) A)
+                       (fut (var 0)))) with (laters (subst (sh 2) A)).
+          apply tr_booltp_eta_hyp.
+          {simpsub_bigs.
+           rewrite make_app1. eapply tr_compute_hyp.
+           { constructor. apply reduce_equiv. apply reduce_bite_beta1. apply reduce_id.
+           } apply (tr_arrow_elim _ (subst (sh 3) A)).
+           { unfold deqtype. inv_subst.
+       rewrite ! subst_sh_shift.
+   change triv with (@shift obj 3 triv). 
+   apply tr_weakening_append3. weaken Ha. }
+           {weaken laters_type. change (univ nzero) with
+                                    (@subst obj (sh 3) (univ nzero)).
+            rewrite ! subst_sh_shift. apply tr_weakening_append3. assumption. }
+        rewrite - ! (sh_sum 2 1).  inv_subst. var_solv.
+        rewrite - ! (sh_sum 1 2).  inv_subst. var_solv. }
+          simpsub_bigs.
+           match goal with |- tr ?G (deq ?M ?M ?T) =>
+                            change M with (inr ( subst1 (prev (var 2))
+                                                (next
+             (app (app (var 0) (prev (var 2)))
+                (var 1))))) 
+           end.
+           apply inr_laters_type.
+           match goal with |- tr ?G (oof ?M ?T) => replace T with
+               (subst1 (prev (var 2))
+                       (fut (laters (subst (sh 4) B)))
+               ) end.
+           2:{ simpsub_bigs. auto.  }
+           eapply (tr_fut_elim _#3
+             (subst (sh 3) 
+             (arrow (laters A)
+                (arrow (arrow A (laters B))
+                   (laters B))))).
+           { inv_subst. var_solv. }
+           { simpsub_bigs.
+             repeat apply tr_arrow_formation; try weaken laters_type;
+               change (univ nzero) with (@subst obj (sh 3) (univ nzero));
+               rewrite ! subst_sh_shift; try apply tr_weakening_append3;
+                 try assumption.
+             unfold deqtype. change triv with (@shift obj 3 triv).
+             inv_subst. rewrite ! subst_sh_shift.
+             apply tr_weakening_append3. weaken Ha1. }
+           match goal with |- tr ?G (deq ?M ?M ?T) => replace T with
+               (subst1 (prev (var 2))
+                       (fut (laters (subst (sh 5) B))));
+                change M with (@subst1 obj (prev (var 2))
+       (next
+          (app (app (var 1) (var 0)) (var 2)))
+                               
+               ) end.
+           rewrite make_app2. eapply tr_compute_hyp.
+           {constructor. apply reduce_equiv. apply reduce_bite_beta2. apply reduce_id. }
+           eapply (tr_fut_elim _#3 (laters (subst (sh 4) A))).
+           { rewrite - (sh_sum 1 3). inv_subst. var_solv. }
+           {simpl.  unfold deqtype. inv_subst.
+       rewrite ! subst_sh_shift.
+   change triv with (@shift obj 4 triv). 
+   apply tr_weakening_append4. weaken laters_type. apply Ha1. }
+           { constructor. simpl. simpsub_bigs.
+             apply (tr_arrow_elim _ (arrow (subst (sh 5) A)
+                   (laters (subst (sh 5) B)))).
+           { 
+             repeat apply tr_arrow_formation; try weaken laters_type;
+               change (univ nzero) with (@subst obj (sh 5) (univ nzero));
+               rewrite ! subst_sh_shift; try apply tr_weakening_append5;
+                 try assumption.
+             unfold deqtype. change triv with (@shift obj 5 triv).
+             inv_subst. rewrite ! subst_sh_shift.
+             apply tr_weakening_append5. weaken Ha1. }
+           { weaken laters_type;
+               change (univ nzero) with (@subst obj (sh 5) (univ nzero));
+               rewrite ! subst_sh_shift; try apply tr_weakening_append5;
+                 try assumption.
+           }
+           {
+             apply (tr_arrow_elim _ (laters (subst (sh 5) A))).
+           { weaken laters_type;
+               change (univ nzero) with (@subst obj (sh 5) (univ nzero));
+               rewrite ! subst_sh_shift; try apply tr_weakening_append5;
+                 try assumption.
+           }
+           { 
+             repeat apply tr_arrow_formation; try weaken laters_type;
+               change (univ nzero) with (@subst obj (sh 5) (univ nzero));
+               rewrite ! subst_sh_shift; try apply tr_weakening_append5;
+                 try assumption.
+             unfold deqtype. change triv with (@shift obj 5 triv).
+             inv_subst. rewrite ! subst_sh_shift.
+             apply tr_weakening_append5. weaken Ha1. }
+           rewrite - ! (sh_sum 3 2). inv_subst. var_solv.
+           rewrite - ! (sh_sum 4 1). inv_subst. var_solv. }
+           rewrite - ! (sh_sum 2 3). inv_subst. var_solv. }
+           simpsub_bigs. auto.
+           simpl.
+               change U0 with (@subst obj (sh 3) (univ nzero));
+               rewrite ! subst_sh_shift; apply tr_weakening_append3;
+                  assumption.
+               change U0 with (@subst obj (sh 3) (univ nzero));
+               rewrite ! subst_sh_shift; apply tr_weakening_append3;
+                  assumption.
+           unfold laters. simpsub_bigs. auto.
+           unfold laters. unfold plus. simpsub_bigs. auto. Qed.
 (*repeated patterns of proofs.v*)
 
 

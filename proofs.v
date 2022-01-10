@@ -700,14 +700,6 @@ Lemma fold_substj M1 M2 T x: (deq (subst1 x M1) (subst1 x M2) (subst1 x T)) =
                                (substj (dot x id) (@ deq obj M1 M2 T)).
 unfold substj. auto. Qed.
 
-Lemma pw_app_typed2 G u l: tr G (oof u preworld) ->
-                                    tr G (oof l nattp) ->
-                                    tr G (oof (app u l)
-       (karrow (fut preworld)
-               (arrow (fut nattp) (univ nzero)))).
-  intros. apply (tr_arrow_elim _ nattp); auto.
-  eapply tr_eqtype_convert. 
-  apply unfold_pw. assumption. Qed.
   (*start here move this to embedded*)
 
   Ltac simpsubs := simpsub; simpl.
