@@ -176,10 +176,10 @@ Lemma sh_under_trans_type : forall w l A s n ,
  (*making a pair of type (a big product at U) out of a pair of (a big product at W)
   iterating over the pair
  but how far to go? use the list because it should be the same size as the pair*)
-Fixpoint move_gamma (G: source.context) (m: Syntax.term obj) (gamma: Syntax.term obj) :=
+Fixpoint move_gamma (G: source.context) l1 l2 (m: Syntax.term obj) (gamma: Syntax.term obj) :=
    match G with
      nil => gamma
-   | A::xs => ppair (move_app A m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
+   | A::xs => ppair (move_app A l1 l2 m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
 
 (*making a product value out of the variables in a source context
  assume vars to start at 0*)

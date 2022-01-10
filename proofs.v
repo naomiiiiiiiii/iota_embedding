@@ -346,6 +346,71 @@ tr G (oof w preworld) ->
       auto. apply leq_refl. auto. 
 Qed.
 
+  Lemma move_works: forall G w1 l1 w2 l2 T,
+      tr G (oof w1 preworld) ->
+      tr G (oof w2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
+     tr G (oof (move T l1 l2) (arrow (subseq w1 l1 w2 l2)
+                               (arrow
+                                  (trans_type w1 l1 T)
+                                  (trans_type w2 l2 T)
+                               )
+                        )
+          ).
+   intros G w1 l1 w2 l2 T Hw1 Hw2 Hl1 Hl2. induction T.
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto. var_solv. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+       try apply tr_arrow_formation; auto; constructor. }
+   {
+     apply tr_arrow_intro. apply subseq_type; try assumption.
+     apply tr_arrow_formation; weaken trans_type_works; try assumption.
+     simpsub. rewrite ! sh_trans_type. apply tr_arrow_intro;
+                              try weaken trans_type_works;
+        try (change preworld with (subst sh1 preworld);
+             change nattp with (@subst obj sh1 nattp);
+             rewrite ! subst_sh_shift;                  
+             apply tr_weakening_append1;
+             assumption
+            ).
+     simpl. simpsub_bigs.
+     apply tr_all_intro; auto.
+     simpsub_bigs.
+     apply tr_pi_intro; auto. rewrite ! subst_trans_type; auto.
+     apply tr_arrow_intro; try apply subseq_type;
+       try apply tr_arrow_formation;
+       try weaken trans_type_works; try var_solv;
+        try (change preworld with (subst (sh 4) preworld);
+             change nattp with (@subst obj (sh 4) nattp);
+             rewrite ! subst_sh_shift;                  
+             apply tr_weakening_append4;
+             assumption
+            ).
+     simpsub_bigs. rewrite ! sh_trans_type; simpsub.
+     apply tr_arrow_intro;
+       try weaken trans_type_works; try var_solv.
+     rewrite ! sh_trans_type. simpsub. simpl.
+     apply (tr_arrow_elim _
+                          (@subst obj sh1
+(trans_type (var 2) (var 1) T1)
+                          )
+           ); try rewrite ! sh_trans_type; simpsub; simpl;
+       try weaken trans_type_works; try var_solv.
+     change (dot (var 0) (dot (var 1) (sh 3))) with
+         (@under obj 2 sh1).
+     rewrite ! sh_under_trans_type. simpsub.
+             change nattp with (subst sh1 nattp);
+             rewrite ! subst_sh_shift;                  
+             apply tr_weakening_append1;
+             assumption.
+     }
+Admitted.
+
 Lemma ref2_type: (forall G w1 v i A,
   tr G (oof w1 preworld) -> 
   tr G (oof i nattp) ->

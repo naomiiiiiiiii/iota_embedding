@@ -162,7 +162,9 @@ lam ( lam (
                let f := var 3 in
                let l := var 2 in
              let x := var 0 in
-                           app (app (app f l) make_subseq) x (*m o m0*)
+             app (app (app f l) (make_subseq_trans 
+
+                 ) x (*m o m0*)
   )))))
      | comp_m _ => lam (lam (* m0= 1, c:= 0,*) ( lam (
                            lam (*m0 = 3, c:= 2, l = 1, m := 0*)
@@ -183,10 +185,10 @@ lam ( lam (
      | _ => lam (lam triv) (*not a type operator, error case*)
 end.
 
- Definition move_app A (m : term obj) (x: term obj) :=
-   app (app (move A) m) x.
+ Definition move_app A l1 l2 (m : term obj) (x: term obj) :=
+   app (app (move A l1 l2) m) x.
 
- Lemma subst_move: forall A s, (subst s (move A)) = move A.
+ Lemma subst_move: forall A l1 l2 s, (subst s (move A l1 l2)) = move A (subst s l1) (subst s l2).
    intros. induction A; simpsub; simpl; auto. Qed.
 
 Hint Rewrite subst_move: subst1.
