@@ -150,7 +150,7 @@ Definition nth w n: term obj := app (ppi1 w) n.
 (*moving terms in a world to a future world*)
 
  (*start here get rid of vacuous cases w program module*)
- Definition move (A: source.term): term obj :=
+ Definition move (A: source.term) l1 l2: term obj :=
    match A with
      nattp_m => lam (lam (var 0))
    | arrow_m _ _ =>
@@ -162,10 +162,13 @@ lam ( lam (
                let f := var 3 in
                let l := var 2 in
              let x := var 0 in
-             app (app (app f l) (make_subseq_trans 
+             app (app (app f l) (make_subseq_trans (subst (sh 5) l1)
+                                                   (subst (sh 5) l2)
+                                                   l
+                                                   (var 4)
+                                                   (var 1)) (*m o m0*)
 
-                 ) x (*m o m0*)
-  )))))
+                 ) x )))))
      | comp_m _ => lam (lam (* m0= 1, c:= 0,*) ( lam (
                            lam (*m0 = 3, c:= 2, l = 1, m := 0*)
                              (lam (*m0 = 4, c:= 3, l = 2, m := 1, s := 0*)
@@ -173,13 +176,25 @@ lam ( lam (
                                   let c:= var 3 in
                                   let l:= var 2 in
                                 let s := var 0 in
-                                app (app (app c l) make_subseq) s
+                                app (app (app c l)
+                                         (make_subseq_trans (subst (sh 5) l1)
+                                                   (subst (sh 5) l2)
+                                                   l
+                                                   (var 4)
+                                                   (var 1))
+                                    ) s
                                 (*compose_sub m m0*)
                              )
                          ))))
      | reftp_m _ => lam (lam (*R := 0*)
                           (let i := ppi1 (var 0) in
-                           ppair i (ppair triv (lam triv))
+                           let iltl1 := ppi1 (ppi2 (var 0)) in
+                             ppair i (ppair (lt_trans_fn_app i (subst (sh 2) l1)
+                                                             (subst (sh 2) l2)
+                                                             iltl1
+                                                             (ppi1 (var 1))
+                                            )
+                                        (lam triv))
                           ))
      | unittp_m  => lam (lam (var 1))
      | _ => lam (lam triv) (*not a type operator, error case*)
@@ -189,7 +204,16 @@ end.
    app (app (move A l1 l2) m) x.
 
  Lemma subst_move: forall A l1 l2 s, (subst s (move A l1 l2)) = move A (subst s l1) (subst s l2).
-   intros. induction A; simpsub; simpl; auto. Qed.
+   intros. induction A; unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+
+ Qed.
 
 Hint Rewrite subst_move: subst1.
 

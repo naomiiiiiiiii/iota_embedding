@@ -586,7 +586,7 @@ tr D (oof w1 preworld) ->
                                     tr D (oof l2 nattp) ->
      tr D (oof m (subseq w1 l1 w2 l2)) ->
      tr D (oof gamma (Gamma_at G w1 l1)) ->
-     tr D (oof (move_gamma G m gamma) (Gamma_at G w2 l2)).
+     tr D (oof (move_gamma G l1 l2 m gamma) (Gamma_at G w2 l2)).
   move => D G. move: D. induction G; simpl; move => D w1 l1 w2 l2 m gamma
                                                   Hw1 Hl1 Hw2  Hl2 Hsub Hg; auto.
   (*IS*)
