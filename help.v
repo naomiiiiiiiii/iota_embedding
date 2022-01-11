@@ -203,19 +203,6 @@ end.
  Definition move_app A l1 l2 (m : term obj) (x: term obj) :=
    app (app (move A l1 l2) m) x.
 
- Lemma subst_move: forall A l1 l2 s, (subst s (move A l1 l2)) = move A (subst s l1) (subst s l2).
-   intros. induction A; unfold make_subseq_trans;
-unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
-   { unfold make_subseq_trans;
-unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
-}
-   { unfold make_subseq_trans;
-unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
-}
-
- Qed.
-
-Hint Rewrite subst_move: subst1.
 
 
 Opaque laters preworld U0 subseq leqtp nzero nattp world nth.

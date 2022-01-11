@@ -403,12 +403,12 @@ Qed.
        try weaken trans_type_works; try var_solv.
      change (dot (var 0) (dot (var 1) (sh 3))) with
          (@under obj 2 sh1).
-     rewrite ! sh_under_trans_type. simpsub.
+    (* rewrite ! sh_under_trans_type. simpsub.
              change nattp with (subst sh1 nattp);
              rewrite ! subst_sh_shift;                  
              apply tr_weakening_append1;
              assumption.
-     }
+     } *)
 Admitted.
 
 Lemma ref2_type: (forall G w1 v i A,

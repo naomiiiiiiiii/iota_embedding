@@ -69,7 +69,7 @@ Lemma moveapp_works : forall T G w1 l1 w2 l2 m v,
      tr G (oof m (subseq w1 l1  w2 l2)) ->
      tr G (oof v (trans_type w1 l1 T)) -> (*it's the occurence of T in this line?!
                                           ask karl*)
-     tr G (oof (move_app T m v) (trans_type w2 l2 T)).
+     tr G (oof (move_app T l1 l2 m v) (trans_type w2 l2 T)).
   intros. unfold move_app.
   eapply tr_arrow_elim; try apply H4; try (weaken trans_type_works; auto).
   eapply tr_arrow_elim; try apply H3; try (apply subseq_type; auto).
@@ -222,17 +222,6 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
 Qed.
 
 
-Lemma subst_make_subseq_trans: forall s a b c d e, (subst s (make_subseq_trans a b c d e)) = (make_subseq_trans
-                                                                                 (subst s a)
-                                                                                 (subst s b)
-                                                                                 (subst s c)
-                                                                                 (subst s d)
-                                                                                 (subst s e)
-                                                                                        ).
-  intros. unfold make_subseq_trans. unfold leq_trans_fn_app. unfold leq_trans_fn. simpsub. auto. Qed.
-
-Hint Rewrite subst_make_subseq_trans: core subst1.
-Hint Rewrite <- subst_make_subseq_trans : inv_subst.
 
 
 Theorem two_working: forall G e T ebar,
@@ -253,7 +242,9 @@ Theorem two_working: forall G e T ebar,
         apply trans_type_works; try var_solv; auto.
     }
 
-remember (move_app (reftp_m A) (var 1) (app (app (subst (sh 7) Rt) (var 5)) (var 4))) as Ru1.
+    remember (move_app (reftp_m A) (var 5) (var 2)
+                       (var 1)
+                       (app (app (subst (sh 7) Rt) (var 5)) (var 4))) as Ru1.
 remember (ppi1 Ru1) as i.
 remember (ppi2 (ppi2 Ru1))  as p.
 remember (app (app (app (var 0) (var 2)) make_subseq) i) as e.
@@ -592,7 +583,9 @@ simpsub_type; auto.
         unfold gettype.
         simpsub_bigs. apply tr_pi_intro; auto.
         (*case on whether index = i size u*)
-        remember (move_app (reftp_m A) 
+        remember (move_app (reftp_m A)
+                           (var 9)
+                           (var 6)
                    (var 5)
                    (app
                       (app (subst (sh 11) Rt)
@@ -665,7 +658,7 @@ replace M with
     (subst1 triv
 (bite (app (eq_b (var 1)) (shift 1 i))
                     (next
-                       (move_app A 
+                       (move_app A (var 10) (var 3)
                 (make_subseq_trans (var 10) (var 7) 
                    (var 3) (var 6) (var 2))
 
@@ -684,7 +677,7 @@ replace M with
               (lam
                  (bite (app (eq_b (var 1)) (shift 1 i))
                     (next
-                       (move_app A 
+                       (move_app A (var 10) (var 3) 
                 (make_subseq_trans 
                    (var 10) (var 7) 
                    (var 3) (var 6) 
@@ -718,7 +711,7 @@ apply reduce_app_beta; apply reduce_id.
                     ( lam (
                       bite (var 1)
           (next
-             (move_app A 
+             (move_app A (var 11) (var 4) 
                    (make_subseq_trans (var 11) 
                       (var 8) (var 4) (var 7) 
                       (var 3))
@@ -762,7 +755,7 @@ apply reduce_app_beta; apply reduce_id.
         match goal with |- tr ?G (deq ?M ?M ?T) =>
       replace M with  (bite (var 1)
          (subst (under 1 sh1) (next
-             (move_app A 
+             (move_app A (var 10) (var 3) 
                 (make_subseq_trans (var 10) 
                    (var 7) (var 3) (var 6) (var 2))
 
@@ -970,8 +963,8 @@ match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
                    (var 7) (nsucc (var 7))
                    (var 3) (make_consb_subseq (var 7))
                    (var 2))) (var 1)) 
-          (next
-             (move_app A 
+          (next 
+             (move_app A (var 10) (var 3) 
                 (make_subseq_trans 
                    (var 10) (var 7) 
                    (var 3) (var 6)
@@ -995,7 +988,7 @@ match goal with |- tr ?G' (@ deq obj ?M ?M ?T) => replace M with
 end.
 2, 4: (simpsub_bigs; auto). rewrite fold_substj.
 eapply (tr_generalize _ booltp).
-apply ltapp_typed; try var_solv.  
+apply ltapp_typed; try var_solv.   
 match goal with |- tr ?G (deq (bite ?M1 ?M2 ?M3) ?M4 ?T) =>
 change M2 with
     (subst sh1 
@@ -1007,10 +1000,10 @@ change M2 with
                    (var 1))) (var 0)));
   replace M3 with
          (subst sh1 (next
-             (move_app A
-                (make_subseq_trans 
-                   (var 9) (var 6) 
-                   (var 2) (var 5)
+             (move_app A (var 9) (var 2)
+                (make_subseq_trans (var 9) (var 6) 
+                   (var 2) 
+                   (var 5)
                    (make_subseq_trans 
                       (var 6) (nsucc (var 6))
                       (var 2) (make_consb_subseq (var 6)) 
@@ -1018,7 +1011,7 @@ change M2 with
                 (app
                    (app (subst (sh 11) Et)
                       (var 9)) 
-                   (var 8))))) end.
+                   (var 8))))) end. 
 
 2: { simpsub_bigs. auto. }
      apply tr_booltp_eta_hyp0.
@@ -1287,22 +1280,27 @@ simpl. simpsub_bigs. auto.
                                               let lv := Syntax.var 0 in
                                               (*u = 4, l = 3, subseq = 2, v = 1, lv = 0*)
                                                     prod (prod (subseq u l v lv) (store v lv))
-                                                     (trans_type v lv A))))
-           ).
-    (*at make_bind*)
+                                                         (trans_type v lv A))))
+           ); try (simpl; sh_var 2 5; simpl;
+                   rewrite - ! subst_sh_shift; apply compm3_type; try var_solv;
+                   apply trans_type_works; try var_solv
+                  ).
+    (*at make_bind
     sh_var 2 5.
-  (* replace (@ ppair obj (var 5) (var 4)) with (@ subst obj (sh 2) (ppair (var 3) (var 2))); auto. *)
-    eapply (tr_arrow_elim _  (store (var 3) (var 2))); auto. apply store_type; try var_solv.
-- 
-  simpl.
-  sh_var 2 5. rewrite - ! subst_sh_shift.
-              comptype; simpsub; try var_solv.
+  (* replace (@ ppair obj (var 5) (var 4)) with (@ subst obj (sh 2) (ppair (var 3) (var 2))); auto. come back here potentially*)
+     *)
+{
+  simpl. 
   (*engage Et1 *) simpsub_bigs.
-  eapply tr_arrow_elim.
+  eapply (tr_arrow_elim _  (store (var 3) (var 2))); auto.
+  { apply store_type; try var_solv.  }
+  {sh_var 2 5. rewrite - ! subst_sh_shift. weaken compm2_type; try var_solv.
+  apply trans_type_works; try var_solv. }
+  eapply tr_arrow_elim. 
   apply (subseq_type _
                      (var 6) (var 5)
                     (var 3) (var 2)); auto; try var_solv. simpl.
-  comptype; try var_solv. simpl.
+  comptype; try var_solv. simpl. 
   match goal with |- tr ?G (deq ?M ?M ?T) =>
 replace 
      T
@@ -1440,9 +1438,9 @@ replace (subseq  (var 6) (var 5)
 apply tr_hyp_tm; repeat constructor.
 replace (store (var 3) (var 2))
   with (subst (sh 1) (store (var 2) (var 1))); auto.
-apply tr_hyp_tm; repeat constructor.
+apply tr_hyp_tm; repeat constructor. }
 (*done with et1, ramping up to et2*)
-- simpl.
+{ simpl.
  rewrite subst_bind.
  simpsub_big.  
  apply tr_arrow_intro; try (sh_var 2 5; rewrite - ! subst_sh_shift;
@@ -1457,7 +1455,7 @@ apply tr_hyp_tm; repeat constructor.
                    (app (subst (sh 9) Et2)
                       (ppi1 (var 0)))
                    (ppair (picomp4 (var 0))
-                      (move_gamma G 
+                      (move_gamma G (var 7) (picomp1 (var 0)) 
                             (make_subseq_trans 
                                (var 7) 
                                (var 4) 
@@ -1507,21 +1505,26 @@ unfold subst1. rewrite subst_bind. simpsub_bigs. auto.
                                               let lv1 := Syntax.var 0 in
                                       prod (prod (subseq v lv v1 lv1) (store v1 lv1))
                                                      (trans_type v1 lv1 B))))
-        ) .
+        ); try (simpl; sh_var 2 8; simpl; inv_subst;
+ apply compm3_type; try var_solv; auto;
+change (dot (var 0) (dot (var 1) (sh 5))) with (@under obj 2 (sh 3));
+try rewrite ! sh_under_trans_type; simpsub;
+                   apply trans_type_works; try var_solv
+                  ).
 (*engage Et2*)
  (*pop the store off*)
  eapply (tr_arrow_elim _ (store (var 1) (picomp1 (var 0)))); simpl; auto.
- apply store_type; try var_solv. auto.
- - sh_var 2 3. inv_subst. 
- comptype; try var_solv.
--
-  eapply (tr_arrow_elim _
+{ apply store_type; try var_solv. auto. }
+ { sh_var 2 3. inv_subst. 
+ comptype; try var_solv. }
+  { eapply (tr_arrow_elim _
                         (subseq  (var 1) (picomp1 (var 0))
                             (var 1) (picomp1 (var 0))
-                        )). apply subseq_type; try var_solv; auto.
-  + sh_var 2 3. inv_subst.
-    comptype; try var_solv.
-        match goal with |- tr ?G' (deq ?M ?M ?T) =>
+           )).
+    { apply subseq_type; try var_solv; auto. }
+  { sh_var 2 3. inv_subst.
+    comptype; try var_solv. }
+  { match goal with |- tr ?G' (deq ?M ?M ?T) =>
                         replace T with 
        (subst1 (ppi1 (var 0)) (arrow
           (subseq  (var 2) (ppi1 (var 1))
@@ -1666,8 +1669,9 @@ rewrite sh_under_trans_type. simpsub.
 apply picomp4_works. var_solv.
 sh_var 3 2. inv_subst. comptype; try var_solv; auto.
 rewrite - (subst_nat (sh 2)). sh_var 2 2. inv_subst. rewrite ! subst_sh_shift.
-apply tr_weakening_append2. apply picomp1_works. apply picomp1_works.
-apply subseq_refl; try var_solv; auto. rewrite ! subst_trans_type; auto.
+apply tr_weakening_append2. apply picomp1_works. apply picomp1_works. }
+  { apply subseq_refl; try var_solv; auto. } }
+  { rewrite ! subst_trans_type; auto.
 - apply tr_arrow_intro; auto.
   +  sh_var 2 8. inv_subst.
      weaken compm3_type; try var_solv; auto. apply trans_type_works; try var_solv.
@@ -1733,7 +1737,7 @@ sh_var 2 11. rewrite - ! subst_sh_shift.
 weaken compm4_type; try var_solv; auto. apply trans_type_works; try var_solv; auto.
 }
 Unshelve. apply nat. 
-Unshelve. apply nat.  
+Unshelve. apply nat.  } }  
 Qed.
 
 

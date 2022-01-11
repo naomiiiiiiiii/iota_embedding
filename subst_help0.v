@@ -169,8 +169,25 @@ Hint Rewrite subst_store: core subst1.
 Lemma subst_nsucc s n : (subst s (nsucc n)) = @ nsucc obj (subst s n).
   unfold nsucc. simpsub. auto. Qed.
 
-Lemma subst_moveapp s A m1 m2 : (subst s (move_app A m1 m2)) =
-                              move_app A (subst s m1) (subst s m2).
+ Lemma subst_move: forall A l1 l2 s, (subst s (move A l1 l2)) = move A (subst s l1) (subst s l2).
+   intros. induction A; unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+   { unfold make_subseq_trans;
+       unfold lt_trans_fn_app; unfold leq_trans_fn_app;
+         unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+ Qed.
+
+Hint Rewrite subst_move: core subst1.
+
+Lemma subst_moveapp s A l1 l2 m1 m2 : (subst s (move_app A l1 l2 m1 m2)) =
+                              move_app A (subst s l1) (subst s l2) (subst s m1) (subst s m2).
    unfold move_app. simpsub_big. auto. Qed.
 
 Hint Rewrite subst_nsucc subst_moveapp: core subst1.
@@ -194,3 +211,15 @@ Lemma subst_consb w l x s: @ subst obj s (cons_b w l x) =
 Qed.
 
 Hint Rewrite subst_consb : subst1 core.
+
+Lemma subst_make_subseq_trans: forall s a b c d e, (subst s (make_subseq_trans a b c d e)) = (make_subseq_trans
+                                                                                 (subst s a)
+                                                                                 (subst s b)
+                                                                                 (subst s c)
+                                                                                 (subst s d)
+                                                                                 (subst s e)
+                                                                                        ).
+  intros. unfold make_subseq_trans. unfold leq_trans_fn_app. unfold leq_trans_fn. simpsub. auto. Qed.
+
+Hint Rewrite subst_make_subseq_trans: core subst1.
+Hint Rewrite <- subst_make_subseq_trans : inv_subst.

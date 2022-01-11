@@ -179,7 +179,7 @@ Lemma sh_under_trans_type : forall w l A s n ,
 Fixpoint move_gamma (G: source.context) l1 l2 (m: Syntax.term obj) (gamma: Syntax.term obj) :=
    match G with
      nil => gamma
-   | A::xs => ppair (move_app A l1 l2 m (ppi1 gamma)) (move_gamma xs m (ppi2 gamma)) end.
+   | A::xs => ppair (move_app A l1 l2 m (ppi1 gamma)) (move_gamma xs l1 l2 m (ppi2 gamma)) end.
 
 (*making a product value out of the variables in a source context
  assume vars to start at 0*)
@@ -194,8 +194,8 @@ Lemma subst_Gamma_at :forall w l s G,
    intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
    rewrite IHG subst_trans_type; auto. Qed.
 
-Lemma subst_move_gamma :forall g m s G,
-    (subst s (move_gamma G m g)) = move_gamma G (subst s m) (subst s g).
+Lemma subst_move_gamma :forall g l1 l2 m s G,
+    (subst s (move_gamma G l1 l2 m g)) = move_gamma G (subst s l1) (subst s l2) (subst s m) (subst s g).
   intros. move: g m s. induction G; intros; auto. simpl. simpsub.
   rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
   auto. Qed.
@@ -280,7 +280,10 @@ that. you want to bind
                                             (*5: Gamma_at G w
                                               move 5: Gamma_at G v
                                           <x, 5> : Gamma_at A::G v*)
-(ppair x' (move_gamma G (make_subseq_trans (var 5) (var 3) lv (var 2) mv) (var 4)))                                                 in
+                       (ppair x' (move_gamma G
+                                             (var 5) lv
+                       (make_subseq_trans (var 5) (var 3) lv (var 2) mv)
+                       (var 4)))                                                 in
                                let e2bar' := app (app (app btarg lv) make_subseq) (*v, z1 <= v, z1*)
                                                  sv in
                                make_bind e2bar' (lam ( (*l = var 4*)
@@ -322,7 +325,9 @@ that. you want to bind
                                          (*m12 o m : W <= U2*)
                                          bite (ltb_app i l)
                                               (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
-                                              (next (move_app A m02 x)) (*move x to be : |> A @ U2*)
+                                              (next (move_app A
+                                                              l1 l2
+                                                              m02 x)) (*move x to be : |> A @ U2*)
                                                ))
                          ))
          ) in
@@ -344,7 +349,9 @@ that. you want to bind
                                       let l1 := var 2 in
                                       let g := var 3 in
                                       let s1 := var 0 in 
-                                      let ref := move_app (reftp_m A) m (app (app (shift 5 Rt) l) g) in
+                                      let ref := move_app (reftp_m A)
+                                                          (var 4) (var 2)
+                                                          m (app (app (shift 5 Rt) l) g) in
                                       let i := ppi1 ref in
                                       let p := ppi2 ref in
                                       let store_u1  := lam (lam (lam (*l2 = 2, m1 = 1,j = 0*)
@@ -360,6 +367,8 @@ that. you want to bind
                                                                     bite
                                                                       (app (eq_b j) i)
                                                                       (next (move_app A
+                                                                                      l
+                                                                                      l2
    (make_subseq_trans l l1 l2 m m1)
                                                                     (app (app (shift 8 Et) l) g)))
                                                                       (app (app (app (shift 3 s1) l2) m1) j)
@@ -380,7 +389,8 @@ that. you want to bind
                                       let l1 := var 2 in
                                       let m := var 1 in
                                       let s := var 0 in
-                                      let ref := move_app (reftp_m A) m (app (app (shift 5 Rt) l) g) in
+                                      let ref := move_app (reftp_m A) l l1
+                                                          m (app (app (shift 5 Rt) l) g) in
                                       let i := ppi1 ref in
                                       let e := prev (app (app (app s l1) make_subseq) i) in
                                      (inr (next (inl (ppair
@@ -412,7 +422,8 @@ that. you want to bind
             (lam (lam (lam (lam (lam (*l1 =4, g = 3, l = 2
                                       m = 1, x = 0*)
                                    (app (app (shift 5 Et) (var 2))
-                                        (ppair (var 0) (move_gamma G (var 1) (var 3)))
+                                        (ppair (var 0) (move_gamma G (var 4) (var 2)
+                                                                   (var 1) (var 3)))
 
             ))))))
 | t_ret : forall G E Et A,
@@ -425,7 +436,7 @@ that. you want to bind
                                   let l := var 2 in
                             let m := var 1 in
                             let s := var 0 in
-                            let e := move_app A m (app (app (shift 5 Et) l1) g) in
+                            let e := move_app A l1 l m (app (app (shift 5 Et) l1) g) in
                             inl (
                                 (ppair
                                    l
