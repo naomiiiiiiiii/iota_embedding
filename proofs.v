@@ -1102,187 +1102,20 @@ change nattp with (@shift obj 6 nattp); rewrite ! subst_sh_shift;
       simpl. apply trans_type_works; var_solv.
       simpsub_big. auto.
       } } 
-       {var_solv. }
-
-     }
-                              ).
-         {
-
-         }
-         
-       }
-     }
-     rewrite ! subst_trans_type; auto.
-     apply tr_arrow_intro.
-     {
-       apply subseq_type; try var_solv;
-        try (change preworld with (subst (sh 4) preworld);
-             change nattp with (@subst obj (sh 4) nattp);
-             rewrite ! subst_sh_shift;                  
-             apply tr_weakening_append4;
-             assumption
-            ). 
-     }
-     {
-       apply tr_arrow_formation.
-       apply store_type; var_solv.
-       sh_var 2 3. inv_subst. weaken compm2_type; try var_solv.
-       apply trans_type_works; var_solv.
-     }
-     simpsub_bigs.
-     change (dot (var 0) (dot (var 1) (sh 3))) with
-         (@under obj 2 sh1).
-     rewrite ! sh_under_trans_type; simpsub.
-     apply tr_arrow_intro.
-     { apply store_type; var_solv. }
-     { 
-       sh_var 2 4. inv_subst. weaken compm2_type; try var_solv.
-       apply trans_type_works; var_solv.
- }
-     simpsub_bigs.
-     change (dot (var 0) (dot (var 1) (sh 3))) with
-         (@under obj 2 sh1). rewrite sh_under_trans_type. simpsub.
-     apply (tr_arrow_elim _
-                         (subst sh1 (store (var 2) (var 1)))
-           ). 
-     {simpsub_bigs. apply store_type; try var_solv. }
-     {sh_var 2 5. inv_subst. weaken compm2_type; try var_solv.
-       apply trans_type_works; var_solv.
-     } 
-     apply (tr_arrow_elim _ (@subst obj (sh 2)
-(subseq (subst (sh 4) w1) (subst (sh 4) l1) 
-             (var 1) (var 0))
-           )).
-     { simpsub_bigs. apply subseq_type; try var_solv;
-                       try (change preworld with (subst (sh 6) preworld);
-             change nattp with (@subst obj (sh 6) nattp);
-             rewrite ! subst_sh_shift;                  
-             apply tr_weakening_append6;
-             assumption
-            ). } 
-     {simpsub_bigs. apply tr_arrow_formation.
-     { apply store_type; var_solv. }
-     { 
-       sh_var 2 5. inv_subst. weaken compm2_type; try var_solv.
-       apply trans_type_works; var_solv.
- } } simpsub_bigs .
-     match goal with |- tr ?G (deq ?M ?M ?A) => replace A with
-         (@subst1 obj (var 2)
-       (arrow
-          (subseq (subst (sh 7) w1) (subst (sh 7) l1) 
-             (var 4) (var 0))
-          (arrow (store (var 4) (var 0))
-             (laters
-                (exist nzero preworld
-                   (sigma nattp
-                      (prod
-                         (prod
-                            (subseq (var 6) 
-                               (var 2) (var 1) 
-                               (var 0))
-                            (store (var 1) (var 0)))
-                         (trans_type (var 1) (var 0) T)))))))) end.
-     2:{ simpsub_bigs.
-         change 
-                      (dot (var 0)
-                           (dot (var 1) (dot (var 4) (sh 2))))
-           with
-             (@under obj 2 (dot (var 2) id)).
-         rewrite ! subst1_under_trans_type.
-         simpsub_bigs. auto.
-     }
-     apply (tr_pi_elim _ nattp); try var_solv0.
-     match goal with |- tr ?G (deq ?M ?M ?A) => replace A with
-         (subst1 (var 3)
-       (pi nattp (arrow
-          (subseq (subst (sh 8) w1) (subst (sh 8) l1)
-             (var 1) (var 0))
-          (arrow (store (var 1) (var 0))
-                (laters
-                   (exist nzero preworld
-                      (sigma nattp
-                         (prod
-                            (prod
-                               (subseq (var 3) 
-                                  (var 2) 
-                                  (var 1) 
-                                  (var 0))
-                               (store (var 1) (var 0)))
-                            (trans_type (var 1) (var 0) T))))))))) end.
-     2:{ simpsub_bigs.
-         change 
-                      (dot (var 0)
-                           (dot (var 1) (dot (var 2) (dot (var 6)
-                                                          (sh 3)))))
-           with
-             (@under obj 3 (dot (var 3) id)).
-         rewrite ! subst1_under_trans_type.
-         simpsub_bigs. auto.
-     }
-     apply (tr_all_elim _ nzero preworld). simpsub_bigs. 
-     match goal with |- tr ?G (deq ?M ?M ?A) => replace A with
-         (subst (sh 5)
-       (all nzero preworld
-          (pi nattp
-             (arrow
-                (subseq (subst (sh 3) w1) 
-                   (subst (sh 3) l1) (var 1) 
-                   (var 0))
-                (arrow (store (var 1) (var 0))
-                   (laters
-                      (exist nzero preworld
-                         (sigma nattp
-                            (prod
-                               (prod
-                                  (subseq 
-                                     (var 3) 
-                                     (var 2) 
-                                     (var 1) 
-                                     (var 0))
-                                  (store (var 1) (var 0)))
-                               (trans_type (var 1) (var 0) T))))))))))
-end.
-         2: { simpsub_bigs.
-         change (dot (var 0)
-                               (dot (var 1)
-                                  (dot (var 2)
-                                       (dot (var 3) (sh 9)))))
-           with
-             (@under obj 4 (sh 5)).
-         rewrite ! sh_under_trans_type.
-         simpsub_bigs. auto. }
-         var_solv. var_solv.
-         { weaken compm0_type;
-           change preworld with (@shift obj 8 preworld);
-change nattp with (@shift obj 8 nattp); rewrite ! subst_sh_shift;
-  try apply tr_weakening_append8; auto.
-           apply trans_type_works; var_solv.  }
-         var_solv. simpsub_bigs.
-     apply (subseq_trans (subst (sh 6) w2));
-       try var_solv;
-change preworld with (@shift obj 6 preworld);
-change nattp with (@shift obj 6 nattp); rewrite ! subst_sh_shift;
-  try apply tr_weakening_append6; auto.
-     sh_var 2 3. inv_subst. rewrite - ! (sh_sum 4 2). inv_subst.
-     var_solv.
-     inv_subst.
-     var_solv.
-     var_solv. } }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+     try apply tr_arrow_formation; auto; constructor. }
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+       try apply tr_arrow_formation; auto. change unittp with (@subst obj (sh 1) unittp). var_solv. 
    }
-     sh_var 1 3. rewrite - ! subst_sh_shift - (sh_trans_type _ (var 1) _ 1).
-     var_solv. }
-   }
-     auto.
-         )
-     }
-    (* rewrite ! sh_under_trans_type. simpsub.
-             change nattp with (subst sh1 nattp);
-             rewrite ! subst_sh_shift;                  
-             apply tr_weakening_append1;
-             assumption.
-     } *)
-Admitted.
-
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+       try apply tr_arrow_formation; auto; constructor. }
+   Qed.
 
 Lemma Gamma_at_type {D G w l}:
 tr D (oof w preworld) ->

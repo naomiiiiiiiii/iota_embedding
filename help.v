@@ -196,7 +196,7 @@ lam ( lam (
                                             )
                                         (lam triv))
                           ))
-     | unittp_m  => lam (lam (var 1))
+     | unittp_m  => lam (lam (var 0))
      | _ => lam (lam triv) (*not a type operator, error case*)
 end.
 
