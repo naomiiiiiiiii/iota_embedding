@@ -435,11 +435,116 @@ Lemma inr_laters_type: forall G A m,
     }
     weaken laters_type. apply H0. Qed.
 
+Definition recarrow (A: term obj) := rec (arrow (fut (var 0)) (subst (sh 1) A)).
+
+Lemma subst_recarrow A s : subst s (recarrow A) = recarrow (subst s A).
+  unfold recarrow. simpsub. auto. Qed.
+
+Hint Rewrite subst_recarrow: subst1.
+Hint Rewrite <- subst_recarrow : inv_subst.
+
+Lemma recarrow_typed G A: tr G (deqtype A A) ->
+                          tr G (deqtype (recarrow A) (recarrow A)).
+Admitted.
+
+Ltac weaken_type1 := try (unfold deqtype;
+    change triv with (@subst obj sh1 triv); inv_subst; rewrite ! subst_sh_shift;
+    apply tr_weakening_append1; try assumption).
+Ltac weaken_type2 := try (unfold deqtype;
+    change triv with (@subst obj (sh 2) triv); inv_subst; rewrite ! subst_sh_shift;
+    apply tr_weakening_append2; try assumption).
+
+Lemma promote_id G : @promote obj (promote G) = (promote G). Admitted.
+
 Lemma yc_typed G A: tr G (deqtype A A) ->
+                    tr (promote G) (deqtype A A) ->
                     tr G (oof Yc (arrow (arrow (fut A) A)
                                         A
                          )).
-  Admitted.
+  intros.
+  assert
+    (forall G x,
+        tr (promote G) (deqtype A A) ->
+        tr
+    (x
+     :: G)
+    (deqtype
+          (fut (recarrow (subst sh1 A)))
+           (fut   (recarrow (subst sh1 A))))) as Hra. 
+  { intros.
+   simpsub_bigs. apply tr_fut_formation; try apply recarrow_typed; weaken_type1. }
+  unfold Yc.
+   apply tr_arrow_intro.
+  {apply tr_arrow_formation; try apply tr_fut_formation; try assumption.  }
+  assumption.
+  assert (forall G, tr G (deqtype A A) ->
+               tr (promote G) (deqtype A A) ->
+  (tr (hyp_tm (arrow (fut A) A) :: G)
+    (deq
+       (lam
+          (app (var 1)
+             (next (app (prev (var 0)) (var 0)))))
+       (lam
+          (app (var 1)
+             (next (app (prev (var 0)) (var 0)))))
+       (arrow (fut (recarrow (subst sh1 A)))
+              (subst sh1 A))))) as Hlam.
+  { intros.
+  apply tr_arrow_intro; try apply Hra; try weaken_type1; try assumption.
+   apply (tr_arrow_elim _ (subst (sh 2) (fut A))).
+   {simpsub_bigs. constructor. simpl. weaken_type2. }
+  simpsub_bigs. weaken_type2.
+  {simpsub_bigs. inv_subst. var_solv. }
+  {match goal with |- tr ?G (deq ?M ?M ?T) => change M with
+      ( @subst1 obj (prev (var 0))
+       (next
+          (app
+             (var 0)
+             (var 1)))); replace T with
+                             (subst1 (prev (var 0))
+                                     (subst (sh 3) (fut A))
+                             ) end.
+   2:{ simpsub_bigs. auto. }
+   apply (tr_fut_elim _ _  _ (subst (sh 2) (recarrow A))).
+   { rewrite - (sh_sum 1 1).
+     inv_subst. var_solv. }
+   { simpl. weaken_type2. apply recarrow_typed. assumption.
+   }
+   { simpsub_bigs. apply tr_fut_intro. simpl. 
+     eapply (tr_eqtype_convert_hyp _ [::] _ 
+                                   (subst1 (recarrow (subst (sh 2) A))
+                                   (arrow (fut (var 0))
+                                                  (subst (sh 3) A)))).
+     {
+       weaken_type2. unfold recarrow. rewrite (sh_sum 2 1). 
+       apply tr_rec_unroll. apply tr_arrow_formation.
+       apply tr_fut_formation. simpl. apply tr_hyp_tp. constructor 1.
+Ltac weaken_type3 := try (unfold deqtype;
+    change triv with (@subst obj (sh 3) triv); inv_subst; rewrite ! subst_sh_shift;
+    apply tr_weakening_append3; try assumption).
+weaken_type3.
+     } 
+     simpsub_bigs. apply (tr_arrow_elim _ (fut (recarrow (subst (sh 3) A)))).
+     weaken_type3. 
+     apply tr_fut_formation; try apply recarrow_typed.
+     rewrite promote_id. assumption.
+     weaken_type3. rewrite - (sh_sum 2 1). inv_subst. var_solv.
+     rewrite - (sh_sum 1 2). inv_subst. var_solv.
+  } }
+  }
+  apply (tr_arrow_elim _  (fut (recarrow (subst sh1 A))));
+   try apply Hra; try weaken_type1. assumption. 
+  {
+    apply Hlam; assumption.
+  }
+  {apply tr_fut_intro. move: Hlam. unfold recarrow. simpsub_bigs. move => Hlam.
+   eapply tr_eqtype_convert. apply tr_eqtype_symmetry. apply tr_rec_unroll.
+   {apply tr_arrow_formation. 
+    apply tr_fut_formation. simpl. apply tr_hyp_tp. constructor 1.
+    simpsub_bigs. weaken_type2.
+   }
+   simpsub_bigs. apply Hlam; try assumption. rewrite promote_id. assumption. 
+  } Qed.
 
 Lemma tr_weakening_append5: forall G1 x y z a b J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -885,6 +990,8 @@ Lemma bind_type G A B M0 M1 :
    { repeat apply tr_arrow_formation; try weaken Ha;
        try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
    apply yc_typed.
+   { repeat apply tr_arrow_formation; try weaken Ha;
+       try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
    { repeat apply tr_arrow_formation; try weaken Ha;
        try weaken Ha1; try weaken Hb1; try weaken laters_type; auto. }
    apply tr_arrow_intro.

@@ -346,29 +346,6 @@ tr G (oof w preworld) ->
       auto. apply leq_refl. auto. 
 Qed.
 
-Lemma tr_weakening_append6: forall G1 x y z a b c J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (x::y::z::a::b::c::G1) (
-                       (deq (shift 6 J1)
-                            (shift 6 J2)
-                            (shift 6 t))).
-Admitted.
-
-Lemma tr_weakening_append7: forall G1 x y z a b c d J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (x::y::z::a::b::c::d::G1) (
-                       (deq (shift 7 J1)
-                            (shift 7 J2)
-                            (shift 7 t))).
-Admitted.
-
-Lemma tr_weakening_append8: forall G1 x y z a b c d e J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (x::y::z::a::b::c::d::e::G1) (
-                       (deq (shift 8 J1)
-                            (shift 8 J2)
-                            (shift 8 t))).
-Admitted.
 
 Lemma ref1_type: (forall G w1 v i A,
   tr G (oof w1 preworld) -> 

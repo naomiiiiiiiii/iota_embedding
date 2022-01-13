@@ -366,15 +366,20 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
         2:{
           simpsub_bigs. auto.
         } rewrite subst1_under_trans_type. simpsub_bigs.
-        apply; auto; try var_solv. var_solv.
-        sh_var 2 5. rewrite - ! subst_sh_shift.
-        weaken ref1_type; try var_solv. assumption.
-        apply trans_type_works; try var_solv; auto.
-        simpsub_bigs. auto.
+        apply; auto; try var_solv. var_solv. 
+        sh_var 1 5.
+        rewrite - ! subst_sh_shift - ! (sh_sum 1 1).
+        weaken ref1_type; try var_solv.
+        {rewrite ! subst_sh_shift.
+         change nattp with (@shift obj 1 nattp).
+         apply tr_weakening_append1. assumption. }
+        { apply trans_type_works; simpl; try var_solv; auto.
+        simpsub. var_solv. }
+        { simpsub_bigs. auto.
         change (dot (var 0) (dot (var 4) sh1)) with
             (@under obj 1 (dot (var 3) id)).
         rewrite subst1_under_trans_type.
-        simpsub_bigs. auto. var_solv.
+        simpsub_bigs. auto. } var_solv.
         (*s l1 m i: u1 i u1 l1*)
         eapply (@store_works (var 2)); try var_solv.
         sh_var 1 3. rewrite - ! subst_sh_shift - ! (subst_store _ _ (sh 1)).
@@ -838,17 +843,35 @@ apply reduce_app_beta; apply reduce_id.
         rewrite ! subst_sh_shift. apply tr_weakening_append1.
         rewrite - subst_sh_shift. assumption.
         subst; var_solv.
-sh_var 1 10. replace (shift 3 i) with (shift 1 (shift 2 i)).
-weaken ref2_type; try (subst; simpl; var_solv).
-rewrite - (subst_nat (sh 2)) subst_sh_shift. apply tr_weakening_append2. assumption.
-simpsub_bigs. auto.
+        sh_var 1 10. inv_subst.  rewrite - (sh_sum 2 1).
+        weaken ref1_type; try (subst; simpl; try apply trans_type_works;
+                               try var_solv).
+        { simpsub_bigs. eapply tr_sigma_elim1.
+          match goal with |- tr ?G (deq ?M ?M ?T) =>
+                          replace T with (trans_type 
+                                                    (var 9)
+                                                    (var 8) (reftp_m A)
+                                         ) end.
+          2:{ simpl. reflexivity. }
+          apply (@moveapp_works _ _ (var 12)); try var_solv.
+          { sh_var 8 12. inv_subst. var_solv. }
+          eapply apply_IH; try apply IHDtrans1; try var_solv.
+          sh_var 11 12. inv_subst. var_solv. }
+        simpsub. var_solv.  (*simpsub_bigs.
+rewrite - (subst_nat (sh 2)) ! subst_sh_shift. apply tr_weakening_append2. assumption.  
+
+        sh_var 2 9. rewrite - (sh_sum 9 2) - ! subst_sh_shift.
+        Hint Rewrite <- subst_moveapp : inv_subst.
+       inv_subst. 
+rewrite - (subst_nat (sh 2)) ! subst_sh_shift. apply tr_weakening_append2. assumption.  
+simpsub_bigs. auto. *)
 simpsub_bigs. auto.
 replace (dot (var 0) (dot (var 5) sh1)) with (@under obj 1 (dot (var 4) id)).
 2:{
 simpsub. auto.
 } 
 rewrite subst1_under_trans_type. simpsub_bigs. auto.
-subst; var_solv.
+subst; var_solv. 
 (*show move (Et @ u l) : A @ U2*)
 subst.
 constructor. apply (@moveapp_works _ _ (var 11) (var 10)); auto; try var_solv. simpl. 
@@ -1081,8 +1104,9 @@ var_solv.
                rewrite ! subst_sh_shift.
                apply tr_weakening_append4. apply Hu1. }
                * (*U1 <= U2*)
-                 replace (shift 4 x) with (shift 2 (shift 2 x)). sh_var 2 7.
-               inv_subst. var_solv0. unfold cons_b. simpsub_big. apply Sequence.index_0. simpsub_big. auto.
+                 Hint Rewrite <- subst_nsucc : inv_subst.
+                sh_var 2 7. rewrite - ! subst_sh_shift - ! (sh_sum 2 2).
+               inv_subst.  var_solv0. unfold cons_b. simpsub_big. apply Sequence.index_0. simpsub_big. auto.
                * (*U<= U1*) 
                  sh_var 4 7. inv_subst. rewrite make_app4.
     rewrite ! subst_sh_shift.
@@ -1239,8 +1263,10 @@ var_solv.
                      apply equiv_refl.
                      constructor. weaken trans_type_works; try var_solv; auto.
                      }
-                   change (nsucc (var 3)) with (@shift obj 1 (nsucc (var 2))).
-                   weaken ref0_type; auto. apply trans_type_works; try var_solv; auto.
+        change (nsucc (var 3)) with (@shift obj 1 (nsucc (var 2))).
+                 weaken ref0_type; auto.
+                 {apply nsucc_type; var_solv. }
+                 apply trans_type_works; try var_solv; auto.
 }
 (*bind ref*) 
 replace 

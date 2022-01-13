@@ -157,6 +157,30 @@ Lemma tr_weakening_append4: forall G1 x y z a J1 J2 t,
                             (shift 4 t))).
 Admitted.
 
+Lemma tr_weakening_append6: forall G1 x y z a b c J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::a::b::c::G1) (
+                       (deq (shift 6 J1)
+                            (shift 6 J2)
+                            (shift 6 t))).
+Admitted.
+
+Lemma tr_weakening_append7: forall G1 x y z a b c d J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::a::b::c::d::G1) (
+                       (deq (shift 7 J1)
+                            (shift 7 J2)
+                            (shift 7 t))).
+Admitted.
+
+Lemma tr_weakening_append8: forall G1 x y z a b c d e J1 J2 t,
+      tr G1 (deq J1 J2 t) ->
+      tr (x::y::z::a::b::c::d::e::G1) (
+                       (deq (shift 8 J1)
+                            (shift 8 J2)
+                            (shift 8 t))).
+Admitted.
+
 Lemma deqtype_intro :
   forall G a b m n,
     tr G (deq m n (eqtype a b))
