@@ -98,7 +98,7 @@ con, cty establish relationship between constructors and
 Goal (@ subst1 obj nattp (var 0)) = nattp.
   unfold subst1. simpl (subst (dot ?x1 ?s) ?x2). cbn - [ nattp].
   cbn [traverse]. *)
-
+(*pretty sure either this or ref2_type is necessary but not both
 Lemma ref1_type: forall A G w1 i,
       (tr G (oof w1 preworld)) ->
       (tr G (oof i nattp)) ->
@@ -170,7 +170,7 @@ Lemma ref0_type: forall A G w1 l1,
 
 Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
 
-
+*)
 
  
 
