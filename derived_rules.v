@@ -1,6 +1,6 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src.
+From istari Require Import source subst_src rules_src lemmas0.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -122,8 +122,12 @@ Qed.
  Lemma tr_weakening_appendt: forall (G1: context) G2 J1 J2,
       tr G1 (deqtype J1 J2) ->
       tr (G2 ++ G1) (deqtype (shift (size G2) J1)
-                            (shift (size G2) J2)).
-Admitted.
+                             (shift (size G2) J2)).
+   intros. unfold deqtype.
+   rewrite - ! subst_sh_shift - subst_eqtype.
+   change triv with (@shift obj (size G2) triv).
+   rewrite ! subst_sh_shift. apply tr_weakening_append.
+   assumption. Qed.
 
  Lemma tr_weakening_append1: forall G1 x J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -131,7 +135,7 @@ Admitted.
                        (deq (shift 1 J1)
                             (shift 1 J2)
                             (shift 1 t))).
-Admitted.
+   intros. rewrite make_app1. apply tr_weakening_append. assumption. Qed.
 
  Lemma tr_weakening_append2: forall G1 x y J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -139,7 +143,7 @@ Admitted.
                        (deq (shift 2 J1)
                             (shift 2 J2)
                             (shift 2 t))).
-Admitted.
+   intros. rewrite make_app2. apply tr_weakening_append. assumption. Qed.
 
  Lemma tr_weakening_append3: forall G1 x y z J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -147,7 +151,7 @@ Admitted.
                        (deq (shift 3 J1)
                             (shift 3 J2)
                             (shift 3 t))).
-Admitted.
+   intros. rewrite make_app3. apply tr_weakening_append. assumption. Qed.
 
 Lemma tr_weakening_append4: forall G1 x y z a J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -155,7 +159,7 @@ Lemma tr_weakening_append4: forall G1 x y z a J1 J2 t,
                        (deq (shift 4 J1)
                             (shift 4 J2)
                             (shift 4 t))).
-Admitted.
+   intros. rewrite make_app4. apply tr_weakening_append. assumption. Qed.
 
 Lemma tr_weakening_append5: forall G1 x y z a b J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -163,14 +167,14 @@ Lemma tr_weakening_append5: forall G1 x y z a b J1 J2 t,
                        (deq (shift 5 J1)
                             (shift 5 J2)
                             (shift 5 t))).
-Admitted.
+   intros. rewrite make_app5. apply tr_weakening_append. assumption. Qed.
 Lemma tr_weakening_append6: forall G1 x y z a b c J1 J2 t,
       tr G1 (deq J1 J2 t) ->
       tr (x::y::z::a::b::c::G1) (
                        (deq (shift 6 J1)
                             (shift 6 J2)
                             (shift 6 t))).
-Admitted.
+   intros. rewrite make_app6.  apply tr_weakening_append. assumption. Qed.
 
 Lemma tr_weakening_append7: forall G1 x y z a b c d J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -178,7 +182,9 @@ Lemma tr_weakening_append7: forall G1 x y z a b c d J1 J2 t,
                        (deq (shift 7 J1)
                             (shift 7 J2)
                             (shift 7 t))).
-Admitted.
+  intros. change [:: x, y, z, a, b, c, d & G1] with
+             ( [:: x; y; z; a; b; c; d] ++ G1).
+  apply tr_weakening_append. assumption. Qed.
 
 Lemma tr_weakening_append8: forall G1 x y z a b c d e J1 J2 t,
       tr G1 (deq J1 J2 t) ->
@@ -186,7 +192,9 @@ Lemma tr_weakening_append8: forall G1 x y z a b c d e J1 J2 t,
                        (deq (shift 8 J1)
                             (shift 8 J2)
                             (shift 8 t))).
-Admitted.
+  intros. change [:: x, y, z, a, b, c, d, e & G1] with
+             ( [:: x; y; z; a; b; c; d; e] ++ G1).
+  apply tr_weakening_append. assumption. Qed.
 
 Lemma deqtype_intro :
   forall G a b m n,
