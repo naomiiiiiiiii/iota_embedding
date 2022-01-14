@@ -89,19 +89,26 @@ Lemma pw_app_typed2 G u u' l l': tr G (deq u u' preworld) ->
   eapply tr_eqtype_convert. 
   apply unfold_pw. assumption. Qed.
 
-Lemma pw_app_typed G u u' l l' v v' i i': tr G (deq u u' preworld) ->
+Lemma pw_app_U0 G u u' l l' v v' i i': tr G (deq u u' preworld) ->
                                     tr G (deq l l' nattp) ->
                                     tr G (deq v v' (fut preworld)) ->
                                     tr G (deq i i' (fut nattp)) ->
-                                    tr G (deqtype (app (app (app u l) v) i)
-                                                  (app (app (app u' l') v') i')).
-  intros. apply (tr_formation_weaken _ nzero).
+                                    tr G (deq (app (app (app u l) v) i)
+                                                  (app (app (app u' l') v') i') U0). intros.
   apply (tr_arrow_elim _ (fut nattp)); auto.
   apply tr_fut_formation. auto.
   apply (tr_karrow_elim _ (fut preworld)); auto.
   apply tr_fut_formation. auto.
   apply tr_arrow_formation; auto.
   apply tr_fut_formation. auto. apply pw_app_typed2; assumption. Qed.
+
+Lemma pw_app_typed G u u' l l' v v' i i': tr G (deq u u' preworld) ->
+                                    tr G (deq l l' nattp) ->
+                                    tr G (deq v v' (fut preworld)) ->
+                                    tr G (deq i i' (fut nattp)) ->
+                                    tr G (deqtype (app (app (app u l) v) i)
+                                                  (app (app (app u' l') v') i')).
+  intros. weaken pw_app_U0; assumption. Qed.
 
 
 
@@ -442,11 +449,6 @@ Lemma subst_recarrow A s : subst s (recarrow A) = recarrow (subst s A).
 
 Hint Rewrite subst_recarrow: subst1.
 Hint Rewrite <- subst_recarrow : inv_subst.
-
-Lemma recarrow_typed G A: tr G (deqtype A A) ->
-                          tr G (deqtype (recarrow A) (recarrow A)).
-Admitted.
-
 Ltac weaken_type1 := try (unfold deqtype;
     change triv with (@subst obj sh1 triv); inv_subst; rewrite ! subst_sh_shift;
     apply tr_weakening_append1; try assumption).
@@ -454,7 +456,18 @@ Ltac weaken_type2 := try (unfold deqtype;
     change triv with (@subst obj (sh 2) triv); inv_subst; rewrite ! subst_sh_shift;
     apply tr_weakening_append2; try assumption).
 
-Lemma promote_id G : @promote obj (promote G) = (promote G). Admitted.
+Lemma recarrow_typed G A: tr G (deqtype A A) ->
+                          tr G (deqtype (recarrow A) (recarrow A)).
+  intros.
+  unfold recarrow. apply tr_rec_formation. apply tr_arrow_formation.
+  constructor. simpl. apply tr_hyp_tp. constructor 1. weaken_type1.
+  Qed.
+
+
+Lemma promote_id G : @promote obj (promote G) = (promote G).
+  induction G.
+  auto.
+  simpl. induction a; simpl; rewrite IHG; auto. Qed.
 
 Lemma yc_typed G A: tr G (deqtype A A) ->
                     tr (promote G) (deqtype A A) ->
@@ -546,13 +559,6 @@ weaken_type3.
    simpsub_bigs. apply Hlam; try assumption. rewrite promote_id. assumption. 
   } Qed.
 
-Lemma tr_weakening_append5: forall G1 x y z a b J1 J2 t,
-      tr G1 (deq J1 J2 t) ->
-      tr (x::y::z::a::b::G1) (
-                       (deq (shift 5 J1)
-                            (shift 5 J2)
-                            (shift 5 t))).
-Admitted.
 
 
 
@@ -609,37 +615,48 @@ Lemma uworld87: forall G x y z a b c d,
   Lemma store_U0: forall w l G, tr G (oof w preworld) ->
                            tr G (oof l nattp) ->
                            tr G (oof (store w l) U0).
-Admitted.
+    intros. unfold store. constructor; auto. constructor; auto.
+    apply tr_arrow_formation_univ.
+    {simpsub_bigs. apply subseq_U0; try var_solv;
+                     try rewrite - (subst_pw (sh 2));
+                     try rewrite - (subst_nat (sh 2));
+                     rewrite ! subst_sh_shift;
+                     try (apply tr_weakening_append2; assumption). }
+    {unfold gettype. simpsub. constructor; auto. simpsub_bigs.
+     apply pw_app_U0; try apply tr_fut_intro; try var_solv; try (
+                     try rewrite - (subst_pw (sh 3));
+                     try rewrite - (subst_nat (sh 3));
+                     rewrite ! subst_sh_shift;
+                     try (apply tr_weakening_append3; assumption)). }
+    apply leq_refl; auto.
+Qed.
 
   Lemma store_type1: forall w l G,
 tr G (oof w preworld) ->
  tr G (oof l nattp) ->
  tr (hyp_tm preworld ::G) (oof_t (pi nattp (*v = 1, l v= 0*)
                  (arrow (subseq (shift 2 w) (shift 2 l) (var 1) (var 0))
-                        (gettype (shift 2 w) (var 1) (var 0))))).
-  Admitted.
-
+                        (gettype (shift 2 w) (var 1) (var 0))))). intros.
+constructor; auto.
+    apply tr_arrow_formation.
+    {simpsub_bigs. weaken subseq_U0; try var_solv;
+                     try rewrite - (subst_pw (sh 2));
+                     try rewrite - (subst_nat (sh 2));
+                     rewrite ! subst_sh_shift;
+                     try (apply tr_weakening_append2; assumption). }
+    {unfold gettype. simpsub. constructor; auto. simpsub_bigs.
+     apply pw_app_typed; try apply tr_fut_intro; try var_solv; try (
+                     try rewrite - (subst_pw (sh 3));
+                     try rewrite - (subst_nat (sh 3));
+                     rewrite ! subst_sh_shift;
+                     try (apply tr_weakening_append3; assumption)). }
+Qed.
 
     Lemma store_type: forall w l G,
    tr G (oof w preworld) ->
    tr G (oof l nattp) ->
  tr G (deqtype (store w l) (store w l)).
-Admitted.
-
-
-Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
-      tr G (oof u1 preworld) ->
-      tr G (oof u2 preworld) ->
-      tr G (oof l1 nattp) ->
-      tr G (oof l2 nattp) ->
-      tr G (oof s1 (store u1 l1)) ->
-      tr G (oof m1 (subseq u1 l1 u2 l2)) ->
-      tr G (oof i nattp) ->
-      tr G (oof (app (app (app s1 l2) m1) i)
-               (app (app (app u1 i) (next u2)) (next l2))
-           ).
-    Admitted.
-
+intros. weaken store_U0; auto.  Qed.
 
 Lemma subseq_type: forall G w1 l1 w2 l2,
       tr G (oof w1 preworld) ->
@@ -647,8 +664,10 @@ Lemma subseq_type: forall G w1 l1 w2 l2,
       tr G (oof l1 nattp) ->
       tr G (oof l2 nattp) ->
     tr G (deqtype (subseq w1 l1 w2 l2) (subseq w1 l1 w2 l2)).
-Admitted.
-Hint Resolve store_type subseq_type.
+  intros. weaken subseq_U0; auto. Qed.
+  Hint Resolve store_type subseq_type.
+
+
 
 
 Lemma tr_karrow_intro: forall G a b m n,
@@ -661,10 +680,84 @@ apply tr_arrow_karrow_equal; try assumption.
 eapply tr_arrow_intro; try assumption. Qed.
 
 Lemma pw_type3: forall {G}, tr G (deqtype (fut preworld)  (fut preworld)).
-  Admitted.
+constructor. auto. Qed.
 
 Hint Resolve pw_type3 pw_type2 pw_type1: core.
 Hint Resolve tr_fut_formation tr_fut_formation_univ: core.
+
+Lemma store_works: forall l1 G u1 u2 l2 s1 m1 i,
+      tr G (oof u1 preworld) ->
+      tr G (oof u2 preworld) ->
+      tr (promote G) (oof u2 preworld) ->
+      tr G (oof l1 nattp) ->
+      tr G (oof l2 nattp) ->
+      tr (promote G) (oof l2 nattp) ->
+      tr G (oof s1 (store u1 l1)) ->
+      tr G (oof m1 (subseq u1 l1 u2 l2)) ->
+      tr G (oof i nattp) ->
+      tr G (oof (app (app (app s1 l2) m1) i)
+               (app (app (app u1 i) (next u2)) (next l2))
+           ).
+ unfold store.  unfold gettype.  intros.
+  match goal with |- tr ?G (oof ?M ?T) => replace T with
+      (subst1 i
+       (app (app (app (subst sh1 u1) (var 0)) (next (subst sh1 u2)))
+          (next (subst sh1 l2)))
+      ) end.
+  2:{ simpsub_bigs. auto. }
+  apply (tr_pi_elim _ nattp); auto.
+  apply (tr_arrow_elim _
+                       (subseq u1 l1 u2 l2)
+        ).
+  {apply subseq_type; auto. }
+  {apply tr_pi_formation; auto. apply pw_app_typed; try var_solv;
+                                  try apply tr_fut_intro; simpl;
+                     try rewrite - (subst_pw (sh 1));
+                     try rewrite - (subst_nat (sh 1));
+                     rewrite ! subst_sh_shift;
+                     apply tr_weakening_append1;
+                     auto. }
+  { 
+  match goal with |- tr ?G (deq ?M  ?M ?T) => replace T with
+      (subst1 l2
+       (arrow (subseq (subst sh1 u1) (subst sh1 l1) (subst sh1 u2) (var 0))
+          (pi nattp
+             (app
+                (app
+                   (app (subst (sh 2) u1) (var 0))
+                   (next (subst (sh 2) u2)))
+                (next (var 1))))
+      )) end.
+  2:{ simpsub_bigs. auto. }
+  apply (tr_pi_elim _ nattp). 
+  match goal with |- tr ?G (deq ?M  ?M ?T) => replace T with
+      (subst1 u2 (pi nattp
+          (arrow
+             (subseq (subst (sh 2) u1)
+                (subst (sh 2) l1) 
+                (var 1) 
+                (var 0))
+             (pi nattp
+                (app
+                   (app
+                      (app (subst (sh 3) u1)
+                         (var 0))
+                      (next (var 2)))
+                   (next (var 1)))))))
+       end.
+  2:{ simpsub_bigs. auto. }
+  apply (tr_all_elim _ nzero preworld); auto. move: H5.
+  simpsub_bigs. move => Hstore. assumption.
+ replace (pi nattp
+                (app
+                   (app
+                      (app (subst (sh 3) u1)
+                         (var 0))
+                      (next (var 2)))
+                   (next (var 1)))) with
+     (gettype (shift 2 u1) (var 1) (var 0)). rewrite ! subst_sh_shift. apply store_type1; auto.
+ unfold gettype. simpsub_bigs. auto. auto. } assumption.
+Qed.
 
 
 Lemma subseq_refl: forall ( u l: term obj) (G: context),
