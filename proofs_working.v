@@ -2,7 +2,7 @@ Require Import Program Equality Ring Lia Omega.
 From Coq Require Import ssreflect ssrfun ssrbool.
 From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
-     source subst_src rules_src basic_types
+     source subst_src rules_src basic_types0 basic_types
      help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -172,7 +172,12 @@ Hint Rewrite <- subst_ppair subst_nsucc: inv_subst.
 
 *)
 
- 
+Lemma subst_make_subseq_refl: forall s l, (subst s (make_subseq_refl l))
+                                     = make_subseq_refl (subst s l).
+  intros. unfold make_subseq_refl. simpsub. auto. Qed.
+
+Hint Rewrite subst_make_subseq_refl : subst1.
+Hint Rewrite <- subst_make_subseq_refl : inv_subst.
 
 
 Lemma apply_IH: forall A Et G G' w l g,
@@ -247,7 +252,7 @@ Theorem two_working: forall G e T ebar,
                        (app (app (subst (sh 7) Rt) (var 5)) (var 4))) as Ru1.
 remember (ppi1 Ru1) as i.
 remember (ppi2 (ppi2 Ru1))  as p.
-remember (app (app (app (var 0) (var 2)) make_subseq) i) as e.
+remember (app (app (app (var 0) (var 2)) (make_subseq_refl (var 2))) i) as e.
 remember 
     [:: hyp_tm (store (var 2) (var 1));
         hyp_tm
@@ -295,7 +300,7 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
                       )
              ))))) as Hp. subst p.
       eapply (tr_prod_elim2 _ (subst1 i (lt_t (var 0) (subst sh1 (var 2))))).
-      inv_subst. subst i. eapply tr_sigma_elim2. apply Hru1.
+      inv_subst. subst i. eapply tr_sigma_elim2. apply Hru1. 
       match goal with |- tr ?G (oof ?M ?T) =>
                       replace M with
           (subst1 (prev e)
@@ -303,7 +308,7 @@ assert (tr G' (oof Ru1 (trans_type (var 3) (var 2) (reftp_m A)))) as Hru1.
           (inl
              (ppair (var 3)
                 (ppair
-                   (ppair make_subseq
+                   (ppair (make_subseq_refl (var 3))
                       (var 1)) 
                    (var 0))))
           ));
@@ -1489,7 +1494,9 @@ apply tr_hyp_tm; repeat constructor. }
                                (var 3) 
                                (picomp2 (var 0)))
  (var 6))))
-                (ppi1 (var 0))) make_subseq)
+                (ppi1 (var 0))) 
+                (make_subseq_refl (picomp1 (var 0))))
+
           (picomp3 (var 0)))
           (lam
                (inl (ppair (picomp1 (var 0))

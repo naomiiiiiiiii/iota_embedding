@@ -1,6 +1,6 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import basic_types source subst_src rules_src
+From istari Require Import basic_types basic_types0 source subst_src rules_src
      derived_rules help subst_help0 subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -284,7 +284,8 @@ that. you want to bind
                                              (var 5) lv
                        (make_subseq_trans (var 5) (var 3) lv (var 2) mv)
                        (var 4)))                                                 in
-                               let e2bar' := app (app (app btarg lv) make_subseq) (*v, z1 <= v, z1*)
+                               let e2bar' := app (app (app btarg lv) (make_subseq_refl lv) )
+                                                 (*v, z1 <= v, z1*)
                                                  sv in
                                make_bind e2bar' (lam ( (*l = var 4*)
                                                     let z2 := (var 0) in
@@ -375,7 +376,7 @@ that. you want to bind
                                                                  ))) in
                                       ret_a (ppair l1
                                                    (ppair
-                                                      (ppair make_subseq (*refl u1*)
+                                                      (ppair (make_subseq_refl l1) (*refl u1*)
                                                              store_u1)
                                                       triv))
             ))))))
@@ -392,11 +393,13 @@ that. you want to bind
                                       let ref := move_app (reftp_m A) l l1
                                                           m (app (app (shift 5 Rt) l) g) in
                                       let i := ppi1 ref in
-                                      let e := prev (app (app (app s l1) make_subseq) i) in
+                                      let e := prev (app (app (app s l1)
+                                                (make_subseq_refl l1)) i) in
                                      (inr (next (inl (ppair
                                                                             l1
                                                                             (ppair (
-                                                                                 ppair make_subseq s)
+                                                                                 ppair (make_subseq_refl l1)
+                                                                                       s)
                                                                                    e)
                                                                                )
                                     ))))
@@ -413,7 +416,7 @@ that. you want to bind
                    let l := (var 1) in
                    let g := (var 0) in
                    let arg := (app (app Et2 l) g) in
-                   (app (app (app (app (app Et1 l) g) l) make_subseq) arg)
+                   (app (app (app (app (app Et1 l) g) l) (make_subseq_refl l)) arg)
                 )))
 | t_lam : forall G E Et Targ T2,
       of_m (Targ::G) E T2 ->
@@ -440,7 +443,7 @@ that. you want to bind
                             inl (
                                 (ppair
                                    l
-                                   (ppair (ppair make_subseq s) e))
+                                   (ppair (ppair (make_subseq_refl l) s) e))
                             )
 
           )))))).

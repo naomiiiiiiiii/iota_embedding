@@ -1,6 +1,6 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import source subst_src rules_src basic_types help.
+From istari Require Import source subst_src rules_src basic_types0 basic_types help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.

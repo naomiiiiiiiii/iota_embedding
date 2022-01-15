@@ -2,7 +2,7 @@
 From Coq Require Import Lists.List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import Tactics Sequence source subst_src rules_src.
-From istari Require Import basic_types Syntax Subst SimpSub Promote Hygiene
+From istari Require Import basic_types basic_types0 Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
 
@@ -116,6 +116,9 @@ Definition nth w n: term obj := app (ppi1 w) n.
         )
         (lam (lam (lam triv))).
 
+ Definition make_subseq_refl l :=
+  ppair (app leq_refl_fn l)
+        (lam (lam (lam triv))).
  (*transitivity of subseq*)
 
 

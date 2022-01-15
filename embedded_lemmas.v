@@ -1,7 +1,7 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import lemmas0 source subst_src rules_src help subst_help0 subst_help
-     trans basic_types derived_rules.
+     trans basic_types0 basic_types derived_rules.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences Rules Defined PageType.
@@ -300,7 +300,7 @@ unfold subseq.
   apply pw_kind.
   apply zero_typed.
   eapply subseq_U01; try assumption; auto.
-  apply zero_typed. apply leq_refl; auto.
+  apply zero_typed. apply nzero_leq; auto.
 Qed.
 
 (*simple lemmas about well typedness of embedding*)
@@ -628,7 +628,7 @@ Lemma uworld87: forall G x y z a b c d,
                      try rewrite - (subst_nat (sh 3));
                      rewrite ! subst_sh_shift;
                      try (apply tr_weakening_append3; assumption)). }
-    apply leq_refl; auto.
+    apply nzero_leq; auto.
 Qed.
 
   Lemma store_type1: forall w l G,
@@ -763,7 +763,7 @@ Qed.
 Lemma subseq_refl: forall ( u l: term obj) (G: context),
      tr G (oof u preworld) ->
      tr G (oof l nattp) 
-                         ->tr G (oof make_subseq 
+                         ->tr G (oof (make_subseq_refl l)
                                     (subseq u l u l)).
   intros. unfold subseq. unfold make_subseq.
   apply tr_prod_intro.

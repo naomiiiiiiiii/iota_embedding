@@ -1,7 +1,7 @@
-Require Import Program.Equality Ring Lia Omega.
+ Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import lemmas0
-     source subst_src rules_src basic_types
+     source subst_src rules_src basic_types0 basic_types
      help subst_help0 subst_help trans derived_rules embedded_lemmas.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -67,7 +67,7 @@ Lemma compm3_type: forall u lu A G,
                                ) U0).
   move =>> H1 H2 H3. apply tr_exist_formation_univ.
   apply pw_kind. eapply compm4_type; try assumption; auto. auto.
- apply leq_refl. auto. Qed.
+ apply nzero_leq.  Qed.
 
 
 Lemma compm2_type: forall u lu A G,
@@ -307,7 +307,7 @@ tr G (oof w preworld) ->
         repeat rewrite subst_nzero.
         eapply IHA1; try assumption; try auto; try var_solv. 
         eapply IHA2; try assumption; try auto; try var_solv.
-        auto. apply leq_refl. auto.
+        auto. apply nzero_leq. auto.
         (*comp type*)
       + simpsub_big. simpl. unfold subst1. simpsub1.
        (* unfold U0. rewrite - (subst_U0 (dot l id)).
@@ -321,7 +321,7 @@ tr G (oof w preworld) ->
         apply tr_weakening_append2; try assumption).
         rewrite subst_trans_type.
         eapply IHA; auto; try var_solv. simpsub. auto. simpsub; auto. auto.
-        apply leq_refl. auto. 
+        apply nzero_leq. auto. 
     - (*ref type*)
       eapply tr_sigma_formation_univ; auto.
       eapply tr_prod_formation_univ. apply lt_type.
@@ -343,7 +343,7 @@ tr G (oof w preworld) ->
     constructor. var_solv.
     constructor. var_solv.
     apply tr_fut_formation_univ; auto. apply IHA; auto; try var_solv.
-      auto. apply leq_refl. auto. 
+      auto. apply nzero_leq. 
 Qed.
 
 
@@ -405,7 +405,7 @@ Lemma ref0_type: forall A G w1 l1,
                                                        try var_solv.
     change preworld with (shift 2 preworld). rewrite subst_sh_shift.
     apply tr_weakening_append2; auto. simpl. assumption.
-     apply leq_refl; auto. Qed.
+     apply nzero_leq; auto. Qed.
 
   Lemma move_works: forall G w1 l1 w2 l2 T,
       tr G (oof w1 preworld) ->
@@ -1675,7 +1675,10 @@ Lemma reduce_consb_end {G w l x v lv} :
   - eapply tr_transitivity. 
     eapply (tr_arrow_elim _ (fut nattp)); try apply H2; auto.
     eapply (tr_karrow_elim _ (fut preworld)); try apply H1; auto.
-    apply eq_iffalse; try apply ltb_false; auto.
+    apply eq_iffalse.
+    apply (deq_intro _#4 (app ltb_false_fn l)
+                        (app ltb_false_fn l)).
+    apply ltb_false; auto. assumption.
     (*w l : |> pw -> |> N -> U0 *)
       eapply tr_arrow_elim; try apply H0; auto.
     eapply tr_eqtype_convert; try apply unfold_pw; auto.
