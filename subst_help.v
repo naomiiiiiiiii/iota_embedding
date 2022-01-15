@@ -6,12 +6,6 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Rules Defined.
 
 
-Lemma eqsub_project : forall s s',
-  (forall i,
-      subst s (var i) = subst s' (var i)) ->
-    @eqsub obj s s'
-.
-  Admitted. 
 
 Lemma size_substctx :
   forall s G, size (@substctx obj s G) = size G.
@@ -37,10 +31,6 @@ Lemma substctx_eqsub {s s': @sub obj} {G: context}
 : eqsub s s'
     -> substctx s G = substctx s' G. Admitted.
 
-Lemma project_dot_geq :
-  forall t s i, i > 0 ->
-           project (dot t s) i = @project obj s (i - 1).
-  Admitted.
 
 Lemma sh_sum :
   forall m n t,
@@ -48,10 +38,6 @@ Lemma sh_sum :
   intros. repeat rewrite subst_sh_shift.
   rewrite shift_sum. auto. Qed.
 
-Lemma shh_sum :
-  forall m n t,
-    @substh obj (sh n) (substh (sh m) t) = @substh obj (sh (n+m)) t.
-Admitted.
 
 (*substitutions for moving variables around in context*)
 (*move old to new*)
