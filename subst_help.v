@@ -27,10 +27,6 @@ Lemma substctx_rcons: forall G1 g s,
     @substctx obj s (rcons G1 g) = rcons (substctx (under 1 s) G1) (substh s g).
   intros. repeat rewrite - cats1. rewrite substctx_app. simpl. auto. Qed.
 
-Lemma substctx_eqsub {s s': @sub obj} {G: context}
-: eqsub s s'
-    -> substctx s G = substctx s' G. Admitted.
-
 
 Lemma sh_sum :
   forall m n t,

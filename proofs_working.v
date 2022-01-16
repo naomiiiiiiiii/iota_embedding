@@ -30,7 +30,12 @@ Lemma shift_trans_type : forall w l A s ,
 
 
 
+Lemma subst_lrfn : forall s, (subst s leq_refl_fn) = leq_refl_fn .
+                  intros. unfold leq_refl_fn. unfold nat_ind_fn.
+                  simpsub. auto. Qed.
 
+Hint Rewrite subst_lrfn : subst1 core.
+Hint Rewrite <- subst_lrfn : inv_subst.
 
 
 
@@ -1238,7 +1243,8 @@ var_solv.
                  rewrite subst1_under_trans_type.
                  simpsub_bigs.
                  constructor. var_solv.
-                 simpsub_bigs. apply tr_prod_intro. apply nsucc_lt. var_solv.
+                 simpsub_bigs. apply tr_prod_intro.
+                 apply nsucc_lt. var_solv.
                  { (*\lv.<> : (U1 v lv)[l] = |> tau @ <v, lv>*)
                    constructor; auto.
                    change (dot (var 0) (dot (var 1)
@@ -1850,5 +1856,5 @@ Theorem one: forall G e A ebar w1 l1,
   apply tr_weakening_append. eapply split_world2. apply Hwl.
   apply gamma_at_typed.
   eapply split_world1. apply Hwl.
-  eapply split_world2. apply Hwl.
+  eapply split_world2. apply Hwl. 
 Qed.

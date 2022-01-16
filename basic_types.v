@@ -248,15 +248,56 @@ Definition leq_refl_fn :=
                   )
                ).
 
+Lemma nzero_leq : forall G, tr G (oof triv (leq_t nzero nzero)).
+  intros.
+  eapply tr_compute.
+  apply leq_zero_equiv. apply equiv_refl. apply equiv_refl. constructor.
+Qed.
+
 Lemma leq_refl: forall G n,
     tr G (deq n n nattp) ->
-    tr G (oof  (app leq_refl_fn n) (leqpagetp n n)). Admitted.
-
-Lemma nzero_leq : forall G, tr G (oof triv (leq_t nzero nzero)). Admitted.
+    tr G (oof  (app leq_refl_fn n) (leqpagetp n n)). 
+intros. unfold leq_refl_fn . 
+replace
+(leqpagetp n n)
+ with (subst1 n 
+       (leqpagetp (var 0) (var 0)))
+.
+  2:{ simpsub_big. auto. } apply (tr_pi_elim _ nattp).
+    eapply nat_ind_lamapp; simpsub_big; try reflexivity.
+    { (*type p*)
+      apply tr_arrow_intro; auto. simpsub_big. 
+      apply leq_type; var_solv'. }
+    apply nzero_leq.
+    {
+      apply tr_pi_intro; auto. apply tr_arrow_intro;
+                                 try weaken leq_type; try apply nsucc_type;
+                                   try (match goal with |- tr ?G (deq ?M ?M nattp) => var_solv' end).
+      var_solv'. var_solv'.
+      simpsub_big. 
+      simpl. eapply tr_compute. eapply equiv_trans.
+      {  apply leq_succsucc_equiv. }
+      { apply equiv_app. apply equiv_app. apply equiv_refl.
+        apply reduce_equiv. apply reduce_app_beta; apply reduce_id. 
+        apply reduce_equiv. apply reduce_app_beta; apply reduce_id. 
+      } apply equiv_refl. apply equiv_refl. 
+      simpsub_big. simpl.
+ change 
+       (app (app leqtp (var 1))
+             (var 1)) with (@subst obj sh1
+ (app (app leqtp (var 0))
+             (var 0))) . 
+   var_solv0.
+    } assumption.
+Qed.
 
 Lemma nsucc_lt: forall G n, tr G (oof n nattp) ->
-                       tr G (oof triv (lt_t n (nsucc n))).
-Admitted.
+                       tr G (oof  (app leq_refl_fn (nsucc n)) (lt_t n (nsucc n))).
+  intros. unfold lt_t. unfold lttp. eapply tr_compute.
+  {apply equiv_app. apply reduce_equiv. apply reduce_app_beta; apply reduce_id.
+   apply equiv_refl. } apply equiv_refl. apply equiv_refl.
+  simpsub_big. apply leq_refl. apply nsucc_type. assumption.
+  Qed.
 
 
       Definition leqb_complete_fn :=
@@ -908,9 +949,80 @@ Definition eq_b n1 := app (wind (lam (* x = 0*)
                                 )
                              )                           
                           )) n1.
+Lemma eqb_typed {G} n1:
+  tr G (oof n1 nattp) ->
+  tr G (oof (eq_b n1) (arrow nattp booltp)).
+  intros.
+  change (arrow nattp booltp) with (subst1 n1 (arrow nattp booltp)).
+  apply (tr_wt_elim _ booltp (bite (var 0) voidtp unittp)).
+  - assumption.
+  - simpsub. simpl.
+    rewrite make_app2.
+     change (lam (if_z (var 0))) with
+      (subst (under 2 sh1)  (lam (if_z (var 0)))).
+    change (lam
+             (bite (if_z (var 0)) bfalse
+                (app (app (var 1) triv)
+                     (app (ppi2 (var 0)) triv)))) with
+        (subst (under 2 sh1)
+(lam (bite (if_z (var 0)) bfalse
+                (app (app (var 1) triv)
+                     (app (ppi2 (var 0)) triv))))
+        ).
+    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub;
+    (*rewrite ! subst_nat; *)
+      apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
+    + apply if_z_typed. var_solv'.
+    + apply (w_elim_hyp _ [::]).
+      weaken tr_booltp_formation. weaken nat_U01.
+      match goal with |- tr ?G (deq ?M ?M ?A) => change M with
+       (@subst obj (under 0 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
+       (bite (var 1) bfalse
+          (app (app (var 2) triv)
+               (app (var 0) triv)))) end.
+      apply tr_sigma_eta_hyp.
+      simpsub. simpl.
+          change (app (app (var 2) triv)
+                      (app (var 0) triv)) with
+              (@subst obj (under 1 sh1)
+                     (app (app (var 1) triv)
+                          (app (var 0) triv))).
+          change bfalse with (@subst obj (under 1 sh1) bfalse).
+          rewrite make_app1.
+          apply tr_booltp_eta_hyp; simpsub.
+      * constructor.
+      * eapply tr_compute_hyp.
+        {
+          constructor. apply equiv_pi. apply reduce_equiv.
+          apply reduce_bite_beta2. apply reduce_id.
+          apply equiv_refl.
+        }
+        simpl. eapply (tr_compute_hyp _ [::]).
+        {
+          constructor. apply equiv_arrow. apply reduce_equiv.
+          apply reduce_bite_beta2. apply reduce_id.
+          apply equiv_refl.
+        }
+        simpl.
+        apply (tr_arrow_elim _ nattp); auto. 
+        change (arrow nattp booltp) with (@subst1 obj triv (arrow nattp booltp)). 
+        apply (tr_pi_elim _ (unittp)).
+        - change (pi unittp (arrow nattp booltp))
+          with (@subst obj (sh 2) (pi unittp (arrow nattp booltp))).
+        var_solv0. constructor.
+        - apply (tr_arrow_elim _ unittp); auto. 
+          change (arrow unittp nattp) with (@subst obj (sh 1) (arrow
+                                                                 unittp nattp)).
+          var_solv0.
+          constructor.
+Qed.
+
+
 
 Lemma eqapp_typed G m n: tr G (oof m nattp) -> tr G (oof n nattp) ->
-  tr G (oof (app (eq_b m) n) booltp). Admitted.
+                         tr G (oof (app (eq_b m) n) booltp).
+  intros. apply (tr_arrow_elim _ nattp) ; auto.
+  apply eqb_typed.  assumption. Qed.
 
           Lemma subst_eqb s n: subst s (eq_b n) = eq_b (subst s n).
   intros. unfold eq_b. simpsub. auto. Qed.
@@ -1120,75 +1232,6 @@ Lemma eq_b0 n2: equiv (app (eq_b nzero) n2) (if_z n2).
 
 
 
-
-
-Lemma eqb_typed {G} n1:
-  tr G (oof n1 nattp) ->
-  tr G (oof (eq_b n1) (arrow nattp booltp)).
-  intros.
-  change (arrow nattp booltp) with (subst1 n1 (arrow nattp booltp)).
-  apply (tr_wt_elim _ booltp (bite (var 0) voidtp unittp)).
-  - assumption.
-  - simpsub. simpl.
-    rewrite make_app2.
-     change (lam (if_z (var 0))) with
-      (subst (under 2 sh1)  (lam (if_z (var 0)))).
-    change (lam
-             (bite (if_z (var 0)) bfalse
-                (app (app (var 1) triv)
-                     (app (ppi2 (var 0)) triv)))) with
-        (subst (under 2 sh1)
-(lam (bite (if_z (var 0)) bfalse
-                (app (app (var 1) triv)
-                     (app (ppi2 (var 0)) triv))))
-        ).
-    apply tr_booltp_eta_hyp; simpsub; simpl; simpsub;
-    (*rewrite ! subst_nat; *)
-      apply tr_arrow_intro; auto; try weaken tr_booltp_formation.
-    + apply if_z_typed. var_solv'.
-    + apply (w_elim_hyp _ [::]).
-      weaken tr_booltp_formation. weaken nat_U01.
-      match goal with |- tr ?G (deq ?M ?M ?A) => change M with
-       (@subst obj (under 0 (dot (ppi2 (var 0)) (dot (ppi1 (var 0)) sh1)))
-       (bite (var 1) bfalse
-          (app (app (var 2) triv)
-               (app (var 0) triv)))) end.
-      apply tr_sigma_eta_hyp.
-      simpsub. simpl.
-          change (app (app (var 2) triv)
-                      (app (var 0) triv)) with
-              (@subst obj (under 1 sh1)
-                     (app (app (var 1) triv)
-                          (app (var 0) triv))).
-          change bfalse with (@subst obj (under 1 sh1) bfalse).
-          rewrite make_app1.
-          apply tr_booltp_eta_hyp; simpsub.
-      * constructor.
-      * eapply tr_compute_hyp.
-        {
-          constructor. apply equiv_pi. apply reduce_equiv.
-          apply reduce_bite_beta2. apply reduce_id.
-          apply equiv_refl.
-        }
-        simpl. eapply (tr_compute_hyp _ [::]).
-        {
-          constructor. apply equiv_arrow. apply reduce_equiv.
-          apply reduce_bite_beta2. apply reduce_id.
-          apply equiv_refl.
-        }
-        simpl.
-        apply (tr_arrow_elim _ nattp); auto. 
-        change (arrow nattp booltp) with (@subst1 obj triv (arrow nattp booltp)). 
-        apply (tr_pi_elim _ (unittp)).
-        - change (pi unittp (arrow nattp booltp))
-          with (@subst obj (sh 2) (pi unittp (arrow nattp booltp))).
-        var_solv0. constructor.
-        - apply (tr_arrow_elim _ unittp); auto. 
-          change (arrow unittp nattp) with (@subst obj (sh 1) (arrow
-                                                                 unittp nattp)).
-          var_solv0.
-          constructor.
-Qed.
 
 
 

@@ -334,7 +334,7 @@ that. you want to bind
          ) in
              ret_a (ppair (nsucc l) (*length of new world*)
                           (ppair p1 (*new word is accessible from current world, *)
-                                 (ppair l (ppair triv (lam triv)) (*ref A @ new world*)
+                                 (ppair l (ppair (app leq_refl_fn (nsucc l)) (lam triv)) (*ref A @ new world*)
                                  ) 
                           )
                    )))))))
