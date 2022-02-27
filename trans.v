@@ -185,7 +185,8 @@ Fixpoint move_gamma (G: source.context) l1 l2 (m: Syntax.term obj) (gamma: Synta
  assume vars to start at 0*)
 Fixpoint gamma_at (G: source.context ):= match G with
                                              [::] => triv
-                                           | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
+                                         | g::gs => @ppair obj (var 0) (shift 1 (gamma_at gs)) end.
+
 
 Lemma subst_Gamma_at :forall w l s G,
     subst s w = w ->
@@ -230,6 +231,7 @@ Lemma subst1_under_Gamma_at: forall G w l s n,
   simpl. simpsub. rewrite subst1_under_trans_type IHG. auto.
 Qed.
 
+
 Definition make_consb_subseq n := ppair (app nsucc_leq_fn n) (lam (lam (lam triv))).
 
 Lemma subst_make_consb_subseq n s : (subst s (make_consb_subseq n)) =
@@ -238,9 +240,45 @@ Lemma subst_make_consb_subseq n s : (subst s (make_consb_subseq n)) =
 Hint Rewrite subst_make_consb_subseq: core subst1.
 Hint Rewrite <- subst_make_consb_subseq : inv_subst.
 
+Fixpoint gamma_nth (bundle: Syntax.term obj) i :=
+  match i with 0 => (ppi1 bundle)
+          | S i' => gamma_nth (ppi2 bundle) i' end.
 
- Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
-  t_bind: forall G E1 Et1 E2 Et2 A B, of_m G (bind_m E1 E2) (comp_m B) ->
+
+Lemma typed_gamma_nth w l G D g A i:
+  tr D (oof w preworld) ->
+  tr D (oof l nattp) ->
+  Sequence.index i G A ->
+  tr D (oof g (Gamma_at G w l)) ->
+  tr D (oof (gamma_nth g i) (trans_type w l A)).
+  intros Hw Hl. move : g G. 
+  induction i; intros g G Hindex Hg.
+  { simpl. inversion Hindex. subst. simpl in Hg.
+    apply (tr_prod_elim1 _ _ (Gamma_at l0 w l)).
+    assumption.
+  }
+  {
+    simpl. inversion Hindex. subst.
+    suffices: (tr D (oof (ppi2 g)
+                         (Gamma_at l0 w l))).
+    intros Hg2.
+    apply (IHi _ _ H0 Hg2).
+    simpl in Hg.
+    apply (tr_prod_elim2 _ (trans_type w l x)).
+    assumption.
+  }
+  Qed.
+
+
+
+Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
+  t_var: forall G i A,
+    Sequence.index i G A ->
+    trans G (source.var i) A
+          (lam (lam
+                  (gamma_nth (var 0) i)
+          ))
+|  t_bind: forall G E1 Et1 E2 Et2 A B, (*of_m G (bind_m E1 E2) (comp_m B) -> require typing of E1 and E2 instead*)
                                    trans G E1 (comp_m A) Et1 ->
                                    trans (A::G) E2 (comp_m B) Et2 ->
                                    trans G (bind_m E1 E2) (comp_m B) (
@@ -303,7 +341,8 @@ that. you want to bind
     ))
                                          ))))
   | t_ref: forall G E Et A, 
-         of_m G (ref_m E) (comp_m (reftp_m A)) -> trans G E A Et ->
+      (*   of_m G (ref_m E) (comp_m (reftp_m A)) -> *)
+ trans G E A Et ->
          trans G (ref_m E) (comp_m (reftp_m A)) (lam (lam (lam (lam ( lam ( (*l1, g, l, m, s*)
          let l := var 2 in                                                        
          let m1 := (make_consb_subseq l) in (*u <= u1, consb subseq*)
@@ -339,8 +378,8 @@ that. you want to bind
                           )
                    )))))))
   | t_assign: forall G R Rt E Et A,
-      of_m G R (reftp_m A) ->
-      of_m G E A ->
+    (*  of_m G R (reftp_m A) ->
+      of_m G E A -> *)
       trans G R (reftp_m A) Rt ->
       trans G E A Et ->
       trans G (asgn_m R E) (comp_m unittp_m)
@@ -381,7 +420,7 @@ that. you want to bind
                                                       triv))
             ))))))
   | t_deref: forall G R Rt A,
-      of_m G R (reftp_m A) ->
+      (* of_m G R (reftp_m A) -> *)
       trans G R (reftp_m A) Rt ->
       trans G (deref_m R) (comp_m A) 
             (lam (lam (lam (lam ( lam ( (*l = 4, g = 3, l1 = 2, m = 1, s = 0*)
@@ -405,8 +444,8 @@ that. you want to bind
                                     ))))
             )))))
 | t_ap : forall G E1 Et1 E2 Et2 Targ T2,  
-      of_m G E1 (arrow_m Targ T2) ->
-      of_m G E2 Targ ->
+    (*  of_m G E1 (arrow_m Targ T2) -> (*take this out*)
+      of_m G E2 Targ -> (*take this out*) *)
       trans G E1 (arrow_m Targ T2) Et1 ->
       trans G E2 Targ Et2 ->
       trans G (app_m E1 E2) T2
@@ -419,7 +458,7 @@ that. you want to bind
                    (app (app (app (app (app Et1 l) g) l) (make_subseq_refl l)) arg)
                 )))
 | t_lam : forall G E Et Targ T2,
-      of_m (Targ::G) E T2 ->
+     (* of_m (Targ::G) E T2 ->*)
       trans (Targ::G) E T2 Et ->
       trans G (lam_m E) (arrow_m Targ T2) 
             (lam (lam (lam (lam (lam (*l1 =4, g = 3, l = 2
@@ -430,7 +469,7 @@ that. you want to bind
 
             ))))))
 | t_ret : forall G E Et A,
-    of_m G E A ->
+   (* of_m G E A -> *)
     trans G E A Et ->
     trans G (ret_m E) (comp_m A)
           (lam (lam (lam (lam (lam (*l1 = 4, g = 3, l =2, m = 1, s = 0*)

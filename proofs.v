@@ -1114,6 +1114,7 @@ tr D (oof (ppair x P) (Gamma_at (A::G) w l)).
   move => Hw Hl Hpair H1. simpl. apply tr_prod_intro; auto.
   (*show that the product type is wellformed *)
 Qed.
+
  
  (*the actual type of translated terms (without the forall)*)
 Lemma trans_type_works1: forall w A G D,

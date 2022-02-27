@@ -232,6 +232,16 @@ match goal with |- tr ?G' (deq ?M ?M ?T) => replace T with
 Qed.
 
 
+Lemma subst_gamma_nth s bundle i :
+  subst s (gamma_nth bundle i) =
+  gamma_nth (subst s bundle) i.
+  move: bundle. induction i; intros.
+  { simpl. simpsub. auto. }
+  { simpl. rewrite (IHi (ppi2 bundle)). simpsub.
+  auto. }
+Qed.
+
+Hint Rewrite subst_gamma_nth : subst1.
 
 
 Theorem two_working: forall G e T ebar,
@@ -241,7 +251,14 @@ Theorem two_working: forall G e T ebar,
                                                      (trans_type (var 1) (var 0) T))))
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
-  move => G e T ebar Dtrans. induction Dtrans; intros.
+  move => G e T ebar Dtrans. induction Dtrans.
+  1:{ apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
+      apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv.
+      weaken trans_type_works; try var_solv.
+      rewrite sh_trans_type. simpsub. apply (typed_gamma_nth _ _ G);
+                                        try var_solv. assumption.
+      simpl. sh_var 1 2. inv_subst. var_solv. }
+      
   4:{
     apply comp_front.
     simpsub_bigs.  simpsub_bigs. apply inr_laters_type.
@@ -1779,15 +1796,15 @@ Unshelve. apply nat.
 Unshelve. apply nat.  } }  
 Qed.
 
-
+(*translation *)
 Theorem one: forall G e A ebar w1 l1,
-    of_m G e A ->
-    tr [::] (oof (ppair w1 l1) world) ->
-    trans G e A ebar -> 
+    tr [::] (oof (ppair w1 l1) world) -> (*  \vdash <w1, l1> : world *)
+    trans G e A ebar -> (*G \vdash e ---> ebar : A*)
     tr (Gamma_at_ctx G w1 l1) (oof (app (app (shift (size G) ebar)
                                              (shift (size G) l1))
                                         (gamma_at G))
-                                     (trans_type (shift (size G) w1) (shift (size G) l1) A)).
+                                   (trans_type (shift (size G) w1) (shift (size G) l1) A)).
+  Proof.
   move => G e A ebar w1 l1 He Hwl Htrans.
   eapply (tr_arrow_elim _ (Gamma_at G (shift (size G) w1) (shift (size G) l1))).
   apply Gamma_at_type; rewrite - ! subst_sh_shift; try rewrite
