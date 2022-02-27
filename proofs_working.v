@@ -252,7 +252,47 @@ Theorem two_working: forall G e T ebar,
            ).
   (*gamma can be part of D, don't even need to move gamma (var 5) over i think*)
   move => G e T ebar Dtrans. induction Dtrans.
-  1:{ apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
+  { apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
+      apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv.
+  }
+  {apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
+   apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv. simpsub_bigs.
+   apply (tr_arrow_elim _ (Gamma_at G (var 2) (var 1))).
+   apply Gamma_at_type; try var_solv; auto. auto.
+   match goal with |- (tr ?G' (deq ?M ?M ?T)) => replace T with
+       (subst1 (var 1)
+               (arrow (Gamma_at G (var 3) (var 0)) nattp)) end.
+   2:{
+     simpsub_big. rewrite subst1_Gamma_at. auto.
+   }
+   apply (tr_pi_elim _ nattp). 
+   match goal with |- (tr ?G' (deq ?M ?M ?T)) => replace T with
+       (subst1 (var 2)
+               (pi nattp
+                   (arrow (Gamma_at G (var 1) (var 0)) nattp))) end.
+   2:{
+     unfold subst1. rewrite subst_pi subst_arrow.
+     rewrite subst1_under_Gamma_at. simpsub_bigs. auto.
+   }
+   apply (tr_all_elim _ nzero preworld).
+   match goal with |- (tr ?G' (deq ?M ?M ?T)) => replace T with
+       (subst (sh 3) T) end.
+   2:{
+      rewrite subst_all subst_pi subst_arrow under_sum.
+     rewrite sh_under_Gamma_at. simpsub_bigs. auto.
+   }
+   rewrite ! subst_sh_shift.
+   apply tr_weakening_append3. apply IHDtrans. var_solv.
+   change nattp with (trans_type (var 1) (var 0) nattp_m) at 3 5.
+   sh_var 1 1.
+   apply trans_type_works1. var_solv. var_solv.
+   sh_var 1 2. inv_subst. var_solv.
+  }
+  {apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
+   apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv. simpsub_bigs.
+constructor.
+  }
+  { apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
       apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv.
       weaken trans_type_works; try var_solv.
       rewrite sh_trans_type. simpsub. apply (typed_gamma_nth _ _ G);
@@ -1805,7 +1845,7 @@ Theorem one: forall G e A ebar w1 l1,
                                         (gamma_at G))
                                    (trans_type (shift (size G) w1) (shift (size G) l1) A)).
   Proof.
-  move => G e A ebar w1 l1 He Hwl Htrans.
+  move => G e A ebar w1 l1 Hwl Htrans. 
   eapply (tr_arrow_elim _ (Gamma_at G (shift (size G) w1) (shift (size G) l1))).
   apply Gamma_at_type; rewrite - ! subst_sh_shift; try rewrite
                                                       - (subst_pw (sh (size G)));

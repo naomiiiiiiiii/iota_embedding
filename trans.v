@@ -272,7 +272,14 @@ Lemma typed_gamma_nth w l G D g A i:
 
 
 Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
-  t_var: forall G i A,
+  t_z : forall G,
+    trans G z_m nattp_m (lam (lam nzero))
+| t_succ : forall G e ebar,
+    trans G e nattp_m ebar ->
+    trans G (succ_m e) nattp_m (lam (lam (app (app (subst (sh 2) ebar) (var 1)) (var 0))))
+| t_triv : forall G,
+    trans G triv_m unittp_m (lam (lam triv))
+| t_var: forall G i A,
     Sequence.index i G A ->
     trans G (source.var i) A
           (lam (lam
