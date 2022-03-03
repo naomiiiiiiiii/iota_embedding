@@ -271,7 +271,7 @@ Lemma typed_gamma_nth w l G D g A i:
 
 
 
-Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Type :=
+Inductive trans: source.context -> source.term -> source.term -> (Syntax.term obj) -> Prop :=
   t_z : forall G,
     trans G z_m nattp_m (lam (lam nzero))
 | t_succ : forall G e ebar,

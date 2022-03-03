@@ -22,8 +22,7 @@ Inductive term: Set :=
 | deref_m: term -> term
 | asgn_m: term -> term -> term
 | triv_m: term
-| unittp_m: term
-| typ: term.
+| unittp_m: term.
 
 Definition context := list term.
 
@@ -45,8 +44,7 @@ Fixpoint traverse (S:Set) (enter : S -> S) (resolve : S -> nat -> term) (s : S) 
    | deref_m t1 => deref_m (traverse S enter resolve s t1)
    | asgn_m R v => asgn_m (traverse S enter resolve s R) (traverse S enter resolve s v)
    | triv_m => triv_m
-   | unittp_m => unittp_m
-  | typ => typ end.
+   | unittp_m => unittp_m end.
 
 Ltac prove_traverse_parametric ind :=
 intros S S' R enter enter' resolve resolve' s s' t Henter Hresolve Hs;
