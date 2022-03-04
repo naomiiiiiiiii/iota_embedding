@@ -43,6 +43,9 @@ Inductive of_m : context -> term -> term -> Type :=
     of_m G (bind_m V E) (comp_m B)
 | of_m_ref: forall G E A, of_m G E A -> of_m G (ref_m E) (comp_m (reftp_m A))
 | of_m_asgn: forall G R V T, of_m G V T ->
-                      of_m G R (comp_m (reftp_m T)) ->
+                      of_m G R (reftp_m T) ->
                       of_m G (asgn_m R V) (comp_m unittp_m)
+| of_m_deref : forall G R T,
+    of_m G R (reftp_m T) ->
+    of_m G (deref_m R) (comp_m T) 
 | of_m_triv: forall G, of_m G triv_m unittp_m.

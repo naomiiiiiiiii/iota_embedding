@@ -1090,8 +1090,6 @@ change nattp with (@shift obj 6 nattp); rewrite ! subst_sh_shift;
    { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
        try apply tr_arrow_formation; auto. change unittp with (@subst obj (sh 1) unittp). var_solv. 
    }
-   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
-       try apply tr_arrow_formation; auto; constructor. }
    Qed.
 
 Lemma Gamma_at_type {D G w l}:
