@@ -256,7 +256,8 @@ Theorem two_working: forall G e T ebar,
       apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv.
   }
   {apply tr_all_intro; auto. simpsub_bigs. apply tr_pi_intro; auto.
-   apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv. simpsub_bigs.
+   apply tr_arrow_intro; auto. apply Gamma_at_type; try var_solv. simpsub_bigs.  
+   apply nsucc_type.
    apply (tr_arrow_elim _ (Gamma_at G (var 2) (var 1))).
    apply Gamma_at_type; try var_solv; auto. auto.
    match goal with |- (tr ?G' (deq ?M ?M ?T)) => replace T with

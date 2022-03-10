@@ -18,7 +18,7 @@ Theorem total G E A: of_m G E A ->
   }
   {
     destruct IHHe as [mbar Hm].
-    exists (lam (lam (app (app (subst (sh 2) mbar) (var 1)) (var 0)))).
+    exists (lam (lam (nsucc (app (app (subst (sh 2) mbar) (var 1)) (var 0))))).
     constructor. assumption.
   }
   { destruct IHHe as [Et Hm].
