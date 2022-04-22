@@ -6,8 +6,6 @@ From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
-
-
 (*moveGamma almost definitely wrong because it assumes Gamma starts from beginning of
  context (var 0) where as there's probably more stuff at the end
  probably need to pass in a starting index to move Gamma
@@ -40,7 +38,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
             let l1 := (shift 3 l1) in
             let i := (var 2) in
             let v := (var 1) in
-            let lv := (var 0) in
+            let lv := (var 0) i
           eqtype (app (app (app w i) (next v)) (next lv))
                  (fut (trans_type v lv tau' ))
                       )
@@ -331,7 +329,7 @@ that. you want to bind
                        (var 4)))                                                 in
                                let e2bar' := app (app (app btarg lv) (make_subseq_refl lv) )
                                                  (*v, z1 <= v, z1*)
-                                                 sv in
+                                                 sv in (*e2 is applied to everything*)
                                make_bind e2bar' (lam ( (*l = var 4*)
                                                     let z2 := (var 0) in
                                                     ret_a (ppair (picomp1 z2)

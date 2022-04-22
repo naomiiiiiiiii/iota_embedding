@@ -22,14 +22,16 @@ Inductive term: Set :=
 | deref_m: term -> term
 | asgn_m: term -> term -> term
 | triv_m: term
-| unittp_m: term.
+| unittp_m: term
+| loc_m : nat -> term.
 
 Definition context := list term.
 
 
 Fixpoint traverse (S:Set) (enter : S -> S) (resolve : S -> nat -> term) (s : S) (t : term) {struct t} : term :=
   match t with
-   | var i => resolve s i
+  | var i => resolve s i
+  | loc_m l => loc_m l
    | nattp_m => nattp_m
    | z_m => z_m
    | succ_m t1 => succ_m (traverse S enter resolve s t1)
