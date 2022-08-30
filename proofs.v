@@ -2,7 +2,7 @@
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types0 basic_types
-     help subst_help0 subst_help trans derived_rules embedded_lemmas.
+     help0 help subst_help0 subst_help trans derived_rules embedded_lemmas.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences.
@@ -1089,7 +1089,9 @@ change nattp with (@shift obj 6 nattp); rewrite ! subst_sh_shift;
      try apply tr_arrow_formation; auto; constructor. }
    { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
        try apply tr_arrow_formation; auto. change unittp with (@subst obj (sh 1) unittp). var_solv. 
-   }
+   } (*loc case*)
+   { repeat (apply tr_arrow_intro; simpsub); try apply subseq_type; try assumption;
+       try apply tr_arrow_formation; auto; constructor. }
    Qed.
 
 Lemma Gamma_at_type {D G w l}:

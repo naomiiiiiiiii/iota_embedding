@@ -1006,3 +1006,29 @@ Lemma leqb_zero_equiv n2: equiv (leqb_app nzero n2) btrue.
   }
   }
   Qed.
+
+Lemma subst_leqtp: forall s,
+    @ subst obj s (leqtp) = leqtp.
+  intros. unfold leqtp. unfold wind. unfold theta.
+  repeat rewrite subst_app.
+  repeat rewrite subst_lam. simpsub. simpl.
+  repeat rewrite project_dot_succ.
+  rewrite project_dot_zero. auto. Qed.
+Hint Rewrite subst_leqtp: core subst1.
+Lemma subst_lttp: forall s,
+    @ subst obj s (lttp) = lttp.
+  intros. unfold lttp.
+  simpsub. rewrite subst_leqtp. unfold nsucc. simpsub. simpl.
+  rewrite subst_leqtp. auto. Qed.
+Hint Rewrite subst_leqtp: core subst1.
+
+
+Lemma subst_leq: forall s n1 n2,
+    @ subst obj s (leq_t n1 n2) =  leq_t (subst s n1) (subst s n2).
+  intros. unfold leq_t.  repeat rewrite subst_app. auto. 
+Qed.
+Lemma subst_lt: forall s n1 n2,
+    subst s (lt_t n1 n2) = lt_t (subst s n1) (@ subst obj s n2).
+  intros. repeat rewrite subst_app. rewrite subst_lttp. auto. Qed. 
+
+Hint Rewrite subst_leq subst_lttp subst_lt.

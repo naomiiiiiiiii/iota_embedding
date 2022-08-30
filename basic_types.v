@@ -6,17 +6,19 @@ From istari Require Import Sigma Tactics
      ContextHygiene Equivalence Equivalences Rules Defined PageType lemmas0 derived_rules basic_types0.
 
 
+Definition leq_refl_fn :=
+    (app (app (app nat_ind_fn (lam
+                           (leq_t (var 0) (var 0)))
+               )
+               triv )
+               (lam (*x : nat*) (lam (*IH: P(x) *)
+                                         (var 0) (*s x  <= s x *)
+                                      )
+                  )
+               ).
 
 
 
-Lemma subst_leqtp: forall s,
-    @ subst obj s (leqtp) = leqtp.
-  intros. unfold leqtp. unfold wind. unfold theta.
-  repeat rewrite subst_app.
-  repeat rewrite subst_lam. simpsub. simpl.
-  repeat rewrite project_dot_succ.
-  rewrite project_dot_zero. auto. Qed.
-Hint Rewrite subst_leqtp: core subst1.
 
 Definition natB : term obj := (bite (var 0) voidtp unittp).
 
@@ -237,16 +239,6 @@ intros. unfold ltb_false_fn .
     } assumption.
 Qed.
 
-Definition leq_refl_fn :=
-    (app (app (app nat_ind_fn (lam
-                           (leq_t (var 0) (var 0)))
-               )
-               triv )
-               (lam (*x : nat*) (lam (*IH: P(x) *)
-                                         (var 0) (*s x  <= s x *)
-                                      )
-                  )
-               ).
 
 Lemma nzero_leq : forall G, tr G (oof triv (leq_t nzero nzero)).
   intros.

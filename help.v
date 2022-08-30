@@ -2,7 +2,7 @@
 From Coq Require Import Lists.List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import Tactics Sequence source subst_src rules_src.
-From istari Require Import basic_types0 basic_types help0 Syntax Subst SimpSub Promote Hygiene
+From istari Require Import basic_types0 basic_types subst_help0 help0 Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
 
 
@@ -142,14 +142,48 @@ end.
 
 Opaque laters preworld U0 subseq leqtp nzero nattp world nth.
 
+
+ Lemma subst_move: forall A l1 l2 s, (subst s (move A l1 l2)) = move A (subst s l1) (subst s l2).
+   intros. induction A; unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+   { unfold make_subseq_trans;
+unfold leq_trans_fn_app; unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+   { unfold make_subseq_trans;
+       unfold lt_trans_fn_app; unfold leq_trans_fn_app;
+         unfold leq_trans_fn; simpsub_big; simpl; auto.
+}
+ Qed.
+
+Hint Rewrite subst_move: core subst1.
+
+ Lemma subst_moveapp s A l1 l2 m1 m2 : (subst s (move_app A l1 l2 m1 m2)) =
+                              move_app A (subst s l1) (subst s l2) (subst s m1) (subst s m2).
+   unfold move_app. simpsub_big. auto. Qed.
+
+Hint Rewrite subst_moveapp: core subst1.
+
 (*cons_b w l x is a preworld equal to <w, l> only with x consed onto the back*)
-
-
-
-(*translation of source contexts to target contexts (at a given world)*)
-
-(*makes a product type at a world out of a source context *)
-
 Definition cons_b w l x :=lam (let i := (var 0) in
                               bite (ltb_app i (shift 1 l)) (app (shift 1 w) i) (shift 1 x)).
 
+Fixpoint gamma_nth (bundle: Syntax.term obj) i :=
+  match i with 0 => (ppi1 bundle)
+          | S i' => gamma_nth (ppi2 bundle) i' end.
+
+Fixpoint move_gamma (G: source.context) l1 l2 (m: Syntax.term obj) (gamma: Syntax.term obj) :=
+   match G with
+     nil => gamma
+   | A::xs => ppair (move_app A l1 l2 m (ppi1 gamma)) (move_gamma xs l1 l2 m (ppi2 gamma)) end.
+
+Lemma subst_move_gamma :forall g l1 l2 m s G,
+    (subst s (move_gamma G l1 l2 m g)) = move_gamma G (subst s l1) (subst s l2) (subst s m) (subst s g).
+  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
+  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
+  auto. Qed.
+
+
+Hint Rewrite subst_move_gamma: subst1.

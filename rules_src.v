@@ -53,7 +53,6 @@ Inductive of_m : context -> term -> term -> Type :=
 
 (*reduction*)
 
-Definition store := seq term.
 
 (*weak head? reduction*)
 Inductive val: term -> Prop :=
@@ -80,7 +79,7 @@ Definition get M i := nth triv_m M i.
 
                           
 
-                
+Definition store := seq term.             
 (*weak head reduction
  karl's reduce is nondeterministic*)
 Inductive reduce : (prod store term) -> (prod store term) -> Prop :=
@@ -118,6 +117,14 @@ Inductive reduce : (prod store term) -> (prod store term) -> Prop :=
 | reduce_app_beta {v f M M'} :
     val v ->
     val f -> reduce (M, (app_m (lam_m f) v)) (M', (subst1 v f)).
+
+Inductive reduce_star : (prod store term) -> (prod store term) -> Prop :=
+| reduce_refl {M e} : reduce_star (M, e) (M, e)
+| reduce_step {M e M' e' M'' e''} : reduce_star (M, e) (M', e') ->
+                                    reduce (M', e') (M'', e'') ->
+                                    reduce_star (M, e) (M'', e'').
+
+
 (*
 Inductive reduce : (prod store term) -> (prod store term) -> Prop :=
 | reduce_var {i M} : reduce (M, (var i)) (M, (var i))

@@ -1,6 +1,6 @@
 Require Import Program.Equality Ring Lia Omega.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
-From istari Require Import lemmas0 source subst_src rules_src help subst_help0 subst_help
+From istari Require Import lemmas0 source subst_src rules_src help0 help subst_help0 subst_help
      trans basic_types0 basic_types derived_rules.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
@@ -468,6 +468,12 @@ Lemma promote_id G : @promote obj (promote G) = (promote G).
   induction G.
   auto.
   simpl. induction a; simpl; rewrite IHG; auto. Qed.
+
+Lemma sh_sum :
+  forall m n t,
+    @subst obj (sh n) (subst (sh m) t) = @subst obj (sh (n+m)) t.
+  intros. repeat rewrite subst_sh_shift.
+  rewrite shift_sum. auto. Qed.
 
 Lemma yc_typed G A: tr G (deqtype A A) ->
                     tr (promote G) (deqtype A A) ->

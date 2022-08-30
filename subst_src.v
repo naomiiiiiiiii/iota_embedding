@@ -572,7 +572,7 @@ intros i n.
 rewrite -> !trunc_sh.
 simpl.
 rewrite -> trunc_sh.
-auto.
+auto. 
 Qed.
 
 

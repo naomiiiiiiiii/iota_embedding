@@ -3,7 +3,7 @@ From Coq Require Import ssreflect ssrfun ssrbool.
 From mathcomp Require Import seq eqtype ssrnat.
 From istari Require Import lemmas0
      source subst_src rules_src basic_types0 basic_types
-     help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
+     help0 help subst_help0 subst_help trans derived_rules embedded_lemmas proofs.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Equivalences.

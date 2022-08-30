@@ -1,7 +1,7 @@
 From Coq.Lists Require Import List.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq eqtype ssrnat.
 From istari Require Import basic_types basic_types0 source subst_src rules_src
-     derived_rules help subst_help0 subst_help.
+     derived_rules help0 help subst_help0 subst_help.
 From istari Require Import Sigma Tactics
      Syntax Subst SimpSub Promote Hygiene
      ContextHygiene Equivalence Rules Defined.
@@ -27,7 +27,7 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
                                         let l := var 0 in
                                         arrow (subseq (shift 2 w1) (shift 2 l1) u l) (arrow (trans_type u l A) (trans_type u l B))
                                     ))
-                          (*does NOT send the refs to comp ref*)
+      (*does NOT send the refs to comp ref*)
       | reftp_m tau' => sigma nattp ( (* i := 0*)
            let i := (var 0) in
             prod (lt_t i (subst sh1 l1))
@@ -38,13 +38,12 @@ Fixpoint  trans_type (w1 l1: Syntax.term obj) (tau : source.term) {struct tau}: 
             let l1 := (shift 3 l1) in
             let i := (var 2) in
             let v := (var 1) in
-            let lv := (var 0) i
+            let lv := (var 0) in
           eqtype (app (app (app w i) (next v)) (next lv))
                  (fut (trans_type v lv tau' ))
                       )
                  ))
             )
-
       | comp_m tau' => subst1 l1 (all nzero preworld((* l1 = 1, u  := var 0. this substitution must go under.*) 
                       pi nattp  (*l1 := 2, u = 1, l := 0*)   (                         
                                                        let l1 := Syntax.var 2 in
@@ -174,10 +173,6 @@ Lemma sh_under_trans_type : forall w l A s n ,
  (*making a pair of type (a big product at U) out of a pair of (a big product at W)
   iterating over the pair
  but how far to go? use the list because it should be the same size as the pair*)
-Fixpoint move_gamma (G: source.context) l1 l2 (m: Syntax.term obj) (gamma: Syntax.term obj) :=
-   match G with
-     nil => gamma
-   | A::xs => ppair (move_app A l1 l2 m (ppi1 gamma)) (move_gamma xs l1 l2 m (ppi2 gamma)) end.
 
 (*making a product value out of the variables in a source context
  assume vars to start at 0*)
@@ -193,11 +188,6 @@ Lemma subst_Gamma_at :forall w l s G,
    intros. induction G; auto. simpl. move: IHG. simpsub. move => IHG. 
    rewrite IHG subst_trans_type; auto. Qed.
 
-Lemma subst_move_gamma :forall g l1 l2 m s G,
-    (subst s (move_gamma G l1 l2 m g)) = move_gamma G (subst s l1) (subst s l2) (subst s m) (subst s g).
-  intros. move: g m s. induction G; intros; auto. simpl. simpsub.
-  rewrite (IHG (ppi2 g) m s); auto. unfold move_app. simpsub. rewrite subst_move.
-  auto. Qed.
 
 
 Lemma sh_under_Gamma_at: forall G w l s n,
@@ -213,7 +203,7 @@ Lemma sh_Gamma_at: forall G w l s,
   change (sh s) with (@ under obj 0 (sh s)). apply sh_under_Gamma_at.
 Qed.
 
-Hint Rewrite sh_Gamma_at subst_move_gamma: subst1.
+Hint Rewrite sh_Gamma_at: subst1.
 
  Lemma subst1_Gamma_at: forall G w l s, 
     (subst (dot s id) (Gamma_at G w l)) = (Gamma_at G (subst1 s w)
@@ -238,9 +228,6 @@ Lemma subst_make_consb_subseq n s : (subst s (make_consb_subseq n)) =
 Hint Rewrite subst_make_consb_subseq: core subst1.
 Hint Rewrite <- subst_make_consb_subseq : inv_subst.
 
-Fixpoint gamma_nth (bundle: Syntax.term obj) i :=
-  match i with 0 => (ppi1 bundle)
-          | S i' => gamma_nth (ppi2 bundle) i' end.
 
 
 Lemma typed_gamma_nth w l G D g A i:
@@ -369,7 +356,8 @@ that. you want to bind
                                          
                                          (*m12 o m : W <= U2*)
                                          bite (ltb_app i l)
-                                              (app (app (app s l2) m12) i) (*move value in s:store(U) to U2*)
+                                              (app (app (app s l2) m12) i)
+                                              (*move value in s:store(U) to U2*)
                                               (next (move_app A
                                                               l1 l2
                                                               m02 x)) (*move x to be : |> A @ U2*)
