@@ -1,0 +1,474 @@
+DIGEST 93c37461039ade2e0b316b1ce1594846
+Fistari.monad.help
+R122:131 Coq.Lists.List <> <> lib
+R163:171 mathcomp.ssreflect.ssreflect <> <> lib
+R173:178 mathcomp.ssreflect.ssrfun <> <> lib
+R180:186 mathcomp.ssreflect.ssrbool <> <> lib
+R188:190 mathcomp.ssreflect.seq <> <> lib
+R192:197 mathcomp.ssreflect.eqtype <> <> lib
+R199:204 mathcomp.ssreflect.ssrnat <> <> lib
+R234:240 istari.coq.Tactics <> <> lib
+R242:249 istari.coq.Sequence <> <> lib
+R251:256 istari.monad.source <> <> lib
+R258:266 istari.monad.subst_src <> <> lib
+R268:276 istari.monad.rules_src <> <> lib
+R306:317 istari.monad.basic_types0 <> <> lib
+R319:329 istari.monad.basic_types <> <> lib
+R331:341 istari.monad.subst_help0 <> <> lib
+R343:347 istari.monad.help0 <> <> lib
+R349:354 istari.coq.Syntax <> <> lib
+R356:360 istari.coq.Subst <> <> lib
+R362:368 istari.coq.SimpSub <> <> lib
+R370:376 istari.coq.Promote <> <> lib
+R378:384 istari.coq.Hygiene <> <> lib
+R391:404 istari.coq.ContextHygiene <> <> lib
+R406:416 istari.coq.Equivalence <> <> lib
+R418:422 istari.coq.Rules <> <> lib
+R424:430 istari.coq.Defined <> <> lib
+def 463:470 <> preworld
+R474:477 istari.coq.Syntax <> term ind
+R479:481 istari.coq.Rules <> obj def
+R487:489 istari.coq.Syntax <> rec def
+R528:532 istari.coq.Syntax <> arrow def
+R541:546 istari.coq.Syntax <> karrow def
+R563:567 istari.coq.Syntax <> arrow def
+R581:582 istari.monad.basic_types0 <> U0 def
+R570:572 istari.coq.Syntax <> fut def
+R574:578 istari.coq.Defined <> nattp def
+R549:551 istari.coq.Syntax <> fut def
+R554:556 istari.coq.Syntax <> var constr
+R534:538 istari.coq.Defined <> nattp def
+def 600:604 <> world
+R608:611 istari.coq.Syntax <> term ind
+R613:615 istari.coq.Rules <> obj def
+R621:625 istari.coq.Syntax <> sigma def
+R636:640 istari.coq.Defined <> nattp def
+R627:634 istari.monad.help <> preworld def
+def 655:657 <> len
+binder 659:659 <> w:1
+R663:666 istari.coq.Syntax <> term ind
+R668:670 istari.coq.Rules <> obj def
+R676:679 istari.coq.Syntax <> ppi2 def
+R681:681 istari.monad.help <> w:1 var
+def 696:698 <> nth
+binder 700:700 <> w:2
+binder 702:702 <> n:3
+R705:708 istari.coq.Syntax <> term ind
+R710:712 istari.coq.Rules <> obj def
+R717:719 istari.coq.Syntax <> app def
+R730:730 istari.monad.help <> n:3 var
+R722:725 istari.coq.Syntax <> ppi1 def
+R727:727 istari.monad.help <> w:2 var
+def 746:751 <> subseq
+binder 753:754 <> w1:4
+binder 756:757 <> l1:5
+binder 759:760 <> w2:6
+binder 762:763 <> l2:7
+R780:783 istari.coq.Syntax <> prod def
+R817:819 istari.coq.Syntax <> all def
+R887:888 istari.coq.Syntax <> pi def
+R941:942 istari.coq.Syntax <> pi def
+R1004:1008 istari.coq.Syntax <> arrow def
+R1101:1106 istari.coq.Syntax <> eqtype def
+R1184:1187 istari.monad.help0 <> app3 def
+R1190:1194 istari.coq.Subst <> subst def
+R1203:1204 istari.monad.help <> w2:6 var
+R1197:1198 istari.coq.Subst <> sh constr
+R1208:1210 istari.coq.Syntax <> var constr
+R1216:1218 istari.coq.Syntax <> var constr
+R1224:1226 istari.coq.Syntax <> var constr
+R1109:1112 istari.monad.help0 <> app3 def
+R1115:1119 istari.coq.Subst <> subst def
+R1128:1129 istari.monad.help <> w1:4 var
+R1122:1123 istari.coq.Subst <> sh constr
+R1133:1135 istari.coq.Syntax <> var constr
+R1141:1143 istari.coq.Syntax <> var constr
+R1149:1151 istari.coq.Syntax <> var constr
+R1011:1014 istari.monad.basic_types0 <> lt_t def
+R1017:1019 istari.coq.Syntax <> var constr
+R1025:1029 istari.coq.Subst <> subst def
+R1038:1039 istari.monad.help <> l1:5 var
+R1032:1033 istari.coq.Subst <> sh constr
+R945:949 istari.coq.Defined <> nattp def
+R891:893 istari.coq.Syntax <> fut def
+R895:899 istari.coq.Defined <> nattp def
+R828:830 istari.coq.Syntax <> fut def
+R832:839 istari.monad.help <> preworld def
+R821:825 istari.coq.Defined <> nzero def
+R786:790 istari.monad.basic_types0 <> leq_t def
+R792:793 istari.monad.help <> l1:5 var
+R795:796 istari.monad.help <> l2:7 var
+def 1399:1409 <> make_subseq
+R1412:1415 istari.coq.Syntax <> term ind
+R1417:1419 istari.coq.Rules <> obj def
+R1424:1428 istari.coq.Syntax <> ppair def
+R1436:1438 istari.coq.Syntax <> lam def
+R1441:1443 istari.coq.Syntax <> lam def
+R1446:1448 istari.coq.Syntax <> lam def
+R1450:1453 istari.coq.Syntax <> triv def
+R1430:1433 istari.coq.Syntax <> triv def
+def 1473:1489 <> make_subseq_trans
+binder 1491:1492 <> l1:8
+binder 1494:1495 <> l2:9
+binder 1497:1498 <> l3:10
+binder 1500:1501 <> M1:11
+binder 1503:1504 <> M2:12
+R1511:1515 istari.coq.Syntax <> ppair def
+R1609:1611 istari.coq.Syntax <> lam def
+R1614:1616 istari.coq.Syntax <> lam def
+R1619:1621 istari.coq.Syntax <> lam def
+R1623:1626 istari.coq.Syntax <> triv def
+R1518:1533 istari.monad.basic_types <> leq_trans_fn_app def
+R1535:1536 istari.monad.help <> l1:8 var
+R1538:1539 istari.monad.help <> l2:9 var
+R1541:1542 istari.monad.help <> l3:10 var
+R1571:1574 istari.coq.Syntax <> ppi1 def
+R1576:1577 istari.monad.help <> M1:11 var
+R1581:1584 istari.coq.Syntax <> ppi1 def
+R1586:1587 istari.monad.help <> M2:12 var
+def 1645:1660 <> make_subseq_refl
+binder 1662:1662 <> l:13
+R1669:1673 istari.coq.Syntax <> ppair def
+R1704:1706 istari.coq.Syntax <> lam def
+R1709:1711 istari.coq.Syntax <> lam def
+R1714:1716 istari.coq.Syntax <> lam def
+R1718:1721 istari.coq.Syntax <> triv def
+R1676:1678 istari.coq.Syntax <> app def
+R1692:1692 istari.monad.help <> l:13 var
+R1680:1690 istari.monad.basic_types <> leq_refl_fn def
+def 2019:2025 <> gettype
+binder 2027:2027 <> w:14
+binder 2029:2029 <> v:15
+binder 2031:2032 <> lv:16
+R2036:2039 istari.coq.Syntax <> term ind
+R2041:2043 istari.coq.Rules <> obj def
+R2049:2050 istari.coq.Syntax <> pi def
+R2121:2123 istari.coq.Syntax <> var constr
+binder 2116:2116 <> i:17
+R2173:2175 istari.coq.Syntax <> app def
+R2223:2226 istari.coq.Syntax <> next def
+R2229:2233 istari.coq.Subst <> shift def
+R2237:2238 istari.monad.help <> lv:16 var
+R2178:2180 istari.coq.Syntax <> app def
+R2203:2206 istari.coq.Syntax <> next def
+R2209:2213 istari.coq.Subst <> shift def
+R2217:2217 istari.monad.help <> v:15 var
+R2183:2185 istari.coq.Syntax <> app def
+R2199:2199 istari.monad.help <> i:17 var
+R2188:2192 istari.coq.Subst <> shift def
+R2196:2196 istari.monad.help <> w:14 var
+R2052:2056 istari.coq.Defined <> nattp def
+def 2343:2347 <> store
+binder 2349:2349 <> w:18
+binder 2351:2351 <> l:19
+R2356:2358 istari.coq.Syntax <> all def
+R2376:2377 istari.coq.Syntax <> pi def
+R2505:2509 istari.coq.Syntax <> arrow def
+R2618:2624 istari.monad.help <> gettype def
+R2627:2631 istari.coq.Subst <> shift def
+R2635:2635 istari.monad.help <> w:18 var
+R2639:2641 istari.coq.Syntax <> var constr
+R2647:2649 istari.coq.Syntax <> var constr
+R2512:2517 istari.monad.help <> subseq def
+R2520:2524 istari.coq.Subst <> shift def
+R2528:2528 istari.monad.help <> w:18 var
+R2532:2536 istari.coq.Subst <> shift def
+R2540:2540 istari.monad.help <> l:19 var
+R2544:2546 istari.coq.Syntax <> var constr
+R2552:2554 istari.coq.Syntax <> var constr
+R2379:2383 istari.coq.Defined <> nattp def
+R2366:2373 istari.monad.help <> preworld def
+R2360:2364 istari.coq.Defined <> nzero def
+def 2875:2878 <> move
+R2884:2894 istari.monad.source <> term ind
+binder 2881:2881 <> A:20
+binder 2897:2898 <> l1:21
+binder 2900:2901 <> l2:22
+R2904:2907 istari.coq.Syntax <> term ind
+R2909:2911 istari.coq.Rules <> obj def
+R2925:2925 istari.monad.help <> A:20 var
+R2937:2943 istari.monad.source <> nattp_m constr
+R2948:2950 istari.coq.Syntax <> lam def
+R2953:2955 istari.coq.Syntax <> lam def
+R2958:2960 istari.coq.Syntax <> var constr
+R2971:2977 istari.monad.source <> arrow_m constr
+R2986:2988 istari.coq.Syntax <> lam def
+R3004:3006 istari.coq.Syntax <> lam def
+R3010:3012 istari.coq.Syntax <> lam def
+R3023:3025 istari.coq.Syntax <> lam def
+R3074:3076 istari.coq.Syntax <> lam def
+R3179:3181 istari.coq.Syntax <> var constr
+binder 3174:3174 <> f:24
+R3212:3214 istari.coq.Syntax <> var constr
+binder 3207:3207 <> l:25
+R3243:3245 istari.coq.Syntax <> var constr
+binder 3238:3238 <> x:26
+R3265:3267 istari.coq.Syntax <> app def
+R3593:3593 istari.monad.help <> x:26 var
+R3270:3272 istari.coq.Syntax <> app def
+R3285:3301 istari.monad.help <> make_subseq_trans def
+R3304:3308 istari.coq.Subst <> subst def
+R3317:3318 istari.monad.help <> l1:21 var
+R3311:3312 istari.coq.Subst <> sh constr
+R3373:3377 istari.coq.Subst <> subst def
+R3386:3387 istari.monad.help <> l2:22 var
+R3380:3381 istari.coq.Subst <> sh constr
+R3441:3441 istari.monad.help <> l:25 var
+R3495:3497 istari.coq.Syntax <> var constr
+R3554:3556 istari.coq.Syntax <> var constr
+R3275:3277 istari.coq.Syntax <> app def
+R3281:3281 istari.monad.help <> l:25 var
+R3279:3279 istari.monad.help <> f:24 var
+R3608:3613 istari.monad.source <> comp_m constr
+R3620:3622 istari.coq.Syntax <> lam def
+R3625:3627 istari.coq.Syntax <> lam def
+R3650:3652 istari.coq.Syntax <> lam def
+R3683:3685 istari.coq.Syntax <> lam def
+R3750:3752 istari.coq.Syntax <> lam def
+R3872:3874 istari.coq.Syntax <> var constr
+binder 3868:3868 <> c:27
+R3923:3925 istari.coq.Syntax <> var constr
+binder 3919:3919 <> l:28
+R3973:3975 istari.coq.Syntax <> var constr
+binder 3968:3968 <> s:29
+R4014:4016 istari.coq.Syntax <> app def
+R4390:4390 istari.monad.help <> s:29 var
+R4019:4021 istari.coq.Syntax <> app def
+R4075:4091 istari.monad.help <> make_subseq_trans def
+R4094:4098 istari.coq.Subst <> subst def
+R4107:4108 istari.monad.help <> l1:21 var
+R4101:4102 istari.coq.Subst <> sh constr
+R4163:4167 istari.coq.Subst <> subst def
+R4176:4177 istari.monad.help <> l2:22 var
+R4170:4171 istari.coq.Subst <> sh constr
+R4231:4231 istari.monad.help <> l:28 var
+R4285:4287 istari.coq.Syntax <> var constr
+R4344:4346 istari.coq.Syntax <> var constr
+R4024:4026 istari.coq.Syntax <> app def
+R4030:4030 istari.monad.help <> l:28 var
+R4028:4028 istari.monad.help <> c:27 var
+R4513:4519 istari.monad.source <> reftp_m constr
+R4526:4528 istari.coq.Syntax <> lam def
+R4531:4533 istari.coq.Syntax <> lam def
+R4582:4585 istari.coq.Syntax <> ppi1 def
+R4588:4590 istari.coq.Syntax <> var constr
+binder 4577:4577 <> i:30
+R4638:4641 istari.coq.Syntax <> ppi1 def
+R4644:4647 istari.coq.Syntax <> ppi2 def
+R4650:4652 istari.coq.Syntax <> var constr
+binder 4629:4633 <> iltl1:31
+R4690:4694 istari.coq.Syntax <> ppair def
+R4699:4703 istari.coq.Syntax <> ppair def
+R5051:5053 istari.coq.Syntax <> lam def
+R5055:5058 istari.coq.Syntax <> triv def
+R4706:4720 istari.monad.basic_types <> lt_trans_fn_app def
+R4722:4722 istari.monad.help <> i:30 var
+R4725:4729 istari.coq.Subst <> subst def
+R4738:4739 istari.monad.help <> l1:21 var
+R4732:4733 istari.coq.Subst <> sh constr
+R4804:4808 istari.coq.Subst <> subst def
+R4817:4818 istari.monad.help <> l2:22 var
+R4811:4812 istari.coq.Subst <> sh constr
+R4882:4886 istari.monad.help <> iltl1:31 var
+R4950:4953 istari.coq.Syntax <> ppi1 def
+R4956:4958 istari.coq.Syntax <> var constr
+R4696:4696 istari.monad.help <> i:30 var
+R5098:5105 istari.monad.source <> unittp_m constr
+R5111:5113 istari.coq.Syntax <> lam def
+R5116:5118 istari.coq.Syntax <> lam def
+R5121:5123 istari.coq.Syntax <> var constr
+R5141:5143 istari.coq.Syntax <> lam def
+R5146:5148 istari.coq.Syntax <> lam def
+R5150:5153 istari.coq.Syntax <> triv def
+def 5210:5217 <> move_app
+binder 5219:5219 <> A:32
+binder 5221:5222 <> l1:33
+binder 5224:5225 <> l2:34
+R5232:5235 istari.coq.Syntax <> term ind
+R5237:5239 istari.coq.Rules <> obj def
+binder 5228:5228 <> m:35
+R5246:5249 istari.coq.Syntax <> term ind
+R5251:5253 istari.coq.Rules <> obj def
+binder 5243:5243 <> x:36
+R5262:5264 istari.coq.Syntax <> app def
+R5289:5289 istari.monad.help <> x:36 var
+R5267:5269 istari.coq.Syntax <> app def
+R5286:5286 istari.monad.help <> m:35 var
+R5272:5275 istari.monad.help <> move def
+R5277:5277 istari.monad.help <> A:32 var
+R5279:5280 istari.monad.help <> l1:33 var
+R5282:5283 istari.monad.help <> l2:34 var
+R5302:5307 istari.monad.help0 <> laters def
+R5309:5316 istari.monad.help <> preworld def
+R5318:5319 istari.monad.basic_types0 <> U0 def
+R5321:5326 istari.monad.help <> subseq def
+R5328:5332 istari.coq.Defined <> leqtp def
+R5334:5338 istari.coq.Defined <> nzero def
+R5340:5344 istari.coq.Defined <> nattp def
+R5346:5350 istari.monad.help <> world def
+R5352:5354 istari.monad.help <> nth def
+prf 5366:5375 <> subst_move
+binder 5385:5385 <> A:37
+binder 5387:5388 <> l1:38
+binder 5390:5391 <> l2:39
+binder 5393:5393 <> s:40
+R5396:5396 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R5419:5422 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R5397:5401 istari.coq.Subst <> subst def
+R5406:5409 istari.monad.help <> move def
+R5411:5411 istari.monad.help <> A:37 var
+R5413:5414 istari.monad.help <> l1:38 var
+R5416:5417 istari.monad.help <> l2:39 var
+R5403:5403 istari.monad.help <> s:40 var
+R5423:5426 istari.monad.help <> move def
+R5428:5428 istari.monad.help <> A:37 var
+R5431:5435 istari.coq.Subst <> subst def
+R5439:5440 istari.monad.help <> l1:38 var
+R5437:5437 istari.monad.help <> s:40 var
+R5444:5448 istari.coq.Subst <> subst def
+R5452:5453 istari.monad.help <> l2:39 var
+R5450:5450 istari.monad.help <> s:40 var
+R5488:5504 istari.monad.help <> make_subseq_trans def
+R5514:5529 istari.monad.basic_types <> leq_trans_fn_app def
+R5539:5550 istari.monad.basic_types <> leq_trans_fn def
+R5591:5607 istari.monad.help <> make_subseq_trans def
+R5617:5632 istari.monad.basic_types <> leq_trans_fn_app def
+R5642:5653 istari.monad.basic_types <> leq_trans_fn def
+R5696:5712 istari.monad.help <> make_subseq_trans def
+R5722:5737 istari.monad.basic_types <> leq_trans_fn_app def
+R5747:5758 istari.monad.basic_types <> leq_trans_fn def
+R5801:5817 istari.monad.help <> make_subseq_trans def
+R5834:5848 istari.monad.basic_types <> lt_trans_fn_app def
+R5858:5873 istari.monad.basic_types <> leq_trans_fn_app def
+R5892:5903 istari.monad.basic_types <> leq_trans_fn def
+R5954:5963 istari.monad.help <> subst_move thm
+prf 5987:5999 <> subst_moveapp
+binder 6001:6001 <> s:41
+binder 6003:6003 <> A:42
+binder 6005:6006 <> l1:43
+binder 6008:6009 <> l2:44
+binder 6011:6012 <> m1:45
+binder 6014:6015 <> m2:46
+R6019:6019 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6052:6085 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6020:6024 istari.coq.Subst <> subst def
+R6029:6036 istari.monad.help <> move_app def
+R6038:6038 istari.monad.help <> A:42 var
+R6040:6041 istari.monad.help <> l1:43 var
+R6043:6044 istari.monad.help <> l2:44 var
+R6046:6047 istari.monad.help <> m1:45 var
+R6049:6050 istari.monad.help <> m2:46 var
+R6026:6026 istari.monad.help <> s:41 var
+R6086:6093 istari.monad.help <> move_app def
+R6095:6095 istari.monad.help <> A:42 var
+R6098:6102 istari.coq.Subst <> subst def
+R6106:6107 istari.monad.help <> l1:43 var
+R6104:6104 istari.monad.help <> s:41 var
+R6111:6115 istari.coq.Subst <> subst def
+R6119:6120 istari.monad.help <> l2:44 var
+R6117:6117 istari.monad.help <> s:41 var
+R6124:6128 istari.coq.Subst <> subst def
+R6132:6133 istari.monad.help <> m1:45 var
+R6130:6130 istari.monad.help <> s:41 var
+R6137:6141 istari.coq.Subst <> subst def
+R6145:6146 istari.monad.help <> m2:46 var
+R6143:6143 istari.monad.help <> s:41 var
+R6160:6167 istari.monad.help <> move_app def
+R6208:6220 istari.monad.help <> subst_moveapp thm
+def 6328:6333 <> cons_b
+binder 6335:6335 <> w:47
+binder 6337:6337 <> l:48
+binder 6339:6339 <> x:49
+R6343:6345 istari.coq.Syntax <> lam def
+R6358:6360 istari.coq.Syntax <> var constr
+binder 6352:6352 <> i:50
+R6398:6401 istari.coq.Syntax <> bite def
+R6448:6452 istari.coq.Subst <> shift def
+R6456:6456 istari.monad.help <> x:49 var
+R6428:6430 istari.coq.Syntax <> app def
+R6444:6444 istari.monad.help <> i:50 var
+R6433:6437 istari.coq.Subst <> shift def
+R6441:6441 istari.monad.help <> w:47 var
+R6404:6410 istari.monad.basic_types0 <> ltb_app def
+R6412:6412 istari.monad.help <> i:50 var
+R6415:6419 istari.coq.Subst <> shift def
+R6423:6423 istari.monad.help <> l:48 var
+def 6471:6479 <> gamma_nth
+R6490:6500 istari.coq.Syntax <> term ind
+R6502:6504 istari.coq.Rules <> obj def
+binder 6482:6487 <> bundle:51
+binder 6507:6507 <> i:52
+R6520:6520 istari.monad.help <> i:52 var
+R6533:6536 istari.coq.Syntax <> ppi1 def
+R6538:6543 istari.monad.help <> bundle:51 var
+R6558:6558 Coq.Init.Datatypes <> S constr
+R6566:6574 istari.monad.help <> gamma_nth:53 def
+R6577:6580 istari.coq.Syntax <> ppi2 def
+R6582:6587 istari.monad.help <> bundle:51 var
+def 6608:6617 <> move_gamma
+R6623:6636 istari.monad.source <> context def
+binder 6620:6620 <> G:55
+binder 6639:6640 <> l1:56
+binder 6642:6643 <> l2:57
+R6649:6659 istari.coq.Syntax <> term ind
+R6661:6663 istari.coq.Rules <> obj def
+binder 6646:6646 <> m:58
+R6674:6684 istari.coq.Syntax <> term ind
+R6686:6688 istari.coq.Rules <> obj def
+binder 6667:6671 <> gamma:59
+R6703:6703 istari.monad.help <> G:55 var
+R6715:6717 Coq.Init.Datatypes <> nil constr
+R6722:6726 istari.monad.help <> gamma:59 var
+R6734:6735 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R6742:6746 istari.coq.Syntax <> ppair def
+R6783:6792 istari.monad.help <> move_gamma:60 def
+R6806:6809 istari.coq.Syntax <> ppi2 def
+R6811:6815 istari.monad.help <> gamma:59 var
+R6803:6803 istari.monad.help <> m:58 var
+R6800:6801 istari.monad.help <> l2:57 var
+R6797:6798 istari.monad.help <> l1:56 var
+R6749:6756 istari.monad.help <> move_app def
+R6760:6761 istari.monad.help <> l1:56 var
+R6763:6764 istari.monad.help <> l2:57 var
+R6766:6766 istari.monad.help <> m:58 var
+R6769:6772 istari.coq.Syntax <> ppi1 def
+R6774:6778 istari.monad.help <> gamma:59 var
+prf 6831:6846 <> subst_move_gamma
+binder 6856:6856 <> g:62
+binder 6858:6859 <> l1:63
+binder 6861:6862 <> l2:64
+binder 6864:6864 <> m:65
+binder 6866:6866 <> s:66
+binder 6868:6868 <> G:67
+R6875:6875 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6908:6911 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6876:6880 istari.coq.Subst <> subst def
+R6885:6894 istari.monad.help <> move_gamma def
+R6896:6896 istari.monad.help <> G:67 var
+R6898:6899 istari.monad.help <> l1:63 var
+R6901:6902 istari.monad.help <> l2:64 var
+R6904:6904 istari.monad.help <> m:65 var
+R6906:6906 istari.monad.help <> g:62 var
+R6882:6882 istari.monad.help <> s:66 var
+R6912:6921 istari.monad.help <> move_gamma def
+R6923:6923 istari.monad.help <> G:67 var
+R6926:6930 istari.coq.Subst <> subst def
+R6934:6935 istari.monad.help <> l1:63 var
+R6932:6932 istari.monad.help <> s:66 var
+R6939:6943 istari.coq.Subst <> subst def
+R6947:6948 istari.monad.help <> l2:64 var
+R6945:6945 istari.monad.help <> s:66 var
+R6952:6956 istari.coq.Subst <> subst def
+R6960:6960 istari.monad.help <> m:65 var
+R6958:6958 istari.monad.help <> s:66 var
+R6964:6968 istari.coq.Subst <> subst def
+R6972:6972 istari.monad.help <> g:62 var
+R6970:6970 istari.monad.help <> s:66 var
+R7058:7061 istari.coq.Syntax <> ppi2 def
+R7058:7061 istari.coq.Syntax <> ppi2 def
+R7058:7061 istari.coq.Syntax <> ppi2 def
+R7085:7092 istari.monad.help <> move_app def
+R7112:7121 istari.monad.help <> subst_move thm
+R7112:7121 istari.monad.help <> subst_move thm
+R7112:7121 istari.monad.help <> subst_move thm
+R7152:7167 istari.monad.help <> subst_move_gamma thm

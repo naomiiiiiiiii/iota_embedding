@@ -1,0 +1,261 @@
+
+9 focused subgoals
+(shelved: 1) (ID 1280)
+  
+  G : source.context
+  R : source.term
+  Rt : term obj
+  A : source.term
+  o : of_m G R (reftp_m A)
+  Dtrans : trans G R (reftp_m A) Rt
+  IHDtrans : tr [::]
+               (oof Rt
+                  (all nzero preworld
+                     (pi nattp
+                        (arrow
+                           (Gamma_at G 
+                              (var 1) 
+                              (var 0))
+                           (trans_type 
+                              (var 1) 
+                              (var 0) 
+                              (reftp_m A))))))
+  Ru1 : term obj
+  HeqRu1 : Ru1 =
+           move_app (reftp_m A) (var 1)
+             (app (app (subst (sh 7) Rt) (var 5))
+                (var 4))
+  i : term obj
+  Heqi : i = ppi1 Ru1
+  p : term obj
+  Heqp : p = ppi2 (ppi2 Ru1)
+  Hp : tr
+         [:: hyp_tm (store (var 2) (var 1));
+             hyp_tm
+               (subseq (ppair (var 4) (var 3))
+                  (ppair (var 1) (var 0)));
+             hyp_tm nattp; hyp_tm preworld;
+             hyp_tm (Gamma_at G (var 1) (var 0));
+             hyp_tm nattp; hyp_tm preworld]
+         (oof p
+            (all nzero preworld
+               (pi nattp
+                  (eqtype
+                     (app
+                        (app
+                           (app
+                              (project
+                                 (dot 
+                                 (var 0)
+                                 (dot
+                                 (var
+                                 (1 + 0)%coq_nat)
+                                 (dot
+                                 (subst
+                                 (sh (1 + 1)%coq_nat)
+                                 i)
+                                 (sh (1 + 1)%coq_nat))))
+                                 (3 + 3)%coq_nat)
+                              (subst
+                                 (sh (1 + 1)%coq_nat)
+                                 i))
+                           (next
+                              (var (1 + 0)%coq_nat)))
+                        (next (var 0)))
+                     (fut
+                        (subst
+                           (dot (var 0)
+                              (dot
+                                 (var
+                                 (1 + 0)%coq_nat)
+                                 (dot
+                                 (subst
+                                 (sh (1 + 1)%coq_nat)
+                                 i)
+                                 (sh (1 + 1)%coq_nat))))
+                           (trans_type 
+                              (var 1) 
+                              (var 0) A)))))))
+  Hi : tr
+         [:: hyp_tm (store (var 2) (var 1));
+             hyp_tm
+               (subseq (ppair (var 4) (var 3))
+                  (ppair (var 1) (var 0)));
+             hyp_tm nattp; hyp_tm preworld;
+             hyp_tm (Gamma_at G (var 1) (var 0));
+             hyp_tm nattp; hyp_tm preworld]
+         (oof i nattp)
+  Hru1 : tr
+           [:: hyp_tm (store (var 2) (var 1));
+               hyp_tm
+                 (subseq (ppair (var 4) (var 3))
+                    (ppair (var 1) (var 0)));
+               hyp_tm nattp; hyp_tm preworld;
+               hyp_tm (Gamma_at G (var 1) (var 0));
+               hyp_tm nattp; hyp_tm preworld]
+           (oof Ru1
+              (trans_type (var 3) 
+                 (var 2) (reftp_m A)))
+  ============================
+  tr
+    [:: hyp_tm preworld;
+        hyp_tm (store (var 2) (var 1));
+        hyp_tm
+          (subseq (ppair (var 4) (var 3))
+             (ppair (var 1) (var 0))); 
+       hyp_tm nattp; hyp_tm preworld;
+        hyp_tm (Gamma_at G (var 1) (var 0));
+        hyp_tm nattp; hyp_tm preworld]
+    (deqtype
+       (pi nattp
+          (eqtype
+             (app
+                (app (app (var 5) (shift 2 i))
+                   (next (var 1))) 
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A))))
+       (pi nattp
+          (eqtype
+             (app
+                (app (app (var 5) (shift 2 i))
+                   (next (var 1))) 
+                (next (var 0)))
+             (fut (trans_type (var 1) (var 0) A)))))
+
+subgoal 2 (ID 1270) is:
+ subst1 (var 3)
+   (pi nattp
+      (eqtype
+         (app
+            (app (app (var 5) (shift 2 i))
+               (next (var 1))) (next (var 0)))
+         (fut (trans_type (var 1) (var 0) A)))) =
+ pi nattp
+   (eqtype
+      (app
+         (app (app (var 4) (shift 1 i))
+            (next (var 4))) (next (var 0)))
+      (fut (trans_type (var 4) (var 0) A)))
+subgoal 3 (ID 1252) is:
+ tr
+   [:: hyp_tm (store (var 2) (var 1));
+       hyp_tm
+         (subseq (ppair (var 4) (var 3))
+            (ppair (var 1) (var 0))); 
+      hyp_tm nattp; hyp_tm preworld;
+       hyp_tm (Gamma_at G (var 1) (var 0));
+       hyp_tm nattp; hyp_tm preworld]
+   (deq (var 2) (var 2) nattp)
+subgoal 4 (ID 1020) is:
+ tr
+   [:: hyp_tm (store (var 2) (var 1));
+       hyp_tm
+         (subseq (ppair (var 4) (var 3))
+            (ppair (var 1) (var 0))); 
+      hyp_tm nattp; hyp_tm preworld;
+       hyp_tm (Gamma_at G (var 1) (var 0));
+       hyp_tm nattp; hyp_tm preworld]
+   (deq
+      (app (app (app (var 0) (var 2)) make_subseq) i)
+      (app (app (app (var 0) (var 2)) make_subseq) i)
+      (app (app (app (var 3) i) (next (var 3)))
+         (next (var 2))))
+subgoal 5 (ID 1001) is:
+ tr
+   (promote
+      [:: hyp_tm (store (var 2) (var 1));
+          hyp_tm
+            (subseq (ppair (var 4) (var 3))
+               (ppair (var 1) (var 0)));
+          hyp_tm nattp; hyp_tm preworld;
+          hyp_tm (Gamma_at G (var 1) (var 0));
+          hyp_tm nattp; hyp_tm preworld])
+   (deqtype (trans_type (var 3) (var 2) A)
+      (trans_type (var 3) (var 2) A))
+subgoal 6 (ID 1002) is:
+ tr
+   [:: hyp_tml (trans_type (var 3) (var 2) A);
+       hyp_tm (store (var 2) (var 1));
+       hyp_tm
+         (subseq (ppair (var 4) (var 3))
+            (ppair (var 1) (var 0))); 
+      hyp_tm nattp; hyp_tm preworld;
+       hyp_tm (Gamma_at G (var 1) (var 0));
+       hyp_tm nattp; hyp_tm preworld]
+   (deq
+      (next
+         (inl
+            (ppair (var 3)
+               (ppair (ppair make_subseq (var 1))
+                  (var 0)))))
+      (next
+         (inl
+            (ppair (var 3)
+               (ppair (ppair make_subseq (var 1))
+                  (var 0)))))
+      (fut
+         (laters
+            (exist nzero preworld
+               (sigma nattp
+                  (prod
+                     (prod
+                        (subseq
+                           (ppair (var 6) (var 5))
+                           (ppair (var 1) (var 0)))
+                        (store (var 1) (var 0)))
+                     (trans_type (var 1) (var 0) A)))))))
+subgoal 7 (ID 973) is:
+ subst1 (prev e)
+   (fut
+      (laters
+         (exist nzero preworld
+            (sigma nattp
+               (prod
+                  (prod
+                     (subseq (ppair (var 6) (var 5))
+                        (ppair (var 1) (var 0)))
+                     (store (var 1) (var 0)))
+                  (trans_type (var 1) (var 0) A)))))) =
+ fut
+   (laters
+      (exist nzero preworld
+         (sigma nattp
+            (prod
+               (prod
+                  (subseq (ppair (var 5) (var 4))
+                     (ppair (var 1) (var 0)))
+                  (store (var 1) (var 0)))
+               (trans_type (var 1) (var 0) A)))))
+subgoal 8 (ID 980) is:
+ subst1 (prev e)
+   (next
+      (inl
+         (ppair (var 3)
+            (ppair (ppair make_subseq (var 1))
+               (var 0))))) =
+ next
+   (inl
+      (ppair (var 2)
+         (ppair (ppair make_subseq (var 0)) (prev e))))
+subgoal 9 (ID 978) is:
+ subst1 (prev e)
+   (fut
+      (laters
+         (exist nzero preworld
+            (sigma nattp
+               (prod
+                  (prod
+                     (subseq (ppair (var 6) (var 5))
+                        (ppair (var 1) (var 0)))
+                     (store (var 1) (var 0)))
+                  (trans_type (var 1) (var 0) A)))))) =
+ fut
+   (laters
+      (exist nzero preworld
+         (sigma nattp
+            (prod
+               (prod
+                  (subseq (ppair (var 5) (var 4))
+                     (ppair (var 1) (var 0)))
+                  (store (var 1) (var 0)))
+               (trans_type (var 1) (var 0) A)))))

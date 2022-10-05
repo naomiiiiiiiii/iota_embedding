@@ -1,0 +1,24 @@
+-R ../ istari
+coq/Sigma.v
+coq/Tactics.v
+coq/Sequence.v
+coq/Syntax.v
+coq/Subst.v
+coq/Simp.v
+coq/Sub.v
+coq/Promote.v
+coq/Hygiene.v
+coq/Context.v
+coq/Hygiene.v
+coq/Equivalence.v
+coq/Rules.v
+coq/Validation.v
+coq/PageType.v
+monad/lemmas0.v
+monad/help.v
+monad/target.v
+monad/trans.v
+monad/subst_help.v
+monad/proofs.v
+monad/proofs_working.v
+monad/basic_types_working.v

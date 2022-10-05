@@ -1,0 +1,843 @@
+DIGEST fce3e0b078beb9f86c28f0aaeb18d7e0
+Fistari.monad.hygiene_help
+R15:30 Coq.Program.Equality <> <> lib
+R32:35 Coq.setoid_ring.Ring <> <> lib
+R37:39 Coq.micromega.Lia <> <> lib
+R41:45 Coq.omega.Omega <> <> lib
+R72:80 Coq.ssr.ssreflect <> <> lib
+R82:87 Coq.ssr.ssrfun <> <> lib
+R89:95 Coq.ssr.ssrbool <> <> lib
+R127:129 mathcomp.ssreflect.seq <> <> lib
+R131:136 mathcomp.ssreflect.eqtype <> <> lib
+R138:143 mathcomp.ssreflect.ssrnat <> <> lib
+R173:179 istari.monad.lemmas0 <> <> lib
+R186:191 istari.monad.source <> <> lib
+R193:201 istari.monad.subst_src <> <> lib
+R203:211 istari.monad.rules_src <> <> lib
+R213:223 istari.monad.basic_types <> <> lib
+R230:233 istari.monad.help <> <> lib
+R235:245 istari.monad.subst_help0 <> <> lib
+R247:256 istari.monad.subst_help <> <> lib
+R286:290 istari.coq.Sigma <> <> lib
+R292:298 istari.coq.Tactics <> <> lib
+R305:310 istari.coq.Syntax <> <> lib
+R312:316 istari.coq.Subst <> <> lib
+R318:324 istari.coq.SimpSub <> <> lib
+R326:332 istari.coq.Promote <> <> lib
+R334:340 istari.coq.Hygiene <> <> lib
+R347:360 istari.coq.ContextHygiene <> <> lib
+R362:372 istari.coq.Equivalence <> <> lib
+R374:385 istari.coq.Equivalences <> <> lib
+R387:391 istari.coq.Rules <> <> lib
+R393:399 istari.coq.Defined <> <> lib
+R401:409 istari.coq.DefsEquiv <> <> lib
+def 424:427 <> hctx
+binder 429:429 <> G:1
+R435:441 istari.coq.Hygiene <> hygiene ind
+R443:445 istari.coq.Rules <> obj def
+R449:455 istari.coq.ContextHygiene <> ctxpred def
+R457:459 istari.coq.Rules <> obj def
+R461:461 istari.monad.hygiene_help <> G:1 var
+R478:481 istari.monad.hygiene_help <> hctx def
+R500:502 istari.monad.lib <> <> lib
+prf 512:519 <> under_op
+R527:533 istari.coq.Syntax <> context def
+R535:537 istari.coq.Rules <> obj def
+binder 522:522 <> G:2
+R542:546 istari.coq.Hygiene <> hincl def
+binder 553:553 <> i:3
+R560:562 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R559:559 istari.monad.hygiene_help <> i:3 var
+R563:568 Coq.Init.Datatypes <> length def
+R570:570 istari.monad.hygiene_help <> G:2 var
+R616:618 Coq.Init.Datatypes <> nat ind
+binder 612:612 <> j:4
+R644:652 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R631:633 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R630:630 istari.monad.hygiene_help <> j:4 var
+R669:677 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R655:658 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'>='_x not
+R654:654 istari.monad.hygiene_help <> j:4 var
+R694:697 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R706:706 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R681:683 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'-'_x not
+R680:680 istari.monad.hygiene_help <> j:4 var
+R698:703 Coq.Init.Datatypes <> length def
+R705:705 istari.monad.hygiene_help <> G:2 var
+prf 900:911 <> under_binder
+R919:925 istari.coq.Syntax <> context def
+R927:929 istari.coq.Rules <> obj def
+binder 914:914 <> G:5
+binder 932:932 <> x:6
+R936:940 istari.coq.Hygiene <> hincl def
+binder 947:947 <> i:7
+R954:956 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R953:953 istari.monad.hygiene_help <> i:7 var
+R957:962 Coq.Init.Datatypes <> length def
+R966:969 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R965:965 istari.monad.hygiene_help <> x:6 var
+R970:970 istari.monad.hygiene_help <> G:5 var
+R1017:1019 Coq.Init.Datatypes <> nat ind
+binder 1013:1013 <> j:8
+R1045:1053 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1032:1034 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R1031:1031 istari.monad.hygiene_help <> j:8 var
+R1070:1078 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R1056:1059 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'>='_x not
+R1055:1055 istari.monad.hygiene_help <> j:8 var
+R1095:1098 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R1107:1107 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'<'_x not
+R1082:1084 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'-'_x not
+R1081:1081 istari.monad.hygiene_help <> j:8 var
+R1099:1104 Coq.Init.Datatypes <> length def
+R1106:1106 istari.monad.hygiene_help <> G:5 var
+R1148:1150 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<'_x not
+R1148:1150 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<'_x not
+R1180:1182 mathcomp.ssreflect.ssrnat <> ltP thm
+R1180:1182 mathcomp.ssreflect.ssrnat <> ltP thm
+R1210:1212 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<'_x not
+R1210:1212 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<'_x not
+R1222:1226 Coq.ssr.ssrbool <> negbT thm
+R1246:1251 mathcomp.ssreflect.ssrnat <> leqNgt thm
+R1246:1251 mathcomp.ssreflect.ssrnat <> leqNgt thm
+R1246:1251 mathcomp.ssreflect.ssrnat <> leqNgt thm
+R1276:1278 mathcomp.ssreflect.ssrnat <> leP thm
+R1276:1278 mathcomp.ssreflect.ssrnat <> leP thm
+R1301:1303 mathcomp.ssreflect.ssrnat <> ltP thm
+R1301:1303 mathcomp.ssreflect.ssrnat <> ltP thm
+R1314:1319 mathcomp.ssreflect.ssrnat <> minusE thm
+R1314:1319 mathcomp.ssreflect.ssrnat <> minusE thm
+R1314:1319 mathcomp.ssreflect.ssrnat <> minusE thm
+R1342:1345 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R1354:1354 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R1337:1339 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<'_x not
+R1334:1336 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'.-1' not
+R1348:1351 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<='_x not
+R1366:1374 mathcomp.ssreflect.ssrnat <> ltn_subLR thm
+R1366:1374 mathcomp.ssreflect.ssrnat <> ltn_subLR thm
+R1366:1374 mathcomp.ssreflect.ssrnat <> ltn_subLR thm
+R1384:1386 mathcomp.ssreflect.ssrnat <> ltP thm
+prf 1422:1431 <> hygiene_pi
+binder 1433:1433 <> G:9
+binder 1435:1436 <> m1:10
+binder 1438:1439 <> m2:11
+R1453:1487 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1443:1446 istari.monad.hygiene_help <> hctx def
+R1448:1448 istari.monad.hygiene_help <> G:9 var
+R1451:1452 istari.monad.hygiene_help <> m1:10 var
+R1516:1550 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1489:1492 istari.monad.hygiene_help <> hctx def
+R1495:1495 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R1505:1509 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R1496:1501 istari.coq.Syntax <> hyp_tm constr
+R1503:1504 istari.monad.hygiene_help <> m1:10 var
+R1510:1510 istari.monad.hygiene_help <> G:9 var
+R1514:1515 istari.monad.hygiene_help <> m2:11 var
+R1552:1555 istari.monad.hygiene_help <> hctx def
+R1557:1557 istari.monad.hygiene_help <> G:9 var
+R1561:1562 istari.coq.Syntax <> pi def
+R1567:1568 istari.monad.hygiene_help <> m2:11 var
+R1564:1565 istari.monad.hygiene_help <> m1:10 var
+R1581:1584 istari.monad.hygiene_help <> hctx def
+R1597:1610 istari.coq.ContextHygiene <> ctxpred_length thm
+R1597:1610 istari.coq.ContextHygiene <> ctxpred_length thm
+R1597:1610 istari.coq.ContextHygiene <> ctxpred_length thm
+R1597:1610 istari.coq.ContextHygiene <> ctxpred_length thm
+R1597:1610 istari.coq.ContextHygiene <> ctxpred_length thm
+R1657:1670 istari.coq.Hygiene <> hygiene_weaken thm
+R1681:1688 istari.monad.hygiene_help <> under_op thm
+R1657:1670 istari.coq.Hygiene <> hygiene_weaken thm
+R1681:1688 istari.monad.hygiene_help <> under_op thm
+R1717:1730 istari.coq.Hygiene <> hygiene_weaken thm
+R1741:1752 istari.monad.hygiene_help <> under_binder thm
+R1717:1730 istari.coq.Hygiene <> hygiene_weaken thm
+R1741:1752 istari.monad.hygiene_help <> under_binder thm
+prf 1785:1798 <> hygiene_karrow
+binder 1800:1800 <> G:12
+binder 1802:1803 <> m1:13
+binder 1805:1806 <> m2:14
+R1820:1854 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1810:1813 istari.monad.hygiene_help <> hctx def
+R1815:1815 istari.monad.hygiene_help <> G:12 var
+R1818:1819 istari.monad.hygiene_help <> m1:13 var
+R1866:1900 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1856:1859 istari.monad.hygiene_help <> hctx def
+R1861:1861 istari.monad.hygiene_help <> G:12 var
+R1864:1865 istari.monad.hygiene_help <> m2:14 var
+R1902:1905 istari.monad.hygiene_help <> hctx def
+R1907:1907 istari.monad.hygiene_help <> G:12 var
+R1911:1916 istari.coq.Syntax <> karrow def
+R1921:1922 istari.monad.hygiene_help <> m2:14 var
+R1918:1919 istari.monad.hygiene_help <> m1:13 var
+R1937:1940 istari.monad.hygiene_help <> hctx def
+R1951:1964 istari.coq.ContextHygiene <> ctxpred_length thm
+R1951:1964 istari.coq.ContextHygiene <> ctxpred_length thm
+R1951:1964 istari.coq.ContextHygiene <> ctxpred_length thm
+R1995:2008 istari.coq.Hygiene <> hygiene_weaken thm
+R2019:2026 istari.monad.hygiene_help <> under_op thm
+R1995:2008 istari.coq.Hygiene <> hygiene_weaken thm
+R2019:2026 istari.monad.hygiene_help <> under_op thm
+R1995:2008 istari.coq.Hygiene <> hygiene_weaken thm
+R2019:2026 istari.monad.hygiene_help <> under_op thm
+prf 2057:2069 <> hygiene_arrow
+binder 2071:2071 <> G:15
+binder 2073:2074 <> m1:16
+binder 2076:2077 <> m2:17
+R2091:2125 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2081:2084 istari.monad.hygiene_help <> hctx def
+R2086:2086 istari.monad.hygiene_help <> G:15 var
+R2089:2090 istari.monad.hygiene_help <> m1:16 var
+R2137:2171 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2127:2130 istari.monad.hygiene_help <> hctx def
+R2132:2132 istari.monad.hygiene_help <> G:15 var
+R2135:2136 istari.monad.hygiene_help <> m2:17 var
+R2173:2176 istari.monad.hygiene_help <> hctx def
+R2178:2178 istari.monad.hygiene_help <> G:15 var
+R2182:2186 istari.coq.Syntax <> arrow def
+R2191:2192 istari.monad.hygiene_help <> m2:17 var
+R2188:2189 istari.monad.hygiene_help <> m1:16 var
+R2207:2210 istari.monad.hygiene_help <> hctx def
+R2221:2234 istari.coq.ContextHygiene <> ctxpred_length thm
+R2221:2234 istari.coq.ContextHygiene <> ctxpred_length thm
+R2221:2234 istari.coq.ContextHygiene <> ctxpred_length thm
+R2265:2278 istari.coq.Hygiene <> hygiene_weaken thm
+R2289:2296 istari.monad.hygiene_help <> under_op thm
+R2265:2278 istari.coq.Hygiene <> hygiene_weaken thm
+R2289:2296 istari.monad.hygiene_help <> under_op thm
+R2265:2278 istari.coq.Hygiene <> hygiene_weaken thm
+R2289:2296 istari.monad.hygiene_help <> under_op thm
+prf 2329:2339 <> hygiene_lam
+binder 2341:2341 <> G:18
+binder 2343:2343 <> m:19
+R2402:2436 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2379:2382 istari.monad.hygiene_help <> hctx def
+R2385:2385 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R2392:2396 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R2386:2391 istari.coq.Syntax <> hyp_tp constr
+R2397:2397 istari.monad.hygiene_help <> G:18 var
+R2401:2401 istari.monad.hygiene_help <> m:19 var
+R2438:2441 istari.monad.hygiene_help <> hctx def
+R2443:2443 istari.monad.hygiene_help <> G:18 var
+R2447:2449 istari.coq.Syntax <> lam def
+R2451:2451 istari.monad.hygiene_help <> m:19 var
+R2464:2467 istari.monad.hygiene_help <> hctx def
+R2480:2493 istari.coq.ContextHygiene <> ctxpred_length thm
+R2480:2493 istari.coq.ContextHygiene <> ctxpred_length thm
+R2480:2493 istari.coq.ContextHygiene <> ctxpred_length thm
+R2480:2493 istari.coq.ContextHygiene <> ctxpred_length thm
+R2480:2493 istari.coq.ContextHygiene <> ctxpred_length thm
+R2538:2551 istari.coq.Hygiene <> hygiene_weaken thm
+R2562:2573 istari.monad.hygiene_help <> under_binder thm
+R2538:2551 istari.coq.Hygiene <> hygiene_weaken thm
+R2562:2573 istari.monad.hygiene_help <> under_binder thm
+prf 2606:2616 <> hygiene_app
+binder 2618:2618 <> G:20
+binder 2620:2621 <> m1:21
+binder 2623:2624 <> m2:22
+R2638:2672 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2628:2631 istari.monad.hygiene_help <> hctx def
+R2633:2633 istari.monad.hygiene_help <> G:20 var
+R2636:2637 istari.monad.hygiene_help <> m1:21 var
+R2684:2718 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2674:2677 istari.monad.hygiene_help <> hctx def
+R2679:2679 istari.monad.hygiene_help <> G:20 var
+R2682:2683 istari.monad.hygiene_help <> m2:22 var
+R2720:2723 istari.monad.hygiene_help <> hctx def
+R2725:2725 istari.monad.hygiene_help <> G:20 var
+R2729:2731 istari.coq.Syntax <> app def
+R2736:2737 istari.monad.hygiene_help <> m2:22 var
+R2733:2734 istari.monad.hygiene_help <> m1:21 var
+R2752:2755 istari.monad.hygiene_help <> hctx def
+R2766:2779 istari.coq.ContextHygiene <> ctxpred_length thm
+R2766:2779 istari.coq.ContextHygiene <> ctxpred_length thm
+R2766:2779 istari.coq.ContextHygiene <> ctxpred_length thm
+R2810:2823 istari.coq.Hygiene <> hygiene_weaken thm
+R2834:2841 istari.monad.hygiene_help <> under_op thm
+R2810:2823 istari.coq.Hygiene <> hygiene_weaken thm
+R2834:2841 istari.monad.hygiene_help <> under_op thm
+R2810:2823 istari.coq.Hygiene <> hygiene_weaken thm
+R2834:2841 istari.monad.hygiene_help <> under_op thm
+prf 2872:2882 <> hygiene_fut
+binder 2884:2884 <> G:23
+binder 2886:2887 <> m1:24
+R2901:2935 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2891:2894 istari.monad.hygiene_help <> hctx def
+R2896:2896 istari.monad.hygiene_help <> G:23 var
+R2899:2900 istari.monad.hygiene_help <> m1:24 var
+R2937:2940 istari.monad.hygiene_help <> hctx def
+R2942:2942 istari.monad.hygiene_help <> G:23 var
+R2946:2948 istari.coq.Syntax <> fut def
+R2950:2951 istari.monad.hygiene_help <> m1:24 var
+R2966:2969 istari.monad.hygiene_help <> hctx def
+R2980:2993 istari.coq.ContextHygiene <> ctxpred_length thm
+R2980:2993 istari.coq.ContextHygiene <> ctxpred_length thm
+R2980:2993 istari.coq.ContextHygiene <> ctxpred_length thm
+R3024:3037 istari.coq.Hygiene <> hygiene_weaken thm
+R3048:3055 istari.monad.hygiene_help <> under_op thm
+R3024:3037 istari.coq.Hygiene <> hygiene_weaken thm
+R3048:3055 istari.monad.hygiene_help <> under_op thm
+prf 3086:3097 <> hygiene_next
+binder 3099:3099 <> G:25
+binder 3101:3102 <> m1:26
+R3116:3150 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3106:3109 istari.monad.hygiene_help <> hctx def
+R3111:3111 istari.monad.hygiene_help <> G:25 var
+R3114:3115 istari.monad.hygiene_help <> m1:26 var
+R3152:3155 istari.monad.hygiene_help <> hctx def
+R3157:3157 istari.monad.hygiene_help <> G:25 var
+R3161:3164 istari.coq.Syntax <> next def
+R3166:3167 istari.monad.hygiene_help <> m1:26 var
+R3182:3185 istari.monad.hygiene_help <> hctx def
+R3196:3209 istari.coq.ContextHygiene <> ctxpred_length thm
+R3196:3209 istari.coq.ContextHygiene <> ctxpred_length thm
+R3196:3209 istari.coq.ContextHygiene <> ctxpred_length thm
+R3240:3253 istari.coq.Hygiene <> hygiene_weaken thm
+R3264:3271 istari.monad.hygiene_help <> under_op thm
+R3240:3253 istari.coq.Hygiene <> hygiene_weaken thm
+R3264:3271 istari.monad.hygiene_help <> under_op thm
+prf 3302:3313 <> hygiene_prev
+binder 3315:3315 <> G:27
+binder 3317:3318 <> m1:28
+R3332:3366 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3322:3325 istari.monad.hygiene_help <> hctx def
+R3327:3327 istari.monad.hygiene_help <> G:27 var
+R3330:3331 istari.monad.hygiene_help <> m1:28 var
+R3368:3371 istari.monad.hygiene_help <> hctx def
+R3373:3373 istari.monad.hygiene_help <> G:27 var
+R3377:3380 istari.coq.Syntax <> prev def
+R3382:3383 istari.monad.hygiene_help <> m1:28 var
+R3398:3401 istari.monad.hygiene_help <> hctx def
+R3412:3425 istari.coq.ContextHygiene <> ctxpred_length thm
+R3412:3425 istari.coq.ContextHygiene <> ctxpred_length thm
+R3412:3425 istari.coq.ContextHygiene <> ctxpred_length thm
+R3456:3469 istari.coq.Hygiene <> hygiene_weaken thm
+R3480:3487 istari.monad.hygiene_help <> under_op thm
+R3456:3469 istari.coq.Hygiene <> hygiene_weaken thm
+R3480:3487 istari.monad.hygiene_help <> under_op thm
+prf 3518:3528 <> hygiene_rec
+binder 3530:3530 <> G:29
+binder 3532:3532 <> m:30
+R3557:3561 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3576:3576 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3536:3539 istari.monad.hygiene_help <> hctx def
+R3548:3551 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R3542:3547 istari.coq.Syntax <> hyp_tp constr
+R3552:3552 istari.monad.hygiene_help <> G:29 var
+R3556:3556 istari.monad.hygiene_help <> m:30 var
+R3562:3565 istari.monad.hygiene_help <> hctx def
+R3567:3567 istari.monad.hygiene_help <> G:29 var
+R3570:3572 istari.coq.Syntax <> rec def
+R3574:3574 istari.monad.hygiene_help <> m:30 var
+R3588:3591 istari.monad.hygiene_help <> hctx def
+R3604:3617 istari.coq.ContextHygiene <> ctxpred_length thm
+R3604:3617 istari.coq.ContextHygiene <> ctxpred_length thm
+R3604:3617 istari.coq.ContextHygiene <> ctxpred_length thm
+R3604:3617 istari.coq.ContextHygiene <> ctxpred_length thm
+R3604:3617 istari.coq.ContextHygiene <> ctxpred_length thm
+R3662:3675 istari.coq.Hygiene <> hygiene_weaken thm
+R3686:3697 istari.monad.hygiene_help <> under_binder thm
+R3662:3675 istari.coq.Hygiene <> hygiene_weaken thm
+R3686:3697 istari.monad.hygiene_help <> under_binder thm
+prf 3728:3739 <> hygiene_triv
+binder 3741:3741 <> G:31
+R3745:3748 istari.monad.hygiene_help <> hctx def
+R3750:3750 istari.monad.hygiene_help <> G:31 var
+R3752:3755 istari.coq.Syntax <> triv def
+prf 3791:3804 <> hygiene_eqtype
+binder 3806:3806 <> G:32
+binder 3808:3809 <> m1:33
+binder 3811:3812 <> m2:34
+R3826:3860 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3816:3819 istari.monad.hygiene_help <> hctx def
+R3821:3821 istari.monad.hygiene_help <> G:32 var
+R3824:3825 istari.monad.hygiene_help <> m1:33 var
+R3872:3906 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3862:3865 istari.monad.hygiene_help <> hctx def
+R3867:3867 istari.monad.hygiene_help <> G:32 var
+R3870:3871 istari.monad.hygiene_help <> m2:34 var
+R3908:3911 istari.monad.hygiene_help <> hctx def
+R3913:3913 istari.monad.hygiene_help <> G:32 var
+R3917:3922 istari.coq.Syntax <> eqtype def
+R3927:3928 istari.monad.hygiene_help <> m2:34 var
+R3924:3925 istari.monad.hygiene_help <> m1:33 var
+R3943:3946 istari.monad.hygiene_help <> hctx def
+R3957:3970 istari.coq.ContextHygiene <> ctxpred_length thm
+R3957:3970 istari.coq.ContextHygiene <> ctxpred_length thm
+R3957:3970 istari.coq.ContextHygiene <> ctxpred_length thm
+R4001:4014 istari.coq.Hygiene <> hygiene_weaken thm
+R4025:4032 istari.monad.hygiene_help <> under_op thm
+R4001:4014 istari.coq.Hygiene <> hygiene_weaken thm
+R4025:4032 istari.monad.hygiene_help <> under_op thm
+R4001:4014 istari.coq.Hygiene <> hygiene_weaken thm
+R4025:4032 istari.monad.hygiene_help <> under_op thm
+prf 4063:4073 <> hygiene_all
+binder 4075:4075 <> G:35
+binder 4077:4077 <> i:36
+binder 4079:4079 <> k:37
+binder 4081:4081 <> m:38
+R4094:4097 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4085:4088 istari.monad.hygiene_help <> hctx def
+R4090:4090 istari.monad.hygiene_help <> G:35 var
+R4093:4093 istari.monad.hygiene_help <> i:36 var
+R4108:4142 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4099:4102 istari.monad.hygiene_help <> hctx def
+R4104:4104 istari.monad.hygiene_help <> G:35 var
+R4107:4107 istari.monad.hygiene_help <> k:37 var
+R4169:4203 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4144:4147 istari.monad.hygiene_help <> hctx def
+R4150:4150 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R4159:4163 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R4151:4156 istari.coq.Syntax <> hyp_tm constr
+R4158:4158 istari.monad.hygiene_help <> k:37 var
+R4164:4164 istari.monad.hygiene_help <> G:35 var
+R4168:4168 istari.monad.hygiene_help <> m:38 var
+R4205:4208 istari.monad.hygiene_help <> hctx def
+R4210:4210 istari.monad.hygiene_help <> G:35 var
+R4214:4216 istari.coq.Syntax <> all def
+R4222:4222 istari.monad.hygiene_help <> m:38 var
+R4220:4220 istari.monad.hygiene_help <> k:37 var
+R4218:4218 istari.monad.hygiene_help <> i:36 var
+R4235:4238 istari.monad.hygiene_help <> hctx def
+R4251:4264 istari.coq.ContextHygiene <> ctxpred_length thm
+R4251:4264 istari.coq.ContextHygiene <> ctxpred_length thm
+R4251:4264 istari.coq.ContextHygiene <> ctxpred_length thm
+R4251:4264 istari.coq.ContextHygiene <> ctxpred_length thm
+R4251:4264 istari.coq.ContextHygiene <> ctxpred_length thm
+R4320:4333 istari.coq.Hygiene <> hygiene_weaken thm
+R4344:4351 istari.monad.hygiene_help <> under_op thm
+R4320:4333 istari.coq.Hygiene <> hygiene_weaken thm
+R4344:4351 istari.monad.hygiene_help <> under_op thm
+R4320:4333 istari.coq.Hygiene <> hygiene_weaken thm
+R4344:4351 istari.monad.hygiene_help <> under_op thm
+R4320:4333 istari.coq.Hygiene <> hygiene_weaken thm
+R4344:4351 istari.monad.hygiene_help <> under_op thm
+R4381:4394 istari.coq.Hygiene <> hygiene_weaken thm
+R4405:4416 istari.monad.hygiene_help <> under_binder thm
+R4381:4394 istari.coq.Hygiene <> hygiene_weaken thm
+R4405:4416 istari.monad.hygiene_help <> under_binder thm
+prf 4449:4461 <> hygiene_exist
+binder 4463:4463 <> G:39
+binder 4465:4465 <> i:40
+binder 4467:4467 <> k:41
+binder 4469:4469 <> m:42
+R4482:4485 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4473:4476 istari.monad.hygiene_help <> hctx def
+R4478:4478 istari.monad.hygiene_help <> G:39 var
+R4481:4481 istari.monad.hygiene_help <> i:40 var
+R4496:4530 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4487:4490 istari.monad.hygiene_help <> hctx def
+R4492:4492 istari.monad.hygiene_help <> G:39 var
+R4495:4495 istari.monad.hygiene_help <> k:41 var
+R4557:4591 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4532:4535 istari.monad.hygiene_help <> hctx def
+R4538:4538 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R4547:4551 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R4539:4544 istari.coq.Syntax <> hyp_tm constr
+R4546:4546 istari.monad.hygiene_help <> k:41 var
+R4552:4552 istari.monad.hygiene_help <> G:39 var
+R4556:4556 istari.monad.hygiene_help <> m:42 var
+R4593:4596 istari.monad.hygiene_help <> hctx def
+R4598:4598 istari.monad.hygiene_help <> G:39 var
+R4602:4606 istari.coq.Syntax <> exist def
+R4612:4612 istari.monad.hygiene_help <> m:42 var
+R4610:4610 istari.monad.hygiene_help <> k:41 var
+R4608:4608 istari.monad.hygiene_help <> i:40 var
+R4625:4628 istari.monad.hygiene_help <> hctx def
+R4641:4654 istari.coq.ContextHygiene <> ctxpred_length thm
+R4641:4654 istari.coq.ContextHygiene <> ctxpred_length thm
+R4641:4654 istari.coq.ContextHygiene <> ctxpred_length thm
+R4641:4654 istari.coq.ContextHygiene <> ctxpred_length thm
+R4641:4654 istari.coq.ContextHygiene <> ctxpred_length thm
+R4710:4723 istari.coq.Hygiene <> hygiene_weaken thm
+R4734:4741 istari.monad.hygiene_help <> under_op thm
+R4710:4723 istari.coq.Hygiene <> hygiene_weaken thm
+R4734:4741 istari.monad.hygiene_help <> under_op thm
+R4710:4723 istari.coq.Hygiene <> hygiene_weaken thm
+R4734:4741 istari.monad.hygiene_help <> under_op thm
+R4710:4723 istari.coq.Hygiene <> hygiene_weaken thm
+R4734:4741 istari.monad.hygiene_help <> under_op thm
+R4771:4784 istari.coq.Hygiene <> hygiene_weaken thm
+R4795:4806 istari.monad.hygiene_help <> under_binder thm
+R4771:4784 istari.coq.Hygiene <> hygiene_weaken thm
+R4795:4806 istari.monad.hygiene_help <> under_binder thm
+prf 4839:4852 <> hygiene_voidtp
+binder 4854:4854 <> G:43
+R4858:4861 istari.monad.hygiene_help <> hctx def
+R4863:4863 istari.monad.hygiene_help <> G:43 var
+R4865:4870 istari.coq.Syntax <> voidtp def
+prf 4906:4919 <> hygiene_unittp
+binder 4921:4921 <> G:44
+R4925:4928 istari.monad.hygiene_help <> hctx def
+R4930:4930 istari.monad.hygiene_help <> G:44 var
+R4932:4937 istari.coq.Syntax <> unittp def
+prf 4972:4985 <> hygiene_booltp
+binder 4987:4987 <> G:45
+R4991:4994 istari.monad.hygiene_help <> hctx def
+R4996:4996 istari.monad.hygiene_help <> G:45 var
+R4998:5003 istari.coq.Syntax <> booltp def
+prf 5038:5050 <> hygiene_btrue
+binder 5052:5052 <> G:46
+R5056:5059 istari.monad.hygiene_help <> hctx def
+R5061:5061 istari.monad.hygiene_help <> G:46 var
+R5063:5067 istari.coq.Syntax <> btrue def
+prf 5102:5115 <> hygiene_bfalse
+binder 5117:5117 <> G:47
+R5121:5124 istari.monad.hygiene_help <> hctx def
+R5126:5126 istari.monad.hygiene_help <> G:47 var
+R5128:5133 istari.coq.Syntax <> bfalse def
+prf 5169:5180 <> hygiene_bite
+binder 5182:5182 <> G:48
+binder 5184:5185 <> m1:49
+binder 5187:5188 <> m2:50
+binder 5190:5191 <> m3:51
+R5205:5208 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5195:5198 istari.monad.hygiene_help <> hctx def
+R5200:5200 istari.monad.hygiene_help <> G:48 var
+R5203:5204 istari.monad.hygiene_help <> m1:49 var
+R5220:5254 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5210:5213 istari.monad.hygiene_help <> hctx def
+R5215:5215 istari.monad.hygiene_help <> G:48 var
+R5218:5219 istari.monad.hygiene_help <> m2:50 var
+R5266:5300 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5256:5259 istari.monad.hygiene_help <> hctx def
+R5261:5261 istari.monad.hygiene_help <> G:48 var
+R5264:5265 istari.monad.hygiene_help <> m3:51 var
+R5302:5305 istari.monad.hygiene_help <> hctx def
+R5307:5307 istari.monad.hygiene_help <> G:48 var
+R5311:5314 istari.coq.Syntax <> bite def
+R5322:5323 istari.monad.hygiene_help <> m3:51 var
+R5319:5320 istari.monad.hygiene_help <> m2:50 var
+R5316:5317 istari.monad.hygiene_help <> m1:49 var
+R5336:5339 istari.monad.hygiene_help <> hctx def
+R5352:5365 istari.coq.ContextHygiene <> ctxpred_length thm
+R5352:5365 istari.coq.ContextHygiene <> ctxpred_length thm
+R5352:5365 istari.coq.ContextHygiene <> ctxpred_length thm
+R5352:5365 istari.coq.ContextHygiene <> ctxpred_length thm
+R5403:5416 istari.coq.Hygiene <> hygiene_weaken thm
+R5427:5434 istari.monad.hygiene_help <> under_op thm
+R5403:5416 istari.coq.Hygiene <> hygiene_weaken thm
+R5427:5434 istari.monad.hygiene_help <> under_op thm
+R5403:5416 istari.coq.Hygiene <> hygiene_weaken thm
+R5427:5434 istari.monad.hygiene_help <> under_op thm
+R5403:5416 istari.coq.Hygiene <> hygiene_weaken thm
+R5427:5434 istari.monad.hygiene_help <> under_op thm
+prf 5466:5477 <> hygiene_prod
+binder 5479:5479 <> G:52
+binder 5481:5482 <> m1:53
+binder 5484:5485 <> m2:54
+R5499:5533 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5489:5492 istari.monad.hygiene_help <> hctx def
+R5494:5494 istari.monad.hygiene_help <> G:52 var
+R5497:5498 istari.monad.hygiene_help <> m1:53 var
+R5545:5579 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5535:5538 istari.monad.hygiene_help <> hctx def
+R5540:5540 istari.monad.hygiene_help <> G:52 var
+R5543:5544 istari.monad.hygiene_help <> m2:54 var
+R5581:5584 istari.monad.hygiene_help <> hctx def
+R5586:5586 istari.monad.hygiene_help <> G:52 var
+R5590:5593 istari.coq.Syntax <> prod def
+R5598:5599 istari.monad.hygiene_help <> m2:54 var
+R5595:5596 istari.monad.hygiene_help <> m1:53 var
+R5614:5617 istari.monad.hygiene_help <> hctx def
+R5628:5641 istari.coq.ContextHygiene <> ctxpred_length thm
+R5628:5641 istari.coq.ContextHygiene <> ctxpred_length thm
+R5628:5641 istari.coq.ContextHygiene <> ctxpred_length thm
+R5672:5685 istari.coq.Hygiene <> hygiene_weaken thm
+R5696:5703 istari.monad.hygiene_help <> under_op thm
+R5672:5685 istari.coq.Hygiene <> hygiene_weaken thm
+R5696:5703 istari.monad.hygiene_help <> under_op thm
+R5672:5685 istari.coq.Hygiene <> hygiene_weaken thm
+R5696:5703 istari.monad.hygiene_help <> under_op thm
+prf 5734:5746 <> hygiene_sigma
+binder 5748:5748 <> G:55
+binder 5750:5751 <> m1:56
+binder 5753:5754 <> m2:57
+R5768:5802 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5758:5761 istari.monad.hygiene_help <> hctx def
+R5763:5763 istari.monad.hygiene_help <> G:55 var
+R5766:5767 istari.monad.hygiene_help <> m1:56 var
+R5831:5865 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5804:5807 istari.monad.hygiene_help <> hctx def
+R5810:5810 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R5820:5824 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R5811:5816 istari.coq.Syntax <> hyp_tm constr
+R5818:5819 istari.monad.hygiene_help <> m1:56 var
+R5825:5825 istari.monad.hygiene_help <> G:55 var
+R5829:5830 istari.monad.hygiene_help <> m2:57 var
+R5867:5870 istari.monad.hygiene_help <> hctx def
+R5872:5872 istari.monad.hygiene_help <> G:55 var
+R5876:5880 istari.coq.Syntax <> sigma def
+R5885:5886 istari.monad.hygiene_help <> m2:57 var
+R5882:5883 istari.monad.hygiene_help <> m1:56 var
+R5899:5902 istari.monad.hygiene_help <> hctx def
+R5915:5928 istari.coq.ContextHygiene <> ctxpred_length thm
+R5915:5928 istari.coq.ContextHygiene <> ctxpred_length thm
+R5915:5928 istari.coq.ContextHygiene <> ctxpred_length thm
+R5915:5928 istari.coq.ContextHygiene <> ctxpred_length thm
+R5915:5928 istari.coq.ContextHygiene <> ctxpred_length thm
+R5975:5988 istari.coq.Hygiene <> hygiene_weaken thm
+R5999:6006 istari.monad.hygiene_help <> under_op thm
+R5975:5988 istari.coq.Hygiene <> hygiene_weaken thm
+R5999:6006 istari.monad.hygiene_help <> under_op thm
+R6035:6048 istari.coq.Hygiene <> hygiene_weaken thm
+R6059:6070 istari.monad.hygiene_help <> under_binder thm
+R6035:6048 istari.coq.Hygiene <> hygiene_weaken thm
+R6059:6070 istari.monad.hygiene_help <> under_binder thm
+prf 6103:6115 <> hygiene_ppair
+binder 6117:6117 <> G:58
+binder 6119:6120 <> m1:59
+binder 6122:6123 <> m2:60
+R6137:6171 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6127:6130 istari.monad.hygiene_help <> hctx def
+R6132:6132 istari.monad.hygiene_help <> G:58 var
+R6135:6136 istari.monad.hygiene_help <> m1:59 var
+R6183:6217 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6173:6176 istari.monad.hygiene_help <> hctx def
+R6178:6178 istari.monad.hygiene_help <> G:58 var
+R6181:6182 istari.monad.hygiene_help <> m2:60 var
+R6219:6222 istari.monad.hygiene_help <> hctx def
+R6224:6224 istari.monad.hygiene_help <> G:58 var
+R6228:6232 istari.coq.Syntax <> ppair def
+R6237:6238 istari.monad.hygiene_help <> m2:60 var
+R6234:6235 istari.monad.hygiene_help <> m1:59 var
+R6253:6256 istari.monad.hygiene_help <> hctx def
+R6267:6280 istari.coq.ContextHygiene <> ctxpred_length thm
+R6267:6280 istari.coq.ContextHygiene <> ctxpred_length thm
+R6267:6280 istari.coq.ContextHygiene <> ctxpred_length thm
+R6311:6324 istari.coq.Hygiene <> hygiene_weaken thm
+R6335:6342 istari.monad.hygiene_help <> under_op thm
+R6311:6324 istari.coq.Hygiene <> hygiene_weaken thm
+R6335:6342 istari.monad.hygiene_help <> under_op thm
+R6311:6324 istari.coq.Hygiene <> hygiene_weaken thm
+R6335:6342 istari.monad.hygiene_help <> under_op thm
+prf 6373:6384 <> hygiene_ppi1
+binder 6386:6386 <> G:61
+binder 6388:6389 <> m1:62
+R6403:6437 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6393:6396 istari.monad.hygiene_help <> hctx def
+R6398:6398 istari.monad.hygiene_help <> G:61 var
+R6401:6402 istari.monad.hygiene_help <> m1:62 var
+R6439:6442 istari.monad.hygiene_help <> hctx def
+R6444:6444 istari.monad.hygiene_help <> G:61 var
+R6448:6451 istari.coq.Syntax <> ppi1 def
+R6453:6454 istari.monad.hygiene_help <> m1:62 var
+R6469:6472 istari.monad.hygiene_help <> hctx def
+R6483:6496 istari.coq.ContextHygiene <> ctxpred_length thm
+R6483:6496 istari.coq.ContextHygiene <> ctxpred_length thm
+R6483:6496 istari.coq.ContextHygiene <> ctxpred_length thm
+R6527:6540 istari.coq.Hygiene <> hygiene_weaken thm
+R6551:6558 istari.monad.hygiene_help <> under_op thm
+R6527:6540 istari.coq.Hygiene <> hygiene_weaken thm
+R6551:6558 istari.monad.hygiene_help <> under_op thm
+prf 6588:6599 <> hygiene_ppi2
+binder 6601:6601 <> G:63
+binder 6603:6604 <> m1:64
+R6618:6652 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6608:6611 istari.monad.hygiene_help <> hctx def
+R6613:6613 istari.monad.hygiene_help <> G:63 var
+R6616:6617 istari.monad.hygiene_help <> m1:64 var
+R6654:6657 istari.monad.hygiene_help <> hctx def
+R6659:6659 istari.monad.hygiene_help <> G:63 var
+R6663:6666 istari.coq.Syntax <> ppi2 def
+R6668:6669 istari.monad.hygiene_help <> m1:64 var
+R6684:6687 istari.monad.hygiene_help <> hctx def
+R6698:6711 istari.coq.ContextHygiene <> ctxpred_length thm
+R6698:6711 istari.coq.ContextHygiene <> ctxpred_length thm
+R6698:6711 istari.coq.ContextHygiene <> ctxpred_length thm
+R6742:6755 istari.coq.Hygiene <> hygiene_weaken thm
+R6766:6773 istari.monad.hygiene_help <> under_op thm
+R6742:6755 istari.coq.Hygiene <> hygiene_weaken thm
+R6766:6773 istari.monad.hygiene_help <> under_op thm
+prf 6804:6813 <> hygiene_wt
+binder 6815:6815 <> G:65
+binder 6817:6818 <> m1:66
+binder 6820:6821 <> m2:67
+R6835:6869 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6825:6828 istari.monad.hygiene_help <> hctx def
+R6830:6830 istari.monad.hygiene_help <> G:65 var
+R6833:6834 istari.monad.hygiene_help <> m1:66 var
+R6898:6932 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6871:6874 istari.monad.hygiene_help <> hctx def
+R6877:6877 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R6887:6891 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R6878:6883 istari.coq.Syntax <> hyp_tm constr
+R6885:6886 istari.monad.hygiene_help <> m1:66 var
+R6892:6892 istari.monad.hygiene_help <> G:65 var
+R6896:6897 istari.monad.hygiene_help <> m2:67 var
+R6934:6937 istari.monad.hygiene_help <> hctx def
+R6939:6939 istari.monad.hygiene_help <> G:65 var
+R6943:6944 istari.coq.Syntax <> wt def
+R6949:6950 istari.monad.hygiene_help <> m2:67 var
+R6946:6947 istari.monad.hygiene_help <> m1:66 var
+R6963:6966 istari.monad.hygiene_help <> hctx def
+R6979:6992 istari.coq.ContextHygiene <> ctxpred_length thm
+R6979:6992 istari.coq.ContextHygiene <> ctxpred_length thm
+R6979:6992 istari.coq.ContextHygiene <> ctxpred_length thm
+R6979:6992 istari.coq.ContextHygiene <> ctxpred_length thm
+R6979:6992 istari.coq.ContextHygiene <> ctxpred_length thm
+R7039:7052 istari.coq.Hygiene <> hygiene_weaken thm
+R7063:7070 istari.monad.hygiene_help <> under_op thm
+R7039:7052 istari.coq.Hygiene <> hygiene_weaken thm
+R7063:7070 istari.monad.hygiene_help <> under_op thm
+R7099:7112 istari.coq.Hygiene <> hygiene_weaken thm
+R7123:7134 istari.monad.hygiene_help <> under_binder thm
+R7099:7112 istari.coq.Hygiene <> hygiene_weaken thm
+R7123:7134 istari.monad.hygiene_help <> under_binder thm
+prf 7168:7175 <> hygiene0
+binder 7177:7177 <> G:68
+binder 7179:7179 <> x:69
+R7183:7186 istari.monad.hygiene_help <> hctx def
+R7190:7191 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7189:7189 istari.monad.hygiene_help <> x:69 var
+R7192:7192 istari.monad.hygiene_help <> G:68 var
+R7196:7198 istari.coq.Syntax <> var constr
+R7214:7217 istari.monad.hygiene_help <> hctx def
+R7230:7243 istari.coq.ContextHygiene <> ctxpred_length thm
+R7230:7243 istari.coq.ContextHygiene <> ctxpred_length thm
+R7230:7243 istari.coq.ContextHygiene <> ctxpred_length thm
+R7230:7243 istari.coq.ContextHygiene <> ctxpred_length thm
+R7274:7276 mathcomp.ssreflect.ssrnat <> ltP thm
+R7274:7276 mathcomp.ssreflect.ssrnat <> ltP thm
+prf 7297:7308 <> hygiene_hint
+binder 7310:7310 <> G:70
+binder 7312:7312 <> x:71
+binder 7314:7314 <> y:72
+R7318:7321 istari.monad.hygiene_help <> hctx def
+R7325:7326 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7324:7324 istari.monad.hygiene_help <> x:71 var
+R7328:7329 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7327:7327 istari.monad.hygiene_help <> y:72 var
+R7330:7330 istari.monad.hygiene_help <> G:70 var
+R7334:7336 istari.coq.Syntax <> var constr
+R7352:7355 istari.monad.hygiene_help <> hctx def
+R7368:7381 istari.coq.ContextHygiene <> ctxpred_length thm
+R7368:7381 istari.coq.ContextHygiene <> ctxpred_length thm
+R7368:7381 istari.coq.ContextHygiene <> ctxpred_length thm
+R7368:7381 istari.coq.ContextHygiene <> ctxpred_length thm
+R7412:7414 mathcomp.ssreflect.ssrnat <> ltP thm
+R7412:7414 mathcomp.ssreflect.ssrnat <> ltP thm
+prf 7435:7442 <> hygiene2
+binder 7444:7444 <> G:73
+binder 7446:7446 <> x:74
+binder 7448:7448 <> y:75
+binder 7450:7450 <> z:76
+R7454:7457 istari.monad.hygiene_help <> hctx def
+R7461:7462 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7460:7460 istari.monad.hygiene_help <> z:76 var
+R7464:7465 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7463:7463 istari.monad.hygiene_help <> x:74 var
+R7467:7468 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7466:7466 istari.monad.hygiene_help <> y:75 var
+R7469:7469 istari.monad.hygiene_help <> G:73 var
+R7473:7475 istari.coq.Syntax <> var constr
+R7491:7494 istari.monad.hygiene_help <> hctx def
+R7507:7520 istari.coq.ContextHygiene <> ctxpred_length thm
+R7507:7520 istari.coq.ContextHygiene <> ctxpred_length thm
+R7507:7520 istari.coq.ContextHygiene <> ctxpred_length thm
+R7507:7520 istari.coq.ContextHygiene <> ctxpred_length thm
+R7551:7553 mathcomp.ssreflect.ssrnat <> ltP thm
+R7551:7553 mathcomp.ssreflect.ssrnat <> ltP thm
+prf 7574:7581 <> hygiene3
+binder 7583:7583 <> G:77
+binder 7585:7585 <> x:78
+binder 7587:7587 <> y:79
+binder 7589:7589 <> z:80
+binder 7591:7591 <> a:81
+R7595:7598 istari.monad.hygiene_help <> hctx def
+R7602:7603 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7601:7601 istari.monad.hygiene_help <> a:81 var
+R7605:7606 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7604:7604 istari.monad.hygiene_help <> z:80 var
+R7608:7609 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7607:7607 istari.monad.hygiene_help <> x:78 var
+R7611:7612 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R7610:7610 istari.monad.hygiene_help <> y:79 var
+R7613:7613 istari.monad.hygiene_help <> G:77 var
+R7617:7619 istari.coq.Syntax <> var constr
+R7635:7638 istari.monad.hygiene_help <> hctx def
+R7651:7664 istari.coq.ContextHygiene <> ctxpred_length thm
+R7651:7664 istari.coq.ContextHygiene <> ctxpred_length thm
+R7651:7664 istari.coq.ContextHygiene <> ctxpred_length thm
+R7651:7664 istari.coq.ContextHygiene <> ctxpred_length thm
+R7695:7697 mathcomp.ssreflect.ssrnat <> ltP thm
+R7695:7697 mathcomp.ssreflect.ssrnat <> ltP thm
+prf 7718:7729 <> hygiene_univ
+binder 7731:7731 <> G:82
+binder 7733:7733 <> m:83
+R7746:7780 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7737:7740 istari.monad.hygiene_help <> hctx def
+R7742:7742 istari.monad.hygiene_help <> G:82 var
+R7745:7745 istari.monad.hygiene_help <> m:83 var
+R7782:7785 istari.monad.hygiene_help <> hctx def
+R7787:7787 istari.monad.hygiene_help <> G:82 var
+R7791:7794 istari.coq.Syntax <> univ def
+R7796:7796 istari.monad.hygiene_help <> m:83 var
+R7811:7814 istari.monad.hygiene_help <> hctx def
+R7825:7838 istari.coq.ContextHygiene <> ctxpred_length thm
+R7825:7838 istari.coq.ContextHygiene <> ctxpred_length thm
+R7825:7838 istari.coq.ContextHygiene <> ctxpred_length thm
+R7869:7882 istari.coq.Hygiene <> hygiene_weaken thm
+R7893:7900 istari.monad.hygiene_help <> under_op thm
+R7869:7882 istari.coq.Hygiene <> hygiene_weaken thm
+R7893:7900 istari.monad.hygiene_help <> under_op thm
+prf 8450:8467 <> hygiene_makesubseq
+binder 8469:8469 <> G:84
+R8473:8476 istari.monad.hygiene_help <> hctx def
+R8478:8478 istari.monad.hygiene_help <> G:84 var
+R8481:8491 istari.monad.help <> make_subseq def
+R8501:8511 istari.monad.help <> make_subseq def
+prf 8584:8598 <> hygiene_moveapp
+binder 8600:8600 <> G:85
+binder 8602:8602 <> A:86
+binder 8604:8604 <> m:87
+binder 8606:8606 <> v:88
+R8619:8653 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8610:8613 istari.monad.hygiene_help <> hctx def
+R8615:8615 istari.monad.hygiene_help <> G:85 var
+R8618:8618 istari.monad.hygiene_help <> m:87 var
+R8664:8698 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8655:8658 istari.monad.hygiene_help <> hctx def
+R8660:8660 istari.monad.hygiene_help <> G:85 var
+R8663:8663 istari.monad.hygiene_help <> v:88 var
+R8700:8703 istari.monad.hygiene_help <> hctx def
+R8705:8705 istari.monad.hygiene_help <> G:85 var
+R8709:8716 istari.monad.help <> move_app def
+R8718:8718 istari.monad.hygiene_help <> A:86 var
+R8720:8720 istari.monad.hygiene_help <> m:87 var
+R8722:8722 istari.monad.hygiene_help <> v:88 var
+R8735:8742 istari.monad.help <> move_app def
+prf 8804:8814 <> hygiene_nat
+binder 8816:8816 <> G:89
+R8820:8823 istari.monad.hygiene_help <> hctx def
+R8825:8825 istari.monad.hygiene_help <> G:89 var
+R8828:8832 istari.coq.Defined <> nattp def
+prf 8881:8893 <> hygiene_nzero
+binder 8903:8903 <> G:90
+R8907:8910 istari.monad.hygiene_help <> hctx def
+R8912:8912 istari.monad.hygiene_help <> G:90 var
+R8915:8919 istari.coq.Defined <> nzero def
+R8932:8936 istari.coq.Defined <> nzero def
+prf 9015:9024 <> hygiene_U0
+binder 9034:9034 <> G:91
+R9038:9041 istari.monad.hygiene_help <> hctx def
+R9043:9043 istari.monad.hygiene_help <> G:91 var
+R9047:9050 istari.coq.Syntax <> univ def
+R9052:9056 istari.coq.Defined <> nzero def
+R9077:9078 istari.monad.basic_types <> U0 def
+prf 9143:9152 <> hygiene_pw
+binder 9154:9154 <> G:92
+R9158:9161 istari.monad.hygiene_help <> hctx def
+R9163:9163 istari.monad.hygiene_help <> G:92 var
+R9166:9173 istari.monad.help <> preworld def
+R9183:9190 istari.monad.help <> preworld def
+prf 9256:9268 <> hygiene_theta
+binder 9270:9270 <> G:93
+R9275:9278 istari.monad.hygiene_help <> hctx def
+R9280:9280 istari.monad.hygiene_help <> G:93 var
+R9283:9287 istari.coq.Defined <> theta def
+R9299:9303 istari.coq.Defined <> theta def
+prf 9370:9382 <> hygiene_minus
+binder 9384:9384 <> G:94
+R9389:9392 istari.monad.hygiene_help <> hctx def
+R9394:9394 istari.monad.hygiene_help <> G:94 var
+R9397:9401 Coq.Init.Peano <> minus syndef

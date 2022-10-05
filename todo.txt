@@ -1,0 +1,19 @@
+1) STORE FINAL PROOF STATE in current state BEFORE YOU COMMIT FOR A BREAK
+OR BEFORE YOU CANCEL OUT OF IT
+
+
+
+Ltac rewrite_term Hrw := match goal with |- tr ?G (oof ?M ?T) =>
+                                    let M' := fresh "M" in
+                                    let Hm := fresh "Hm" in
+                                    remember M as M' eqn:Hm;
+                                    rewrite Hrw in Hm; subst M
+  end.
+match goal with |- tr (?z::?y::?x::?G') (oof ?M ?T) =>
+                change (z::y::x::G') with ([:: z; y; x] ++ G') end.
+
+picomp_moveback lemma
+
+whats the minimum number of hypotheses i need in the picomps
+2?) add specific instances of picomps also cuz those were super useful
+move subseq_refl out of proofs_working

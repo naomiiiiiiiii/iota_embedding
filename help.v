@@ -7,7 +7,24 @@ From istari Require Import basic_types0 basic_types subst_help0 help0 Syntax Sub
 
 
 
+(*\mu n. Nat -> fut n -> fut nat -> U0
 
+nat := z
+| S nat
+
+
+\mu n. z + n
+
+preworld :=
+| pw : Nat -> fut preworld -> fut nat -> U0 -> preworld
+
+??
+
+pw \\\.z : preworld
+
+
+
+ *)
 
 
 

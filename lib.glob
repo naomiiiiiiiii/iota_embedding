@@ -1,0 +1,23 @@
+DIGEST e60c244c355e5854a82489b294254542
+Fistari.monad.lib
+R15:21 Coq.Program.Program <> <> lib
+R23:30 istari.coq.Equality <> <> lib
+R32:35 Coq.setoid_ring.Ring <> <> lib
+R37:39 Coq.micromega.Lia <> <> lib
+R41:45 Coq.omega.Omega <> <> lib
+R72:80 Coq.ssr.ssreflect <> <> lib
+R82:87 Coq.ssr.ssrfun <> <> lib
+R89:95 Coq.ssr.ssrbool <> <> lib
+R127:129 mathcomp.ssreflect.seq <> <> lib
+R131:136 mathcomp.ssreflect.eqtype <> <> lib
+R138:143 mathcomp.ssreflect.ssrnat <> <> lib
+prf 153:157 <> geq0c
+binder 159:159 <> n:1
+R164:167 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'>='_x not
+R163:163 istari.monad.lib <> n:1 var
+R188:193 Coq.Arith.Compare_dec <> not_lt thm
+R188:193 Coq.Arith.Compare_dec <> not_lt thm
+R216:218 mathcomp.ssreflect.ssrnat <> ltP thm
+R262:270 Coq.Arith.Minus <> minus_n_O thm
+R346:350 mathcomp.ssreflect.ssrnat <> addn1 thm
+R352:356 mathcomp.ssreflect.ssrnat <> add1n thm

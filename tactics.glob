@@ -1,0 +1,555 @@
+DIGEST e9bce4e58cc61d4e3701a34ed8d9d04c
+Fistari.monad.tactics
+R4335:4335 Coq.Init.Datatypes <> S constr
+R4335:4335 Coq.Init.Datatypes <> S constr
+R5018:5020 Coq.Init.Logic <> not def
+R5018:5020 Coq.Init.Logic <> not def
+R5066:5067 Coq.Init.Logic <> eq ind
+R5066:5067 Coq.Init.Logic <> eq ind
+R5083:5085 Coq.Init.Logic <> not def
+R5089:5090 Coq.Init.Logic <> eq ind
+R5083:5085 Coq.Init.Logic <> not def
+R5089:5090 Coq.Init.Logic <> eq ind
+R5150:5152 Coq.Init.Logic <> not def
+R5156:5157 Coq.Init.Logic <> eq ind
+R5150:5152 Coq.Init.Logic <> not def
+R5156:5157 Coq.Init.Logic <> eq ind
+R5208:5212 Coq.Init.Logic <> False ind
+R5208:5212 Coq.Init.Logic <> False ind
+R5498:5504 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R5508:5509 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R5498:5504 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R5508:5509 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R5656:5659 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R5656:5659 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R5789:5792 Coq.Init.Datatypes <> prod ind
+R5789:5792 Coq.Init.Datatypes <> prod ind
+R6211:6213 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6211:6213 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6310:6312 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6310:6312 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6433:6434 Coq.Init.Logic <> eq ind
+R6433:6434 Coq.Init.Logic <> eq ind
+R6468:6470 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R7122:7124 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R7802:7808 Coq.Init.Logic <> eq_refl constr
+R8442:8442 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8454:8458 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8444:8445 Coq.Init.Logic <> eq ind
+R8442:8442 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8454:8458 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8444:8445 Coq.Init.Logic <> eq ind
+binder 9863:9863 <> x:1
+R9870:9870 istari.monad.tactics <> x:1 var
+binder 9863:9863 <> x:2
+R9870:9870 istari.monad.tactics <> x:2 var
+R9882:9897 Coq.Init.Wf <> well_founded_ind thm
+R10756:10759 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10756:10759 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11318:11321 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11318:11321 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+binder 11495:11495 <> x:3
+R11507:11507 istari.monad.tactics <> x:3 var
+binder 11495:11495 <> x:4
+R11507:11507 istari.monad.tactics <> x:4 var
+R12828:12830 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R12978:12980 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13145:13147 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13324:13326 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13489:13491 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13669:13671 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13866:13868 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R14075:14077 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R14183:14187 Coq.omega.Omega <> <> lib
+R14205:14215 Coq.omega.OmegaTactic <> <> lib
+R14320:14320 Coq.Init.Datatypes <> S constr
+R14320:14320 Coq.Init.Datatypes <> S constr
+R14525:14527 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14525:14527 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14659:14661 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14659:14661 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14722:14724 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14680:14683 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14692:14692 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14688:14690 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14397:14399 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14397:14399 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14457:14457 Coq.Init.Datatypes <> S constr
+R14420:14422 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14417:14417 Coq.Init.Datatypes <> S constr
+R14807:14809 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14807:14809 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14925:14925 Coq.Init.Datatypes <> S constr
+R14925:14925 Coq.Init.Datatypes <> S constr
+R14953:14955 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R14953:14955 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R15549:15552 Coq.Lists.List <> <> lib
+R15615:15616 Coq.Lists.List <> In def
+R15622:15625 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R15615:15616 Coq.Lists.List <> In def
+R15622:15625 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R15777:15778 Coq.Lists.List <> In def
+R15783:15785 Coq.Init.Datatypes <> app def
+R15777:15778 Coq.Lists.List <> In def
+R15783:15785 Coq.Init.Datatypes <> app def
+R15957:15958 Coq.Lists.List <> In def
+R15963:15965 Coq.Lists.List <> map def
+R15957:15958 Coq.Lists.List <> In def
+R15963:15965 Coq.Lists.List <> map def
+R16134:16135 Coq.Lists.List <> In def
+R16140:16147 Coq.Lists.List <> flat_map def
+R16134:16135 Coq.Lists.List <> In def
+R16140:16147 Coq.Lists.List <> flat_map def
+R16340:16341 Coq.Lists.List <> In def
+R16345:16347 Coq.Init.Datatypes <> nil constr
+R16340:16341 Coq.Lists.List <> In def
+R16345:16347 Coq.Init.Datatypes <> nil constr
+R16377:16383 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R16387:16388 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R16377:16383 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R16387:16388 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R16237:16247 Coq.Lists.List <> in_flat_map thm
+binder 16227:16227 <> H:5
+R16262:16262 istari.monad.tactics <> H:5 var
+R16048:16057 Coq.Lists.List <> in_map_iff thm
+binder 16038:16038 <> H:6
+R16072:16072 istari.monad.tactics <> H:6 var
+R15856:15864 Coq.Lists.List <> in_app_or thm
+R16534:16535 Coq.Lists.List <> In def
+R16541:16544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16534:16535 Coq.Lists.List <> In def
+R16541:16544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16610:16611 Coq.Lists.List <> In def
+R16617:16620 Coq.Init.Datatypes <> ::list_scope:x_'++'_x not
+R16610:16611 Coq.Lists.List <> In def
+R16617:16620 Coq.Init.Datatypes <> ::list_scope:x_'++'_x not
+R16639:16647 Coq.Lists.List <> in_or_app thm
+prf 16753:16761 <> rel_quest
+binder 16775:16775 <> A:7
+R16791:16794 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16790:16790 istari.monad.tactics <> A:7 var
+binder 16786:16786 <> P:8
+R16808:16808 istari.monad.tactics <> A:7 var
+binder 16802:16802 <> x:9
+binder 16804:16804 <> y:10
+R16819:16826 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16816:16816 istari.monad.tactics <> P:8 var
+R16818:16818 istari.monad.tactics <> x:9 var
+R16832:16839 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16828:16830 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R16827:16827 istari.monad.tactics <> x:9 var
+R16831:16831 istari.monad.tactics <> y:10 var
+R16840:16840 istari.monad.tactics <> P:8 var
+R16842:16842 istari.monad.tactics <> y:10 var
+prf 16885:16895 <> rel_quest_1
+binder 16909:16909 <> A:11
+binder 16911:16911 <> B:12
+R16927:16930 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16926:16926 istari.monad.tactics <> A:11 var
+R16932:16935 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16931:16931 istari.monad.tactics <> B:12 var
+binder 16922:16922 <> P:13
+R16949:16949 istari.monad.tactics <> A:11 var
+binder 16943:16943 <> x:14
+binder 16945:16945 <> y:15
+R16957:16957 istari.monad.tactics <> B:12 var
+binder 16953:16953 <> z:16
+R16970:16977 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16965:16965 istari.monad.tactics <> P:13 var
+R16969:16969 istari.monad.tactics <> z:16 var
+R16967:16967 istari.monad.tactics <> x:14 var
+R16983:16990 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R16979:16981 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R16978:16978 istari.monad.tactics <> x:14 var
+R16982:16982 istari.monad.tactics <> y:15 var
+R16991:16991 istari.monad.tactics <> P:13 var
+R16995:16995 istari.monad.tactics <> z:16 var
+R16993:16993 istari.monad.tactics <> y:15 var
+prf 17038:17048 <> rel_quest_2
+binder 17062:17062 <> A:17
+binder 17064:17064 <> B:18
+binder 17066:17066 <> C:19
+R17082:17085 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17081:17081 istari.monad.tactics <> A:17 var
+R17087:17090 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17086:17086 istari.monad.tactics <> B:18 var
+R17092:17095 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17091:17091 istari.monad.tactics <> C:19 var
+binder 17077:17077 <> P:20
+R17109:17109 istari.monad.tactics <> A:17 var
+binder 17103:17103 <> x:21
+binder 17105:17105 <> y:22
+R17117:17117 istari.monad.tactics <> B:18 var
+binder 17113:17113 <> z:23
+R17126:17126 istari.monad.tactics <> C:19 var
+binder 17121:17122 <> z':24
+R17142:17149 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17134:17134 istari.monad.tactics <> P:20 var
+R17140:17141 istari.monad.tactics <> z':24 var
+R17138:17138 istari.monad.tactics <> z:23 var
+R17136:17136 istari.monad.tactics <> x:21 var
+R17155:17162 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17151:17153 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R17150:17150 istari.monad.tactics <> x:21 var
+R17154:17154 istari.monad.tactics <> y:22 var
+R17163:17163 istari.monad.tactics <> P:20 var
+R17169:17170 istari.monad.tactics <> z':24 var
+R17167:17167 istari.monad.tactics <> z:23 var
+R17165:17165 istari.monad.tactics <> y:22 var
+R17231:17239 istari.monad.tactics <> rel_quest thm
+def 17276:17281 <> eqrefl
+binder 17284:17284 <> A:25
+R17295:17295 istari.monad.tactics <> A:25 var
+binder 17293:17293 <> x:26
+R17301:17307 Coq.Init.Logic <> eq_refl constr
+R17309:17309 istari.monad.tactics <> x:26 var
+def 17325:17330 <> eqconv
+binder 17333:17333 <> A:27
+R17349:17352 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17348:17348 istari.monad.tactics <> A:27 var
+binder 17344:17344 <> P:28
+R17366:17366 istari.monad.tactics <> A:27 var
+binder 17360:17360 <> x:29
+binder 17362:17362 <> y:30
+R17377:17379 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R17376:17376 istari.monad.tactics <> x:29 var
+R17380:17380 istari.monad.tactics <> y:30 var
+binder 17370:17372 <> Heq:31
+R17388:17388 istari.monad.tactics <> P:28 var
+R17390:17390 istari.monad.tactics <> x:29 var
+binder 17384:17384 <> H:32
+R17395:17395 istari.monad.tactics <> P:28 var
+R17397:17397 istari.monad.tactics <> y:30 var
+def 17443:17448 <> eqsymm
+binder 17451:17451 <> A:33
+R17468:17468 istari.monad.tactics <> A:33 var
+binder 17462:17462 <> x:34
+binder 17464:17464 <> y:35
+R17479:17481 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R17478:17478 istari.monad.tactics <> x:34 var
+R17482:17482 istari.monad.tactics <> y:35 var
+binder 17472:17474 <> Heq:36
+R17488:17490 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R17487:17487 istari.monad.tactics <> y:35 var
+R17491:17491 istari.monad.tactics <> x:34 var
+def 17540:17545 <> eintro
+binder 17548:17548 <> A:37
+R17564:17567 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17563:17563 istari.monad.tactics <> A:37 var
+binder 17559:17559 <> P:38
+R17579:17579 istari.monad.tactics <> A:37 var
+binder 17575:17575 <> x:39
+R17587:17587 istari.monad.tactics <> P:38 var
+R17589:17589 istari.monad.tactics <> x:39 var
+binder 17583:17583 <> H:40
+R17595:17601 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R17603:17604 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+binder 17602:17602 <> x:41
+R17605:17605 istari.monad.tactics <> P:38 var
+R17607:17607 istari.monad.tactics <> x:41 var
+def 17643:17645 <> car
+binder 17648:17648 <> A:42
+binder 17650:17650 <> B:43
+R17665:17667 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17664:17664 istari.monad.tactics <> A:42 var
+R17668:17668 istari.monad.tactics <> B:43 var
+binder 17660:17660 <> p:44
+R17688:17688 istari.monad.tactics <> p:44 var
+binder 17679:17679 <> x:45
+R17693:17693 istari.monad.tactics <> x:45 var
+def 17707:17709 <> cdr
+binder 17712:17712 <> A:46
+binder 17714:17714 <> B:47
+R17729:17731 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17728:17728 istari.monad.tactics <> A:46 var
+R17732:17732 istari.monad.tactics <> B:47 var
+binder 17724:17724 <> p:48
+R17752:17752 istari.monad.tactics <> p:48 var
+binder 17746:17746 <> y:49
+R17757:17757 istari.monad.tactics <> y:49 var
+def 17772:17775 <> caar
+binder 17778:17778 <> A:50
+binder 17780:17780 <> B:51
+binder 17782:17782 <> C:52
+R17801:17803 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17797:17799 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17796:17796 istari.monad.tactics <> A:50 var
+R17800:17800 istari.monad.tactics <> B:51 var
+R17804:17804 istari.monad.tactics <> C:52 var
+binder 17792:17792 <> p:53
+R17811:17813 istari.monad.tactics <> car def
+R17816:17818 istari.monad.tactics <> car def
+R17820:17820 istari.monad.tactics <> p:53 var
+def 17836:17840 <> caaar
+binder 17843:17843 <> A:54
+binder 17845:17845 <> B:55
+binder 17847:17847 <> C:56
+binder 17849:17849 <> D:57
+R17872:17874 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17868:17870 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17864:17866 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17863:17863 istari.monad.tactics <> A:54 var
+R17867:17867 istari.monad.tactics <> B:55 var
+R17871:17871 istari.monad.tactics <> C:56 var
+R17875:17875 istari.monad.tactics <> D:57 var
+binder 17859:17859 <> p:58
+R17882:17884 istari.monad.tactics <> car def
+R17887:17889 istari.monad.tactics <> car def
+R17892:17894 istari.monad.tactics <> car def
+R17896:17896 istari.monad.tactics <> p:58 var
+def 17913:17917 <> cdaar
+binder 17920:17920 <> A:59
+binder 17922:17922 <> B:60
+binder 17924:17924 <> C:61
+binder 17926:17926 <> D:62
+R17949:17951 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17945:17947 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17941:17943 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17940:17940 istari.monad.tactics <> A:59 var
+R17944:17944 istari.monad.tactics <> B:60 var
+R17948:17948 istari.monad.tactics <> C:61 var
+R17952:17952 istari.monad.tactics <> D:62 var
+binder 17936:17936 <> p:63
+R17959:17961 istari.monad.tactics <> cdr def
+R17964:17966 istari.monad.tactics <> car def
+R17969:17971 istari.monad.tactics <> car def
+R17973:17973 istari.monad.tactics <> p:63 var
+def 17990:17993 <> cdar
+binder 17996:17996 <> A:64
+binder 17998:17998 <> B:65
+binder 18000:18000 <> C:66
+R18019:18021 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18015:18017 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18014:18014 istari.monad.tactics <> A:64 var
+R18018:18018 istari.monad.tactics <> B:65 var
+R18022:18022 istari.monad.tactics <> C:66 var
+binder 18010:18010 <> p:67
+R18029:18031 istari.monad.tactics <> cdr def
+R18034:18036 istari.monad.tactics <> car def
+R18038:18038 istari.monad.tactics <> p:67 var
+def 18054:18057 <> cadr
+binder 18060:18060 <> A:68
+binder 18062:18062 <> B:69
+binder 18064:18064 <> C:70
+R18079:18082 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18088:18088 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18078:18078 istari.monad.tactics <> A:68 var
+R18084:18086 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18083:18083 istari.monad.tactics <> B:69 var
+R18087:18087 istari.monad.tactics <> C:70 var
+binder 18074:18074 <> p:71
+R18095:18097 istari.monad.tactics <> car def
+R18100:18102 istari.monad.tactics <> cdr def
+R18104:18104 istari.monad.tactics <> p:71 var
+def 18120:18123 <> cddr
+binder 18126:18126 <> A:72
+binder 18128:18128 <> B:73
+binder 18130:18130 <> C:74
+R18145:18148 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18154:18154 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18144:18144 istari.monad.tactics <> A:72 var
+R18150:18152 Coq.Init.Datatypes <> ::type_scope:x_'*'_x not
+R18149:18149 istari.monad.tactics <> B:73 var
+R18153:18153 istari.monad.tactics <> C:74 var
+binder 18140:18140 <> p:75
+R18161:18163 istari.monad.tactics <> cdr def
+R18166:18168 istari.monad.tactics <> cdr def
+R18170:18170 istari.monad.tactics <> p:75 var
+def 18188:18193 <> tuple2
+binder 18196:18196 <> T:76
+binder 18207:18207 <> A:77
+binder 18209:18209 <> B:78
+R18233:18236 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18232:18232 istari.monad.tactics <> A:77 var
+R18238:18241 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18237:18237 istari.monad.tactics <> B:78 var
+R18242:18242 istari.monad.tactics <> T:76 var
+binder 18228:18228 <> f:79
+binder 18245:18245 <> x:80
+R18250:18250 istari.monad.tactics <> f:79 var
+R18261:18263 istari.monad.tactics <> cdr def
+R18265:18265 istari.monad.tactics <> x:80 var
+R18253:18255 istari.monad.tactics <> car def
+R18257:18257 istari.monad.tactics <> x:80 var
+def 18281:18286 <> tuple3
+binder 18289:18289 <> T:81
+binder 18300:18300 <> A:82
+binder 18302:18302 <> B:83
+binder 18304:18304 <> C:84
+R18328:18331 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18327:18327 istari.monad.tactics <> A:82 var
+R18333:18336 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18332:18332 istari.monad.tactics <> B:83 var
+R18338:18341 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18337:18337 istari.monad.tactics <> C:84 var
+R18342:18342 istari.monad.tactics <> T:81 var
+binder 18323:18323 <> f:85
+binder 18345:18345 <> x:86
+R18350:18350 istari.monad.tactics <> f:85 var
+R18371:18373 istari.monad.tactics <> cdr def
+R18375:18375 istari.monad.tactics <> x:86 var
+R18362:18365 istari.monad.tactics <> cdar def
+R18367:18367 istari.monad.tactics <> x:86 var
+R18353:18356 istari.monad.tactics <> caar def
+R18358:18358 istari.monad.tactics <> x:86 var
+def 18391:18396 <> tuple4
+binder 18399:18399 <> T:87
+binder 18410:18410 <> A:88
+binder 18412:18412 <> B:89
+binder 18414:18414 <> C:90
+binder 18416:18416 <> D:91
+R18440:18443 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18439:18439 istari.monad.tactics <> A:88 var
+R18445:18448 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18444:18444 istari.monad.tactics <> B:89 var
+R18450:18453 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18449:18449 istari.monad.tactics <> C:90 var
+R18455:18458 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18454:18454 istari.monad.tactics <> D:91 var
+R18459:18459 istari.monad.tactics <> T:87 var
+binder 18435:18435 <> f:92
+binder 18462:18462 <> x:93
+R18467:18467 istari.monad.tactics <> f:92 var
+R18499:18501 istari.monad.tactics <> cdr def
+R18503:18503 istari.monad.tactics <> x:93 var
+R18490:18493 istari.monad.tactics <> cdar def
+R18495:18495 istari.monad.tactics <> x:93 var
+R18480:18484 istari.monad.tactics <> cdaar def
+R18486:18486 istari.monad.tactics <> x:93 var
+R18470:18474 istari.monad.tactics <> caaar def
+R18476:18476 istari.monad.tactics <> x:93 var
+def 18519:18525 <> tuple22
+binder 18528:18528 <> T:94
+binder 18539:18539 <> A:95
+binder 18541:18541 <> B:96
+binder 18543:18543 <> C:97
+binder 18545:18545 <> D:98
+R18569:18572 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18568:18568 istari.monad.tactics <> A:95 var
+R18574:18577 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18573:18573 istari.monad.tactics <> B:96 var
+R18579:18582 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18578:18578 istari.monad.tactics <> C:97 var
+R18584:18587 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R18583:18583 istari.monad.tactics <> D:98 var
+R18588:18588 istari.monad.tactics <> T:94 var
+binder 18564:18564 <> f:99
+binder 18591:18591 <> x:100
+R18596:18596 istari.monad.tactics <> f:99 var
+R18626:18629 istari.monad.tactics <> cddr def
+R18631:18631 istari.monad.tactics <> x:100 var
+R18617:18620 istari.monad.tactics <> cadr def
+R18622:18622 istari.monad.tactics <> x:100 var
+R18608:18611 istari.monad.tactics <> cdar def
+R18613:18613 istari.monad.tactics <> x:100 var
+R18599:18602 istari.monad.tactics <> caar def
+R18604:18604 istari.monad.tactics <> x:100 var
+def 18648:18651 <> carp
+binder 18654:18654 <> P:101
+binder 18656:18656 <> Q:102
+R18672:18675 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18671:18671 istari.monad.tactics <> P:101 var
+R18676:18676 istari.monad.tactics <> Q:102 var
+binder 18667:18667 <> x:103
+R18681:18681 istari.monad.tactics <> P:101 var
+binder 18703:18703 <> p:104
+binder 18705:18705 <> q:105
+R18710:18710 istari.monad.tactics <> p:104 var
+binder 18703:18703 <> p:106
+binder 18705:18705 <> q:107
+R18710:18710 istari.monad.tactics <> p:106 var
+def 18735:18738 <> cdrp
+binder 18741:18741 <> P:108
+binder 18743:18743 <> Q:109
+R18759:18762 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18758:18758 istari.monad.tactics <> P:108 var
+R18763:18763 istari.monad.tactics <> Q:109 var
+binder 18754:18754 <> x:110
+R18768:18768 istari.monad.tactics <> Q:109 var
+binder 18790:18790 <> p:111
+binder 18792:18792 <> q:112
+R18797:18797 istari.monad.tactics <> q:112 var
+binder 18790:18790 <> p:113
+binder 18792:18792 <> q:114
+R18797:18797 istari.monad.tactics <> q:114 var
+def 18822:18826 <> cadrp
+binder 18829:18829 <> P:115
+binder 18831:18831 <> Q:116
+binder 18833:18833 <> R:117
+R18849:18852 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18848:18848 istari.monad.tactics <> P:115 var
+R18854:18857 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18853:18853 istari.monad.tactics <> Q:116 var
+R18858:18858 istari.monad.tactics <> R:117 var
+binder 18844:18844 <> x:118
+R18864:18867 istari.monad.tactics <> carp def
+R18870:18873 istari.monad.tactics <> cdrp def
+R18875:18875 istari.monad.tactics <> x:118 var
+def 18890:18894 <> cddrp
+binder 18897:18897 <> P:119
+binder 18899:18899 <> Q:120
+binder 18901:18901 <> R:121
+R18917:18920 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18916:18916 istari.monad.tactics <> P:119 var
+R18922:18925 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R18921:18921 istari.monad.tactics <> Q:120 var
+R18926:18926 istari.monad.tactics <> R:121 var
+binder 18912:18912 <> x:122
+R18932:18935 istari.monad.tactics <> cdrp def
+R18938:18941 istari.monad.tactics <> cdrp def
+R18943:18943 istari.monad.tactics <> x:122 var
+def 18960:18964 <> swapp
+binder 18967:18967 <> P:123
+binder 18969:18969 <> Q:124
+R18985:18988 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R18984:18984 istari.monad.tactics <> P:123 var
+R18989:18989 istari.monad.tactics <> Q:124 var
+binder 18980:18980 <> x:125
+R18996:18999 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R18995:18995 istari.monad.tactics <> Q:124 var
+R19000:19000 istari.monad.tactics <> P:123 var
+R19108:19111 istari.monad.tactics <> carp def
+not 19092:19092 <> ::tactics_scope:x_'andel'
+R19209:19212 istari.monad.tactics <> cdrp def
+not 19193:19193 <> ::tactics_scope:x_'ander'
+R19311:19314 istari.monad.tactics <> carp def
+R19317:19320 istari.monad.tactics <> cdrp def
+not 19294:19294 <> ::tactics_scope:x_'anderl'
+R19421:19424 istari.monad.tactics <> carp def
+R19427:19430 istari.monad.tactics <> cdrp def
+R19433:19436 istari.monad.tactics <> cdrp def
+not 19403:19403 <> ::tactics_scope:x_'anderrl'
+R19539:19542 istari.monad.tactics <> carp def
+R19545:19548 istari.monad.tactics <> cdrp def
+R19551:19554 istari.monad.tactics <> cdrp def
+R19557:19560 istari.monad.tactics <> cdrp def
+not 19520:19520 <> ::tactics_scope:x_'anderrrl'
+R19664:19667 istari.monad.tactics <> cdrp def
+R19670:19673 istari.monad.tactics <> cdrp def
+R19676:19679 istari.monad.tactics <> cdrp def
+R19682:19685 istari.monad.tactics <> cdrp def
+not 19645:19645 <> ::tactics_scope:x_'anderrrr'
+R19787:19791 istari.monad.tactics <> cddrp def
+not 19770:19770 <> ::tactics_scope:x_'anderr'
+R19891:19894 istari.monad.tactics <> cdrp def
+R19897:19901 istari.monad.tactics <> cddrp def
+not 19873:19873 <> ::tactics_scope:x_'anderrr'
+not 19984:19984 <> ::tactics_scope:x_'_#2'
+not 20079:20079 <> ::tactics_scope:x_'_#3'
+not 20176:20176 <> ::tactics_scope:x_'_#4'
+not 20275:20275 <> ::tactics_scope:x_'_#5'
+not 20376:20376 <> ::tactics_scope:x_'_#6'
+not 20479:20479 <> ::tactics_scope:x_'_#7'
+not 20584:20584 <> ::tactics_scope:x_'_#8'
+not 20691:20691 <> ::tactics_scope:x_'_#9'
+not 20800:20800 <> ::tactics_scope:x_'_#10'
+not 20912:20912 <> ::tactics_scope:x_'_#11'
+not 21026:21026 <> ::tactics_scope:x_'_#12'
+not 21142:21142 <> ::tactics_scope:x_'_#13'
+not 21260:21260 <> ::tactics_scope:x_'_#14'
+not 21380:21380 <> ::tactics_scope:x_'_#15'
+not 21502:21502 <> ::tactics_scope:x_'_#16'
+not 21626:21626 <> ::tactics_scope:x_'_#17'
+not 21752:21752 <> ::tactics_scope:x_'_#18'
+not 21880:21880 <> ::tactics_scope:x_'_#19'
+not 22010:22010 <> ::tactics_scope:x_'_#20'

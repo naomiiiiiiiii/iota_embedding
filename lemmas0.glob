@@ -1,0 +1,191 @@
+DIGEST 93659a7c9b4a16c2ca9d8716a3b16632
+Fistari.monad.lemmas0
+R15:30 Coq.Program.Equality <> <> lib
+R32:35 Coq.setoid_ring.Ring <> <> lib
+R37:39 Coq.micromega.Lia <> <> lib
+R41:45 Coq.omega.Omega <> <> lib
+R77:85 mathcomp.ssreflect.ssreflect <> <> lib
+R87:92 mathcomp.ssreflect.ssrfun <> <> lib
+R94:100 mathcomp.ssreflect.ssrbool <> <> lib
+R102:104 mathcomp.ssreflect.seq <> <> lib
+R106:111 mathcomp.ssreflect.eqtype <> <> lib
+R113:118 mathcomp.ssreflect.ssrnat <> <> lib
+prf 150:158 <> make_app1
+binder 160:160 <> T:1
+R166:168 mathcomp.ssreflect.seq <> seq syndef
+R170:170 istari.monad.lemmas0 <> T:1 var
+binder 163:163 <> L:2
+binder 173:173 <> x:3
+R176:176 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R181:184 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R178:179 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R177:177 istari.monad.lemmas0 <> x:3 var
+R180:180 istari.monad.lemmas0 <> L:2 var
+R190:193 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R185:187 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_']' not
+R189:189 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_']' not
+R188:188 istari.monad.lemmas0 <> x:3 var
+R194:194 istari.monad.lemmas0 <> L:2 var
+prf 217:225 <> make_app2
+binder 227:227 <> T:4
+R233:235 mathcomp.ssreflect.seq <> seq syndef
+R237:237 istari.monad.lemmas0 <> T:4 var
+binder 230:230 <> L:5
+binder 240:240 <> x:6
+binder 242:242 <> y:7
+R245:245 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R253:256 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R247:248 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R246:246 istari.monad.lemmas0 <> x:6 var
+R250:251 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R249:249 istari.monad.lemmas0 <> y:7 var
+R252:252 istari.monad.lemmas0 <> L:5 var
+R265:268 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R257:259 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R261:262 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R264:264 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R260:260 istari.monad.lemmas0 <> x:6 var
+R263:263 istari.monad.lemmas0 <> y:7 var
+R269:269 istari.monad.lemmas0 <> L:5 var
+prf 292:300 <> make_app3
+binder 302:302 <> T:8
+R308:310 mathcomp.ssreflect.seq <> seq syndef
+R312:312 istari.monad.lemmas0 <> T:8 var
+binder 305:305 <> L:9
+binder 315:315 <> x:10
+binder 317:317 <> y:11
+binder 319:319 <> z:12
+R322:322 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R333:336 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R324:325 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R323:323 istari.monad.lemmas0 <> x:10 var
+R327:328 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R326:326 istari.monad.lemmas0 <> y:11 var
+R330:331 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R329:329 istari.monad.lemmas0 <> z:12 var
+R332:332 istari.monad.lemmas0 <> L:9 var
+R348:351 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R337:339 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R341:342 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R344:345 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R347:347 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R340:340 istari.monad.lemmas0 <> x:10 var
+R343:343 istari.monad.lemmas0 <> y:11 var
+R346:346 istari.monad.lemmas0 <> z:12 var
+R352:352 istari.monad.lemmas0 <> L:9 var
+prf 375:383 <> make_app4
+binder 385:385 <> T:13
+R391:393 mathcomp.ssreflect.seq <> seq syndef
+R395:395 istari.monad.lemmas0 <> T:13 var
+binder 388:388 <> L:14
+binder 398:398 <> x:15
+binder 400:400 <> y:16
+binder 402:402 <> z:17
+binder 404:404 <> a:18
+R407:407 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R421:424 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R409:410 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R408:408 istari.monad.lemmas0 <> x:15 var
+R412:413 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R411:411 istari.monad.lemmas0 <> y:16 var
+R415:416 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R414:414 istari.monad.lemmas0 <> z:17 var
+R418:419 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R417:417 istari.monad.lemmas0 <> a:18 var
+R420:420 istari.monad.lemmas0 <> L:14 var
+R439:442 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R425:427 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R429:430 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R432:433 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R435:436 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R438:438 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R428:428 istari.monad.lemmas0 <> x:15 var
+R431:431 istari.monad.lemmas0 <> y:16 var
+R434:434 istari.monad.lemmas0 <> z:17 var
+R437:437 istari.monad.lemmas0 <> a:18 var
+R443:443 istari.monad.lemmas0 <> L:14 var
+prf 466:474 <> make_app5
+binder 476:476 <> T:19
+R482:484 mathcomp.ssreflect.seq <> seq syndef
+R486:486 istari.monad.lemmas0 <> T:19 var
+binder 479:479 <> L:20
+binder 489:489 <> x:21
+binder 491:491 <> y:22
+binder 493:493 <> z:23
+binder 495:495 <> a:24
+binder 497:497 <> b:25
+R500:500 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R517:520 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R502:503 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R501:501 istari.monad.lemmas0 <> x:21 var
+R505:506 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R504:504 istari.monad.lemmas0 <> y:22 var
+R508:509 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R507:507 istari.monad.lemmas0 <> z:23 var
+R511:512 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R510:510 istari.monad.lemmas0 <> a:24 var
+R514:515 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R513:513 istari.monad.lemmas0 <> b:25 var
+R516:516 istari.monad.lemmas0 <> L:20 var
+R538:541 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R521:523 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R525:526 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R528:529 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R531:532 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R534:535 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R537:537 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R524:524 istari.monad.lemmas0 <> x:21 var
+R527:527 istari.monad.lemmas0 <> y:22 var
+R530:530 istari.monad.lemmas0 <> z:23 var
+R533:533 istari.monad.lemmas0 <> a:24 var
+R536:536 istari.monad.lemmas0 <> b:25 var
+R542:542 istari.monad.lemmas0 <> L:20 var
+prf 565:573 <> make_app6
+binder 575:575 <> T:26
+R581:583 mathcomp.ssreflect.seq <> seq syndef
+R585:585 istari.monad.lemmas0 <> T:26 var
+binder 578:578 <> L:27
+binder 588:588 <> x:28
+binder 590:590 <> y:29
+binder 592:592 <> z:30
+binder 594:594 <> a:31
+binder 596:596 <> b:32
+binder 598:598 <> c:33
+R601:601 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R621:624 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R603:604 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R602:602 istari.monad.lemmas0 <> x:28 var
+R606:607 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R605:605 istari.monad.lemmas0 <> y:29 var
+R609:610 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R608:608 istari.monad.lemmas0 <> z:30 var
+R612:613 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R611:611 istari.monad.lemmas0 <> a:31 var
+R615:616 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R614:614 istari.monad.lemmas0 <> b:32 var
+R618:619 mathcomp.ssreflect.seq <> ::seq_scope:x_'::'_x not
+R617:617 istari.monad.lemmas0 <> c:33 var
+R620:620 istari.monad.lemmas0 <> L:27 var
+R645:648 mathcomp.ssreflect.seq <> ::seq_scope:x_'++'_x not
+R625:627 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R629:630 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R632:633 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R635:636 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R638:639 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R641:642 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R644:644 mathcomp.ssreflect.seq <> ::seq_scope:'['_'::'_x_';'_x_';'_'..'_';'_x_']' not
+R628:628 istari.monad.lemmas0 <> x:28 var
+R631:631 istari.monad.lemmas0 <> y:29 var
+R634:634 istari.monad.lemmas0 <> z:30 var
+R637:637 istari.monad.lemmas0 <> a:31 var
+R640:640 istari.monad.lemmas0 <> b:32 var
+R643:643 istari.monad.lemmas0 <> c:33 var
+R649:649 istari.monad.lemmas0 <> L:27 var
+prf 672:676 <> geq0c
+binder 678:678 <> n:34
+R683:686 mathcomp.ssreflect.ssrnat <> ::coq_nat_scope:x_'>='_x not
+R682:682 istari.monad.lemmas0 <> n:34 var
+R707:712 Coq.Arith.Compare_dec <> not_lt thm
+R707:712 Coq.Arith.Compare_dec <> not_lt thm
+R735:737 mathcomp.ssreflect.ssrnat <> ltP thm
+R777:785 Coq.Arith.Minus <> minus_n_O thm

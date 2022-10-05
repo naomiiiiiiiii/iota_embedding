@@ -52,9 +52,6 @@ Inductive of_m : context -> term -> term -> Type :=
 | of_m_triv: forall G, of_m G triv_m unittp_m.
 
 (*reduction*)
-
-
-(*weak head? reduction*)
 Inductive val: term -> Prop :=
 (*| val_var {i} : val (var i) *) (*can assume terms are closed*)
 | val_z : val z_m
@@ -80,7 +77,7 @@ Definition get M i := nth triv_m M i.
                           
 
 Definition store := seq term.             
-(*weak head reduction
+(*
  karl's reduce is nondeterministic*)
 Inductive reduce : (prod store term) -> (prod store term) -> Prop :=
 | reduce_ref {e M e' M'}: reduce (M, e) (M', e') ->

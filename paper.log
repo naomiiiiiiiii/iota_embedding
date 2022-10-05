@@ -1,0 +1,1001 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.6.15)  16 JUN 2021 22:00
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**paper.tex
+(./paper.tex
+LaTeX2e <2020-10-01> patch level 4
+L3 programming layer <2021-02-18>
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2020/04/10 v1.4m Standard LaTeX file (size option)
+)
+\c@part=\count179
+\c@section=\count180
+\c@subsection=\count181
+\c@subsubsection=\count182
+\c@paragraph=\count183
+\c@subparagraph=\count184
+\c@figure=\count185
+\c@table=\count186
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2020/08/01 v1.3d Input encoding file
+\inpenc@prehook=\toks15
+\inpenc@posthook=\toks16
+)
+(./packages.sty (/usr/local/texlive/2021/texmf-dist/tex/latex/was/upgreek.sty
+Package: upgreek 2003/02/12 v2.0 (WaS)
+Package upgreek Info: Using Euler Roman for upright Greek on input line 31.
+\symugrf@m=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `ugrf@m' in version `bold'
+(Font)                  U/eur/m/n --> U/eur/b/n on input line 38.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2020/03/06 v1.0d TeX engine tests
+))
+\Gm@cnth=\count187
+\Gm@cntv=\count188
+\c@Gm@tempcnt=\count189
+\Gm@bindingoffset=\dimen139
+\Gm@wd@mp=\dimen140
+\Gm@odd@mp=\dimen141
+\Gm@even@mp=\dimen142
+\Gm@layoutwidth=\dimen143
+\Gm@layoutheight=\dimen144
+\Gm@layouthoffset=\dimen145
+\Gm@layoutvoffset=\dimen146
+\Gm@dimlist=\toks18
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/doublestroke/dsfont.sty
+Package: dsfont 1995/08/01 v0.1 Double stroke roman fonts
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip49
+\enit@outerparindent=\dimen147
+\enit@toks=\toks19
+\enit@inbox=\box47
+\enit@count@id=\count190
+\enitdp@description=\count191
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/minted/minted.sty
+Package: minted 2017/07/19 v2.5 Yet another Pygments shim for LaTeX
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/fvextra/fvextra.sty
+Package: fvextra 2019/02/04 v1.4 fvextra - extensions and patches for fancyvrb
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count192
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2021/01/20 v3.7 verbatim text (tvz,hv)
+\FV@CodeLineNo=\count193
+\FV@InFile=\read2
+\FV@TabBox=\box48
+\c@FancyVerbLine=\count194
+\FV@StepNumber=\count195
+\FV@OutFile=\write3
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2005/11/02 line numbers on paragraphs v4.41
+\linenopenalty=\count196
+\output=\toks20
+\linenoprevgraf=\count197
+\linenumbersep=\dimen148
+\linenumberwidth=\dimen149
+\c@linenumber=\count198
+\c@pagewiselinenumber=\count199
+\c@LN@truepage=\count266
+\c@internallinenumber=\count267
+\c@internallinenumbers=\count268
+\quotelinenumbersep=\dimen150
+\bframerule=\dimen151
+\bframesep=\dimen152
+\bframebox=\box49
+LaTeX Info: Redefining \\ on input line 3056.
+)
+\c@FV@TrueTabGroupLevel=\count269
+\c@FV@TrueTabCounter=\count270
+\FV@TabBox@Group=\box50
+\FV@TmpLength=\skip50
+\c@FV@HighlightLinesStart=\count271
+\c@FV@HighlightLinesStop=\count272
+\FV@LoopCount=\count273
+\FV@NCharsBox=\box51
+\FV@BreakIndent=\dimen153
+\FV@BreakIndentNChars=\count274
+\FV@BreakSymbolSepLeft=\dimen154
+\FV@BreakSymbolSepLeftNChars=\count275
+\FV@BreakSymbolSepRight=\dimen155
+\FV@BreakSymbolSepRightNChars=\count276
+\FV@BreakSymbolIndentLeft=\dimen156
+\FV@BreakSymbolIndentLeftNChars=\count277
+\FV@BreakSymbolIndentRight=\dimen157
+\FV@BreakSymbolIndentRightNChars=\count278
+\c@FancyVerbLineBreakLast=\count279
+\FV@LineBox=\box52
+\FV@LineIndentBox=\box53
+\FV@LineWidth=\dimen158
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count280
+\calc@Bcount=\count281
+\calc@Adimen=\dimen159
+\calc@Bdimen=\dimen160
+\calc@Askip=\skip51
+\calc@Bskip=\skip52
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count282
+\calc@Cskip=\skip53
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/shellesc.sty
+Package: shellesc 2019/11/08 v1.0c unified shell escape interface for LaTeX
+Package shellesc Info: Restricted shell escape enabled on input line 77.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/ifplatform/ifplatform.sty
+Package: ifplatform 2017/10/13 v0.4a Testing for the operating system
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/catchfile/catchfile.sty
+Package: catchfile 2019/12/09 v1.8 Catch the contents of a file (HO)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+))
+(/usr/local/texlive/2021/texmf-dist/tex/generic/iftex/ifluatex.sty
+Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
+)
+
+Package ifplatform Warning: 
+    shell escape is disabled, so I can only detect \ifwindows.
+
+) (/usr/local/texlive/2021/texmf-dist/tex/generic/xstring/xstring.sty
+(/usr/local/texlive/2021/texmf-dist/tex/generic/xstring/xstring.tex
+\integerpart=\count283
+\decimalpart=\count284
+)
+Package: xstring 2019/02/06 v1.83 String manipulations (CT)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip54
+\fb@frw=\dimen161
+\fb@frh=\dimen162
+\FrameRule=\dimen163
+\FrameSep=\dimen164
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count285
+\float@exts=\toks21
+\float@box=\box54
+\@float@everytoks=\toks22
+\@floatcapt=\box55
+)
+\minted@appexistsfile=\read3
+\minted@bgbox=\box56
+\minted@code=\write4
+\c@minted@FancyVerbLineTemp=\count286
+\c@minted@pygmentizecounter=\count287
+\@float@every@listing=\toks23
+\c@listing=\count288
+)
+runsystem(mkdir -p _minted-paper)...disabled (restricted).
+
+
+
+./packages.sty:8: Package minted Error: You must invoke LaTeX with the -shell-e
+scape flag.
+
+See the minted package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.8 \RequirePackage
+                   {mathtools}
+Pass the -shell-escape flag to LaTeX. Refer to the minted.sty documentation for
+ more information.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2021/03/18 v1.25 mathematical typesetting tools
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/mathtools/mhsetup.sty
+Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2020/09/23 v2.17i AMS math features
+\@mathmargin=\skip55
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks24
+\ex@=\dimen165
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen166
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count289
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count290
+\leftroot@=\count291
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count292
+\DOTSCASE@=\count293
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box57
+\strutbox@=\box58
+\big@size=\dimen167
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count294
+\c@MaxMatrixCols=\count295
+\dotsspace@=\muskip16
+\c@parentequation=\count296
+\dspbrk@lvl=\count297
+\tag@help=\toks25
+\row@=\count298
+\column@=\count299
+\maxfields@=\count300
+\andhelp@=\toks26
+\eqnshift@=\dimen168
+\alignsep@=\dimen169
+\tagshift@=\dimen170
+\tagwidth@=\dimen171
+\totwidth@=\dimen172
+\lineht@=\dimen173
+\@envbody=\toks27
+\multlinegap=\skip56
+\multlinetaggap=\skip57
+\mathdisplay@stack=\toks28
+LaTeX Info: Redefining \[ on input line 2923.
+LaTeX Info: Redefining \] on input line 2924.
+)
+LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 130.
+\g_MT_multlinerow_int=\count301
+\l_MT_multwidth_dim=\dimen174
+\origjot=\skip58
+\l_MT_shortvdotswithinadjustabove_dim=\dimen175
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen176
+\l_MT_above_intertext_sep=\dimen177
+\l_MT_below_intertext_sep=\dimen178
+\l_MT_above_shortintertext_sep=\dimen179
+\l_MT_below_shortintertext_sep=\dimen180
+\xmathstrut@box=\box59
+\xmathstrut@dim=\dimen181
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip59
+\bibsep=\skip60
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count302
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 105.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen182
+\Gin@req@width=\dimen183
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup5
+\symAMSb=\mathgroup6
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip61
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.te
+x
+\pgfutil@everybye=\toks29
+\pgfutil@tempdima=\dimen184
+\pgfutil@tempdimb=\dimen185
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfutil-common-li
+sts.tex))
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box60
+) (/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2020/12/27 v3.1.8b (3.1.8b)
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks30
+\pgfkeys@temptoks=\toks31
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.c
+ode.tex
+\pgfkeys@tmptoks=\toks32
+))) (/usr/local/texlive/2021/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex
+\pgf@x=\dimen186
+\pgf@xa=\dimen187
+\pgf@xb=\dimen188
+\pgf@xc=\dimen189
+\pgf@y=\dimen190
+\pgf@ya=\dimen191
+\pgf@yb=\dimen192
+\pgf@yc=\dimen193
+\c@pgf@counta=\count303
+\c@pgf@countb=\count304
+\c@pgf@countc=\count305
+\c@pgf@countd=\count306
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen194
+\pgfmath@count=\count307
+\pgfmath@box=\box61
+\pgfmath@toks=\toks33
+\pgfmath@stack@operand=\toks34
+\pgfmath@stack@operation=\toks35
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.
+tex
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic
+.code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigo
+nometric.code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.rando
+m.code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.compa
+rison.code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.
+code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round
+.code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.
+code.tex)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integ
+erarithmetics.code.tex)))
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count308
+)))
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+Package: pgffor 2020/12/27 v3.1.8b (3.1.8b)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+\pgffor@iter=\dimen195
+\pgffor@skip=\dimen196
+\pgffor@stack=\toks36
+\pgffor@toks=\toks37
+)))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/qtree/qtree.sty
+Package: 2008/12/12 v.3.1bQtree: tree-drawing for linguistics
+Package: qtree 2008/12/12 v.3.1bQtree: tree-drawing for linguistics
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pict2e/pict2e.sty
+Package: pict2e 2020/09/30 v0.4b Improved picture commands (HjG,RN,JT)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pict2e/pict2e.cfg
+File: pict2e.cfg 2016/02/05 v0.1u pict2e configuration for teTeX/TeXLive
+)
+Package pict2e Info: Driver file: pdftex.def on input line 112.
+Package pict2e Info: Driver file for pict2e: p2e-pdftex.def on input line 114.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/pict2e/p2e-pdftex.def
+File: p2e-pdftex.def 2016/02/05 v0.1u Driver-dependant file (RN,HjG,JT)
+)
+\pIIe@GRAPH=\toks38
+\@arclen=\dimen197
+\@arcrad=\dimen198
+\pIIe@tempdima=\dimen199
+\pIIe@tempdimb=\dimen256
+\pIIe@tempdimc=\dimen257
+\pIIe@tempdimd=\dimen258
+\pIIe@tempdime=\dimen259
+\pIIe@tempdimf=\dimen260
+)
+\c@treecount=\count309
+\c@branchcount=\count310
+\parentbox=\box62
+\treebox=\box63
+\treeboxone=\box64
+\treeboxtwo=\box65
+\treeboxthree=\box66
+\treeboxfour=\box67
+\treeboxfive=\box68
+\treeboxsix=\box69
+\treeboxseven=\box70
+\treeboxeight=\box71
+\treeboxnine=\box72
+\treeboxten=\box73
+\treeboxeleven=\box74
+\treeboxtwelve=\box75
+\treeboxthirteen=\box76
+\treeboxfourteen=\box77
+\treeboxfifteen=\box78
+\treeboxsixteen=\box79
+\treeboxseventeen=\box80
+\treeboxeighteen=\box81
+\treeboxnineteen=\box82
+\treeboxtwenty=\box83
+\treeoffsetone=\skip62
+\treeoffsettwo=\skip63
+\treeoffsetthree=\skip64
+\treeoffsetfour=\skip65
+\treeoffsetfive=\skip66
+\treeoffsetsix=\skip67
+\treeoffsetseven=\skip68
+\treeoffseteight=\skip69
+\treeoffsetnine=\skip70
+\treeoffsetten=\skip71
+\treeoffseteleven=\skip72
+\treeoffsettwelve=\skip73
+\treeoffsetthirteen=\skip74
+\treeoffsetfourteen=\skip75
+\treeoffsetfifteen=\skip76
+\treeoffsetsixteen=\skip77
+\treeoffsetseventeen=\skip78
+\treeoffseteighteen=\skip79
+\treeoffsetnineteen=\skip80
+\treeoffsettwenty=\skip81
+\treeshiftone=\skip82
+\treeshifttwo=\skip83
+\treeshiftthree=\skip84
+\treeshiftfour=\skip85
+\treeshiftfive=\skip86
+\treeshiftsix=\skip87
+\treeshiftseven=\skip88
+\treeshifteight=\skip89
+\treeshiftnine=\skip90
+\treeshiftten=\skip91
+\treeshifteleven=\skip92
+\treeshifttwelve=\skip93
+\treeshiftthirteen=\skip94
+\treeshiftfourteen=\skip95
+\treeshiftfifteen=\skip96
+\treeshiftsixteen=\skip97
+\treeshiftseventeen=\skip98
+\treeshifteighteen=\skip99
+\treeshiftnineteen=\skip100
+\treeshifttwenty=\skip101
+\treewidthone=\skip102
+\treewidthtwo=\skip103
+\treewidththree=\skip104
+\treewidthfour=\skip105
+\treewidthfive=\skip106
+\treewidthsix=\skip107
+\treewidthseven=\skip108
+\treewidtheight=\skip109
+\treewidthnine=\skip110
+\treewidthten=\skip111
+\treewidtheleven=\skip112
+\treewidthtwelve=\skip113
+\treewidththirteen=\skip114
+\treewidthfourteen=\skip115
+\treewidthfifteen=\skip116
+\treewidthsixteen=\skip117
+\treewidthseventeen=\skip118
+\treewidtheighteen=\skip119
+\treewidthnineteen=\skip120
+\treewidthtwenty=\skip121
+\daughteroffsetone=\skip122
+\daughteroffsettwo=\skip123
+\daughteroffsetthree=\skip124
+\daughteroffsetfour=\skip125
+\branchwidthone=\skip126
+\branchwidthtwo=\skip127
+\branchwidththree=\skip128
+\branchwidthfour=\skip129
+\parentoffset=\skip130
+\treeoffset=\skip131
+\daughteroffset=\skip132
+\branchwidth=\skip133
+\parentwidth=\skip134
+\treewidth=\skip135
+\qta=\toks39
+\qtb=\toks40
+\nbranches=\count311
+\qroofx=\count312
+\qroofy=\count313
+\@qrscratchbox=\box84
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+runsystem(which pygmentize && touch paper.aex)...disabled (restricted).
+
+
+
+./paper.tex:8: Package minted Error: You must have `pygmentize' installed to us
+e this package.
+
+See the minted package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.8 \begin{document}
+                    
+Refer to the installation instructions in the minted documentation for more inf
+ormation.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count314
+\l__pdf_internal_box=\box85
+)
+(./paper.aux)
+\openout1 = `paper.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(92.14519pt, 430.00462pt, 92.14519pt)
+* v-part:(T,H,B)=(95.39737pt, 556.47656pt, 143.09605pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=469.75502pt
+* \textheight=620.43001pt
+* \oddsidemargin=0.0pt
+* \evensidemargin=0.0pt
+* \topmargin=0.0pt
+* \headheight=0.0pt
+* \headsep=0.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count315
+\scratchdimen=\dimen261
+\scratchbox=\box86
+\nofMPsegments=\count316
+\nofMParguments=\count317
+\everyMPshowfont=\toks41
+\MPscratchCnt=\count318
+\MPscratchDim=\dimen262
+\MPnumerator=\count319
+\makeMPintoPDFobject=\count320
+\everyMPtoPDFconversion=\toks42
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+LaTeX Font Info:    Trying to load font information for U+msa on input line 10.
+
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 10.
+
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+
+LaTeX Warning: No \author given.
+
+[1
+
+{/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+[2]
+Overfull \hbox (41.32185pt too wide) detected at line 118
+\OT1/cmr/m/n/10 ^^@\OML/cmm/m/it/10 ; m[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 W[
+] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 W[]; m[] \OT1/cmr/m/n/10 : \OML/cmm/m/i
+t/10 W[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 W[] \OMS/cmsy/m/n/10 ` \OML/cmm/
+m/it/10 ^^Ul:^^Ui:^^Um:\OMS/cmsy/m/n/10 ^^C \OT1/cmr/m/n/10 : \OMS/cmsy/m/n/10 
+8\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u \OT1/cmr/m/n/10 : \U/msa/m/n/10 B\OML/cmm/
+m/it/10 pw\OT1/cmr/m/n/10 )^^E(\OML/cmm/m/it/10 l \OT1/cmr/m/n/10 : \U/msa/m/n/
+10 B\U/msb/m/n/10 N\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 ^^E(\OML/
+cmm/m/it/10 i \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )^^E(\OML/cmm/m/
+it/10 m \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 i \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it
+/10 l[]\OT1/cmr/m/n/10 )(\OML/cmm/m/it/10 w[] i u l \OT1/cmr/m/n/10 = \OML/cmm/
+m/it/10 w[] i u l \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 type\OT1/cmr/m/n/10 )
+ []
+
+
+Overfull \hbox (32.43289pt too wide) detected at line 120
+\OT1/cmr/m/n/10 ^^@\OML/cmm/m/it/10 ; m[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 W[
+] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 W[]; m[] \OT1/cmr/m/n/10 : \OML/cmm/m/i
+t/10 W[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 W[]; u \OT1/cmr/m/n/10 : \U/msa/
+m/n/10 B\OML/cmm/m/it/10 pw \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 ^^Ul:^^Ui:^^Um:
+\OMS/cmsy/m/n/10 ^^C \OT1/cmr/m/n/10 : ^^E(\OML/cmm/m/it/10 l \OT1/cmr/m/n/10 :
+ \U/msa/m/n/10 B\U/msb/m/n/10 N\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :\OT1/cmr/m/n/
+10 ^^E(\OML/cmm/m/it/10 i \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )^^E
+(\OML/cmm/m/it/10 m \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 i \OMS/cmsy/m/n/10 ^^T \
+OML/cmm/m/it/10 l[]\OT1/cmr/m/n/10 )(\OML/cmm/m/it/10 w[] i u l \OT1/cmr/m/n/10
+ = \OML/cmm/m/it/10 w[] i u l \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 type\OT1/cmr/m
+/n/10 )
+ []
+
+[3]
+Overfull \hbox (44.5762pt too wide) detected at line 176
+\OT1/cmr/m/n/10 ^^@\OML/cmm/m/it/10 ; v \OT1/cmr/m/n/10 : \U/msa/m/n/10 B\OML/c
+mm/m/it/10 pw; l[] \OT1/cmr/m/n/10 : \U/msa/m/n/10 B\U/msb/m/n/10 N\OML/cmm/m/i
+t/10 ; i \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OML/cmm/m/it/10 ; m \OT1/cmr/m/n/10 
+: (\OML/cmm/m/it/10 i <[] l[] \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 true \OT1/cmr/
+m/n/10 : \OML/cmm/m/it/10 bool\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ` \OML/cmm/m/i
+t/10 ^^U[]:\OMS/cmsy/m/n/10 ^^C \OT1/cmr/m/n/10 : ^^E(\OML/cmm/m/it/10 m[] \OT1
+/cmr/m/n/10 : \OML/cmm/m/it/10 i <[] l[] \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 tru
+e \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 bool\OT1/cmr/m/n/10 )((\OML/cmm/m/it/10 w[
+] i v l[]\OT1/cmr/m/n/10 ) = (\OML/cmm/m/it/10 w[] i v l[]\OT1/cmr/m/n/10 ) : \
+OML/cmm/m/it/10 type\OT1/cmr/m/n/10 )  (\OMS/cmsy/m/n/10 ^^C^^C\OT1/cmr/m/n/10 
+)
+ []
+
+[4] [5] [6]
+Overfull \hbox (73.19687pt too wide) in paragraph at lines 345--355
+ [] 
+ []
+
+[7] [8]
+Overfull \hbox (36.0298pt too wide) detected at line 388
+\OT1/cmr/m/n/10 ^^@[] \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 c \OT1/cmr/m/n/10 : \
+OMS/cmsy/m/n/10 8\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u \OT1/cmr/m/n/10 : \OML/cmm
+/m/it/10 pw\OT1/cmr/m/n/10 )^^E(\OML/cmm/m/it/10 l \OT1/cmr/m/n/10 : \U/msb/m/n
+/10 N\OT1/cmr/m/n/10 )(\OML/cmm/m/it/10 W[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/
+10 U \OMS/cmsy/m/n/10 ! \OML/cmm/m/it/10 store\OT1/cmr/m/n/10 (\OML/cmm/m/it/10
+ U\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ! \U/msa/m/n/10 B B \OMS/cmsy/m/n/10 9\OT1
+/cmr/m/n/10 (\OML/cmm/m/it/10 u[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 pw\OT1/cmr
+/m/n/10 )^^F(\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n
+/10 )(\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 u[]; l[]\OMS/cmsy/m/n/10 i ^^T h\OML/c
+mm/m/it/10 u[]; l[]\OMS/cmsy/m/n/10 i ^^B \OML/cmm/m/it/10 store\OMS/cmsy/m/n/1
+0 h\OML/cmm/m/it/10 u[]; l[]\OMS/cmsy/m/n/10 i ^^B \OML/cmm/m/it/10 ^^\\OT1/cmr
+/m/n/10 @\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 u[]; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/
+m/n/10 )
+ []
+
+[9]
+Underfull \hbox (badness 10000) in paragraph at lines 470--473
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 481--483
+
+ []
+
+[10]
+Overfull \hbox (9.81985pt too wide) detected at line 555
+\OT1/cmr/m/n/10 ^^A\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 ^^@@\OML/cmm/m/it/10 W[];
+ u \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 pw \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 ^^
+Ul:^^Um:^^Us:return[]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 l; \OMS/cmsy/m/n/10 h\O
+ML/cmm/m/it/10 refl[]; s; move[] m \OT1/cmr/m/n/10 ([] \OML/cmm/m/it/10 W[]\OT1
+/cmr/m/n/10 )\OMS/cmsy/m/n/10 ii \OT1/cmr/m/n/10 : ^^E(\OML/cmm/m/it/10 l \OT1/
+cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 W[] \OMS/cmsy/m/n
+/10 ^^T \OML/cmm/m/it/10 U \OMS/cmsy/m/n/10 ! \OML/cmm/m/it/10 store\OT1/cmr/m/
+n/10 (\OML/cmm/m/it/10 U\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ! []
+ []
+
+[11]
+
+./paper.tex:586: LaTeX Error: Too deeply nested.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.586                          \item
+                                     $\Gamma' \vdash move_{\tau}\;m : \Pi(\_...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[12]
+Overfull \hbox (29.38754pt too wide) detected at line 634
+\OT1/cmr/m/n/10 ^^@[] \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 ^^U z[]:[]bind[] [][]
+ []^^Uz[]:[]return[]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 ^^Y[]z[]; \OMS/cmsy/m/n/
+10 h\OML/cmm/m/it/10 ^^Y[]z[] \OMS/cmsy/m/n/10 ^^N \OML/cmm/m/it/10 ^^Y[]z; ^^Y
+[]z[]; ^^Y[]z[]\OMS/cmsy/m/n/10 ii[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 z[] \OT1/
+cmr/m/n/10 := \OML/cmm/m/it/10 z[]\OT1/cmr/m/n/10 ][][][\OML/cmm/m/it/10 z \OT1
+/cmr/m/n/10 := \OML/cmm/m/it/10 z[]\OT1/cmr/m/n/10 ] : \OML/cmm/m/it/10 A \OMS/
+cmsy/m/n/10 ! \U/msa/m/n/10 B B \OML/cmm/m/it/10 B
+ []
+
+
+Overfull \hbox (17.99858pt too wide) detected at line 637
+\OT1/cmr/m/n/10 ^^@[]\OML/cmm/m/it/10 ; z[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+A \OMS/cmsy/m/n/10 ` []\OML/cmm/m/it/10 bind[] [][] []^^Uz[]:[]return[]\OMS/cms
+y/m/n/10 h\OML/cmm/m/it/10 ^^Y[]z[]; \OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 ^^Y[]z[
+] \OMS/cmsy/m/n/10 ^^N \OML/cmm/m/it/10 ^^Y[]z; ^^Y[]z[]; ^^Y[]z[]\OMS/cmsy/m/n
+/10 ii[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 z[] \OT1/cmr/m/n/10 := \OML/cmm/m/it/
+10 z[]\OT1/cmr/m/n/10 ][][][\OML/cmm/m/it/10 z \OT1/cmr/m/n/10 := \OML/cmm/m/it
+/10 z[]\OT1/cmr/m/n/10 ] : \U/msa/m/n/10 B B \OML/cmm/m/it/10 B
+ []
+
+[13]
+Overfull \hbox (47.7621pt too wide) detected at line 668
+\OT1/cmr/m/n/10 ^^E(\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/
+cmr/m/n/10 )\OML/cmm/m/it/10 V \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 V[] \OMS/c
+msy/m/n/10 ! \OML/cmm/m/it/10 store\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V[]\OT1/cm
+r/m/n/10 ) \OMS/cmsy/m/n/10 ! \U/msa/m/n/10 B B \OMS/cmsy/m/n/10 9\OT1/cmr/m/n/
+10 (\OML/cmm/m/it/10 v[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 pw\OT1/cmr/m/n/10 )
+^^F(\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )(\OM
+L/cmm/m/it/10 V[] \OMS/cmsy/m/n/10 ^^T h\OML/cmm/m/it/10 v[]; l[]\OMS/cmsy/m/n/
+10 i ^^B \OML/cmm/m/it/10 store\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 v[]; l[]\OMS/
+cmsy/m/n/10 i ^^B \OML/cmm/m/it/10 ^^\[]\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\OML
+/cmm/m/it/10 v; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/10 )
+ []
+
+[14] [15]
+Overfull \hbox (37.35342pt too wide) detected at line 764
+\OT1/cmr/m/n/10 ^^A\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 ^^@@\OML/cmm/m/it/10 W[];
+ u \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 pw; l \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\O
+ML/cmm/m/it/10 ; m \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 W[] \OMS/cmsy/m/n/10 ^^T 
+\OML/cmm/m/it/10 U; s \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 store\OT1/cmr/m/n/10 (
+\OML/cmm/m/it/10 U\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; v \OT1/cmr/m/n/10 : \U/ms
+a/m/n/10 B\OML/cmm/m/it/10 pw; l[] \OT1/cmr/m/n/10 : \U/msa/m/n/10 B\U/msb/m/n/
+10 N\OML/cmm/m/it/10 ; v[] \OT1/cmr/m/n/10 : [] \OMS/cmsy/m/n/10 ` []\OML/cmm/m
+/it/10 l[] \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 l[][] \U/msa/m/n/10 B \OT1/cmr/m/
+n/10 (\OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 v
+[]; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/10 ) : \OML/cmm/m/it/10 U[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 776--777
+
+ []
+
+[16]
+Overfull \hbox (18.07791pt too wide) detected at line 840
+\OT1/cmr/m/n/10 ^^@[]\OML/cmm/m/it/10 ; u[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+pw; l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OML/cmm/m/it/10 ; m[] \OT1/cmr/m/n/10
+ : \OML/cmm/m/it/10 U[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 U[]; i \OT1/cmr/m
+/n/10 : \U/msb/m/n/10 N \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 s \OT1/cmr/m/n/10 :
+ ^^E(\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )\OM
+L/cmm/m/it/10 :U \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 U[] \OMS/cmsy/m/n/10 ! \
+OT1/cmr/m/n/10 ^^E(\OML/cmm/m/it/10 i \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OT1/cmr
+/m/n/10 )[]\OML/cmm/m/it/10 u i \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 next u[]\OT1/
+cmr/m/n/10 )(\OML/cmm/m/it/10 next l[]\OT1/cmr/m/n/10 )[]
+ []
+
+
+Overfull \hbox (62.4147pt too wide) detected at line 844
+\OT1/cmr/m/n/10 ^^@[]\OML/cmm/m/it/10 ; u[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+pw; l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OML/cmm/m/it/10 ; m[] \OT1/cmr/m/n/10
+ : \OML/cmm/m/it/10 U[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 U[]; i \OT1/cmr/m
+/n/10 : \U/msb/m/n/10 N \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 s \OT1/cmr/m/n/10 :
+ \OMS/cmsy/m/n/10 8\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u[] \OT1/cmr/m/n/10 : \OML
+/cmm/m/it/10 pw\OT1/cmr/m/n/10 )^^E(\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 : \U/m
+sb/m/n/10 N\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :U \OMS/cmsy/m/n/10 ^^T \OML/cmm/m
+/it/10 U[] \OMS/cmsy/m/n/10 ! \OT1/cmr/m/n/10 ^^E(\OML/cmm/m/it/10 i \OT1/cmr/m
+/n/10 : \U/msb/m/n/10 N\OT1/cmr/m/n/10 )[]\OML/cmm/m/it/10 u i \OT1/cmr/m/n/10 
+(\OML/cmm/m/it/10 next u[]\OT1/cmr/m/n/10 )(\OML/cmm/m/it/10 next l[]\OT1/cmr/m
+/n/10 )[]
+ []
+
+[17]
+Overfull \hbox (8.34802pt too wide) detected at line 865
+\OT1/cmr/m/n/10 ^^@[]\OML/cmm/m/it/10 ; u[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+pw; l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N\OML/cmm/m/it/10 ; m[] \OT1/cmr/m/n/10
+ : \OML/cmm/m/it/10 U[] \OMS/cmsy/m/n/10 ^^T \OML/cmm/m/it/10 U[]; i \OT1/cmr/m
+/n/10 : \U/msb/m/n/10 N\OML/cmm/m/it/10 ; b \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+bool \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 next\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 
+move[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 m[] \OMS/cmsy/m/n/10 ^^N \OML/cmm/m/it/
+10 m[] \OMS/cmsy/m/n/10 ^^N \OML/cmm/m/it/10 m\OT1/cmr/m/n/10 )([] \OML/cmm/m/i
+t/10 W[]\OT1/cmr/m/n/10 )) : \U/msa/m/n/10 B\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^
+^\\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 u[]; l[]\OMS/cmsy/m/n/10 
+i\OT1/cmr/m/n/10 )
+ []
+
+
+Overfull \hbox (3.33575pt too wide) detected at line 904
+\OT1/cmr/m/n/10 ^^E(\OML/cmm/m/it/10 m[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 l <
+[] l \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 false \OT1/cmr/m/n/10 : \OML/cmm/m/it/1
+0 bool\OT1/cmr/m/n/10 )[][]\OML/cmm/m/it/10 ite \OT1/cmr/m/n/10 (\OML/cmm/m/it/
+10 l <[] l\OT1/cmr/m/n/10 ) (\OML/cmm/m/it/10 u l\OT1/cmr/m/n/10 ) \OML/cmm/m/i
+t/10 ^^Uv:^^Ul[]:x[] \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 next v\OT1/cmr/m/n/10 ) 
+(\OML/cmm/m/it/10 next l[]\OT1/cmr/m/n/10 ) = \U/msa/m/n/10 B\OT1/cmr/m/n/10 (\
+OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 v; l[]\O
+MS/cmsy/m/n/10 i\OT1/cmr/m/n/10 ) : \OML/cmm/m/it/10 type[]
+ []
+
+[18]
+Underfull \hbox (badness 10000) in paragraph at lines 913--915
+
+ []
+
+
+Overfull \hbox (66.47707pt too wide) detected at line 917
+\OT1/cmr/m/n/10 ^^@[] [] \OML/cmm/m/it/10 b \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+bool \OMS/cmsy/m/n/10 ` \OML/cmm/m/it/10 ^^U[]:\OMS/cmsy/m/n/10 ^^C \OT1/cmr/m/
+n/10 : ^^E(\OML/cmm/m/it/10 m[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 b \OT1/cmr/m
+/n/10 = \OML/cmm/m/it/10 false \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 bool\OT1/cmr/
+m/n/10 )[][]\OML/cmm/m/it/10 ite b \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u l\OT1/cm
+r/m/n/10 ) \OML/cmm/m/it/10 ^^Uv:^^Ul[]:x[] \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 n
+ext v\OT1/cmr/m/n/10 ) (\OML/cmm/m/it/10 next l[]\OT1/cmr/m/n/10 ) = \U/msa/m/n
+/10 B\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\O
+ML/cmm/m/it/10 v; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/10 ) : \OML/cmm/m/it/10 typ
+e[]
+ []
+
+
+Overfull \hbox (31.48805pt too wide) detected at line 921
+\OT1/cmr/m/n/10 ^^@[] [] \OML/cmm/m/it/10 b \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 
+bool; m[] \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 b \OT1/cmr/m/n/10 = \OML/cmm/m/it/
+10 false \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 bool \OMS/cmsy/m/n/10 ` ^^C \OT1/cm
+r/m/n/10 : []\OML/cmm/m/it/10 ite b \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u l\OT1/c
+mr/m/n/10 ) \OML/cmm/m/it/10 ^^Uv:^^Ul[]:x[] \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 
+next v\OT1/cmr/m/n/10 ) (\OML/cmm/m/it/10 next l[]\OT1/cmr/m/n/10 ) = \U/msa/m/
+n/10 B\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/10 @\OMS/cmsy/m/n/10 h\
+OML/cmm/m/it/10 v; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/10 ) : \OML/cmm/m/it/10 ty
+pe
+ []
+
+
+Overfull \hbox (60.27936pt too wide) detected at line 938
+\OT1/cmr/m/n/10 ^^@[]\OML/cmm/m/it/10 ; v \OT1/cmr/m/n/10 : \OML/cmm/m/it/10 pw
+; l[] \OT1/cmr/m/n/10 : \U/msb/m/n/10 N \OMS/cmsy/m/n/10 ` ^^C \OT1/cmr/m/n/10 
+: []\OML/cmm/m/it/10 v[] \OT1/cmr/m/n/10 = (\OML/cmm/m/it/10 next v\OT1/cmr/m/n
+/10 )[]\OML/cmm/m/it/10 l[] \OT1/cmr/m/n/10 = (\OML/cmm/m/it/10 next l[]\OT1/cm
+r/m/n/10 )[] \U/msa/m/n/10 B \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/
+10 @\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 v[]; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/1
+0 ) = \U/msa/m/n/10 B\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^\\OT1/cmr/m/n/10 @\OMS
+/cmsy/m/n/10 h\OML/cmm/m/it/10 v; l[]\OMS/cmsy/m/n/10 i\OT1/cmr/m/n/10 ) : \OML
+/cmm/m/it/10 type
+ []
+
+[19] [20] (./paper.aux) ) 
+Here is how much of TeX's memory you used:
+ 13670 strings out of 478994
+ 247288 string characters out of 5858184
+ 595068 words of memory out of 5000000
+ 30914 multiletter control sequences out of 15000+600000
+ 413326 words of font info for 65 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 100i,10n,102p,431b,491s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm
+-super/cm-super-ts1.enc}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmbx10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmbx12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmex10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmmi10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmmi12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi5.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmmi7.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmmi8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+17.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.
+pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb
+></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></
+usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></u
+sr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
+/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb><
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.p
+fb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb
+>
+Output written on paper.pdf (20 pages, 243877 bytes).
+PDF statistics:
+ 147 PDF objects out of 1000 (max. 8388607)
+ 104 compressed objects within 2 object streams
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
