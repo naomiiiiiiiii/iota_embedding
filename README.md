@@ -1,9 +1,8 @@
 # Mechanized Proofs of a Well-typed Store
-## Still under development
 
 This development is done under the mentorship of [Karl Crary](http://www.cs.cmu.edu/~crary/) (@kcrary).
 
-It embeds [Iota](https://github.com/misstaggart/monad_interpreter "Iota development") into a new computational logic designed for reasoning about imperative programs. This logic can be thought of as a purely functional programming language, and is referred to below as the target language. In this development, I also verify that well-typed terms in Iota translate to well-typed terms in the target language. 
+It embeds [Iota](https://github.com/misstaggart/monad_interpreter "Iota development") into [Istari](http://istarilogic.org), a new computational logic designed for reasoning about imperative programs. This logic can be thought of as a purely functional programming language, and is referred to below as the target language. In this development, I also verify that well-typed terms in Iota translate to well-typed terms in Istari. 
 
 At a higher level, these proofs show that our logic is sufficiently expressive to support easy reasoning about standard imperative programs.
 
@@ -14,6 +13,7 @@ Notable features of the embedding are:
 Files are, in order of importance:
 
 Quite important:
+- proofs_working: top level proof that my embedding of Iota terms in Istari is type preserving
 - proofs: proof of well-typedness and other crucial properties of the embedding
 - trans: translation of source terms to target terms
 - rules_src: model of Iota’s type-checker
@@ -30,5 +30,3 @@ Less important:
 - basic_types
 - lemmas0
 - tactics
-
-proofs_working is for the most unstable proofs (they may be changing as you read this!)
